@@ -1,9 +1,21 @@
-<div class="register-container">
-  <h2>Registrarse</h2>
-  <form (ngSubmit)="register()">
-    <input type="text" [(ngModel)]="nombre" name="nombre" placeholder="Nombre" required />
-    <input type="email" [(ngModel)]="email" name="email" placeholder="Email" required />
-    <input type="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required />
-    <button type="submit">Registrar</button>
-  </form>
+<div class="register-page">
+  <div class="register-left">
+    <img src="https://res.cloudinary.com/dxuk9bogw/image/upload/v1757488558/2YMJBJZ7ABFARCOAEINHGMPBQE_oauma2.avif" alt="Imagen lateral" />
+  </div>
+  <div class="register-form">
+    <form (ngSubmit)="register()">
+      <h2>Registro</h2>
+      <p>Crea tu cuenta para acceder a la comunidad</p>
+      <label>Nombre</label>
+      <input type="text" [(ngModel)]="nombre" name="nombre" required />
+      <label>Email</label>
+      <input type="email" [(ngModel)]="email" name="email" required />
+      <label>Contraseña</label>
+      <input type="password" [(ngModel)]="password" name="password" required />
+      <button type="submit">Registrarse</button>
+      <div class="register-options">
+        <a routerLink="/login">¿Ya tienes cuenta? Inicia sesión</a>
+      </div>
+    </form>
+  </div>
 </div>
