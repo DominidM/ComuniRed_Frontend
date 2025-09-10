@@ -1,0 +1,63 @@
+<div class="crud-tipo-reaccion-root">
+  <div class="crud-tipo-reaccion-header">
+    <h2>Gestión de Tipos de Reacción</h2>
+    <button class="btn-primary" (click)="openAddModal()">Nuevo Tipo</button>
+  </div>
+
+  <div *ngIf="tipos && tipos.length > 0; else noTipos">
+    <table class="crud-tipo-reaccion-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Icono</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let tipo of tipos">
+          <td>{{ tipo.id }}</td>
+          <td>{{ tipo.nombre }}</td>
+          <td>
+            <span *ngIf="tipo.icono">
+              <img *ngIf="isUrl(tipo.icono)" [src]="tipo.icono" class="reaccion-icon-img" alt="icono" />
+              <span *ngIf="!isUrl(tipo.icono)">{{ tipo.icono }}</span>
+            </span>
+            <span *ngIf="!tipo.icono">Sin icono</span>
+          </td>
+          <td>
+            <button class="btn-edit" (click)="openEditModal(tipo)">Editar</button>
+            <button class="btn-delete" (click)="deleteTipo(tipo)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noTipos>
+    <div class="crud-tipo-reaccion-empty">
+      No hay tipos de reacción registrados.
+    </div>
+  </ng-template>
+
+  <!-- Modal Formulario -->
+  <div class="crud-tipo-reaccion-modal" *ngIf="showModal">
+    <div class="crud-tipo-reaccion-modal-content">
+      <h3>{{ editingTipo ? 'Editar Tipo' : 'Nuevo Tipo' }}</h3>
+      <form (ngSubmit)="saveTipo()" #tipoForm="ngForm">
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" [(ngModel)]="tipoData.nombre" required maxlength="50" />
+        </div>
+        <div class="form-group">
+          <label for="icono">Icono (URL o nombre)</label>
+          <input id="icono" name="icono" [(ngModel)]="tipoData.icono" maxlength="100" />
+        </div>
+        <div class="crud-tipo-reaccion-modal-actions">
+          <button type="submit" class="btn-primary">Guardar</button>
+          <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

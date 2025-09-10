@@ -1,0 +1,142 @@
+.crud-estado-queja-root {
+  padding: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.crud-estado-queja-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.crud-estado-queja-header h2 {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #1e293b;
+}
+.btn-primary {
+  background: #1064ff;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 10px 24px;
+  font-size: 1em;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+.btn-primary:hover {
+  background: #003f9a;
+}
+.crud-estado-queja-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+.crud-estado-queja-table th, .crud-estado-queja-table td {
+  padding: 12px 18px;
+  text-align: left;
+  border-bottom: 1px solid #e7eaf3;
+}
+.crud-estado-queja-table th {
+  background: #f4f6fa;
+  color: #232e3c;
+  font-weight: 600;
+}
+.crud-estado-queja-table td {
+  color: #232e3c;
+  font-size: 1em;
+}
+.btn-edit, .btn-delete {
+  border: none;
+  border-radius: 7px;
+  padding: 7px 16px;
+  font-size: 0.95em;
+  margin-right: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.btn-edit {
+  background: #ffd600;
+  color: #232e3c;
+}
+.btn-edit:hover {
+  background: #ffe676;
+}
+.btn-delete {
+  background: #ff3d3d;
+  color: #fff;
+}
+.btn-delete:hover {
+  background: #d81b1b;
+}
+.crud-estado-queja-empty {
+  padding: 24px;
+  text-align: center;
+  color: #7e8ba3;
+  font-size: 1.1em;
+}
+.crud-estado-queja-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(30,41,59,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.crud-estado-queja-modal-content {
+  background: #fff;
+  padding: 32px 28px 24px 28px;
+  border-radius: 16px;
+  box-shadow: 0 4px 32px rgba(16,100,255,0.08);
+  min-width: 340px;
+}
+.crud-estado-queja-modal-content h3 {
+  margin-top: 0;
+  font-size: 1.2em;
+  margin-bottom: 18px;
+}
+.form-group {
+  margin-bottom: 18px;
+}
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #232e3c;
+}
+.form-group input {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 7px;
+  border: 1px solid #dde4ee;
+  font-size: 1em;
+  background: #f4f6fa;
+}
+.crud-estado-queja-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 14px;
+}
+.btn-cancel {
+  background: #e7eaf3;
+  color: #232e3c;
+  border: none;
+  border-radius: 7px;
+  padding: 9px 18px;
+  font-size: 1em;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+.btn-cancel:hover {
+  background: #c2c9d6;
+}

@@ -1,0 +1,52 @@
+<div class="dashboard-content">
+  <h1>Bienvenido, {{ userEmail }}</h1>
+  <p>Resumen de reportes y estado de la infraestructura pública en tu comunidad.</p>
+  <div class="dashboard-cards">
+    <div class="dashboard-card users">
+      <div class="card-title">Total Usuarios</div>
+      <div class="card-value">{{ stats.totalUsuarios }}</div>
+      <div class="card-sub">+{{ stats.crecimientoUsuarios }}% desde el mes pasado</div>
+    </div>
+    <div class="dashboard-card reports">
+      <div class="card-title">Reportes Enviados</div>
+      <div class="card-value">{{ stats.reportesEnviados }}</div>
+      <div class="card-sub">+{{ stats.crecimientoReportes }}% desde el mes pasado</div>
+    </div>
+    <div class="dashboard-card resueltos">
+      <div class="card-title">Reportes Resueltos</div>
+      <div class="card-value">{{ stats.reportesResueltos }}</div>
+      <div class="card-sub">+{{ stats.crecimientoResueltos }}% desde el mes pasado</div>
+    </div>
+    <div class="dashboard-card pendientes">
+      <div class="card-title">Reportes Pendientes</div>
+      <div class="card-value">{{ stats.reportesPendientes }}</div>
+      <div class="card-sub negative">-{{ stats.cambioPendientes }}% desde el mes pasado</div>
+    </div>
+  </div>
+  <div class="dashboard-graphs">
+    <div class="dashboard-graph">
+      <div>
+        <div class="graph-title">Tipos de infraestructura más reportados</div>
+        <div class="graph-placeholder">Gráfico de barras - Próximamente</div>
+      </div>
+    </div>
+    <div class="dashboard-graph">
+      <div>
+        <div class="graph-title">Evolución de reportes por mes</div>
+        <div class="graph-placeholder">Gráfico de líneas - Próximamente</div>
+      </div>
+    </div>
+    <div class="dashboard-graph">
+      <div>
+        <div class="graph-title">Barrios con más incidentes</div>
+        <div class="graph-placeholder">Gráfico circular - Próximamente</div>
+      </div>
+    </div>
+    <div class="dashboard-graph">
+      <div>
+        <div class="graph-title">Estado de los reportes</div>
+        <div class="graph-placeholder">Gráfico de área - Próximamente</div>
+      </div>
+    </div>
+  </div>
+</div>

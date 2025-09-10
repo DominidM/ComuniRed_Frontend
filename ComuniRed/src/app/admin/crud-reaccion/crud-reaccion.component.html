@@ -1,0 +1,79 @@
+<div class="crud-reaccion-root">
+  <div class="crud-reaccion-header">
+    <h2>Gestión de Reacciones</h2>
+    <button class="btn-primary" (click)="openAddModal()">Nueva Reacción</button>
+  </div>
+
+  <div *ngIf="reacciones && reacciones.length > 0; else noReacciones">
+    <table class="crud-reaccion-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Queja</th>
+          <th>Tipo</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reaccion of reacciones">
+          <td>{{ reaccion.id }}</td>
+          <td>{{ reaccion.usuario_nombre }}</td>
+          <td>{{ reaccion.queja_descripcion | slice:0:50 }}</td>
+          <td>
+            <span *ngIf="reaccion.tipo_icono">
+              <img *ngIf="isUrl(reaccion.tipo_icono)" [src]="reaccion.tipo_icono" class="reaccion-icon-img" alt="icono" />
+              <span *ngIf="!isUrl(reaccion.tipo_icono)">{{ reaccion.tipo_icono }}</span>
+            </span>
+            <span *ngIf="!reaccion.tipo_icono">{{ reaccion.tipo_nombre }}</span>
+          </td>
+          <td>{{ reaccion.fecha | date:'short' }}</td>
+          <td>
+            <button class="btn-edit" (click)="openEditModal(reaccion)">Editar</button>
+            <button class="btn-delete" (click)="deleteReaccion(reaccion)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noReacciones>
+    <div class="crud-reaccion-empty">
+      No hay reacciones registradas.
+    </div>
+  </ng-template>
+
+  <!-- Modal Formulario -->
+  <div class="crud-reaccion-modal" *ngIf="showModal">
+    <div class="crud-reaccion-modal-content">
+      <h3>{{ editingReaccion ? 'Editar Reacción' : 'Nueva Reacción' }}</h3>
+      <form (ngSubmit)="saveReaccion()" #reaccionForm="ngForm">
+        <div class="form-group">
+          <label for="usuario_id">Usuario</label>
+          <select id="usuario_id" name="usuario_id" [(ngModel)]="reaccionData.usuario_id" required>
+            <option *ngFor="let usuario of usuarios" [value]="usuario.id">{{ usuario.nombre }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="queja_id">Queja</label>
+          <select id="queja_id" name="queja_id" [(ngModel)]="reaccionData.queja_id" required>
+            <option *ngFor="let queja of quejas" [value]="queja.id">{{ queja.descripcion | slice:0:50 }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="tipo_reaccion_id">Tipo de Reacción</label>
+          <select id="tipo_reaccion_id" name="tipo_reaccion_id" [(ngModel)]="reaccionData.tipo_reaccion_id" required>
+            <option *ngFor="let tipo of tipos" [value]="tipo.id">
+              {{ tipo.nombre }} <span *ngIf="tipo.icono">({{ tipo.icono }})</span>
+            </option>
+          </select>
+        </div>
+        <div class="crud-reaccion-modal-actions">
+          <button type="submit" class="btn-primary">Guardar</button>
+          <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

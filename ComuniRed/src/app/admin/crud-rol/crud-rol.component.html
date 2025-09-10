@@ -1,0 +1,57 @@
+<div class="crud-rol-root">
+  <div class="crud-rol-header">
+    <h2>Gestión de Roles</h2>
+    <button class="btn-primary" (click)="openAddModal()">Nuevo Rol</button>
+  </div>
+
+  <div *ngIf="roles && roles.length > 0; else noRoles">
+    <table class="crud-rol-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let rol of roles">
+          <td>{{ rol.id }}</td>
+          <td>{{ rol.nombre }}</td>
+          <td>{{ rol.descripcion }}</td>
+          <td>
+            <button class="btn-edit" (click)="openEditModal(rol)">Editar</button>
+            <button class="btn-delete" (click)="deleteRol(rol)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noRoles>
+    <div class="crud-rol-empty">
+      No hay roles registrados.
+    </div>
+  </ng-template>
+
+  <!-- Modal Formulario -->
+  <div class="crud-rol-modal" *ngIf="showModal">
+    <div class="crud-rol-modal-content">
+      <h3>{{ editingRol ? 'Editar Rol' : 'Nuevo Rol' }}</h3>
+      <form (ngSubmit)="saveRol()" #rolForm="ngForm">
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" [(ngModel)]="rolData.nombre" required />
+        </div>
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <input id="descripcion" name="descripcion" [(ngModel)]="rolData.descripcion" />
+        </div>
+        <div class="crud-rol-modal-actions">
+          <button type="submit" class="btn-primary">Guardar</button>
+          <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+aside {
+  width: 220px;
+  background: #fff;
+  border-right: 1px solid #eee;
+  min-height: 100%;
+  padding: 16px 0;
+}
+mat-list-item {
+  cursor: pointer;
+}

@@ -1,0 +1,76 @@
+<div class="crud-asignacion-root">
+  <div class="crud-asignacion-header">
+    <h2>Gestión de Asignaciones de Quejas</h2>
+    <button class="btn-primary" (click)="openAddModal()">Nueva Asignación</button>
+  </div>
+
+  <div *ngIf="asignaciones && asignaciones.length > 0; else noAsignaciones">
+    <table class="crud-asignacion-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Queja</th>
+          <th>Soporte</th>
+          <th>Fecha de Asignación</th>
+          <th>Atendida</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let asignacion of asignaciones">
+          <td>{{ asignacion.id }}</td>
+          <td>{{ asignacion.queja_descripcion }}</td>
+          <td>{{ asignacion.soporte_nombre }}</td>
+          <td>{{ asignacion.fecha_asignacion | date:'short' }}</td>
+          <td>
+            <span [class.atendida]="asignacion.atendida" [class.no-atendida]="!asignacion.atendida">
+              {{ asignacion.atendida ? 'Sí' : 'No' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn-edit" (click)="openEditModal(asignacion)">Editar</button>
+            <button class="btn-delete" (click)="deleteAsignacion(asignacion)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noAsignaciones>
+    <div class="crud-asignacion-empty">
+      No hay asignaciones registradas.
+    </div>
+  </ng-template>
+
+  <!-- Modal Formulario -->
+  <div class="crud-asignacion-modal" *ngIf="showModal">
+    <div class="crud-asignacion-modal-content">
+      <h3>{{ editingAsignacion ? 'Editar Asignación' : 'Nueva Asignación' }}</h3>
+      <form (ngSubmit)="saveAsignacion()" #asignacionForm="ngForm">
+        <div class="form-group">
+          <label for="queja_id">Queja</label>
+          <select id="queja_id" name="queja_id" [(ngModel)]="asignacionData.queja_id" required>
+            <option *ngFor="let queja of quejas" [value]="queja.id">{{ queja.descripcion | slice:0:50 }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="soporte_id">Soporte</label>
+          <select id="soporte_id" name="soporte_id" [(ngModel)]="asignacionData.soporte_id" required>
+            <option *ngFor="let soporte of soportes" [value]="soporte.id">{{ soporte.nombre }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="atendida">¿Atendida?</label>
+          <select id="atendida" name="atendida" [(ngModel)]="asignacionData.atendida">
+            <option [value]="true">Sí</option>
+            <option [value]="false">No</option>
+          </select>
+        </div>
+        <div class="crud-asignacion-modal-actions">
+          <button type="submit" class="btn-primary">Guardar</button>
+          <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

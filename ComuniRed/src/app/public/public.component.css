@@ -1,0 +1,11 @@
+.public-layout {
+  display: flex;
+  flex-direction: row;
+  min-height: calc(100vh - 64px); /* Assuming navbar is 64px */
+}
+
+.main-content {
+  flex: 1;
+  padding: 32px;
+  background: #f5f6fa;
+}

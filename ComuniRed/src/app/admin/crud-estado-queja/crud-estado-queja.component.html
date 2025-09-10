@@ -1,0 +1,57 @@
+<div class="crud-estado-queja-root">
+  <div class="crud-estado-queja-header">
+    <h2>Gestión de Estados de Queja</h2>
+    <button class="btn-primary" (click)="openAddModal()">Nuevo Estado</button>
+  </div>
+
+  <div *ngIf="estados && estados.length > 0; else noEstados">
+    <table class="crud-estado-queja-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let estado of estados">
+          <td>{{ estado.id }}</td>
+          <td>{{ estado.nombre }}</td>
+          <td>{{ estado.descripcion }}</td>
+          <td>
+            <button class="btn-edit" (click)="openEditModal(estado)">Editar</button>
+            <button class="btn-delete" (click)="deleteEstado(estado)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noEstados>
+    <div class="crud-estado-queja-empty">
+      No hay estados registrados.
+    </div>
+  </ng-template>
+
+  <!-- Modal Formulario -->
+  <div class="crud-estado-queja-modal" *ngIf="showModal">
+    <div class="crud-estado-queja-modal-content">
+      <h3>{{ editingEstado ? 'Editar Estado' : 'Nuevo Estado' }}</h3>
+      <form (ngSubmit)="saveEstado()" #estadoForm="ngForm">
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" [(ngModel)]="estadoData.nombre" required maxlength="50" />
+        </div>
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <input id="descripcion" name="descripcion" [(ngModel)]="estadoData.descripcion" maxlength="255" />
+        </div>
+        <div class="crud-estado-queja-modal-actions">
+          <button type="submit" class="btn-primary">Guardar</button>
+          <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

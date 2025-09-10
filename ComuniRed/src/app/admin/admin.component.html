@@ -1,1 +1,66 @@
-<p>admin works!</p>
+<div class="admin-root">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-logo">ComuniRed</div>
+    <ul>
+      <li [routerLink]="['/admin/dashboard']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</li>
+      <li [routerLink]="['/admin/rol']" routerLinkActive="active">Gestión Roles</li>
+      <li [routerLink]="['/admin/usuario']" routerLinkActive="active">Gestión Usuarios</li>
+      <li [routerLink]="['/admin/estado-queja']" routerLinkActive="active">Gestión Estados Queja</li>
+      <li [routerLink]="['/admin/queja']" routerLinkActive="active">Gestión Quejas</li>
+      <li [routerLink]="['/admin/asignacion']" routerLinkActive="active">Gestión Asignaciones</li>
+      <li [routerLink]="['/admin/tipo-reaccion']" routerLinkActive="active">Gestión Tipos Reacción</li>
+      <li [routerLink]="['/admin/reaccion']" routerLinkActive="active">Gestión Reacciones</li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="admin-main">
+    <header class="admin-navbar">
+      <input class="admin-search" type="text" placeholder="Buscar en todo el sistema..." />
+      <div class="admin-user-info">
+        <span>{{ userEmail }}</span>
+        <button class="admin-logout" (click)="logout()">Cerrar Sesión</button>
+      </div>
+    </header>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <!-- Chatbot -->
+  <div class="chatbot-container">
+    <button class="chatbot-toggle" (click)="toggleChatbot()">
+      {{ chatbotOpen ? '×' : '💬' }}
+    </button>
+    <div class="chatbot-window" [class.open]="chatbotOpen">
+      <div class="chatbot-header">
+        <span>Asistente ComuniRed</span>
+        <button class="chatbot-close" (click)="closeChatbot()">×</button>
+      </div>
+      <div class="chatbot-messages" #chatMessagesDiv>
+        <div class="chat-message bot">
+          <div class="message-avatar">🤖</div>
+          <div class="message-content">
+            ¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?
+          </div>
+        </div>
+        <div *ngFor="let message of chatMessages" class="chat-message" [class.user]="message.isUser" [class.bot]="!message.isUser">
+          <div class="message-avatar">{{ message.isUser ? '👤' : '🤖' }}</div>
+          <div class="message-content">{{ message.content }}</div>
+        </div>
+      </div>
+      <div class="chatbot-input-area">
+        <input 
+          class="chatbot-input" 
+          type="text" 
+          placeholder="Escribe tu mensaje..."
+          [(ngModel)]="chatMessage"
+          (keyup.enter)="sendMessage()"
+          #chatInput
+        />
+        <button class="chatbot-send" (click)="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
