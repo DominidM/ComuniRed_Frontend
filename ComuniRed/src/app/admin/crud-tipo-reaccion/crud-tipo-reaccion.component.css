@@ -24,7 +24,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 32px;
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.95) 0%, rgba(190, 24, 93, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
@@ -70,7 +70,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: #fff;
   border: none;
   border-radius: 15px;

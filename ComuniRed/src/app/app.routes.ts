@@ -48,6 +48,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },
-  { path: 'soporte', component: SoporteComponent },
+  { 
+    path: 'soporte', 
+    component: SoporteComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];
