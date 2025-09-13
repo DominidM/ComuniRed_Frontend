@@ -1,0 +1,144 @@
+.reporte-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 1rem;
+  margin: 1rem auto;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  transition: transform 0.2s ease-in-out;
+}
+.reporte-card:hover {
+  transform: translateY(-3px);
+}
+
+.reporte-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.usuario-info h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+.usuario-info small {
+  color: #666;
+}
+
+.reporte-body h4 {
+  margin: 0.3rem 0;
+  font-size: 1.1rem;
+}
+
+.imagenes {
+  display: flex;
+  gap: 0.5rem;
+}
+.imagen-mini {
+  width: 60px;
+  height: 60px;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.imagen-mini:hover {
+  transform: scale(1.05);
+}
+
+.reporte-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.estado {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.btn-detalles {
+  background: #007bff;
+  border: none;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.btn-detalles:hover {
+  background: #0056b3;
+}
+
+/* Colores por estado */
+.estado-pendiente {
+  border-left: 5px solid #f39c12;
+}
+.estado-progreso {
+  border-left: 5px solid #3498db;
+}
+.estado-resuelto {
+  border-left: 5px solid #2ecc71;
+}
+.estado-default {
+  border-left: 5px solid #bdc3c7;
+}
+
+/* Modal de detalles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-contenido {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 500px;
+}
+.btn-cerrar {
+  margin-top: 1rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.btn-cerrar:hover {
+  background: #c0392b;
+}
+
+/* Imagen en grande */
+.modal-imagen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-imagen img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 1rem;
+}
