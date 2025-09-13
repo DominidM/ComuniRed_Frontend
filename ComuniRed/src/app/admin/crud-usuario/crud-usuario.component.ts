@@ -25,14 +25,8 @@ interface Rol {
   styleUrls: ['./crud-usuario.component.css']
 })
 export class CrudUsuarioComponent implements OnInit {
-  usuarios: Usuario[] = [
-    { id: 1, nombre: 'Franco', email: 'Acceso total al sistema', rol_id: 123, rol_nombre: 'Admin'},
-    { id: 2, nombre: 'Jeremy', email: 'Acceso total al sistema', rol_id: 321, rol_nombre: 'Admin'},
-    { id: 3, nombre: 'Axel', email: 'Acceso total al sistema', rol_id: 231, rol_nombre: 'Admin'},
-  ];
-  roles: Rol[] = [
-    { id: 1, nombre: 'Admin'}
-    ];
+  usuarios: Usuario[] = [];
+  roles: Rol[] = [];
   showModal = false;
   editingUsuario: Usuario | null = null;
   usuarioData: Partial<Usuario & { password?: string }> = {};

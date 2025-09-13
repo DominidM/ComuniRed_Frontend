@@ -1,12 +1,152 @@
 <div class="soporte-container">
+  <!-- Barra superior -->
+  <header class="soporte-header">
+    <div class="soporte-info">
+      <img [src]="soporte.avatar" alt="Avatar Soporte" class="avatar">
+      <div>
+        <h2>{{ soporte.nombre }}</h2>
+        <p>{{ soporte.rol }}</p>
+      </div>
+    </div>
+    <div class="acciones">
+      <button (click)="irConfiguracion()">⚙️ Configuración</button>
+      <button (click)="cerrarSesion()">🚪 Cerrar sesión</button>
+    </div>
+  </header>
 
-  <app-home></app-home>
+  <!-- Resumen -->
+  <section class="resumen">
+    <div class="card">
+      <h3>Total reportes</h3>
+      <p>{{ totalReportes }}</p>
+    </div>
+    <div class="card pendiente">
+      <h3>Pendientes</h3>
+      <p>{{ totalPendientes }}</p>
+    </div>
+    <div class="card progreso">
+      <h3>En progreso</h3>
+      <p>{{ totalEnProgreso }}</p>
+    </div>
+    <div class="card resuelto">
+      <h3>Resueltos</h3>
+      <p>{{ totalResueltos }}</p>
+    </div>
+  </section>
 
-  <app-report-stats [reportes]="reportes"></app-report-stats>
+  <!-- Filtros -->
+  <section class="filtros">
+    <input
+      type="text"
+      placeholder="Buscar reporte..."
+      [(ngModel)]="busqueda"
+      (input)="filtrarReportes()"
+    />
 
-  <app-report-filters [reportes]="reportesFiltrados"></app-report-filters>
+    <select [(ngModel)]="estadoSeleccionado" (change)="filtrarReportes()">
+      <option value="">Todos</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="en-progreso">En progreso</option>
+      <option value="resuelto">Resuelto</option>
+    </select>
 
+    <button (click)="ordenarPor('reciente')">Más recientes</button>
+    <button (click)="ordenarPor('votos')">Más votados</button>
+    <button (click)="mostrarSoloUrgentes()">Urgentes</button>
+  </section>
 
-  <app-map-reports [reportes]="reportes"></app-map-reports>
+  <!-- Lista de reportes -->
+  <section class="reportes">
+    <article
+      class="reporte-card"
+      *ngFor="let reporte of reportesFiltrados"
+      (click)="verDetalle(reporte)"
+    >
+      <header>
+        <img
+          [src]="reporte.usuarioAvatar || 'assets/user-placeholder.png'"
+          alt="avatar usuario"
+        />
+        <div>
+          <h4>{{ reporte.usuario }}</h4>
+          <span class="categoria">{{ reporte.categoria }}</span>
+          <span [ngClass]="getEstadoClase(reporte.estado)">{{ reporte.estado }}</span>
+        </div>
+      </header>
 
+      <h3>{{ reporte.titulo }}</h3>
+      <p>
+        {{ (reporte.descripcion || '').slice(0, 140) }}
+        <span *ngIf="(reporte.descripcion?.length || 0) > 140">...</span>
+      </p>
+
+      <div class="imagenes">
+        <img
+          *ngFor="let img of reporte.imagenes"
+          [src]="img"
+          alt="imagen del reporte"
+          (click)="ampliarImagen(img, $event)"
+        />
+      </div>
+
+      <footer>
+        <button (click)="reaccionar(reporte, 'like', $event)">
+          👍 {{ reporte.likes || 0 }}
+        </button>
+        <button (click)="reaccionar(reporte, 'helpful', $event)">
+          💡 Útil ({{ reporte.helpful || 0 }})
+        </button>
+        <button (click)="compartir(reporte, $event)">🔗 Compartir</button>
+        <button (click)="bloquearUsuario(reporte.usuario, $event)">🚫 Bloquear</button>
+      </footer>
+    </article>
+  </section>
+
+  <!-- Modal de detalle -->
+  <div class="modal" *ngIf="reporteSeleccionado">
+    <div class="modal-content">
+      <button class="close" (click)="reporteSeleccionado = null">✖</button>
+      <h2>{{ reporteSeleccionado.titulo }}</h2>
+      <p><strong>Usuario:</strong> {{ reporteSeleccionado.usuario }}</p>
+      <p><strong>Descripción:</strong> {{ reporteSeleccionado.descripcion }}</p>
+      <p><strong>Ubicación:</strong> {{ reporteSeleccionado.ubicacion }}</p>
+      <p><strong>Fecha:</strong> {{ reporteSeleccionado.fecha | date: 'fullDate' }}</p>
+
+      <div class="imagenes-detalle">
+        <img
+          *ngFor="let img of reporteSeleccionado.imagenes"
+          [src]="img"
+          alt="imagen del reporte"
+        />
+      </div>
+
+      <!-- Comentarios -->
+      <h3>Comentarios</h3>
+      <div class="comentarios">
+        <p *ngFor="let c of reporteSeleccionado.comentarios">
+          <strong>{{ c.autor }}:</strong> {{ c.texto }}
+          <span class="fecha">{{ c.fecha | date: 'short' }}</span>
+        </p>
+      </div>
+
+      <textarea
+        placeholder="Escribe un comentario..."
+        [(ngModel)]="nuevoComentario"
+      ></textarea>
+      <button (click)="agregarComentario()">Agregar comentario</button>
+
+      <!-- Acciones -->
+      <div class="acciones-detalle">
+        <button (click)="asignarAmi(reporteSeleccionado)">Asignar a mí</button>
+        <button (click)="marcarResuelto(reporteSeleccionado)">Marcar como resuelto</button>
+        <button (click)="exportarReporte(reporteSeleccionado)">Exportar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de imagen ampliada -->
+  <div class="modal imagen" *ngIf="imagenAmpliada" (click)="cerrarImagenAmpliada($event)">
+    <img [src]="imagenAmpliada" alt="Imagen ampliada" />
+    <button class="close" (click)="cerrarImagenAmpliada($event)">✖</button>
+  </div>
 </div>

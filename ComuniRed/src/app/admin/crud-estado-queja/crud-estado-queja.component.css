@@ -1,20 +1,20 @@
 :root {
-  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --secondary-gradient: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+  --primary-gradient: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+  --secondary-gradient: linear-gradient(135deg, #fbbf24 0%, #fb923c 100%);
   --success-gradient: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
   --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
   --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(255, 255, 255, 0.6);
-  --shadow-soft: 0 10px 40px rgba(99, 102, 241, 0.25);
-  --shadow-hover: 0 20px 50px rgba(99, 102, 241, 0.35);
+  --shadow-soft: 0 10px 40px rgba(245, 158, 11, 0.25);
+  --shadow-hover: 0 20px 50px rgba(245, 158, 11, 0.35);
 }
 
 .crud-estado-queja-root {
   padding: 40px;
   max-width: 1000px;
   margin: 0 auto;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #fffbeb 0%, #fffbeb 100%);
   min-height: 100vh;
   position: relative;
 }
@@ -24,12 +24,12 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 32px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(249, 115, 22, 0.95) 100%);
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
   padding: 24px 32px;
-  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 15px 35px rgba(245, 158, 11, 0.4);
   position: relative;
   overflow: hidden;
 }
@@ -70,7 +70,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
   color: #fff;
   border: none;
   border-radius: 15px;
@@ -79,7 +79,7 @@
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -103,7 +103,7 @@
 }
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.7);
+  box-shadow: 0 15px 40px rgba(245, 158, 11, 0.7);
 }
 
 .crud-estado-queja-table {
@@ -111,9 +111,9 @@
   border-collapse: collapse;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border: 2px solid rgba(99, 102, 241, 0.2);
+  border: 2px solid rgba(245, 158, 11, 0.2);
   border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 15px 35px rgba(245, 158, 11, 0.2);
   overflow: hidden;
   margin-top: 20px;
 }
@@ -121,7 +121,7 @@
 .crud-estado-queja-table th {
   padding: 18px 24px;
   text-align: left;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
   color: #fff;
   font-weight: 600;
   font-size: 1.1em;
@@ -136,13 +136,13 @@
   color: #1e293b;
   font-size: 1em;
   font-weight: 500;
-  border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.1);
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.8);
 }
 
 .crud-estado-queja-table tr:hover td {
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(245, 158, 11, 0.1);
   transform: scale(1.02);
   color: #0f172a;
 }
@@ -205,10 +205,10 @@
 .crud-estado-queja-modal-content {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border: 2px solid rgba(99, 102, 241, 0.3);
+  border: 2px solid rgba(245, 158, 11, 0.3);
   padding: 40px 36px 32px 36px;
   border-radius: 25px;
-  box-shadow: 0 25px 60px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 25px 60px rgba(245, 158, 11, 0.4);
   width: 450px;
   max-width: 90vw;
   animation: slideUp 0.3s ease;
@@ -219,7 +219,7 @@
   margin-top: 0;
   font-size: 1.5em;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -248,7 +248,7 @@
   max-width: 350px;
   padding: 12px 18px;
   border-radius: 12px;
-  border: 2px solid rgba(99, 102, 241, 0.2);
+  border: 2px solid rgba(245, 158, 11, 0.2);
   font-size: 1em;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
@@ -261,8 +261,8 @@
 }
 
 .form-group input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
   outline: none;
 }
 
@@ -312,36 +312,4 @@
     transform: translateY(0);
     opacity: 1;
   }
-}
-
-@keyframes slideInUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.crud-estado-queja-table tr {
-  animation: slideInUp 0.5s ease forwards;
-  opacity: 0;
-}
-
-.crud-estado-queja-table tr:nth-child(1) {
-  animation-delay: 0.1s;
-}
-.crud-estado-queja-table tr:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.crud-estado-queja-table tr:nth-child(3) {
-  animation-delay: 0.3s;
-}
-.crud-estado-queja-table tr:nth-child(4) {
-  animation-delay: 0.4s;
-}
-.crud-estado-queja-table tr:nth-child(5) {
-  animation-delay: 0.5s;
 }
