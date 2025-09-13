@@ -1,0 +1,27 @@
+<div class="filtros">
+  <input type="text" placeholder="Buscar reportes..." [(ngModel)]="busqueda" />
+
+  <label for="categoria">Categoría:</label>
+  <select id="categoria" [(ngModel)]="categoriaSeleccionada">
+    <option *ngFor="let cat of categorias">{{ cat }}</option>
+  </select>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="tipo === 'recientes'" (click)="setTipo('recientes')">
+      Más recientes
+    </button>
+    <button class="tab" [class.active]="tipo === 'votados'" (click)="setTipo('votados')">
+      Más votados
+    </button>
+    <button class="tab urgent" [class.active]="tipo === 'urgentes'" (click)="setTipo('urgentes')">
+      Urgentes
+    </button>
+  </div>
+</div>
+
+<div class="contenedor-reportes">
+  <app-report-card
+    *ngFor="let reporte of filtrarReportes()"
+    [reporte]="reporte">
+  </app-report-card>
+</div>
