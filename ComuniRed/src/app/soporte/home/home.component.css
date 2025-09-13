@@ -1,4 +1,5 @@
-.home-container {
+.home-container 
+{
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -9,7 +10,8 @@
   position: relative;
 }
 
-.perfil {
+.perfil
+{
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -17,20 +19,23 @@
   width: 100%;
 }
 
-.avatar {
+.avatar 
+{
   width: 50px;
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.nombre {
+.nombre 
+{
   font-weight: bold;
   font-size: 1rem;
-  flex-grow: 1; /* ocupa el espacio entre avatar y botón */
+  flex-grow: 1;
 }
 
-.perfil button {
+.perfil button 
+{
   background: #007bff;
   color: white;
   border: none;
@@ -40,14 +45,15 @@
   font-size: 1rem;
 }
 
-.perfil button:hover {
+.perfil button:hover 
+{
   background: #0056b3;
 }
 
-/* Menu desplegable */
-.menu {
+.menu 
+{
   position: absolute;
-  top: 60px; /* justo debajo del botón */
+  top: 60px;
   right: 0;
   background: white;
   border: 1px solid #ccc;
@@ -69,6 +75,7 @@
   width: 100%;
 }
 
-.menu button:hover {
+.menu button:hover 
+{
   background: #f0f0f0;
 }

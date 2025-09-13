@@ -9,19 +9,23 @@ import { Usuario } from '../soporte.component';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
+export class HomeComponent 
+{
   mostrarMenu = false;
 
-  usuario: Usuario = {
+  usuario: Usuario = 
+  {
     nombre: 'Carlos Ruiz',
     avatar: 'https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757493645/Poses-Perfil-Profesional-Hombresdic.-27-2022-3-819x1024_p76mzs.webp'
   };
 
-  toggleMenu() {
+  toggleMenu() 
+  {
     this.mostrarMenu = !this.mostrarMenu;
   }
 
-  salir() {
+  salir() 
+  {
     console.log('Usuario ha salido');
   }
 }

@@ -20,12 +20,10 @@ export class ReportFiltersComponent
   categorias: string[] = ['Todos', 'Alumbrado', 'Limpieza', 'Seguridad'];
   tipo: 'recientes' | 'votados' | 'urgentes' = 'recientes';
 
-  // 🔄 Cambiar pestaña
   setTipo(nuevoTipo: 'recientes' | 'votados' | 'urgentes') {
     this.tipo = nuevoTipo;
   }
 
-  // 🎯 Filtro principal
   filtrarReportes(): Reporte[] {
     let filtrados = [...this.reportes];
 
@@ -42,21 +40,20 @@ export class ReportFiltersComponent
       filtrados = filtrados.filter(r => r.categoria === this.categoriaSeleccionada);
     }
 
-    switch (this.tipo) {
+    switch (this.tipo) 
+    {
       case 'votados':
-
-      return filtrados.sort((a, b) => b.likes - a.likes);
+        return filtrados.sort((a, b) => b.reacciones.likes - a.reacciones.likes);
 
       case 'urgentes':
-
-      return filtrados
+        return filtrados
           .filter(r => r.estado.toLowerCase() === 'pendiente')
           .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
 
       case 'recientes':
       default:
-
-      return filtrados.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+        return filtrados.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
     }
+
   }
 }

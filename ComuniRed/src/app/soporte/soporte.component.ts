@@ -7,6 +7,16 @@ import { MapReportComponent } from './map-reports/map-report.component';
 import { HomeComponent } from './home/home.component'
 
 
+
+export interface Reacciones 
+{
+  likes: number;
+  helpful?: number;
+  love?: number;
+  wow?: number;
+  sad?: number;
+}
+
 export interface Usuario {
   nombre: string;
   avatar: string;
@@ -35,8 +45,7 @@ export interface Reporte {
   fecha: Date;
   ubicacion: string;
   imagenes: string[];
-  likes: number;
-  helpful: number;
+  reacciones: Reacciones;
   comentarios: Comentario[];
   historial: Historial[];
 }
@@ -46,7 +55,6 @@ export interface Reporte {
   standalone: true,
   imports: [
     CommonModule,
-    ReportCardComponent,
     ReportFiltersComponent,
     ReportStatsComponent,
     MapReportComponent,
@@ -55,13 +63,15 @@ export interface Reporte {
   templateUrl: './soporte.component.html',
   styleUrls: ['./soporte.component.css']
 })
-export class SoporteComponent implements OnInit {  // ✅ Implementa la interfaz
+export class SoporteComponent implements OnInit 
+{
 
-  reportes: Reporte[] = [];           // ✅ primero vacío
-  reportesFiltrados: Reporte[] = [];  // ✅ también vacío
+  reportes: Reporte[] = [];
+  reportesFiltrados: Reporte[] = [];
 
-  ngOnInit(): void {
-    this.reportes = REPORTES;                       // ✅ cargamos los datos
-    this.reportesFiltrados = [...this.reportes];    // ✅ copiamos para filtrar
+  ngOnInit(): void 
+  {
+    this.reportes = REPORTES;
+    this.reportesFiltrados = [...this.reportes];
   }
 }

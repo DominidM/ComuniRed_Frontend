@@ -1,4 +1,5 @@
-<div class="reporte-card" [ngClass]="getEstadoClase()">
+<div class="reporte-card" [ngClass]="getEstadoClase()" [class.expanded]="mostrarDetalles">
+
   <div class="reporte-header">
     <img [src]="reporte.usuarioAvatar" alt="avatar" class="avatar">
     <div class="usuario-info">
@@ -20,32 +21,46 @@
   <div class="reporte-footer">
     <span class="estado">{{ reporte.estado }}</span>
     <span class="fecha">{{ reporte.fecha | date:'short' }}</span>
+
+    <span class="reacciones">
+      👍 {{ reporte.reacciones.likes }}
+      ❤️ {{ reporte.reacciones.love || 0 }}
+      😮 {{ reporte.reacciones.wow || 0 }}
+      😢 {{ reporte.reacciones.sad || 0 }}
+      | Útil: {{ reporte.reacciones.helpful || 0 }}
+    </span>
+
     <button class="btn-detalles" (click)="abrirDetalles()">Ver detalles</button>
   </div>
+</div>
 
-  <!-- Modal de detalles -->
-  <div class="modal" *ngIf="mostrarDetalles">
-    <div class="modal-contenido">
-      <h3>{{ reporte.titulo }}</h3>
-      <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
-      <p><strong>Ubicación:</strong> {{ reporte.ubicacion }}</p>
-      <p><strong>Likes:</strong> {{ reporte.likes }} | <strong>Útil:</strong> {{ reporte.helpful }}</p>
+<div class="modal" *ngIf="mostrarDetalles">
+  <div class="modal-contenido">
+    <h3>{{ reporte.titulo }}</h3>
+    <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
+    <p><strong>Ubicación:</strong> {{ reporte.ubicacion }}</p>
 
-      <div class="historial">
-        <h4>Historial</h4>
-        <ul>
-          <li *ngFor="let h of reporte.historial">
-            {{ h.accion }} - <small>{{ h.fecha | date:'short' }}</small>
-          </li>
-        </ul>
-      </div>
+    <p><strong>Reacciones:</strong>
+      👍 {{ reporte.reacciones.likes }}
+      ❤️ {{ reporte.reacciones.love || 0 }}
+      😮 {{ reporte.reacciones.wow || 0 }}
+      😢 {{ reporte.reacciones.sad || 0 }}
+      | Útil: {{ reporte.reacciones.helpful || 0 }}
+    </p>
 
-      <button class="btn-cerrar" (click)="cerrarDetalles()">Cerrar</button>
+    <div class="historial">
+      <h4>Historial</h4>
+      <ul>
+        <li *ngFor="let h of reporte.historial">
+          {{ h.accion }} - <small>{{ h.fecha | date:'short' }}</small>
+        </li>
+      </ul>
     </div>
-  </div>
 
-  <!-- Modal de imagen grande -->
-  <div class="modal-imagen" *ngIf="imagenSeleccionada" (click)="cerrarImagen()">
-    <img [src]="imagenSeleccionada" alt="imagen ampliada">
+    <button class="btn-cerrar" (click)="cerrarDetalles()">Cerrar</button>
   </div>
+</div>
+
+<div class="modal-imagen" *ngIf="imagenSeleccionada" (click)="cerrarImagen()">
+  <img [src]="imagenSeleccionada" alt="imagen ampliada">
 </div>

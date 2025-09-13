@@ -13,16 +13,16 @@ export class MapReportComponent implements AfterViewInit, OnChanges {
   private map!: L.Map;
   private markers: L.Marker[] = [];
 
-  // Limites aproximados de Lima
   private limaBounds: L.LatLngBoundsExpression = [
-    [-12.1, -77.2], // suroeste
-    [-11.9, -76.9]  // noreste
+    [-12.1, -77.2],
+    [-11.9, -76.9]
   ];
 
-  ngAfterViewInit(): void {
+  ngAfterViewInit(): void 
+  {
     this.map = L.map('mapa', {
-      maxBounds: this.limaBounds,       // 🔹 Limita el mapa a Lima
-      maxBoundsViscosity: 1.0,          // 🔹 No permite arrastrar fuera de los límites
+      maxBounds: this.limaBounds,   
+      maxBoundsViscosity: 1.0,
       minZoom: 11,
       maxZoom: 16
     }).setView([-12.0464, -77.0428], 13);
@@ -34,19 +34,23 @@ export class MapReportComponent implements AfterViewInit, OnChanges {
     this.agregarMarcadores();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['reportes'] && this.map) {
+  ngOnChanges(changes: SimpleChanges): void 
+  {
+    if (changes['reportes'] && this.map) 
+    {
       this.agregarMarcadores();
     }
   }
 
-  private agregarMarcadores() {
+  private agregarMarcadores() 
+  {
     this.markers.forEach(m => m.remove());
     this.markers = [];
 
     this.reportes.forEach(r => {
       const coords = this.obtenerCoordenadas(r.ubicacion);
-      if (coords) {
+      if (coords) 
+        {
         const marker = L.marker(coords, { icon: this.iconoRojo() }).addTo(this.map);
         marker.bindPopup(`<b>${r.titulo}</b><br>${r.descripcion}`);
         this.markers.push(marker);
@@ -54,10 +58,10 @@ export class MapReportComponent implements AfterViewInit, OnChanges {
     });
   }
 
-  private obtenerCoordenadas(direccion: string): [number, number] | null {
-    // Coordenadas aleatorias **solo dentro de Lima**
-    const lat = -12.0464 + (Math.random() - 0.5) * 0.2;   // +-0.1 grados
-    const lng = -77.0428 + (Math.random() - 0.5) * 0.3;   // +-0.15 grados
+  private obtenerCoordenadas(direccion: string): [number, number] | null 
+  {
+    const lat = -12.0464 + (Math.random() - 0.5) * 0.2;
+    const lng = -77.0428 + (Math.random() - 0.5) * 0.3;
     return [lat, lng];
   }
 

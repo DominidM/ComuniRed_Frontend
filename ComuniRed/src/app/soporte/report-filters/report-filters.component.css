@@ -73,11 +73,11 @@
 }
 
 .tab.urgent.active {
-  background: #dc3545; /* Rojo para urgentes */
+  background: #dc3545;
   box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
 }
 
-/* Contenedor de reportes */
+
 .contenedor-reportes {
   display: grid;
   grid-template-columns: 1fr;
