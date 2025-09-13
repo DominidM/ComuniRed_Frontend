@@ -18,7 +18,9 @@ interface Rol {
 export class CrudRolComponent {
   roles: Rol[] = [
     { id: 1, nombre: 'Administrador', descripcion: 'Acceso total al sistema' },
-    { id: 2, nombre: 'Usuario', descripcion: 'Acceso limitado' }
+    { id: 2, nombre: 'Usuario', descripcion: 'Acceso limitado' },
+    { id: 3, nombre: 'Soporte', descripcion: 'Acceso ilimitado' },
+
   ];
 
   showModal = false;
