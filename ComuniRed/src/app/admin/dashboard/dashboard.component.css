@@ -1,10 +1,8 @@
 .dashboard-content {
-  padding: 24px 16px 16px 16px;
-  max-width: 1200px;
+  padding: 1px 16px 16px 16px;
+  max-width: 1600px;
   margin: 0 auto;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #f8fafc 0%, #f8fafc 100%);
   overflow-y: auto;
   max-height: calc(100vh - 100px);
   scroll-behavior: smooth;
@@ -33,7 +31,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 12px;
+  margin-bottom: 2px;
   letter-spacing: -0.02em;
 }
 
