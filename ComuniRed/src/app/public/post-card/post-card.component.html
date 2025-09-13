@@ -1,1 +1,28 @@
-<p>post-card works!</p>
+<mat-card class="card">
+  <div class="card-header">
+    <img class="user-avatar" [src]="getAvatarUrl(post.author)" alt="Avatar"/>
+    <div class="card-header-text">
+      <span class="author">{{ post.author }}</span>
+      <span class="date">{{ post.date }}</span>
+    </div>
+    <button mat-icon-button class="menu-btn"><mat-icon>more_vert</mat-icon></button>
+  </div>
+  <mat-card-content class="card-content">
+    <p>{{ post.content }}</p>
+    <!-- Cuadro de imagen tipo LinkedIn -->
+    <div class="post-image-box" *ngIf="post.imageUrl">
+      <img [src]="post.imageUrl" alt="Imagen" class="post-img"/>
+    </div>
+  </mat-card-content>
+  <mat-card-actions class="card-actions">
+    <button mat-button [class.liked]="post.liked" (click)="toggleLike()">
+      <mat-icon>{{ post.liked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon> Me gusta
+      <span *ngIf="post.likes > 0">({{ post.likes }})</span>
+    </button>
+    <button mat-button (click)="toggleComments()">
+      <mat-icon>comment</mat-icon> Comentar
+      <span *ngIf="post.comments.length > 0">({{ post.comments.length }})</span>
+    </button>
+  </mat-card-actions>
+  <app-comment-list *ngIf="post.showComments" [comments]="post.comments"></app-comment-list>
+</mat-card>

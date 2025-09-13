@@ -1,0 +1,80 @@
+.card {
+  margin-bottom: 28px;
+  border-radius: 16px;
+  box-shadow: 0 1px 8px rgba(80,80,80,0.07);
+  background: #fff;
+  padding-bottom: 2px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 18px 0 18px;
+}
+
+.user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f3f3f6;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.card-header-text {
+  flex: 1;
+}
+
+.author {
+  font-weight: 600;
+  font-size: 1.08em;
+  color: #183a5c;
+}
+.date {
+  display: block;
+  font-size: 0.93em;
+  color: #9098a7;
+}
+
+.menu-btn {
+  margin-left: auto;
+}
+
+.card-content {
+  padding: 8px 18px 0 18px;
+}
+
+.post-image-box {
+  margin-top: 12px;
+  margin-bottom: 6px;
+  border-radius: 12px;
+  background: #f6f7fa;
+  overflow: hidden;
+  box-shadow: 0 0.5px 7px rgba(100,100,120,0.06);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.post-img {
+  max-width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(80,85,90,0.03);
+}
+
+.card-actions {
+  padding: 0 18px 12px 18px;
+  display: flex;
+  gap: 10px;
+}
+
+.card-actions button {
+  color: #2766c4;
+  font-weight: 500;
+}
+.card-actions .liked {
+  color: #0a6aee;
+}

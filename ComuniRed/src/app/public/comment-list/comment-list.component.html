@@ -1,1 +1,14 @@
-<p>comment-list works!</p>
+<div class="comments-section">
+  <div *ngFor="let comment of comments" class="comment">
+    <img class="comment-avatar" [src]="getAvatarUrl(comment.author)" alt="Avatar"/>
+    <div>
+      <span class="comment-author">{{ comment.author }}</span>
+      <span class="comment-date">{{ comment.date }}</span>
+      <p class="comment-content">{{ comment.content }}</p>
+    </div>
+  </div>
+  <mat-form-field style="width: 100%;">
+    <input matInput [(ngModel)]="newComment" placeholder="Escribe un comentario...">
+  </mat-form-field>
+  <button mat-stroked-button color="primary" (click)="addComment()">Comentar</button>
+</div>

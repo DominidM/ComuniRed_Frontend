@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { MatListModule } from '@angular/material/list';
+import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [MatListModule, MatIconModule],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
