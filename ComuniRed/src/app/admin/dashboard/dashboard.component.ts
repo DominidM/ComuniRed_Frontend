@@ -1,73 +1,81 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
-// import { DashboardService } from '../../services/dashboard.service';
+import { Component, type OnInit, Input } from "@angular/core"
+import { CommonModule } from "@angular/common"
 
 @Component({
-  selector: 'app-dashboard',
+  selector: "app-dashboard",
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  templateUrl: "./dashboard.component.html",
+  styleUrls: ["./dashboard.component.css"],
 })
 export class DashboardComponent implements OnInit {
-  @Input() userEmail: string = '';
+  @Input() userEmail = ""
 
-  // Datos principales del sistema de reportes comunitarios
   stats = {
-    totalUsuarios: 0,
-    reportesEnviados: 0,
-    reportesResueltos: 0,
-    reportesPendientes: 0,
-    crecimientoUsuarios: 0,
-    crecimientoReportes: 0,
-    crecimientoResueltos: 0,
-    cambioPendientes: 0
-  };
+    totalUsuarios: 250,
+    reportesEnviados: 320,
+    reportesResueltos: 220,
+    reportesPendientes: 100,
+    crecimientoUsuarios: 2.8,
+    crecimientoReportes: 4.1,
+    crecimientoResueltos: 3.5,
+    cambioPendientes: 1.8,
+  }
 
-  // Datos para gráficos
-  infraMasReportada: any[] = [];         // Tipos de infraestructuras más reportadas
-  evolucionReportes: any[] = [];         // Evolución de reportes por mes
-  barriosMasIncidentes: any[] = [];      // Barrios con más incidentes
-  estadoReportes: any[] = [];            // Estado (resueltos/pendientes)
+  // Datos para gráficos con información realista
+  infraMasReportada = [
+    { tipo: "Alumbrado Público", cantidad: 85 },
+    { tipo: "Pavimentación", cantidad: 72 },
+    { tipo: "Alcantarillado", cantidad: 58 },
+    { tipo: "Parques", cantidad: 43 },
+    { tipo: "Señalización", cantidad: 31 },
+  ]
 
-  // constructor(private dashboardService: DashboardService) {}
+  evolucionReportes = [
+    { mes: "Ene", cantidad: 45 },
+    { mes: "Feb", cantidad: 52 },
+    { mes: "Mar", cantidad: 48 },
+    { mes: "Abr", cantidad: 61 },
+    { mes: "May", cantidad: 58 },
+    { mes: "Jun", cantidad: 67 },
+    { mes: "Jul", cantidad: 54 },
+    { mes: "Ago", cantidad: 73 },
+    { mes: "Sep", cantidad: 69 },
+    { mes: "Oct", cantidad: 78 },
+  ]
+
+  barriosMasIncidentes = [
+    { barrio: "Centro", porcentaje: 40, cantidad: 128 },
+    { barrio: "Norte", porcentaje: 30, cantidad: 96 },
+    { barrio: "Sur", porcentaje: 20, cantidad: 64 },
+    { barrio: "Oriente", porcentaje: 10, cantidad: 32 },
+  ]
+
+  estadoReportes = [
+    { mes: "Ene", resueltos: 28, pendientes: 17 },
+    { mes: "Feb", resueltos: 35, pendientes: 17 },
+    { mes: "Mar", resueltos: 31, pendientes: 17 },
+    { mes: "Abr", resueltos: 42, pendientes: 19 },
+    { mes: "May", resueltos: 38, pendientes: 20 },
+    { mes: "Jun", resueltos: 45, pendientes: 22 },
+    { mes: "Jul", resueltos: 36, pendientes: 18 },
+    { mes: "Ago", resueltos: 51, pendientes: 22 },
+    { mes: "Sep", resueltos: 47, pendientes: 22 },
+    { mes: "Oct", cantidad: 56, pendientes: 22 },
+  ]
+
   constructor() {}
 
   ngOnInit(): void {
-    this.loadStats();
-    this.loadGraphs();
+    this.loadStats()
+    this.loadGraphs()
   }
 
   loadStats() {
-    // Ejemplo con servicio real:
-    // this.dashboardService.getStats().subscribe(data => {
-    //   this.stats = data;
-    // });
-    // Demo: datos simulados
-    this.stats = {
-      totalUsuarios: 250,
-      reportesEnviados: 320,
-      reportesResueltos: 220,
-      reportesPendientes: 100,
-      crecimientoUsuarios: 2.8,
-      crecimientoReportes: 4.1,
-      crecimientoResueltos: 3.5,
-      cambioPendientes: -1.8
-    };
+    // Los datos ya están definidos arriba
   }
 
   loadGraphs() {
-    // Ejemplo con servicio real:
-    // this.dashboardService.getGraphs().subscribe(data => {
-    //   this.infraMasReportada = data.infraMasReportada;
-    //   this.evolucionReportes = data.evolucionReportes;
-    //   this.barriosMasIncidentes = data.barriosMasIncidentes;
-    //   this.estadoReportes = data.estadoReportes;
-    // });
-    // Demo: datos simulados
-    this.infraMasReportada = [];
-    this.evolucionReportes = [];
-    this.barriosMasIncidentes = [];
-    this.estadoReportes = [];
+    // Los datos de gráficos ya están definidos arriba
   }
 }

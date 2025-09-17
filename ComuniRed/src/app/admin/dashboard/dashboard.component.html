@@ -1,6 +1,7 @@
 <div class="dashboard-content">
   <h1>Bienvenido, {{ userEmail }}</h1>
   <p>Resumen de reportes y estado de la infraestructura pública en tu comunidad.</p>
+  
   <div class="dashboard-cards">
     <div class="dashboard-card users">
       <div class="card-title">Total Usuarios</div>
@@ -23,29 +24,166 @@
       <div class="card-sub negative">-{{ stats.cambioPendientes }}% desde el mes pasado</div>
     </div>
   </div>
+
   <div class="dashboard-graphs">
+    <!-- Gráfico de Barras - Tipos de infraestructura -->
     <div class="dashboard-graph">
-      <div>
-        <div class="graph-title">Tipos de infraestructura más reportados</div>
-        <div class="graph-placeholder">Gráfico de barras - Próximamente</div>
+      <div class="graph-title">Tipos de infraestructura más reportados</div>
+      <div class="bar-chart">
+        <div class="bar-item">
+          <div class="bar-label">Alumbrado Público</div>
+          <div class="bar-container">
+            <div class="bar-fill" style="--percentage: 85%" data-value="85"></div>
+          </div>
+          <div class="bar-value">85</div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label">Pavimentación</div>
+          <div class="bar-container">
+            <div class="bar-fill" style="--percentage: 72%" data-value="72"></div>
+          </div>
+          <div class="bar-value">72</div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label">Alcantarillado</div>
+          <div class="bar-container">
+            <div class="bar-fill" style="--percentage: 58%" data-value="58"></div>
+          </div>
+          <div class="bar-value">58</div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label">Parques</div>
+          <div class="bar-container">
+            <div class="bar-fill" style="--percentage: 43%" data-value="43"></div>
+          </div>
+          <div class="bar-value">43</div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label">Señalización</div>
+          <div class="bar-container">
+            <div class="bar-fill" style="--percentage: 31%" data-value="31"></div>
+          </div>
+          <div class="bar-value">31</div>
+        </div>
       </div>
     </div>
+
+    <!-- Gráfico de Líneas - Evolución de reportes -->
     <div class="dashboard-graph">
-      <div>
-        <div class="graph-title">Evolución de reportes por mes</div>
-        <div class="graph-placeholder">Gráfico de líneas - Próximamente</div>
+      <div class="graph-title">Evolución de reportes por mes</div>
+      <div class="line-chart">
+        <div class="line-chart-container">
+          <svg class="line-svg" viewBox="0 0 400 200">
+            <defs>
+              <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#60a5fa;stop-opacity:1" />
+              </linearGradient>
+              <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
+                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.05" />
+              </linearGradient>
+            </defs>
+            <path class="line-area" d="M 20 180 L 60 140 L 100 120 L 140 100 L 180 90 L 220 70 L 260 85 L 300 60 L 340 45 L 380 40 L 380 180 Z" fill="url(#areaGradient)"/>
+            <path class="line-path" d="M 20 140 L 60 120 L 100 100 L 140 90 L 180 70 L 220 85 L 260 60 L 300 45 L 340 40 L 380 35" stroke="url(#lineGradient)" stroke-width="3" fill="none"/>
+            <circle class="line-point" cx="20" cy="140" r="4" fill="#1e40af"/>
+            <circle class="line-point" cx="60" cy="120" r="4" fill="#1e40af"/>
+            <circle class="line-point" cx="100" cy="100" r="4" fill="#1e40af"/>
+            <circle class="line-point" cx="140" cy="90" r="4" fill="#1e40af"/>
+            <circle class="line-point" cx="180" cy="70" r="4" fill="#1e40af"/>
+            <circle class="line-point" cx="220" cy="85" r="4" fill="#1e40af"/>
+            <circle class="line-point" cx="260" cy="60" r="4" fill="#1e40af"/>
+            <circle class="line-point" cx="300" cy="45" r="4" fill="#1e40af"/>
+            <circle class="line-point" cx="340" cy="40" r="4" fill="#1e40af"/>
+            <circle class="line-point" cx="380" cy="35" r="4" fill="#1e40af"/>
+          </svg>
+          <div class="line-labels">
+            <span>Ene</span><span>Feb</span><span>Mar</span><span>Abr</span><span>May</span><span>Jun</span><span>Jul</span><span>Ago</span><span>Sep</span><span>Oct</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Gráfico Circular - Barrios con más incidentes -->
     <div class="dashboard-graph">
-      <div>
-        <div class="graph-title">Barrios con más incidentes</div>
-        <div class="graph-placeholder">Gráfico circular - Próximamente</div>
+      <div class="graph-title">Barrios con más incidentes</div>
+      <div class="pie-chart">
+        <div class="pie-container">
+          <svg class="pie-svg" viewBox="0 0 200 200">
+            <circle class="pie-segment" cx="100" cy="100" r="80" fill="none" stroke="#1e40af" stroke-width="40" 
+                    stroke-dasharray="125.6 314.16" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
+            <circle class="pie-segment" cx="100" cy="100" r="80" fill="none" stroke="#3b82f6" stroke-width="40" 
+                    stroke-dasharray="94.2 314.16" stroke-dashoffset="-125.6" transform="rotate(-90 100 100)"/>
+            <circle class="pie-segment" cx="100" cy="100" r="80" fill="none" stroke="#60a5fa" stroke-width="40" 
+                    stroke-dasharray="62.8 314.16" stroke-dashoffset="-219.8" transform="rotate(-90 100 100)"/>
+            <circle class="pie-segment" cx="100" cy="100" r="80" fill="none" stroke="#93c5fd" stroke-width="40" 
+                    stroke-dasharray="31.4 314.16" stroke-dashoffset="-282.6" transform="rotate(-90 100 100)"/>
+          </svg>
+          <div class="pie-center">
+            <div class="pie-total">320</div>
+            <div class="pie-label">Total</div>
+          </div>
+        </div>
+        <div class="pie-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #1e40af;"></div>
+            <span>Centro (40%)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #3b82f6;"></div>
+            <span>Norte (30%)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #60a5fa;"></div>
+            <span>Sur (20%)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #93c5fd;"></div>
+            <span>Oriente (10%)</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Gráfico de Área - Estado de reportes -->
     <div class="dashboard-graph">
-      <div>
-        <div class="graph-title">Estado de los reportes</div>
-        <div class="graph-placeholder">Gráfico de área - Próximamente</div>
+      <div class="graph-title">Estado de los reportes</div>
+      <div class="area-chart">
+        <div class="area-container">
+          <svg class="area-svg" viewBox="0 0 400 200">
+            <defs>
+              <linearGradient id="resolvedGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#059669;stop-opacity:0.6" />
+                <stop offset="100%" style="stop-color:#059669;stop-opacity:0.1" />
+              </linearGradient>
+              <linearGradient id="pendingGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#dc2626;stop-opacity:0.6" />
+                <stop offset="100%" style="stop-color:#dc2626;stop-opacity:0.1" />
+              </linearGradient>
+            </defs>
+            <!-- Área de resueltos -->
+            <path class="area-resolved" d="M 20 180 L 60 160 L 100 140 L 140 130 L 180 120 L 220 110 L 260 105 L 300 100 L 340 95 L 380 90 L 380 180 Z" fill="url(#resolvedGradient)"/>
+            <!-- Área de pendientes -->
+            <path class="area-pending" d="M 20 160 L 60 140 L 100 120 L 140 110 L 180 100 L 220 90 L 260 85 L 300 80 L 340 75 L 380 70 L 380 180 Z" fill="url(#pendingGradient)"/>
+            <!-- Líneas -->
+            <path class="area-line-resolved" d="M 20 160 L 60 140 L 100 120 L 140 110 L 180 100 L 220 90 L 260 85 L 300 80 L 340 75 L 380 70" stroke="#059669" stroke-width="2" fill="none"/>
+            <path class="area-line-pending" d="M 20 140 L 60 120 L 100 100 L 140 90 L 180 80 L 220 70 L 260 65 L 300 60 L 340 55 L 380 50" stroke="#dc2626" stroke-width="2" fill="none"/>
+          </svg>
+          <div class="area-labels">
+            <span>Ene</span><span>Feb</span><span>Mar</span><span>Abr</span><span>May</span><span>Jun</span><span>Jul</span><span>Ago</span><span>Sep</span><span>Oct</span>
+          </div>
+        </div>
+        <div class="area-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #059669;"></div>
+            <span>Resueltos</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #dc2626;"></div>
+            <span>Pendientes</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
