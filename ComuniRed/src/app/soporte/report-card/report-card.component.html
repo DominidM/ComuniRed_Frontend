@@ -1,4 +1,5 @@
-<div class="reporte-card" [ngClass]="getEstadoClase()" [class.expanded]="mostrarDetalles">
+<div class="reporte-card" [ngClass]="getEstadoClase()" [class.expanded]="mostrarDetalles"
+      (click)="seleccionarReporte()">
 
   <div class="reporte-header">
     <img [src]="reporte.usuarioAvatar" alt="avatar" class="avatar">
