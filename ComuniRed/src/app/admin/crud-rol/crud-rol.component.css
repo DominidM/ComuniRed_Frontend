@@ -39,30 +39,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  margin-bottom: 32px;
-  background: linear-gradient(135deg, rgba(76, 79, 241, 0.95) 0%, rgba(92, 102, 246, 0.95) 100%);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
-  padding: 24px 32px;
-  box-shadow: 0 15px 35px rgba(90, 92, 238, 0.4);
-  position: relative;
-  overflow: hidden;
-=======
-=======
->>>>>>> Stashed changes
   margin-bottom: 2rem;
   padding: 2rem 2rem 1.5rem 2rem;
   background: transparent;
   border: none;
   box-shadow: none;
   border-radius: 0;
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 }
 .crud-rol-header h2 {
   margin: 0;
@@ -73,14 +55,6 @@
   line-height: 1.25;
 }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-.btn-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #5154f3 100%);
-  color: #fff;
-=======
-=======
->>>>>>> Stashed changes
 /* --- Buscador y controles superiores --- */
 .crud-rol-controls-row {
   display: flex;
@@ -105,10 +79,6 @@
 }
 
 .crud-rol-search-box input {
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
   border: none;
   outline: none;
   background: transparent;
@@ -117,8 +87,10 @@
   width: 100%;
   padding: 0.5rem 0.5rem 0.5rem 0;
 }
+
+/* BTN lupa centrado, FIXED */
 .crud-rol-search-btn {
-  background: transparent;               
+  background: transparent;
   border: none;
   padding: 0.5rem;
   cursor: pointer;
@@ -134,19 +106,19 @@
 }
 
 .crud-rol-search-btn svg {
-  stroke: var(rgb(0, 0, 0));          /* Azul siempre visible */
+  stroke: var(--primary-color);      /* Azul siempre visible */
   width: 20px;
   height: 20px;
   transition: stroke 0.15s;
 }
 
 .crud-rol-search-btn:hover {
-  background: var(blue);           /* Fondo gris claro en hover */
-  box-shadow: 0 1px 4px rgba(255, 255, 255, 0.07);
+  background: var(--gray-100);       /* Fondo gris claro al hover */
+  box-shadow: 0 1px 4px rgba(37,99,235,0.07);
 }
 
 .crud-rol-search-btn:hover svg {
-  stroke: var(blue);          /* Azul oscuro en hover */
+  stroke: var(--primary-hover);      /* Azul oscuro en hover */
 }
 
 /* Mostrar por página y total */
@@ -193,13 +165,6 @@
 }
 
 .btn-primary:hover {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(92, 119, 240, 0.7);
-=======
-=======
->>>>>>> Stashed changes
   background: var(--success-color);
   color: rgb(65, 161, 73);
   box-shadow: 0 4px 8px rgba(5, 150, 104, 0.678);
@@ -210,10 +175,6 @@
   outline: 2px solid transparent;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(40, 182, 137, 0.705);
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 }
 
 .crud-rol-table {
@@ -232,18 +193,8 @@
 .crud-rol-table th {
   padding: 1rem 1.5rem;
   text-align: left;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  background: linear-gradient(135deg, #5d60f1 0%, #536fee 100%);
-  color: #fff;
-=======
   background: var(--gray-50);
   color: var(--gray-700);
->>>>>>> Stashed changes
-=======
-  background: var(--gray-50);
-  color: var(--gray-700);
->>>>>>> Stashed changes
   font-weight: 600;
   font-size: 0.875rem;
   text-transform: none;
@@ -388,28 +339,12 @@
 }
 
 .crud-rol-modal-content {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border: 2px solid rgba(89, 92, 236, 0.3);
-  padding: 40px 36px 32px 36px;
-  border-radius: 25px;
-  box-shadow: 0 25px 60px rgba(89, 91, 236, 0.4);
-  width: 450px;
-=======
-=======
->>>>>>> Stashed changes
   background: rgb(248, 248, 248);
   border: 1px solid var(--gray-200);
   padding: 2rem;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-lg);
   width: 400px;
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
   max-width: 90vw;
   animation: slideUp 0.2s ease;
 }
@@ -426,19 +361,6 @@
 }
 
 .crud-rol-modal-content h3 {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  margin-top: 0;
-  font-size: 1.5em;
-  margin-bottom: 24px;
-  background: linear-gradient(135deg, #5d67f5 0%, #5f5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 700;
-=======
-=======
->>>>>>> Stashed changes
   margin: 0 0 1.5rem 0;
   font-size: 1.25rem;
   color: var(--gray-900);
@@ -447,10 +369,6 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 }
 
 .form-group {
