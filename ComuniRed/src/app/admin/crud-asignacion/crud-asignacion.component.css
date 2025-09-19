@@ -1,20 +1,20 @@
 :root {
-  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --secondary-gradient: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+  --primary-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  --secondary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   --success-gradient: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
   --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
   --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(255, 255, 255, 0.6);
-  --shadow-soft: 0 10px 40px rgba(99, 102, 241, 0.25);
-  --shadow-hover: 0 20px 50px rgba(99, 102, 241, 0.35);
+  --shadow-soft: 0 10px 40px rgba(30, 64, 175, 0.25);
+  --shadow-hover: 0 20px 50px rgba(30, 64, 175, 0.35);
 }
 
 .crud-asignacion-root {
   padding: 40px;
   max-width: 1300px;
   margin: 0 auto;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
   min-height: 100vh;
   position: relative;
 }
@@ -24,13 +24,12 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 32px;
-  /* Unificando colores del header con crud-rol */
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.95) 0%, rgba(59, 130, 246, 0.95) 100%);
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
   padding: 24px 32px;
-  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 15px 35px rgba(30, 64, 175, 0.4);
   position: relative;
   overflow: hidden;
 }
@@ -71,7 +70,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   color: #fff;
   border: none;
   border-radius: 15px;
@@ -80,7 +79,7 @@
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 8px 25px rgba(30, 64, 175, 0.5);
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -104,26 +103,32 @@
 }
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.7);
+  box-shadow: 0 15px 40px rgba(30, 64, 175, 0.7);
+}
+
+/* Agregando contenedor con scroll para la tabla */
+.crud-asignacion-table-container {
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(30, 64, 175, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(30, 64, 175, 0.2);
 }
 
 .crud-asignacion-table {
   width: 100%;
+  min-width: 1000px;
   border-collapse: collapse;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(99, 102, 241, 0.2);
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
-  overflow: hidden;
-  margin-top: 20px;
+  margin: 0;
 }
 
 .crud-asignacion-table th {
   padding: 18px 24px;
   text-align: left;
-  /* Unificando colores del header de tabla con crud-rol */
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   color: #fff;
   font-weight: 600;
   font-size: 1.1em;
@@ -131,6 +136,9 @@
   letter-spacing: 0.5px;
   border: none;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .crud-asignacion-table td {
@@ -138,13 +146,13 @@
   color: #1e293b;
   font-size: 1em;
   font-weight: 500;
-  border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+  border-bottom: 1px solid rgba(30, 64, 175, 0.1);
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.8);
 }
 
 .crud-asignacion-table tr:hover td {
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(30, 64, 175, 0.1);
   transform: scale(1.02);
   color: #0f172a;
 }
@@ -210,14 +218,57 @@
   letter-spacing: 0.5px;
 }
 
-.status-pending {
-  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+.status-active {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
 }
 
 .status-completed {
-  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
+}
+
+.status-pending {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.status-cancelled {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.priority-high {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.priority-medium {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.priority-low {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .crud-asignacion-modal {
@@ -238,10 +289,10 @@
 .crud-asignacion-modal-content {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border: 2px solid rgba(99, 102, 241, 0.3);
+  border: 2px solid rgba(30, 64, 175, 0.3);
   padding: 40px 36px 32px 36px;
   border-radius: 25px;
-  box-shadow: 0 25px 60px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 25px 60px rgba(30, 64, 175, 0.4);
   width: 550px;
   max-width: 90vw;
   animation: slideUp 0.3s ease;
@@ -252,7 +303,7 @@
   margin-top: 0;
   font-size: 1.5em;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -281,7 +332,7 @@
   max-width: 450px;
   padding: 12px 18px;
   border-radius: 12px;
-  border: 2px solid rgba(99, 102, 241, 0.2);
+  border: 2px solid rgba(30, 64, 175, 0.2);
   font-size: 1em;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
@@ -294,8 +345,8 @@
 }
 
 .form-group select:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #1e40af;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
   outline: none;
 }
 
@@ -356,4 +407,140 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.crud-asignacion-table tr {
+  animation: slideInUp 0.5s ease forwards;
+  opacity: 0;
+}
+
+.crud-asignacion-table tr:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.crud-asignacion-table tr:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.crud-asignacion-table tr:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.crud-asignacion-table tr:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.crud-asignacion-table tr:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+/* Agregando datos de asignaciones usando pseudo-elementos */
+.crud-asignacion-table tbody tr:nth-child(1) td:nth-child(1)::after {
+  content: "1";
+}
+.crud-asignacion-table tbody tr:nth-child(1) td:nth-child(2)::after {
+  content: "Reparación Semáforo Centro";
+}
+.crud-asignacion-table tbody tr:nth-child(1) td:nth-child(3)::after {
+  content: "Juan Pérez";
+}
+.crud-asignacion-table tbody tr:nth-child(1) td:nth-child(4)::after {
+  content: "María García";
+}
+.crud-asignacion-table tbody tr:nth-child(1) td:nth-child(6)::after {
+  content: "2024-01-15";
+}
+.crud-asignacion-table tbody tr:nth-child(1) td:nth-child(7)::after {
+  content: "2024-01-25";
+}
+
+.crud-asignacion-table tbody tr:nth-child(2) td:nth-child(1)::after {
+  content: "2";
+}
+.crud-asignacion-table tbody tr:nth-child(2) td:nth-child(2)::after {
+  content: "Bacheo Avenida Principal";
+}
+.crud-asignacion-table tbody tr:nth-child(2) td:nth-child(3)::after {
+  content: "Carlos López";
+}
+.crud-asignacion-table tbody tr:nth-child(2) td:nth-child(4)::after {
+  content: "Ana Martínez";
+}
+.crud-asignacion-table tbody tr:nth-child(2) td:nth-child(6)::after {
+  content: "2024-02-01";
+}
+.crud-asignacion-table tbody tr:nth-child(2) td:nth-child(7)::after {
+  content: "2024-02-15";
+}
+
+.crud-asignacion-table tbody tr:nth-child(3) td:nth-child(1)::after {
+  content: "3";
+}
+.crud-asignacion-table tbody tr:nth-child(3) td:nth-child(2)::after {
+  content: "Limpieza Parque Norte";
+}
+.crud-asignacion-table tbody tr:nth-child(3) td:nth-child(3)::after {
+  content: "Luis Rodríguez";
+}
+.crud-asignacion-table tbody tr:nth-child(3) td:nth-child(4)::after {
+  content: "Pedro Sánchez";
+}
+.crud-asignacion-table tbody tr:nth-child(3) td:nth-child(6)::after {
+  content: "2024-02-10";
+}
+.crud-asignacion-table tbody tr:nth-child(3) td:nth-child(7)::after {
+  content: "2024-02-20";
+}
+
+/* Estados y prioridades con indicadores visuales */
+.crud-asignacion-table tbody tr:nth-child(1) td:nth-child(5)::after {
+  content: "Alta";
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.crud-asignacion-table tbody tr:nth-child(2) td:nth-child(5)::after {
+  content: "Media";
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.crud-asignacion-table tbody tr:nth-child(3) td:nth-child(5)::after {
+  content: "Baja";
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Estilos para scrollbar personalizada */
+.crud-asignacion-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.crud-asignacion-table-container::-webkit-scrollbar-track {
+  background: rgba(30, 64, 175, 0.1);
+  border-radius: 10px;
+}
+
+.crud-asignacion-table-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  border-radius: 10px;
+}
+
+.crud-asignacion-table-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
 }

@@ -1,55 +1,120 @@
 <div class="crud-estado-queja-root">
   <div class="crud-estado-queja-header">
     <h2>Gestión de Estados de Queja</h2>
-    <button class="btn-primary" (click)="openAddModal()">Nuevo Estado</button>
+    <button class="btn-primary">Nuevo Estado</button>
   </div>
 
-  <div *ngIf="estados && estados.length > 0; else noEstados">
-    <table class="crud-estado-queja-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let estado of estados">
-          <td>{{ estado.id }}</td>
-          <td>{{ estado.nombre }}</td>
-          <td>{{ estado.descripcion }}</td>
-          <td>
-            <button class="btn-edit" (click)="openEditModal(estado)">Editar</button>
-            <button class="btn-delete" (click)="deleteEstado(estado)">Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <table class="crud-estado-queja-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Color</th>
+        <th>Estado</th>
+        <th>Fecha Creación</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Pendiente</td>
+        <td>Queja recibida, esperando revisión</td>
+        <td><span class="color-indicator" style="background: #fbbf24;"></span> Amarillo</td>
+        <td><span class="status-active">Activo</span></td>
+        <td>2024-01-10</td>
+        <td>
+          <button class="btn-edit">Editar</button>
+          <button class="btn-delete">Eliminar</button>
+        </td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>En Proceso</td>
+        <td>Queja siendo atendida por el equipo</td>
+        <td><span class="color-indicator" style="background: #3b82f6;"></span> Azul</td>
+        <td><span class="status-active">Activo</span></td>
+        <td>2024-01-10</td>
+        <td>
+          <button class="btn-edit">Editar</button>
+          <button class="btn-delete">Eliminar</button>
+        </td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Resuelto</td>
+        <td>Queja solucionada satisfactoriamente</td>
+        <td><span class="color-indicator" style="background: #10b981;"></span> Verde</td>
+        <td><span class="status-active">Activo</span></td>
+        <td>2024-01-10</td>
+        <td>
+          <button class="btn-edit">Editar</button>
+          <button class="btn-delete">Eliminar</button>
+        </td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Rechazado</td>
+        <td>Queja no procede según normativas</td>
+        <td><span class="color-indicator" style="background: #ef4444;"></span> Rojo</td>
+        <td><span class="status-active">Activo</span></td>
+        <td>2024-01-10</td>
+        <td>
+          <button class="btn-edit">Editar</button>
+          <button class="btn-delete">Eliminar</button>
+        </td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>En Revisión</td>
+        <td>Queja requiere análisis adicional</td>
+        <td><span class="color-indicator" style="background: #8b5cf6;"></span> Púrpura</td>
+        <td><span class="status-inactive">Inactivo</span></td>
+        <td>2024-01-15</td>
+        <td>
+          <button class="btn-edit">Editar</button>
+          <button class="btn-delete">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-  <ng-template #noEstados>
-    <div class="crud-estado-queja-empty">
-      No hay estados registrados.
-    </div>
-  </ng-template>
-
-  <!-- Modal Formulario -->
-  <div class="crud-estado-queja-modal" *ngIf="showModal">
+  <div class="crud-estado-queja-modal" style="display: none;">
     <div class="crud-estado-queja-modal-content">
-      <h3>{{ editingEstado ? 'Editar Estado' : 'Nuevo Estado' }}</h3>
-      <form (ngSubmit)="saveEstado()" #estadoForm="ngForm">
+      <h3>Nuevo Estado de Queja</h3>
+      <form>
         <div class="form-group">
           <label for="nombre">Nombre</label>
-          <input id="nombre" name="nombre" [(ngModel)]="estadoData.nombre" required maxlength="50" />
+          <input id="nombre" name="nombre" type="text" placeholder="Nombre del estado" />
         </div>
         <div class="form-group">
           <label for="descripcion">Descripción</label>
-          <input id="descripcion" name="descripcion" [(ngModel)]="estadoData.descripcion" maxlength="255" />
+          <textarea id="descripcion" name="descripcion" placeholder="Descripción del estado"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="color">Color</label>
+          <select id="color" name="color">
+            <option value="">Seleccionar color</option>
+            <option value="amarillo">Amarillo</option>
+            <option value="azul">Azul</option>
+            <option value="verde">Verde</option>
+            <option value="rojo">Rojo</option>
+            <option value="purpura">Púrpura</option>
+            <option value="naranja">Naranja</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado">
+            <option value="">Seleccionar estado</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
         </div>
         <div class="crud-estado-queja-modal-actions">
           <button type="submit" class="btn-primary">Guardar</button>
-          <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+          <button type="button" class="btn-cancel">Cancelar</button>
         </div>
       </form>
     </div>

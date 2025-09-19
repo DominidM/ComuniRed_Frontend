@@ -1,57 +1,157 @@
 <div class="crud-rol-root">
-  <div class="crud-rol-header">
-    <h2>Gestión de Roles</h2>
-    <button class="btn-primary" (click)="openAddModal()">Nuevo Rol</button>
-  </div>
-
-  <div *ngIf="roles && roles.length > 0; else noRoles">
-    <table class="crud-rol-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let rol of roles">
-          <td>{{ rol.id }}</td>
-          <td>{{ rol.nombre }}</td>
-          <td>{{ rol.descripcion }}</td>
-          <td>
-            <button class="btn-edit" (click)="openEditModal(rol)">Editar</button>
-            <button class="btn-delete" (click)="deleteRol(rol)">Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <ng-template #noRoles>
-    <div class="crud-rol-empty">
-      No hay roles registrados.
+  <div class="crud-rol-card">
+    <div class="crud-rol-header">
+      <h2>Gestión de Roles</h2>
+      <button class="btn-primary" (click)="openAddModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nuevo Rol
+      </button>
     </div>
-  </ng-template>
 
-  <!-- Modal Formulario -->
-  <div class="crud-rol-modal" *ngIf="showModal">
-    <div class="crud-rol-modal-content">
-      <h3>{{ editingRol ? 'Editar Rol' : 'Nuevo Rol' }}</h3>
-      <form (ngSubmit)="saveRol()" #rolForm="ngForm">
-        <div class="form-group">
-          <label for="nombre">Nombre</label>
-          <input id="nombre" name="nombre" [(ngModel)]="rolData.nombre" required />
-        </div>
-        <div class="form-group">
-          <label for="descripcion">Descripción</label>
-          <input id="descripcion" name="descripcion" [(ngModel)]="rolData.descripcion" />
-        </div>
-        <div class="crud-rol-modal-actions">
-          <button type="submit" class="btn-primary">Guardar</button>
-          <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
-        </div>
-      </form>
+    <!-- Controles superiores: Buscador + mostrar por página + total -->
+    <div class="crud-rol-controls-row">
+      <div class="crud-rol-search-box">
+        <input type="text" [(ngModel)]="searchText" placeholder="Buscar por nombre..." />
+        <!-- BOTÓN DE BÚSQUEDA CON ICONO LUPA -->
+        <button class="crud-rol-search-btn" (click)="buscarRol()" aria-label="Buscar rol">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </div>
+      <div class="crud-rol-show-select">
+        <label for="pageSize">por página</label>
+        <select id="pageSize" (change)="onPageSizeChange($event)" [value]="size">
+          <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
+        </select>
+        <span>Total: {{ totalElements }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="roles && roles.length > 0; else noRoles">
+      <table class="crud-rol-table">
+        <thead>
+          <tr>
+            <th style="display: none;">ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let rol of roles; trackBy: trackByRolId">
+            <td style="display: none;">{{ rol.id }}</td>
+            <td>
+              <div class="role-name">{{ rol.nombre }}</div>
+            </td>
+            <td>
+              <div class="role-description">{{ rol.descripcion }}</div>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-edit" (click)="openEditModal(rol)" title="Editar rol">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                  </svg>
+                  Editar
+                </button>
+                <button class="btn-delete" (click)="deleteRol(rol)" title="Eliminar rol">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                  </svg>
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noRoles>
+      <div class="crud-rol-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #000000;">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <p>No hay roles registrados</p>
+        <button class="btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">
+          Crear primer rol
+        </button>
+      </div>
+    </ng-template>
+
+    <!-- Paginación abajo centrada y contador -->
+    <div class="crud-rol-pagination-row" *ngIf="totalElements > 0">
+      <div class="crud-rol-pagination">
+        <button class="crud-rol-pagination-btn" (click)="prevPage()" [disabled]="page === 0"><b>&lt; Anterior</b></button>
+        <span class="crud-rol-pagination-info"><b>Página {{ page + 1 }} de {{ totalPages }}</b></span>
+        <button class="crud-rol-pagination-btn" (click)="nextPage()" [disabled]="page >= totalPages - 1"><b>Siguiente &gt;</b></button>
+      </div>
+      <div class="crud-rol-pagination-count">
+        <span>Mostrando {{ roles.length }} de {{ totalElements }} datos.</span>
+      </div>
+    </div>
+
+    <!-- Modal Formulario -->
+    <div class="crud-rol-modal" *ngIf="showModal" (click)="closeModal()">
+      <div class="crud-rol-modal-content" (click)="$event.stopPropagation()">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          {{ editingRol ? 'Editar Rol' : 'Nuevo Rol' }}
+        </h3>
+        
+        <form (ngSubmit)="saveRol()" #rolForm="ngForm">
+          <div class="form-group">
+            <label for="nombre">Nombre del Rol</label>
+            <input 
+              id="nombre" 
+              name="nombre" 
+              type="text"
+              [(ngModel)]="rolData.nombre" 
+              required 
+              placeholder="Ej: Administrador, Usuario, Moderador..."
+              autocomplete="off"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <input 
+              id="descripcion" 
+              name="descripcion" 
+              type="text"
+              [(ngModel)]="rolData.descripcion" 
+              placeholder="Describe las responsabilidades de este rol..."
+              autocomplete="off"
+            />
+          </div>
+          
+          <div class="crud-rol-modal-actions">
+            <button type="button" class="btn-cancel" (click)="closeModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="!rolForm.valid">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20,6 9,17 4,12"></polyline>
+              </svg>
+              {{ editingRol ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>

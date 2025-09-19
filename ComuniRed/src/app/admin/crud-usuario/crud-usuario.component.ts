@@ -21,7 +21,7 @@ interface Rol {
   selector: 'app-crud-usuario',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './crud-usuario.component.html',
+  templateUrl: './crud-usuario.component.css',
   styleUrls: ['./crud-usuario.component.css']
 })
 export class CrudUsuarioComponent implements OnInit {
@@ -36,8 +36,6 @@ export class CrudUsuarioComponent implements OnInit {
   showModal = false;
   editingUsuario: Usuario | null = null;
   usuarioData: Partial<Usuario & { password?: string }> = {};
-
-  // constructor(private usuarioService: UsuarioService, private rolService: RolService) {}
   constructor() {}
 
   ngOnInit(): void {
@@ -46,16 +44,10 @@ export class CrudUsuarioComponent implements OnInit {
   }
 
   loadUsuarios() {
-    // Ejemplo con tu servicio real:
-    // this.usuarioService.getUsuarios().subscribe(data => { this.usuarios = data; });
-    // Demo:
     this.usuarios = [];
   }
 
   loadRoles() {
-    // Ejemplo con tu servicio real:
-    // this.rolService.getRoles().subscribe(data => { this.roles = data; });
-    // Demo:
     this.roles = [];
   }
 
@@ -78,15 +70,14 @@ export class CrudUsuarioComponent implements OnInit {
       // Actualiza en tu API
       // this.usuarioService.updateUsuario(this.editingUsuario.id, this.usuarioData).subscribe(() => this.loadUsuarios());
     } else {
-      // Inserta en tu API
-      // this.usuarioService.createUsuario(this.usuarioData).subscribe(() => this.loadUsuarios());
+
     }
     this.closeModal();
   }
 
   deleteUsuario(usuario: Usuario) {
     if (confirm(`¿Seguro que deseas eliminar el usuario "${usuario.nombre}"?`)) {
-      // this.usuarioService.deleteUsuario(usuario.id).subscribe(() => this.loadUsuarios());
+      
     }
   }
 

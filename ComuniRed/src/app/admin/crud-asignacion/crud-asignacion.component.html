@@ -1,74 +1,131 @@
 <div class="crud-asignacion-root">
   <div class="crud-asignacion-header">
-    <h2>Gestión de Asignaciones de Quejas</h2>
-    <button class="btn-primary" (click)="openAddModal()">Nueva Asignación</button>
+    <h2>Gestión de Asignaciones</h2>
+    <button class="btn-primary">Nueva Asignación</button>
   </div>
 
-  <div *ngIf="asignaciones && asignaciones.length > 0; else noAsignaciones">
-    <table class="crud-asignacion-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Queja</th>
-          <th>Soporte</th>
-          <th>Fecha de Asignación</th>
-          <th>Atendida</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let asignacion of asignaciones">
-          <td>{{ asignacion.id }}</td>
-          <td>{{ asignacion.queja_descripcion }}</td>
-          <td>{{ asignacion.soporte_nombre }}</td>
-          <td>{{ asignacion.fecha_asignacion | date:'short' }}</td>
-          <td>
-            <span [class.atendida]="asignacion.atendida" [class.no-atendida]="!asignacion.atendida">
-              {{ asignacion.atendida ? 'Sí' : 'No' }}
-            </span>
-          </td>
-          <td>
-            <button class="btn-edit" (click)="openEditModal(asignacion)">Editar</button>
-            <button class="btn-delete" (click)="deleteAsignacion(asignacion)">Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <table class="crud-asignacion-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Queja</th>
+        <th>Usuario Asignado</th>
+        <th>Fecha Asignación</th>
+        <th>Estado</th>
+        <th>Prioridad</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Alumbrado público dañado en Av. Principal</td>
+        <td>Carlos Mendoza</td>
+        <td>2024-01-15</td>
+        <td><span class="status-active">En Proceso</span></td>
+        <td><span class="priority-high">Alta</span></td>
+        <td>
+          <button class="btn-edit">Editar</button>
+          <button class="btn-delete">Eliminar</button>
+        </td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Bache en Calle 5ta Norte</td>
+        <td>Ana Rodríguez</td>
+        <td>2024-01-18</td>
+        <td><span class="status-completed">Completado</span></td>
+        <td><span class="priority-medium">Media</span></td>
+        <td>
+          <button class="btn-edit">Editar</button>
+          <button class="btn-delete">Eliminar</button>
+        </td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Parque sin mantenimiento</td>
+        <td>Luis García</td>
+        <td>2024-01-20</td>
+        <td><span class="status-pending">Pendiente</span></td>
+        <td><span class="priority-low">Baja</span></td>
+        <td>
+          <button class="btn-edit">Editar</button>
+          <button class="btn-delete">Eliminar</button>
+        </td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Alcantarilla obstruida</td>
+        <td>María López</td>
+        <td>2024-01-22</td>
+        <td><span class="status-active">En Proceso</span></td>
+        <td><span class="priority-high">Alta</span></td>
+        <td>
+          <button class="btn-edit">Editar</button>
+          <button class="btn-delete">Eliminar</button>
+        </td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Señalización de tránsito faltante</td>
+        <td>Pedro Martínez</td>
+        <td>2024-01-25</td>
+        <td><span class="status-cancelled">Cancelado</span></td>
+        <td><span class="priority-medium">Media</span></td>
+        <td>
+          <button class="btn-edit">Editar</button>
+          <button class="btn-delete">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-  <ng-template #noAsignaciones>
-    <div class="crud-asignacion-empty">
-      No hay asignaciones registradas.
-    </div>
-  </ng-template>
-
-  <!-- Modal Formulario -->
-  <div class="crud-asignacion-modal" *ngIf="showModal">
+  <div class="crud-asignacion-modal" style="display: none;">
     <div class="crud-asignacion-modal-content">
-      <h3>{{ editingAsignacion ? 'Editar Asignación' : 'Nueva Asignación' }}</h3>
-      <form (ngSubmit)="saveAsignacion()" #asignacionForm="ngForm">
+      <h3>Nueva Asignación</h3>
+      <form>
         <div class="form-group">
-          <label for="queja_id">Queja</label>
-          <select id="queja_id" name="queja_id" [(ngModel)]="asignacionData.queja_id" required>
-            <option *ngFor="let queja of quejas" [value]="queja.id">{{ queja.descripcion | slice:0:50 }}</option>
+          <label for="queja">Queja</label>
+          <select id="queja" name="queja">
+            <option value="">Seleccionar queja</option>
+            <option value="1">Alumbrado público dañado</option>
+            <option value="2">Bache en la calle</option>
+            <option value="3">Parque sin mantenimiento</option>
+            <option value="4">Alcantarilla obstruida</option>
           </select>
         </div>
         <div class="form-group">
-          <label for="soporte_id">Soporte</label>
-          <select id="soporte_id" name="soporte_id" [(ngModel)]="asignacionData.soporte_id" required>
-            <option *ngFor="let soporte of soportes" [value]="soporte.id">{{ soporte.nombre }}</option>
+          <label for="usuario">Usuario Asignado</label>
+          <select id="usuario" name="usuario">
+            <option value="">Seleccionar usuario</option>
+            <option value="1">Carlos Mendoza</option>
+            <option value="2">Ana Rodríguez</option>
+            <option value="3">Luis García</option>
+            <option value="4">María López</option>
           </select>
         </div>
         <div class="form-group">
-          <label for="atendida">¿Atendida?</label>
-          <select id="atendida" name="atendida" [(ngModel)]="asignacionData.atendida">
-            <option [value]="true">Sí</option>
-            <option [value]="false">No</option>
+          <label for="prioridad">Prioridad</label>
+          <select id="prioridad" name="prioridad">
+            <option value="">Seleccionar prioridad</option>
+            <option value="alta">Alta</option>
+            <option value="media">Media</option>
+            <option value="baja">Baja</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado">
+            <option value="">Seleccionar estado</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="en_proceso">En Proceso</option>
+            <option value="completado">Completado</option>
+            <option value="cancelado">Cancelado</option>
           </select>
         </div>
         <div class="crud-asignacion-modal-actions">
           <button type="submit" class="btn-primary">Guardar</button>
-          <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+          <button type="button" class="btn-cancel">Cancelar</button>
         </div>
       </form>
     </div>
