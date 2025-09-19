@@ -1,21 +1,16 @@
-/* Dashboard Content - Versión Mejorada con Tonalidades Azules */
 .dashboard-content {
   padding: 24px 16px 16px 16px;
   max-width: 1200px;
   margin: 0 auto;
-  /* Fondo con gradiente azul más llamativo */
   background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
   border-radius: 20px;
-  /* Sombra azul más prominente */
   box-shadow: 0 8px 32px rgba(30, 64, 175, 0.15);
   overflow-y: auto;
   max-height: calc(100vh - 100px);
   scroll-behavior: smooth;
-  /* Borde azul sutil */
   border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
-/* Personalización del scrollbar */
 .dashboard-content::-webkit-scrollbar {
   width: 10px;
 }
@@ -37,7 +32,6 @@
 .dashboard-content h1 {
   font-size: 2.4em;
   font-weight: 900;
-  /* Gradiente azul para el título principal */
   background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -48,14 +42,12 @@
 }
 
 .dashboard-content p {
-  /* Color azul más suave para el texto */
   color: #1e40af;
   font-size: 1.15em;
   margin-bottom: 32px;
   font-weight: 600;
 }
 
-/* Dashboard Cards */
 .dashboard-cards {
   display: flex;
   gap: 24px;
@@ -64,10 +56,8 @@
 }
 
 .dashboard-card {
-  /* Fondo con gradiente azul sutil */
   background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%);
   border-radius: 24px;
-  /* Sombra azul más intensa */
   box-shadow: 0 12px 40px rgba(30, 64, 175, 0.15);
   padding: 32px 28px;
   min-width: 220px;
@@ -76,7 +66,6 @@
   flex-direction: column;
   align-items: flex-start;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Borde azul */
   border: 2px solid rgba(59, 130, 246, 0.2);
   position: relative;
   overflow: hidden;
@@ -89,7 +78,6 @@
   left: 0;
   right: 0;
   height: 6px;
-  /* Gradiente azul para la barra superior */
   background: linear-gradient(90deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -97,7 +85,6 @@
 
 .dashboard-card:hover {
   transform: translateY(-12px) scale(1.02);
-  /* Sombra azul más dramática en hover */
   box-shadow: 0 24px 60px rgba(30, 64, 175, 0.25);
   border-color: rgba(59, 130, 246, 0.4);
 }
@@ -115,7 +102,6 @@
 .card-value {
   font-size: 2.6em;
   font-weight: 900;
-  /* Gradiente azul para los valores */
   background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -150,27 +136,22 @@
   content: "↘";
 }
 
-/* Dashboard Graphs */
 .dashboard-graphs {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 24px;
-  /* Agregado margen inferior para scroll */
   margin-bottom: 40px;
 }
 
 .dashboard-graph {
-  /* Fondo con gradiente azul para los gráficos */
   background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%);
   border-radius: 24px;
-  /* Sombra azul más intensa */
   box-shadow: 0 12px 40px rgba(30, 64, 175, 0.12);
   padding: 32px 36px;
   min-height: 380px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  /* Borde azul */
   border: 2px solid rgba(59, 130, 246, 0.15);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -184,7 +165,6 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  /* Efecto radial azul */
   background: radial-gradient(circle, rgba(30, 64, 175, 0.08) 0%, transparent 70%);
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -192,7 +172,6 @@
 
 .dashboard-graph:hover {
   transform: translateY(-8px) scale(1.01);
-  /* Sombra azul más dramática */
   box-shadow: 0 20px 60px rgba(30, 64, 175, 0.2);
   border-color: rgba(59, 130, 246, 0.3);
 }
@@ -200,7 +179,6 @@
 .graph-title {
   font-size: 1.2em;
   font-weight: 800;
-  /* Color azul para los títulos de gráficos */
   color: #1e40af;
   margin-bottom: 20px;
   position: relative;
@@ -209,7 +187,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Estilos mejorados para los gráficos */
 .recharts-wrapper {
   font-family: "Inter", sans-serif;
 }
@@ -226,7 +203,6 @@
   border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
-/* Gráfico de Barras */
 .bar-chart {
   display: flex;
   flex-direction: column;
@@ -306,7 +282,6 @@
   }
 }
 
-/* Gráfico de Líneas */
 .line-chart {
   padding: 20px 0;
 }
@@ -503,7 +478,6 @@
   }
 }
 
-/* Gráfico de Área */
 .area-chart {
   padding: 20px 0;
 }
@@ -559,7 +533,6 @@
   justify-content: center;
 }
 
-/* Efectos hover para todos los gráficos */
 .bar-item:hover .bar-fill {
   transform: scaleY(1.1);
   transition: transform 0.3s ease;
@@ -574,7 +547,6 @@
   stroke-width: 45;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .dashboard-cards {
     flex-direction: column;
@@ -582,7 +554,6 @@
 
   .dashboard-content {
     padding: 16px 12px;
-    /* Ajuste de altura para móviles */
     max-height: calc(100vh - 80px);
   }
 
@@ -629,7 +600,7 @@
   }
 }
 
-/* Animaciones para entrada de gráficos */
+
 @keyframes fadeInUp {
   from {
     opacity: 0;

@@ -24,12 +24,12 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 32px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(76, 79, 241, 0.95) 0%, rgba(92, 102, 246, 0.95) 100%);
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
   padding: 24px 32px;
-  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 15px 35px rgba(90, 92, 238, 0.4);
   position: relative;
   overflow: hidden;
 }
@@ -70,7 +70,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #5154f3 100%);
   color: #fff;
   border: none;
   border-radius: 15px;
@@ -104,7 +104,7 @@
 
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.7);
+  box-shadow: 0 15px 40px rgba(92, 119, 240, 0.7);
 }
 
 .crud-rol-table {
@@ -122,7 +122,7 @@
 .crud-rol-table th {
   padding: 18px 24px;
   text-align: left;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #5d60f1 0%, #536fee 100%);
   color: #fff;
   font-weight: 600;
   font-size: 1.1em;
@@ -226,10 +226,10 @@
 .crud-rol-modal-content {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border: 2px solid rgba(99, 102, 241, 0.3);
+  border: 2px solid rgba(89, 92, 236, 0.3);
   padding: 40px 36px 32px 36px;
   border-radius: 25px;
-  box-shadow: 0 25px 60px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 25px 60px rgba(89, 91, 236, 0.4);
   width: 450px;
   max-width: 90vw;
   animation: slideUp 0.3s ease;
@@ -251,7 +251,7 @@
   margin-top: 0;
   font-size: 1.5em;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #5d67f5 0%, #5f5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

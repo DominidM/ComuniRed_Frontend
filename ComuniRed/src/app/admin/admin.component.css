@@ -24,7 +24,7 @@
   right: 0;
   width: 1px;
   height: 100%;
-  background: linear-gradient(180deg, transparent 0%, rgba(139, 92, 246, 0.3) 50%, transparent 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(102, 92, 246, 0.356) 50%, transparent 100%);
 }
 
 .admin-logo {
@@ -65,15 +65,15 @@
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, #5f5cf6 0%, #8b92fa 100%);
   transition: width 0.3s ease;
 }
 
 .admin-sidebar li.active,
 .admin-sidebar li.router-link-active {
-  background: linear-gradient(90deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.05) 100%);
+  background: linear-gradient(90deg, rgba(92, 107, 246, 0.2) 0%, rgba(139, 92, 246, 0.05) 100%);
   color: #ffffff;
-  border-left: 4px solid #8b5cf6;
+  border-left: 4px solid #4f4cf5;
   box-shadow: inset 0 0 20px rgba(139, 92, 246, 0.1);
 }
 
@@ -103,7 +103,7 @@
   box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
   backdrop-filter: blur(20px);
   border-bottom: 2px solid transparent;
-  border-image: linear-gradient(90deg, #8b5cf6, #a78bfa, #c4b5fd) 1;
+  border-image: linear-gradient(90deg, #5f5cf6, #928bfa, #b5b6fd) 1;
   position: relative;
   overflow: hidden;
 }
@@ -148,7 +148,7 @@
 
 .admin-search:focus {
   outline: none;
-  border-color: #8b5cf6;
+  border-color: #5f5cf6;
   box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.15), 0 12px 32px rgba(139, 92, 246, 0.2);
   background: #ffffff;
   transform: translateY(-2px);
@@ -168,7 +168,7 @@
   content: "👤";
   font-size: 1.4em;
   margin-right: 8px;
-  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  background: linear-gradient(135deg, #5c5ff6, #968bfa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -226,7 +226,7 @@ main {
 }
 
 .chatbot-toggle {
-  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, #5f5cf6 0%, #8b96fa 100%);
   color: #fff;
   font-size: 1.8em;
   border: none;
@@ -234,7 +234,7 @@ main {
   width: 64px;
   height: 64px;
   cursor: pointer;
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8px 32px rgba(92, 95, 246, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -254,7 +254,7 @@ main {
 
 .chatbot-toggle:hover {
   transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 12px 40px rgba(92, 95, 246, 0.5);
 }
 
 .chatbot-toggle:hover::before {
@@ -269,11 +269,11 @@ main {
   width: 380px;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 20px 60px rgba(95, 92, 246, 0.2);
   overflow: hidden;
   flex-direction: column;
   min-height: 400px;
-  border: 1px solid rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(115, 92, 246, 0.1);
   backdrop-filter: blur(10px);
 }
 
@@ -294,7 +294,7 @@ main {
 }
 
 .chatbot-header {
-  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, #5c6bf6 0%, #848bf8 100%);
   color: #fff;
   padding: 20px 24px;
   font-size: 1.1em;
@@ -350,7 +350,7 @@ main {
 }
 
 .chat-message.user .message-content {
-  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, #5f5cf6 0%, #928bfa 100%);
   color: #fff;
   border-color: transparent;
 }
@@ -376,13 +376,13 @@ main {
 
 .chatbot-input:focus {
   outline: none;
-  border-color: #8b5cf6;
+  border-color: #6157f5;
   background: #ffffff;
   box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
 }
 
 .chatbot-send {
-  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, #5856f7 0%, #a78bfa 100%);
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -390,12 +390,12 @@ main {
   font-size: 1.2em;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(92, 154, 246, 0.3);
 }
 
 .chatbot-send:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8px 20px rgba(86, 123, 247, 0.4);
 }
 
 @media (max-width: 768px) {
