@@ -87,17 +87,15 @@
   width: 100%;
   padding: 0.5rem 0.5rem 0.5rem 0;
 }
-
-/* BTN lupa centrado, FIXED */
 .crud-rol-search-btn {
-  background: transparent;
+  background: transparent;               
   border: none;
   padding: 0.5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, box-shadow 0.15s;
+  transition:0.15s, box-shadow 0.15s;
   border-radius: 4px;
   position: absolute;
   right: 0.5rem;
@@ -106,19 +104,19 @@
 }
 
 .crud-rol-search-btn svg {
-  stroke: var(--primary-color);      /* Azul siempre visible */
+  stroke: var(rgb(0, 0, 0));          /* Azul siempre visible */
   width: 20px;
   height: 20px;
   transition: stroke 0.15s;
 }
 
 .crud-rol-search-btn:hover {
-  background: var(--gray-100);       /* Fondo gris claro al hover */
-  box-shadow: 0 1px 4px rgba(37,99,235,0.07);
+  background: var(blue);           /* Fondo gris claro en hover */
+  box-shadow: 0 1px 4px rgba(255, 255, 255, 0.07);
 }
 
 .crud-rol-search-btn:hover svg {
-  stroke: var(--primary-hover);      /* Azul oscuro en hover */
+  stroke: var(blue);          /* Azul oscuro en hover */
 }
 
 /* Mostrar por página y total */
