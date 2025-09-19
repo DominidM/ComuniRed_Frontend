@@ -1,0 +1,30 @@
+/*.acciones {
+  position: relative;
+  height: 40px;
+  width: 100%;
+  padding-right: 0;
+  background: rgba(0, 0, 255, 0.2);
+}
+
+.accion-btn.notificacion {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 152, 0, 0.8);
+  color: #fff;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.accion-btn.notificacion:hover {
+  background: rgba(230, 137, 0, 0.8);
+}
+*/

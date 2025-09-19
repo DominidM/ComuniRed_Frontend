@@ -1,68 +1,63 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms'; // ✅ IMPORT CORRECTO
+import { Reporte } from '../ajson/json';
 import { ReportCardComponent } from '../report-card/report-card.component';
-import { Reporte } from '../soporte.component';
 
 @Component({
   selector: 'app-report-filters',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReportCardComponent],
+  imports: [
+    CommonModule,
+    FormsModule,          // ✅ AHORA FUNCIONA
+    ReportCardComponent
+  ],
   templateUrl: './report-filters.component.html',
   styleUrls: ['./report-filters.component.css']
 })
 export class ReportFiltersComponent {
   @Input() reportes: Reporte[] = [];
-
-  @Output() filtrar = new EventEmitter<Reporte[]>(); // ✅ AHORA EXISTE
+  @Output() filtrar = new EventEmitter<Reporte[]>();
 
   busqueda: string = '';
-  categoriaSeleccionada: string = 'Todos';
-  categorias: string[] = ['Todos', 'Alumbrado', 'Limpieza', 'Seguridad'];
-  tipo: 'recientes' | 'votados' | 'urgentes' = 'recientes';
+  tipoReporte: string = '';
+  estadoSeleccionado: string = '';
+  prioridadSeleccionada: string = '';
+  periodoSeleccionado: string = '';
 
-  setTipo(nuevoTipo: 'recientes' | 'votados' | 'urgentes') {
-    this.tipo = nuevoTipo;
-    this.emitirFiltrados(); // ✅ cada vez que cambias el tipo, emites los resultados
+  tiposReporte = ['Incidente', 'Mantenimiento', 'Sugerencia'];
+  estados = ['Pendiente', 'En progreso', 'Resuelto'];
+  prioridades = ['Baja', 'Media', 'Alta'];
+  periodos = ['Hoy', 'Esta semana', 'Este mes'];
+
+  reportesFiltrados: Reporte[] = [];
+
+  ngOnInit() {
+    this.reportesFiltrados = this.reportes;
   }
 
-  filtrarReportes(): Reporte[] {
-    let filtrados = [...this.reportes];
+  aplicarFiltro() {
+    let filtrados = this.reportes;
 
-    if (this.busqueda.trim() !== '') {
-      const query = this.busqueda.toLowerCase();
+    if (this.busqueda.trim()) {
       filtrados = filtrados.filter(r =>
-        r.titulo.toLowerCase().includes(query) ||
-        r.descripcion.toLowerCase().includes(query)
+        r.titulo.toLowerCase().includes(this.busqueda.toLowerCase())
       );
     }
 
-    if (this.categoriaSeleccionada !== 'Todos') {
-      filtrados = filtrados.filter(r => r.categoria === this.categoriaSeleccionada);
+    if (this.tipoReporte) {
+      filtrados = filtrados.filter(r => r.tipo === this.tipoReporte);
     }
 
-    switch (this.tipo) {
-      case 'votados':
-        filtrados.sort((a, b) => b.reacciones.likes - a.reacciones.likes);
-        break;
-
-      case 'urgentes':
-        filtrados = filtrados
-          .filter(r => r.estado.toLowerCase() === 'pendiente')
-          .sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
-        break;
-
-      case 'recientes':
-      default:
-        filtrados.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
-        break;
+    if (this.estadoSeleccionado) {
+      filtrados = filtrados.filter(r => r.estado === this.estadoSeleccionado);
     }
 
-    return filtrados;
-  }
+    if (this.prioridadSeleccionada) {
+      filtrados = filtrados.filter(r => r.prioridad === this.prioridadSeleccionada);
+    }
 
-  emitirFiltrados() {
-    const filtrados = this.filtrarReportes();
-    this.filtrar.emit(filtrados); // ✅ esto manda el array filtrado al padre
+    this.reportesFiltrados = filtrados;
+    this.filtrar.emit(filtrados);
   }
 }

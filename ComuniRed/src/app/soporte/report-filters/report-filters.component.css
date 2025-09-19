@@ -1,98 +1,44 @@
-/* Contenedor general de filtros */
 .filtros {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 1rem;
-  background: #ffffff;
   padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  background: #f7f7f7;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   margin-bottom: 1rem;
 }
 
-/* Input de búsqueda */
-.filtros input[type="text"] {
-  flex: 1;
-  min-width: 200px;
-  padding: 0.6rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+.filtros label {
+  font-weight: 600;
+  margin-right: 0.5rem;
+  align-self: center;
 }
 
-.filtros input[type="text"]:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
-}
-
-/* Select de categorías */
+.filtros input,
 .filtros select {
-  padding: 0.6rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: white;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  min-width: 150px;
+  outline: none;
+  transition: border 0.2s ease-in-out;
 }
 
+.filtros input {
+  flex: 1;
+  width: 250px; 
+}
+
+.filtros input:focus,
 .filtros select:focus {
   border-color: #007bff;
-  outline: none;
 }
-
-/* Tabs */
-.tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-left: auto;
-}
-
-.tab {
-  background: #f5f5f5;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s ease-in-out;
-}
-
-.tab:hover {
-  background: #eaeaea;
-}
-
-.tab.active {
-  background: #007bff;
-  color: white;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.4);
-}
-
-.tab.urgent.active {
-  background: #dc3545;
-  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
-}
-
 
 .contenedor-reportes {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1rem;
-  margin-top: 1rem;
-}
-
-@media (min-width: 768px) {
-  .contenedor-reportes {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (min-width: 1200px) {
-  .contenedor-reportes {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }

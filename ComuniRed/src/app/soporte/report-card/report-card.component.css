@@ -1,32 +1,35 @@
+/* ====== CARD PRINCIPAL ====== */
 .reporte-card {
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  margin: 16px 0;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   padding: 16px;
-  border-left: 8px solid #ccc;
-  transition: transform 0.2s, box-shadow 0.2s;
+  margin: 12px auto;
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: 450px;
 }
 
-.reporte-card.expanded {
-  transform: scale(1.02);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+.reporte-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
+/* ====== HEADER ====== */
 .reporte-header {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  gap: 10px;
 }
 
 .avatar {
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 12px;
+  background: #ddd;
 }
 
 .usuario-info h3 {
@@ -37,131 +40,143 @@
 
 .usuario-info small {
   color: #666;
+  font-size: 0.8rem;
 }
 
-.reporte-body h4 
-{
-  margin: 8px 0;
+/* ====== BADGES ====== */
+.badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+/* ====== IMAGEN PRINCIPAL ====== */
+.imagen-principal {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+/* ====== CUERPO ====== */
+.reporte-body h4 {
+  margin: 6px 0;
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-.reporte-body p 
-{
-  margin: 4px 0 12px 0;
-  font-size: 0.95rem;
-  color: #333;
+.reporte-body p {
+  margin: 4px 0 10px 0;
+  color: #444;
+  font-size: 0.9rem;
+  line-height: 1.3;
 }
 
+/* ====== IMÁGENES MINI ====== */
 .imagenes {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
+  margin-top: 6px;
+  justify-content: flex-start;
 }
 
-.imagen-mini 
-{
-  width: 70px;
-  height: 70px;
+.imagen-mini {
+  width: 65px;
+  height: 65px;
   object-fit: cover;
   border-radius: 8px;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
 }
 
-.imagen-mini:hover 
-{
-  transform: scale(1.1);
+.imagen-mini:hover {
+  transform: scale(1.08);
 }
 
-.reporte-footer 
-{
+/* ====== FOOTER ====== */
+.reporte-footer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-
-.estado {
-  font-weight: bold;
-  text-transform: capitalize;
-}
-
-.fecha {
-  color: #666;
-  font-size: 0.85rem;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .reacciones {
-  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.botones {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  gap: 8px;
+}
+
+.btn {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
   font-size: 0.9rem;
+  transition: background 0.2s ease;
 }
 
 .btn-detalles {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  background: #f0f0f0;
 }
 
 .btn-detalles:hover {
-  background-color: #0056b3;
+  background: #e0e0e0;
 }
 
-/* ===== Modal detalles ===== */
+.btn-ubicacion {
+  background: #000;
+  color: #fff;
+}
+
+.btn-ubicacion:hover {
+  background: #222;
+}
+
+/* ====== MODAL ====== */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  inset: 0;
+  background: rgba(0,0,0,0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px;
   z-index: 100;
 }
 
 .modal-contenido {
-  background-color: #fff;
+  background: #fff;
+  padding: 20px;
   border-radius: 12px;
-  padding: 24px;
-  width: 100%;
   max-width: 600px;
-  position: relative;
+  width: 90%;
 }
 
-.btn-cerrar {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 16px;
-}
-
-.btn-cerrar:hover {
-  background-color: #a71d2a;
-}
-
-/* ===== Modal imagen ===== */
 .modal-imagen {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.8);
+  inset: 0;
+  background: rgba(0,0,0,0.85);
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: zoom-out;
   z-index: 200;
 }
 
@@ -169,39 +184,31 @@
   max-width: 90%;
   max-height: 90%;
   border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.5);
 }
 
-/* ===== Colores según estado ===== */
-.estado-pendiente {
-  border-left-color: #ffc107; /* amarillo */
+.btn-cerrar {
+  margin-top: 12px;
+  background: #f44336;
+  color: #fff;
 }
 
-.estado-progreso {
-  border-left-color: #17a2b8; /* azul */
+.btn-cerrar:hover {
+  background: #d32f2f;
 }
 
-.estado-resuelto {
-  border-left-color: #28a745; /* verde */
-}
+/* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+  .imagen-principal {
+    height: 180px;
+  }
 
-.estado-default {
-  border-left-color: #6c757d; /* gris */
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 600px) {
   .reporte-card {
     padding: 12px;
+    max-width: 95%;
   }
-  .avatar {
-    width: 40px;
-    height: 40px;
-  }
-  .imagen-mini {
-    width: 60px;
-    height: 60px;
-  }
-  .reporte-body h4 {
-    font-size: 1rem;
+
+  .botones {
+    flex-direction: column;
   }
 }

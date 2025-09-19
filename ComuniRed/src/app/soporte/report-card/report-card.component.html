@@ -1,6 +1,5 @@
-<div class="reporte-card" [ngClass]="getEstadoClase()" [class.expanded]="mostrarDetalles"
-      (click)="seleccionarReporte()">
-
+<div class="reporte-card" [ngClass]="getEstadoClase()" [class.expanded]="mostrarDetalles">
+  <!-- Header -->
   <div class="reporte-header">
     <img [src]="reporte.usuarioAvatar" alt="avatar" class="avatar">
     <div class="usuario-info">
@@ -9,47 +8,53 @@
     </div>
   </div>
 
+  <!-- Imagen principal -->
+  <img *ngIf="reporte.imagenPrincipal" 
+       [src]="reporte.imagenPrincipal" 
+       alt="imagen principal" 
+       class="imagen-principal">
+
+  <!-- Cuerpo -->
   <div class="reporte-body">
     <h4>{{ reporte.titulo }}</h4>
     <p>{{ reporte.descripcion }}</p>
+    <p>Ubicación: {{ reporte.ubicacion}}</p>
 
-    <div class="imagenes" *ngIf="reporte.imagenes.length > 0">
-      <img *ngFor="let img of reporte.imagenes" [src]="img" alt="imagen"
-           class="imagen-mini" (click)="abrirImagen(img)">
+    <!-- Imágenes mini -->
+    <div class="imagenes" *ngIf="reporte.imagenes?.length">
+      <img *ngFor="let img of reporte.imagenes" [src]="img" alt="imagen mini" class="imagen-mini">
     </div>
   </div>
 
+  <!-- Footer -->
   <div class="reporte-footer">
-    <span class="estado">{{ reporte.estado }}</span>
-    <span class="fecha">{{ reporte.fecha | date:'short' }}</span>
-
-    <span class="reacciones">
+    <div class="reacciones">
       👍 {{ reporte.reacciones.likes }}
-      ❤️ {{ reporte.reacciones.love || 0 }}
-      😮 {{ reporte.reacciones.wow || 0 }}
-      😢 {{ reporte.reacciones.sad || 0 }}
-      | Útil: {{ reporte.reacciones.helpful || 0 }}
-    </span>
+      👎 {{ reporte.reacciones.dislikes }}
+      ⚠️ {{ reporte.reacciones.reportes }}
+      ❤️ {{ reporte.reacciones.love }}
+      😮 {{ reporte.reacciones.wow }}
+      😔 {{ reporte.reacciones.sad }}
+      ☑️ {{ reporte.reacciones.helpful}}
+    </div>
 
-    <button class="btn-detalles" (click)="abrirDetalles()">Ver detalles</button>
+    <div class="botones">
+      <button class="btn btn-detalles" (click)="abrirDetalles($event)">👁 Ver Detalles</button>
+      <button class="btn btn-ubicacion" (click)="abrirUbicacion($event)">📍 Ver Ubicación</button>
+    </div>
   </div>
 </div>
 
+<!-- Modal Detalles -->
 <div class="modal" *ngIf="mostrarDetalles">
   <div class="modal-contenido">
     <h3>{{ reporte.titulo }}</h3>
     <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
-    <p><strong>Ubicación:</strong> {{ reporte.ubicacion }}</p>
+    <p><strong>Estado:</strong> {{ reporte.estado }}</p>
+    <p><strong>Prioridad:</strong> {{ reporte.prioridad }}</p>
+    <p><strong>Fecha:</strong> {{ reporte.fecha | date:'short' }}</p>
 
-    <p><strong>Reacciones:</strong>
-      👍 {{ reporte.reacciones.likes }}
-      ❤️ {{ reporte.reacciones.love || 0 }}
-      😮 {{ reporte.reacciones.wow || 0 }}
-      😢 {{ reporte.reacciones.sad || 0 }}
-      | Útil: {{ reporte.reacciones.helpful || 0 }}
-    </p>
-
-    <div class="historial">
+    <div class="historial" *ngIf="reporte.historial?.length">
       <h4>Historial</h4>
       <ul>
         <li *ngFor="let h of reporte.historial">
@@ -58,10 +63,22 @@
       </ul>
     </div>
 
-    <button class="btn-cerrar" (click)="cerrarDetalles()">Cerrar</button>
+    <button class="btn btn-cerrar" (click)="cerrarDetalles()">Cerrar</button>
   </div>
 </div>
 
-<div class="modal-imagen" *ngIf="imagenSeleccionada" (click)="cerrarImagen()">
-  <img [src]="imagenSeleccionada" alt="imagen ampliada">
+<!-- Modal Ubicación -->
+<div class="modal" *ngIf="mostrarUbicacion">
+  <div class="modal-contenido modal-mapa">
+    <h3>Ubicación del reporte</h3>
+    <iframe
+      width="100%"
+      height="300"
+      style="border:0"
+      [src]="'https://www.google.com/maps?q=' + reporte.ubicacion + '&output=embed'"
+      allowfullscreen
+      loading="lazy">
+    </iframe>
+    <button class="btn btn-cerrar" (click)="cerrarUbicacion()">Cerrar</button>
+  </div>
 </div>
