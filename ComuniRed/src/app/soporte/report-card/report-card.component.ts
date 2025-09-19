@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Reporte } from '../soporte.component';
 
@@ -12,6 +12,8 @@ import { Reporte } from '../soporte.component';
 export class ReportCardComponent 
 {
   @Input() reporte!: Reporte;
+
+  @Output() seleccionar = new EventEmitter<Reporte>(); 
 
   mostrarDetalles = false;
   imagenSeleccionada: string | null = null;
@@ -52,6 +54,10 @@ export class ReportCardComponent
         return 'estado-default';
     }
   }
+  
+  seleccionarReporte() {
+    this.seleccionar.emit(this.reporte);
+  }
 }
 
 export const REPORTES: Reporte[] = [
@@ -65,6 +71,8 @@ export const REPORTES: Reporte[] = [
     estado: 'pendiente',
     fecha: new Date('2025-09-01'),
     ubicacion: 'Av. Arequipa 123, Miraflores, Lima',
+    lat: undefined,
+    lng: undefined,
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757491814/poste-barrios-altos2_542958_twyi5f.jpg'],
     reacciones: { likes: 5, helpful: 3, love: 0, wow: 5, sad: 0 },
     comentarios: [{ autor: 'María', texto: 'Yo también lo vi', fecha: new Date('2025-09-02') }],
@@ -80,6 +88,8 @@ export const REPORTES: Reporte[] = [
     estado: 'en progreso',
     fecha: new Date('2025-09-03'),
     ubicacion: 'Jr. Cusco 456, Cercado de Lima, Lima',
+    lat: undefined,
+    lng: undefined,
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787551/a09ffa08-24fb-4593-9c48-0183b0fee4bf_bwj8fs.jpg'],
     reacciones: { likes: 8, helpful: 5, love: 0, wow: 1, sad: 0 },
     comentarios: [{ autor: 'Pedro', texto: 'Esto genera mal olor', fecha: new Date('2025-09-03') }],
@@ -94,6 +104,8 @@ export const REPORTES: Reporte[] = [
     descripcion: 'Vecinos reportaron un robo anoche cerca del parque central.',
     estado: 'pendiente',
     fecha: new Date('2025-09-04'),
+    lat: undefined,
+    lng: undefined,
     ubicacion: 'Parque Kennedy, Miraflores, Lima',
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787586/203920_394774_mobdrw.webp'],
     reacciones: { likes: 12, helpful: 8, love: 10, wow: 7, sad: 0 },
@@ -109,6 +121,8 @@ export const REPORTES: Reporte[] = [
     descripcion: 'La farola frente a mi casa parpadea constantemente.',
     estado: 'resuelto',
     fecha: new Date('2025-08-28'),
+    lat: undefined,
+    lng: undefined,
     ubicacion: 'Calle Los Pinos 789, San Isidro, Lima',
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787597/655663_u3ycdh.webp'],
     reacciones: { likes: 3, helpful: 1, love: 4, wow: 1, sad: 0 },
@@ -127,6 +141,8 @@ export const REPORTES: Reporte[] = [
     descripcion: 'La papelera del parque está rota y la basura se cae.',
     estado: 'pendiente',
     fecha: new Date('2025-09-05'),
+    lat: undefined,
+    lng: undefined,
     ubicacion: 'Parque de la Exposición, Cercado de Lima, Lima',
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787633/images_nzyale.jpg'],
     reacciones: { likes: 6, helpful: 2, love: 0, wow: 0, sad: 0 },
@@ -142,6 +158,8 @@ export const REPORTES: Reporte[] = [
     descripcion: 'Un auto sin placas lleva estacionado 2 días en la calle del parque.',
     estado: 'en progreso',
     fecha: new Date('2025-09-06'),
+    lat: undefined,
+    lng: undefined,
     ubicacion: 'Parque de la Muralla, Lima Cercado, Lima',
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787635/1502568_ebwuqi.webp'],
     reacciones: { likes: 9, helpful: 4, love: 1, wow: 1, sad: 1 },
@@ -157,6 +175,8 @@ export const REPORTES: Reporte[] = [
     descripcion: 'Un vehículo derribó el poste de alumbrado esta madrugada.',
     estado: 'pendiente',
     fecha: new Date('2025-09-07'),
+    lat: undefined,
+    lng: undefined,
     ubicacion: 'Av. La Marina 321, San Miguel, Lima',
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787831/images_nkrvjf.jpg'],
     reacciones: { likes: 15, helpful: 7, love: 4, wow: 2, sad: 5 },
@@ -172,6 +192,8 @@ export const REPORTES: Reporte[] = [
     descripcion: 'El semáforo de la esquina no funciona correctamente.',
     estado: 'pendiente',
     fecha: new Date('2025-09-08'),
+    lat: undefined,
+    lng: undefined,
     ubicacion: 'Av. Javier Prado 55, San Isidro, Lima',
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787973/LM5562NESVBZ3IRCHEAWGH4HQM_iyuzva.jpg'],
     reacciones: { likes: 4, helpful: 2, love: 0, wow: 5, sad: 2 },

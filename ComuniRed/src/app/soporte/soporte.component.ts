@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core'; // ✅ Aquí se importa OnInit
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReportCardComponent, REPORTES } from './report-card/report-card.component';
 import { ReportFiltersComponent } from './report-filters/report-filters.component';
 import { ReportStatsComponent } from './report-stats/report-stats.component';
 import { MapReportComponent } from './map-reports/map-report.component';
-import { HomeComponent } from './home/home.component'
+import { HomeComponent } from './home/home.component';
 
-
-
-export interface Reacciones 
-{
+export interface Reacciones {
   likes: number;
   helpful?: number;
   love?: number;
@@ -44,6 +41,10 @@ export interface Reporte {
   estado: 'pendiente' | 'en progreso' | 'resuelto';
   fecha: Date;
   ubicacion: string;
+
+  lat?: number;
+  lng?: number;
+
   imagenes: string[];
   reacciones: Reacciones;
   comentarios: Comentario[];
@@ -58,20 +59,32 @@ export interface Reporte {
     ReportFiltersComponent,
     ReportStatsComponent,
     MapReportComponent,
-    HomeComponent
+    HomeComponent,
+  
   ],
   templateUrl: './soporte.component.html',
   styleUrls: ['./soporte.component.css']
 })
-export class SoporteComponent implements OnInit 
-{
+export class SoporteComponent implements OnInit {
 
   reportes: Reporte[] = [];
   reportesFiltrados: Reporte[] = [];
+  
+  // ✅ Agregado para evitar error en el template
+  reporteSeleccionado?: Reporte = undefined;
 
-  ngOnInit(): void 
-  {
+  ngOnInit(): void {
     this.reportes = REPORTES;
     this.reportesFiltrados = [...this.reportes];
+  }
+
+  // ✅ Método para seleccionar un reporte desde los report-cards
+  seleccionarReporte(reporte: Reporte) {
+    this.reporteSeleccionado = reporte;
+  }
+
+  // (Opcional) Método para aplicar filtros y actualizar reportesFiltrados
+  aplicarFiltro(filtrados: Reporte[]) {
+    this.reportesFiltrados = filtrados;
   }
 }

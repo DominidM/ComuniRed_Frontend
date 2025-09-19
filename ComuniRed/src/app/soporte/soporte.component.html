@@ -2,11 +2,16 @@
 
   <app-home></app-home>
 
-  <app-report-stats [reportes]="reportes"></app-report-stats>
+  <app-report-stats [reportes]="reportesFiltrados"></app-report-stats>
 
-  <app-report-filters [reportes]="reportesFiltrados"></app-report-filters>
+  <app-report-filters 
+    [reportes]="reportes" 
+    (filtrar)="aplicarFiltro($event)">
+  </app-report-filters>
 
-
-  <app-map-reports [reportes]="reportes"></app-map-reports>
+  <app-map-reports 
+    [reportes]="reportesFiltrados"
+    [reporteSeleccionado]="reporteSeleccionado">
+  </app-map-reports>
 
 </div>
