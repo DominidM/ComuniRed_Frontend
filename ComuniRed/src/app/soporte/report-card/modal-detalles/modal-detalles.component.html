@@ -1,20 +1,57 @@
-<div class="modal">
-  <div class="modal-contenido">
-    <h3>{{ reporte.titulo }}</h3>
-    <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
-    <p><strong>Estado:</strong> {{ reporte.estado }}</p>
-    <p><strong>Prioridad:</strong> {{ reporte.prioridad }}</p>
-    <p><strong>Fecha:</strong> {{ reporte.fecha | date:'short' }}</p>
+<div class="modal" *ngIf="isOpen" (click)="cerrarDesdeFondo($event)">
+  <div class="modal-contenido" (click)="$event.stopPropagation()">
+    <!-- Botón de cierre (X) -->
+    <button class="btn-cerrar-x" (click)="cerrarModal()">✖</button>
 
-    <div class="historial" *ngIf="reporte.historial?.length">
-      <h4>Historial</h4>
+    <!-- Título del modal -->
+    <h3 class="modal-titulo">Detalles del Reporte</h3>
+
+    <!-- Imagenes si existen -->
+    <div class="imagenes" *ngIf="reporte?.imagenes?.length">
+      <img *ngFor="let img of reporte.imagenes"
+           [src]="img"
+           alt="imagen mini"
+           class="imagen-mini">
+    </div>
+
+    <h2 class="reporte-titulo">{{ reporte.titulo }}</h2>
+
+    <div class="seccion">
+      <h4><i class="bi bi-chat-left-dots-fill"></i> Descripción</h4>
+      <p>{{ reporte?.descripcion }}</p>
+    </div>
+
+    <div class="seccion">
+      <h4><i class="bi bi-person-fill"></i> Información del Cliente</h4>
+      <p><strong>Nombre:</strong> {{ reporte?.cliente?.nombre }}</p>
+      <p *ngIf="reporte?.cliente?.telefono"><strong>Teléfono:</strong> {{ reporte.cliente.telefono }}</p>
+      <p *ngIf="reporte?.cliente?.email"><strong>Email:</strong> {{ reporte.cliente.email }}</p>
+      <p *ngIf="reporte?.cliente?.direccion"><strong>Dirección:</strong> {{ reporte.cliente.direccion }}</p>
+    </div>
+
+    <div class="seccion">
+      <h4><i class="bi bi-geo-alt-fill"></i> Ubicación</h4>
+      <p>{{ reporte?.ubicacion }}</p>
+    </div>
+
+    <div class="seccion">
+      <h4><i class="bi bi-info-circle-fill"></i> Información Adicional</h4>
+      <p><strong>Estado:</strong> {{ reporte?.estado }}</p>
+      <p><strong>Prioridad:</strong> {{ reporte?.prioridad }}</p>
+      <p><strong>Fecha:</strong> {{ reporte?.fecha | date:'dd/MM/yyyy, h:mm a' }}</p>
+    </div>
+
+    <div class="seccion historial" *ngIf="reporte?.historial?.length">
+      <h4><i class="bi bi-clock-history"></i> Historial</h4>
       <ul>
         <li *ngFor="let h of reporte.historial">
-          {{ h.accion }} - <small>{{ h.fecha | date:'short' }}</small>
+          {{ h.accion }} por {{ h.autor }} - <small>{{ h.fecha | date:'short' }}</small>
         </li>
       </ul>
     </div>
 
-    <button class="btn btn-cerrar" (click)="cerrarModal()">Cerrar</button>
+    <div class="modal-footer">
+      <button class="btn btn-cerrar" (click)="cerrarModal()">Cerrar</button>
+    </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Usuario } from '../../ajson/json';
+import { Soporte } from '../../ajson/json';
 
 @Component({
   selector: 'app-perfil-header',
@@ -10,7 +10,7 @@ import { Usuario } from '../../ajson/json';
   styleUrls: ['./perfil-header.component.css']
 })
 export class PerfilHeaderComponent {
-  @Input() usuario!: Usuario;
+  @Input() usuario!: Soporte;
 
   @Output() modificar = new EventEmitter<void>();
   @Output() salir = new EventEmitter<void>();

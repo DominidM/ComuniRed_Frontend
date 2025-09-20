@@ -1,59 +1,118 @@
+/* Fondo oscuro */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.7); /* fondo más claro, no tan oscuro */
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(2px);
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
 }
 
+/* Card centrado */
 .modal-contenido {
-  background: #ffffff;
-  padding: 1.5rem;
+  position: relative;
+  background: #fff;
+  padding: 20px 25px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  max-width: 520px;
-  width: 90%;
-  max-height: 80%;
+  width: 480px;
+  max-height: 85vh;
   overflow-y: auto;
-  animation: fadeIn 0.2s ease-in-out;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  animation: scaleIn 0.3s ease;
 }
 
-.modal-contenido h3 {
-  margin-top: 0;
-  font-size: 1.3rem;
-  color: #111;
+/* Botón de cierre (X arriba derecha) */
+.btn-cerrar-x {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.btn-cerrar-x:hover {
+  color: red;
 }
 
-.historial h4 {
-  margin-top: 1rem;
-  font-weight: 600;
+/* Título */
+.modal-titulo {
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+/* Subtítulo */
+.reporte-titulo {
+  text-align: center;
+  font-size: 18px;
+  margin: 10px 0 20px 0;
   color: #333;
 }
 
-.historial li {
-  font-size: 0.9rem;
-  color: #555;
+/* Secciones */
+.seccion {
+  margin-bottom: 15px;
 }
-
-.btn-cerrar {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background: #f5f5f5;
+.seccion h4 {
+  font-size: 15px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   color: #222;
-  border: 1px solid #ddd;
+}
+
+/* Imágenes mini */
+.imagenes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+.imagen-mini {
+  width: 100px;
+  height: 80px;
+  object-fit: cover;
   border-radius: 8px;
+  border: 1px solid #ddd;
 }
 
+/* Footer */
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+.btn-cerrar {
+  padding: 8px 15px;
+  background: #ff4d4d;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
 .btn-cerrar:hover {
-  background: #ebebeb;
+  background: #cc0000;
 }
 
+/* Animaciones */
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }

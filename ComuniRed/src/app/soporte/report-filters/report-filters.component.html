@@ -25,10 +25,3 @@
     <option *ngFor="let periodo of periodos" [value]="periodo">{{ periodo }}</option>
   </select>
 </div>
-
-<div class="contenedor-reportes">
-  <app-report-card
-    *ngFor="let reporte of reportesFiltrados"
-    [reporte]="reporte">
-  </app-report-card>
-</div>

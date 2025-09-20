@@ -7,10 +7,10 @@ import { LogoSectionComponent } from './logo-section/logo-section.component';
 import { PerfilHeaderComponent } from './perfil-header/perfil-header.component';
 
 
-import { Usuario, USUARIO_ACTUAL } from '../ajson/json';
+import { Usuario_soporte, Soporte } from '../ajson/json';
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-header',
   standalone: true,
   imports: [
     CommonModule,
@@ -21,8 +21,9 @@ import { Usuario, USUARIO_ACTUAL } from '../ajson/json';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HomeComponent {
-  usuario: Usuario = USUARIO_ACTUAL;
+export class HeaderComponent 
+{
+  usuario: Soporte = Usuario_soporte[0];
 
   actualizar() {
     console.log('🔄 Actualizando datos...');

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Reporte } from '../ajson/json';
+import { Reporte, Cliente, Soporte } from '../ajson/json';
 import { ModalDetallesComponent } from './modal-detalles/modal-detalles.component';
 import { ModalUbicacionComponent } from './modal-ubicacion/modal-ubicacion.component';
 
@@ -12,7 +12,9 @@ import { ModalUbicacionComponent } from './modal-ubicacion/modal-ubicacion.compo
   styleUrls: ['./report-card.component.css']
 })
 export class ReportCardComponent {
-  @Input() reporte!: Reporte;
+  @Input() reporte!: Reporte ;
+  @Input() cliente!: Cliente ;
+  @Input() soporte!: Soporte ;
   @Output() seleccionar = new EventEmitter<Reporte>(); 
 
   mostrarDetalles = false;

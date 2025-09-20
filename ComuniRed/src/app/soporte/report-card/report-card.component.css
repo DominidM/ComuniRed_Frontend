@@ -1,15 +1,23 @@
+/* ===== CONTENEDOR DE TODAS LAS TARJETAS ===== */
+.container-report-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Se ajusta solo */
+  gap: 20px;
+  padding: 20px;
+}
+
 /* ===== CARD PRINCIPAL ===== */
 .reporte-card {
-  background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   padding: 16px;
-  margin: 12px auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  max-width: 500px;
+  background: #fff;
+  width: 100%;
+  height: 100%; /* 🔑 ocupa todo el alto disponible dentro de la fila */
 }
 
 .reporte-card:hover {
@@ -47,12 +55,10 @@
 .imagen-principal {
   display: block;
   width: 100%;
-  max-width: 480px;
   height: 220px;
   object-fit: cover;
   border-radius: 12px;
   cursor: pointer;
-  margin: 0 auto;
   transition: transform 0.2s ease;
 }
 
@@ -64,6 +70,7 @@
 .imagenes {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 0.8rem;
   margin: 0.8rem 0;
 }
@@ -82,59 +89,13 @@
   transform: scale(1.08);
 }
 
-/* ===== MODAL DE IMAGEN ===== */
-.modal-imagen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  cursor: pointer;
-}
-
-.modal-contenido-imagen {
-  position: relative;
-  max-width: 70%;
-  max-height: 70%;
-  cursor: auto;
-}
-
-.modal-contenido-imagen img {
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-}
-
-.btn-cerrar {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background: #fff;
-  border: none;
-  border-radius: 50%;
-  padding: 0.4rem;
-  cursor: pointer;
-  font-size: 1.2rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  transition: background 0.2s ease;
-}
-
-.btn-cerrar:hover {
-  background: #f0f0f0;
-}
-
 /* ===== FOOTER ===== */
 .reacciones {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   font-size: 0.9rem;
+  margin-top: auto; /* 🔑 empuja el footer hacia abajo para uniformidad */
 }
 
 .botones {
@@ -152,11 +113,30 @@
   font-weight: 500;
   font-size: 0.9rem;
   transition: background 0.2s ease, transform 0.15s ease;
-  color: #000; /* TEXTO NEGRO */
+  color: #000;
   background: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Botón Detalles */
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+  .container-report-card {
+    grid-template-columns: repeat(3, minmax(250px, 1fr));
+  }
+}
 
+@media (max-width: 900px) {
+  .container-report-card {
+    grid-template-columns: repeat(2, minmax(250px, 1fr));
+  }
+}
 
+@media (max-width: 600px) {
+  .container-report-card {
+    grid-template-columns: 1fr; /* 🔑 ahora se apilan automáticamente */
+  }
+
+  .reporte-card {
+    max-width: 100%;
+  }
+}
