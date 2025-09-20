@@ -4,27 +4,25 @@
   gap: 0.8rem;
 }
 
-/* Contenedor del logo */
+
 .logo {
   width: 40px;
   height: 40px;
-  border-radius: 50%;          /* mantiene forma circular */
+  border-radius: 50%;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  overflow: hidden;            /* recorta la imagen para que quede dentro del círculo */
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;            /* opcional: color de fondo si la imagen tiene transparencia */
+  background: #fff;
 }
 
-/* Imagen dentro del logo */
 .logo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;           /* ajusta la imagen para llenar el contenedor */
+  object-fit: cover;
 }
 
-/* Información de la app */
 .app-info h1 {
   font-size: 1.1rem;
   margin: 0;

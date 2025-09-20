@@ -1,0 +1,14 @@
+<div class="modal">
+  <div class="modal-contenido modal-mapa">
+    <h3>Ubicación del reporte</h3>
+    <iframe
+      width="100%"
+      height="300"
+      style="border:0"
+      [src]="'https://www.google.com/maps?q=' + ubicacion + '&output=embed'"
+      allowfullscreen
+      loading="lazy">
+    </iframe>
+    <button class="btn btn-cerrar" (click)="cerrarModal()">Cerrar</button>
+  </div>
+</div>

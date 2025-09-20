@@ -1,0 +1,20 @@
+<div class="modal">
+  <div class="modal-contenido">
+    <h3>{{ reporte.titulo }}</h3>
+    <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
+    <p><strong>Estado:</strong> {{ reporte.estado }}</p>
+    <p><strong>Prioridad:</strong> {{ reporte.prioridad }}</p>
+    <p><strong>Fecha:</strong> {{ reporte.fecha | date:'short' }}</p>
+
+    <div class="historial" *ngIf="reporte.historial?.length">
+      <h4>Historial</h4>
+      <ul>
+        <li *ngFor="let h of reporte.historial">
+          {{ h.accion }} - <small>{{ h.fecha | date:'short' }}</small>
+        </li>
+      </ul>
+    </div>
+
+    <button class="btn btn-cerrar" (click)="cerrarModal()">Cerrar</button>
+  </div>
+</div>

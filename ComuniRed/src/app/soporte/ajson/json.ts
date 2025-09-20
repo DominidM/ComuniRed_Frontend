@@ -1,7 +1,7 @@
 export interface Reacciones {
   likes: number;
-  dislikes?: number;   // 👎 agregado
-  reportes?: number;   // ⚠️ agregado
+  dislikes?: number;
+  reportes?: number; 
   helpful?: number;
   love?: number;
   wow?: number;
@@ -38,14 +38,13 @@ export interface Reporte {
   periodo: string;
   fecha: Date;
   ubicacion: string;
+  telefono: string;
 
   lat?: number;
   lng?: number;
 
-  /** Imagen destacada para la card */
-  imagenPrincipal?: string; // 🔥 agregado
+  imagenPrincipal?: string;
 
-  /** Galería de imágenes adicionales */
   imagenes: string[];
 
   reacciones: Reacciones;
@@ -72,6 +71,7 @@ export const REPORTES: Reporte[] = [
     prioridad: 'Alta',
     fecha: new Date('2025-09-01'),
     ubicacion: 'Av. Arequipa 123, Miraflores, Lima',
+    telefono: '987654321',
     lat: undefined,
     lng: undefined,
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757491814/poste-barrios-altos2_542958_twyi5f.jpg'],
@@ -92,6 +92,7 @@ export const REPORTES: Reporte[] = [
     fecha: new Date('2025-09-03'),
     prioridad: 'Media',
     ubicacion: 'Jr. Cusco 456, Cercado de Lima, Lima',
+    telefono: '987213891',
     lat: undefined,
     lng: undefined,
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787551/a09ffa08-24fb-4593-9c48-0183b0fee4bf_bwj8fs.jpg'],
@@ -111,6 +112,7 @@ export const REPORTES: Reporte[] = [
     estado: 'pendiente',
     prioridad: 'Alta',
     fecha: new Date('2025-09-04'),
+    telefono: '911920950',
     lat: undefined,
     lng: undefined,
     ubicacion: 'Parque Kennedy, Miraflores, Lima',
@@ -131,6 +133,7 @@ export const REPORTES: Reporte[] = [
     estado: 'resuelto',
     prioridad: 'Baja',
     fecha: new Date('2025-08-28'),
+    telefono: '980210502',
     lat: undefined,
     lng: undefined,
     ubicacion: 'Calle Los Pinos 789, San Isidro, Lima',
@@ -154,6 +157,7 @@ export const REPORTES: Reporte[] = [
     estado: 'pendiente',
     prioridad: 'Alta',
     fecha: new Date('2025-09-05'),
+    telefono: '987662521',
     lat: undefined,
     lng: undefined,
     ubicacion: 'Parque de la Exposición, Cercado de Lima, Lima',
@@ -174,6 +178,7 @@ export const REPORTES: Reporte[] = [
     estado: 'en progreso',
     prioridad: 'Baja',
     fecha: new Date('2025-09-06'),
+    telefono: '987654441',
     lat: undefined,
     lng: undefined,
     ubicacion: 'Parque de la Muralla, Lima Cercado, Lima',
@@ -194,6 +199,7 @@ export const REPORTES: Reporte[] = [
     estado: 'pendiente',
     prioridad: 'Alta',
     fecha: new Date('2025-09-07'),
+    telefono: '987654300',
     lat: undefined,
     lng: undefined,
     ubicacion: 'Av. La Marina 321, San Miguel, Lima',
@@ -214,6 +220,7 @@ export const REPORTES: Reporte[] = [
     estado: 'pendiente',
     prioridad: 'Media',
     fecha: new Date('2025-09-08'),
+    telefono: '987004321',
     lat: undefined,
     lng: undefined,
     ubicacion: 'Av. Javier Prado 55, San Isidro, Lima',

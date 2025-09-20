@@ -3,27 +3,33 @@
   <div class="reporte-header">
     <img [src]="reporte.usuarioAvatar" alt="avatar" class="avatar">
     <div class="usuario-info">
-      <h3>{{ reporte.usuario }}</h3>
-      <small>{{ reporte.categoria }}</small>
+      <h4>{{ reporte.titulo }}</h4>
+      <small>👤 {{ reporte.usuario }}</small>
     </div>
   </div>
 
   <!-- Imagen principal -->
-  <img *ngIf="reporte.imagenPrincipal" 
-       [src]="reporte.imagenPrincipal" 
-       alt="imagen principal" 
-       class="imagen-principal">
+  <img *ngIf="reporte.imagenPrincipal"
+       [src]="reporte.imagenPrincipal"
+       alt="imagen principal"
+       class="imagen-principal"
+       (click)="abrirImagenCompleta(reporte.imagenPrincipal)">
+
+  <!-- Miniaturas -->
+  <div class="imagenes" *ngIf="reporte.imagenes?.length">
+    <img *ngFor="let img of reporte.imagenes"
+         [src]="img"
+         alt="imagen mini"
+         class="imagen-mini"
+         (click)="abrirImagenCompleta(img)">
+  </div>
 
   <!-- Cuerpo -->
   <div class="reporte-body">
-    <h4>{{ reporte.titulo }}</h4>
-    <p>{{ reporte.descripcion }}</p>
-    <p>Ubicación: {{ reporte.ubicacion}}</p>
-
-    <!-- Imágenes mini -->
-    <div class="imagenes" *ngIf="reporte.imagenes?.length">
-      <img *ngFor="let img of reporte.imagenes" [src]="img" alt="imagen mini" class="imagen-mini">
-    </div>
+    <p><strong>Ubicación:</strong> {{ reporte.ubicacion }}</p>
+    <p *ngIf="reporte.telefono"><strong>Teléfono:</strong> {{ reporte.telefono }}</p>
+    <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
+    <p><strong>Fecha:</strong> {{ reporte.fecha | date:'mediumDate' }}</p>
   </div>
 
   <!-- Footer -->
@@ -35,7 +41,7 @@
       ❤️ {{ reporte.reacciones.love }}
       😮 {{ reporte.reacciones.wow }}
       😔 {{ reporte.reacciones.sad }}
-      ☑️ {{ reporte.reacciones.helpful}}
+      ☑️ {{ reporte.reacciones.helpful }}
     </div>
 
     <div class="botones">
@@ -45,40 +51,22 @@
   </div>
 </div>
 
-<!-- Modal Detalles -->
-<div class="modal" *ngIf="mostrarDetalles">
-  <div class="modal-contenido">
-    <h3>{{ reporte.titulo }}</h3>
-    <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
-    <p><strong>Estado:</strong> {{ reporte.estado }}</p>
-    <p><strong>Prioridad:</strong> {{ reporte.prioridad }}</p>
-    <p><strong>Fecha:</strong> {{ reporte.fecha | date:'short' }}</p>
-
-    <div class="historial" *ngIf="reporte.historial?.length">
-      <h4>Historial</h4>
-      <ul>
-        <li *ngFor="let h of reporte.historial">
-          {{ h.accion }} - <small>{{ h.fecha | date:'short' }}</small>
-        </li>
-      </ul>
-    </div>
-
-    <button class="btn btn-cerrar" (click)="cerrarDetalles()">Cerrar</button>
+<!-- Modal Imagen GLOBAL -->
+<div class="modal-imagen" *ngIf="imagenSeleccionada" (click)="cerrarImagenCompleta()">
+  <div class="modal-contenido-imagen" (click)="$event.stopPropagation()">
+    <img [src]="imagenSeleccionada" alt="Imagen completa">
+    <button class="btn-cerrar" (click)="cerrarImagenCompleta()">✖</button>
   </div>
 </div>
 
-<!-- Modal Ubicación -->
-<div class="modal" *ngIf="mostrarUbicacion">
-  <div class="modal-contenido modal-mapa">
-    <h3>Ubicación del reporte</h3>
-    <iframe
-      width="100%"
-      height="300"
-      style="border:0"
-      [src]="'https://www.google.com/maps?q=' + reporte.ubicacion + '&output=embed'"
-      allowfullscreen
-      loading="lazy">
-    </iframe>
-    <button class="btn btn-cerrar" (click)="cerrarUbicacion()">Cerrar</button>
-  </div>
-</div>
+<app-modal-detalles 
+  *ngIf="mostrarDetalles"
+  [reporte]="reporte"
+  (cerrar)="cerrarDetalles()">
+</app-modal-detalles>
+
+<app-modal-ubicacion
+  *ngIf="mostrarUbicacion"
+  [ubicacion]="reporte.ubicacion"
+  (cerrar)="cerrarUbicacion()">
+</app-modal-ubicacion>

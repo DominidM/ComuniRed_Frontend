@@ -1,11 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Reporte } from '../ajson/json';
+import { ModalDetallesComponent } from './modal-detalles/modal-detalles.component';
+import { ModalUbicacionComponent } from './modal-ubicacion/modal-ubicacion.component';
 
 @Component({
   selector: 'app-report-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ModalDetallesComponent, ModalUbicacionComponent],
   templateUrl: './report-card.component.html',
   styleUrls: ['./report-card.component.css']
 })
@@ -15,6 +17,7 @@ export class ReportCardComponent {
 
   mostrarDetalles = false;
   mostrarUbicacion = false;
+  imagenSeleccionada: string | null = null; 
 
   abrirDetalles(event: Event) {
     event.stopPropagation();
@@ -32,6 +35,14 @@ export class ReportCardComponent {
 
   cerrarUbicacion() {
     this.mostrarUbicacion = false;
+  }
+
+  abrirImagenCompleta(img: string) {
+    this.imagenSeleccionada = img;
+  }
+
+  cerrarImagenCompleta() {
+    this.imagenSeleccionada = null;
   }
 
   getEstadoClase(): string {
