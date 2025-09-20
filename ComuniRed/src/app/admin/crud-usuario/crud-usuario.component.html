@@ -1,153 +1,300 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRUD Usuario</title>
-    <link rel="stylesheet" href="crud-usuario.css">
-</head>
-<body>
-    <div class="crud-usuario-root">
-        <div class="crud-usuario-header">
-            <h2>Gestión de Usuarios</h2>
-            <button class="btn-primary" onclick="openModal()">Nuevo Usuario</button>
-        </div>
-
-        <div class="crud-usuario-table-container">
-            <table class="crud-usuario-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Email</th>
-                        <th>Rol</th>
-                        <th>Estado</th>
-                        <th>Fecha Registro</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <button class="btn-edit" onclick="editUser(1)">Editar</button>
-                            <button class="btn-delete" onclick="deleteUser(1)">Eliminar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <button class="btn-edit" onclick="editUser(2)">Editar</button>
-                            <button class="btn-delete" onclick="deleteUser(2)">Eliminar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <button class="btn-edit" onclick="editUser(3)">Editar</button>
-                            <button class="btn-delete" onclick="deleteUser(3)">Eliminar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <button class="btn-edit" onclick="editUser(4)">Editar</button>
-                            <button class="btn-delete" onclick="deleteUser(4)">Eliminar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <button class="btn-edit" onclick="editUser(5)">Editar</button>
-                            <button class="btn-delete" onclick="deleteUser(5)">Eliminar</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="crud-usuario-modal" id="userModal" style="display: none;">
-            <div class="crud-usuario-modal-content">
-                <h3>Nuevo Usuario</h3>
-                <form>
-                    <div class="form-group">
-                        <label for="nombre">Nombre:</label>
-                        <input type="text" id="nombre" name="nombre" placeholder="Ingrese el nombre">
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" placeholder="usuario@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="rol">Rol:</label>
-                        <select id="rol" name="rol">
-                            <option value="administrador">Administrador</option>
-                            <option value="usuario">Usuario</option>
-                            <option value="moderador">Moderador</option>
-                            <option value="supervisor">Supervisor</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="estado">Estado:</label>
-                        <select id="estado" name="estado">
-                            <option value="activo">Activo</option>
-                            <option value="inactivo">Inactivo</option>
-                            <option value="suspendido">Suspendido</option>
-                            <option value="pendiente">Pendiente</option>
-                        </select>
-                    </div>
-                    <div class="crud-usuario-modal-actions">
-                        <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
-                        <button type="submit" class="btn-primary">Guardar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+<div class="crud-usuario-root">
+  <div class="crud-usuario-card">
+    <div class="crud-usuario-header">
+      <h2>Gestión de Usuarios</h2>
+      <button class="btn-primary" (click)="openAddModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nuevo Usuario
+      </button>
     </div>
 
-    <script>
-        function openModal() {
-            document.getElementById('userModal').style.display = 'flex';
-        }
+    <!-- Controles superiores: Buscador + mostrar por página + total -->
+    <div class="crud-usuario-controls-row">
+      <div class="crud-usuario-search-box">
+        <input type="text" [(ngModel)]="searchText" placeholder="Buscar por nombre, apellido, DNI..." />
+        <!-- BOTÓN DE BÚSQUEDA CON ICONO LUPA -->
+        <button class="crud-usuario-search-btn" (click)="buscarUsuario()" aria-label="Buscar usuario">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </div>
+      <div class="crud-usuario-show-select">
+        <label for="pageSize">por página</label>
+        <select id="pageSize" (change)="onPageSizeChange($event)" [value]="size">
+          <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
+        </select>
+        <span>Total: {{ totalElements }}</span>
+      </div>
+    </div>
 
-        function closeModal() {
-            document.getElementById('userModal').style.display = 'none';
-        }
+    <div *ngIf="usuarios && usuarios.length > 0; else noUsuarios">
+      <table class="crud-usuario-table">
+        <thead>
+          <tr>
+            <th style="display: none;">ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Rol</th>
+            <th>DNI</th>
+            <th>Distrito</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of usuarios; trackBy: trackByUsuarioId">
+            <td style="display: none;">{{ usuario.id }}</td>
+            <td>
+              <div class="user-name">{{ usuario.nombre }}</div>
+            </td>
+            <td>
+              <div class="user-lastname">{{ usuario.apellido }}</div>
+            </td>
+            <td>
+              <div class="user-role">{{ getRolNombre(usuario.rol_id) }}</div>
+            </td>
+            <td>
+              <div class="user-dni">{{ usuario.dni }}</div>
+            </td>
+            <td>
+              <div class="user-district">{{ usuario.distrito }}</div>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-edit" (click)="openEditModal(usuario)" title="Editar usuario">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                  </svg>
+                  Editar
+                </button>
+                <button class="btn-delete" (click)="deleteUsuario(usuario)" title="Eliminar usuario">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                  </svg>
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-        function editUser(id) {
-            openModal();
-        }
+    <ng-template #noUsuarios>
+      <div class="crud-usuario-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #000000;">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <p>No hay usuarios registrados</p>
+        <button class="btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">
+          Crear primer usuario
+        </button>
+      </div>
+    </ng-template>
 
-        function deleteUser(id) {
-            if (confirm('¿Está seguro de eliminar este usuario?')) {
-                console.log('Usuario eliminado:', id);
-            }
-        }
-    </script>
-</body>
-</html>
+    <!-- Paginación abajo centrada y contador -->
+    <div class="crud-usuario-pagination-row" *ngIf="totalElements > 0">
+      <div class="crud-usuario-pagination">
+        <button class="crud-usuario-pagination-btn" (click)="prevPage()" [disabled]="page === 0"><b>&lt; Anterior</b></button>
+        <span class="crud-usuario-pagination-info"><b>Página {{ page + 1 }} de {{ totalPages }}</b></span>
+        <button class="crud-usuario-pagination-btn" (click)="nextPage()" [disabled]="page >= totalPages - 1"><b>Siguiente &gt;</b></button>
+      </div>
+      <div class="crud-usuario-pagination-count">
+        <span>Mostrando {{ usuarios.length }} de {{ totalElements }} datos.</span>
+      </div>
+    </div>
+
+    <!-- Modal Formulario -->
+    <div class="crud-usuario-modal" *ngIf="showModal" (click)="closeModal()">
+      <div class="crud-usuario-modal-content" (click)="$event.stopPropagation()">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          {{ editingUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}
+        </h3>
+        
+        <form (ngSubmit)="saveUsuario()" #usuarioForm="ngForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nombre">Nombre *</label>
+              <input 
+                id="nombre" 
+                name="nombre" 
+                type="text"
+                [(ngModel)]="usuarioData.nombre" 
+                required 
+                placeholder="Nombre del usuario"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label for="apellido">Apellido *</label>
+              <input 
+                id="apellido" 
+                name="apellido" 
+                type="text"
+                [(ngModel)]="usuarioData.apellido" 
+                required 
+                placeholder="Apellido del usuario"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="dni">DNI</label>
+              <input 
+                id="dni" 
+                name="dni" 
+                type="text"
+                [(ngModel)]="usuarioData.dni" 
+                placeholder="12345678"
+                autocomplete="off"
+                maxlength="8"
+              />
+            </div>
+            <div class="form-group">
+              <label for="numero_telefono">Teléfono</label>
+              <input 
+                id="numero_telefono" 
+                name="numero_telefono" 
+                type="text"
+                [(ngModel)]="usuarioData.numero_telefono" 
+                placeholder="987654321"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edad">Edad</label>
+              <input 
+                id="edad" 
+                name="edad" 
+                type="number"
+                [(ngModel)]="usuarioData.edad" 
+                placeholder="25"
+                min="0"
+                max="120"
+              />
+            </div>
+            <div class="form-group">
+              <label for="sexo">Sexo</label>
+              <select 
+                id="sexo" 
+                name="sexo" 
+                [(ngModel)]="usuarioData.sexo"
+              >
+                <option value="">Seleccionar...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="distrito">Distrito</label>
+              <input 
+                id="distrito" 
+                name="distrito" 
+                type="text"
+                [(ngModel)]="usuarioData.distrito" 
+                placeholder="Ej: San Isidro, Miraflores..."
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label for="codigo_postal">Código Postal</label>
+              <input 
+                id="codigo_postal" 
+                name="codigo_postal" 
+                type="text"
+                [(ngModel)]="usuarioData.codigo_postal" 
+                placeholder="15074"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="direccion">Dirección</label>
+            <input 
+              id="direccion" 
+              name="direccion" 
+              type="text"
+              [(ngModel)]="usuarioData.direccion" 
+              placeholder="Av. Ejemplo 123"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input 
+              id="email" 
+              name="email" 
+              type="email"
+              [(ngModel)]="usuarioData.email" 
+              required 
+              placeholder="usuario@ejemplo.com"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password">Contraseña {{ !editingUsuario ? '*' : '' }}</label>
+              <input 
+                id="password" 
+                name="password" 
+                type="password"
+                [(ngModel)]="usuarioData.password" 
+                [required]="!editingUsuario"
+                placeholder="Contraseña del usuario"
+                autocomplete="new-password"
+              />
+            </div>
+            <div class="form-group">
+              <label for="rol_id">Rol ID</label>
+              <input 
+                id="rol_id" 
+                name="rol_id" 
+                type="text"
+                [(ngModel)]="usuarioData.rol_id" 
+                placeholder="ID del rol"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          
+          <div class="crud-usuario-modal-actions">
+            <button type="button" class="btn-cancel" (click)="closeModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="!usuarioForm.valid">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20,6 9,17 4,12"></polyline>
+              </svg>
+              {{ editingUsuario ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

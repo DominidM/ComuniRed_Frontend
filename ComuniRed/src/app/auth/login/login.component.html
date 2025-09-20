@@ -3,18 +3,32 @@
     <img src="https://res.cloudinary.com/dxuk9bogw/image/upload/v1757487126/Inmobiliarias-en-Peru-Seis-estrategias-para-gestionar-la-relacion-con-los-vecinos_fiomik.jpg" alt="Imagen lateral" />
   </div>
   <div class="login-form">
-    <form (ngSubmit)="login()">
+    <form (ngSubmit)="login()" #form="ngForm" autocomplete="off">
       <h2>ComuniRed</h2>
       <p>Bienvidos ayudanos a formar una comunidad</p>
       <label>Usuario</label>
-      <input type="email" [(ngModel)]="email" name="email" required />
+      <input type="email" [(ngModel)]="email" name="email" required autocomplete="off" [disabled]="isLoading" />
       <label>Contraseña</label>
-      <input type="password" [(ngModel)]="password" name="password" required />
+      <input type="password" [(ngModel)]="password" name="password" required autocomplete="off" [disabled]="isLoading" />
       <div class="login-options">
         <a href="#">¿Olvidaste tu contraseña?</a>
         <a routerLink="/register">Regístrate</a>
       </div>
-      <button type="submit">Ingresar</button>
+      <button type="submit" [disabled]="form.invalid || isLoading">
+        <ng-container *ngIf="!isLoading">Ingresar</ng-container>
+        <ng-container *ngIf="isLoading">
+          <span class="spinner"></span> Procesando...
+        </ng-container>
+      </button>
     </form>
+  </div>
+  <!-- Flotantes globales (dentro de login-page pero fuera del formulario) -->
+  <div class="snackbar" *ngIf="showSuccess">
+    <span class="snackbar-icon">✔️</span>
+    ¡Bienvenido!
+  </div>
+  <div class="snackbar error" *ngIf="showError">
+    <span class="snackbar-icon">❌</span>
+    {{ showError }}
   </div>
 </div>

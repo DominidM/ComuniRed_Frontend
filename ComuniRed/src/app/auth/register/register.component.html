@@ -1,21 +1,90 @@
 <div class="register-page">
-  <div class="register-left">
-    <img src="https://res.cloudinary.com/dxuk9bogw/image/upload/v1757488558/2YMJBJZ7ABFARCOAEINHGMPBQE_oauma2.avif" alt="Imagen lateral" />
-  </div>
   <div class="register-form">
-    <form (ngSubmit)="register()">
+    <form (ngSubmit)="register()" #form="ngForm" autocomplete="off">
       <h2>Registro</h2>
       <p>Crea tu cuenta para acceder a la comunidad</p>
-      <label>Nombre</label>
-      <input type="text" [(ngModel)]="nombre" name="nombre" required />
-      <label>Email</label>
-      <input type="email" [(ngModel)]="email" name="email" required />
-      <label>Contraseña</label>
-      <input type="password" [(ngModel)]="password" name="password" required />
-      <button type="submit">Registrarse</button>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" [(ngModel)]="usuarioData.nombre" name="nombre" required autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>Apellido</label>
+          <input type="text" [(ngModel)]="usuarioData.apellido" name="apellido" required autocomplete="off" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>DNI</label>
+          <input type="text" [(ngModel)]="usuarioData.dni" name="dni" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" [(ngModel)]="usuarioData.numero_telefono" name="numero_telefono" autocomplete="off" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Edad</label>
+          <input type="number" [(ngModel)]="usuarioData.edad" name="edad" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>Sexo</label>
+          <select [(ngModel)]="usuarioData.sexo" name="sexo">
+            <option value="">Sin especificar</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Distrito</label>
+          <input type="text" [(ngModel)]="usuarioData.distrito" name="distrito" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>Código Postal</label>
+          <input type="text" [(ngModel)]="usuarioData.codigo_postal" name="codigo_postal" autocomplete="off" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="width:100%">
+          <label>Dirección</label>
+          <input type="text" [(ngModel)]="usuarioData.direccion" name="direccion" autocomplete="off" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" [(ngModel)]="usuarioData.email" name="email" required autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" [(ngModel)]="usuarioData.password" name="password" required autocomplete="off" />
+        </div>
+      </div>
+      <button type="submit" [disabled]="form.invalid || isLoading">
+        <ng-container *ngIf="!isLoading">Registrarse</ng-container>
+        <ng-container *ngIf="isLoading">
+          <span class="spinner"></span> Procesando...
+        </ng-container>
+      </button>
       <div class="register-options">
         <a routerLink="/login">¿Ya tienes cuenta? Inicia sesión</a>
       </div>
     </form>
+    <!-- Flotante de éxito -->
+    <div class="snackbar" *ngIf="showSuccess">
+      <span class="snackbar-icon">✔️</span>
+      ¡Usuario creado exitosamente!
+    </div>
+    <!-- Flotante de error -->
+    <div class="snackbar error" *ngIf="showError">
+      <span class="snackbar-icon">❌</span>
+      {{ showError }}
+    </div>
+  </div>
+  <div class="register-left">
+    <img src="https://res.cloudinary.com/dxuk9bogw/image/upload/v1757488558/2YMJBJZ7ABFARCOAEINHGMPBQE_oauma2.avif" alt="Imagen lateral" />
   </div>
 </div>

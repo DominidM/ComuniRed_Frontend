@@ -12,12 +12,12 @@ import { RolService, Rol, RolPage } from '../../services/rol.service';
 })
 export class CrudRolComponent {
   roles: Rol[] = [];
-  allRoles: Rol[] = []; // Para búsqueda local
+  allRoles: Rol[] = []; 
   showModal = false;
   editingRol: Rol | null = null;
   rolData: Partial<Rol> = {};
   page = 0;
-  size = 10;
+  size = 5;
   totalPages = 1;
   totalElements = 0;
   pageSizes = [5, 10, 20, 50];
