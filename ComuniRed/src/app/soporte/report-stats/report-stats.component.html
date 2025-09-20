@@ -1,18 +1,44 @@
 <div class="stats-container">
-  <div class="stats-box total">
-    <h4>Total de reportes</h4>
-    <p>{{total}}</p>
+  <!-- Total de Reportes -->
+  <div class="stats-card total">
+    <div class="stats-header">
+      <h4>Total de Reportes</h4>
+      <span class="icon blue">📍</span>
+    </div>
+    <p class="stats-number">{{ total }}</p>
+    <span class="stats-sub">Todos los reportes</span>
   </div>
-  <div class="stats-box pendientes">
-    <h4>Pendientes</h4>
-    <p>{{pendientes}}</p>
+
+  <!-- Reportes Nuevos -->
+  <div class="stats-card nuevos">
+    <div class="stats-header">
+      <h4>Reportes Nuevos</h4>
+      <span class="icon red">⚠️</span>
+    </div>
+    <p class="stats-number">{{ nuevos }}</p>
+    <span class="stats-sub">Requieren atención</span>
   </div>
-  <div class="stats-box en-progreso">
-    <h4>En progreso</h4>
-    <p>{{enProgreso}}</p>
+
+  <!-- En Proceso -->
+  <div class="stats-card proceso">
+    <div class="stats-header">
+      <h4>En Proceso</h4>
+      <span class="icon orange">⏳</span>
+    </div>
+    <p class="stats-number">{{ enProceso }}</p>
+    <span class="stats-sub">En seguimiento</span>
   </div>
-  <div class="stats-box resueltos">
-    <h4>Resueltos</h4>
-    <p>{{resueltos}}</p>
+
+  <!-- Resueltos -->
+  <div class="stats-card resueltos">
+    <div class="stats-header">
+      <h4>Resueltos</h4>
+      <span class="icon green">✅</span>
+    </div>
+    <p class="stats-number">{{ resueltos }}</p>
+    <span class="stats-sub">
+      Tasa de resolución 
+      <span class="badge">{{ tasaResolucion }}%</span>
+    </span>
   </div>
 </div>

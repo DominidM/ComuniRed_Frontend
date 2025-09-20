@@ -1,27 +1,34 @@
 <div class="filtros">
-  <input type="text" placeholder="Buscar reportes..." [(ngModel)]="busqueda" />
+  <input type="text" placeholder="Buscar reportes..." [(ngModel)]="busqueda" (input)="aplicarFiltro()" />
 
-  <label for="categoria">Categoría:</label>
-  <select id="categoria" [(ngModel)]="categoriaSeleccionada">
-    <option *ngFor="let cat of categorias">{{ cat }}</option>
+  <label for="tipo">Tipo:</label>
+  <select id="tipo" [(ngModel)]="tipoReporte" (change)="aplicarFiltro()">
+    <option value="">Todos</option> <!-- 🔥 Opción inicial -->
+    <option *ngFor="let tipo of tiposReporte" [value]="tipo">{{ tipo }}</option>
   </select>
 
-  <div class="tabs">
-    <button class="tab" [class.active]="tipo === 'recientes'" (click)="setTipo('recientes')">
-      Más recientes
-    </button>
-    <button class="tab" [class.active]="tipo === 'votados'" (click)="setTipo('votados')">
-      Más votados
-    </button>
-    <button class="tab urgent" [class.active]="tipo === 'urgentes'" (click)="setTipo('urgentes')">
-      Urgentes
-    </button>
-  </div>
+  <label for="estado">Estado:</label>
+  <select id="estado" [(ngModel)]="estadoSeleccionado" (change)="aplicarFiltro()">
+    <option value="">Todos</option> <!-- 🔥 Opción inicial -->
+    <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+  </select>
+
+  <label for="prioridad">Prioridad:</label>
+  <select id="prioridad" [(ngModel)]="prioridadSeleccionada" (change)="aplicarFiltro()">
+    <option value="">Todas</option> <!-- 🔥 Opción inicial -->
+    <option *ngFor="let prioridad of prioridades" [value]="prioridad">{{ prioridad }}</option>
+  </select>
+
+  <label for="periodo">Periodo:</label>
+  <select id="periodo" [(ngModel)]="periodoSeleccionado" (change)="aplicarFiltro()">
+    <option value="">Todos</option> <!-- 🔥 Opción inicial -->
+    <option *ngFor="let periodo of periodos" [value]="periodo">{{ periodo }}</option>
+  </select>
 </div>
 
 <div class="contenedor-reportes">
   <app-report-card
-    *ngFor="let reporte of filtrarReportes()"
+    *ngFor="let reporte of reportesFiltrados"
     [reporte]="reporte">
   </app-report-card>
 </div>

@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
-import { Reporte } from '../soporte.component';
+import { Reporte } from '../ajson/json';
 
 @Component({
   selector: 'app-map-reports',
