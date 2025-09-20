@@ -12,9 +12,25 @@ app-sidebar {
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f6f7fa;
+  max-height: 100vh;
 }
 @media (max-width: 700px) {
   app-sidebar { display: none; }
   .main-content { padding: 0; }
   .public-layout { flex-direction: column; }
+}
+
+/* Estilos para scroll personalizado en navegadores Webkit */
+.main-content::-webkit-scrollbar {
+  width: 8px;
+}
+.main-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+.main-content::-webkit-scrollbar-track {
+  background: #f6f7fa;
 }

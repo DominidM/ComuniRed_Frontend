@@ -1,5 +1,6 @@
-<div class="sidebar">
-  <a class="sidebar-item" href="#"><mat-icon>home</mat-icon> Inicio</a>
-  <a class="sidebar-item" href="#"><mat-icon>group</mat-icon> Usuarios</a>
-  <a class="sidebar-item" href="#"><mat-icon>help</mat-icon> Soporte</a>
-</div>
+<mat-nav-list>
+  <a mat-list-item *ngFor="let item of menuItems" [routerLink]="item.route">
+    <mat-icon matListIcon>{{ item.icon }}</mat-icon>
+    <span matLine>{{ item.label }}</span>
+  </a>
+</mat-nav-list>

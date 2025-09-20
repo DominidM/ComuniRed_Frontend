@@ -10,7 +10,8 @@ interface Comment {
   date: string;
   content: string;
 }
-interface Post {
+
+export interface Post {
   author: string;
   date: string;
   content: string;

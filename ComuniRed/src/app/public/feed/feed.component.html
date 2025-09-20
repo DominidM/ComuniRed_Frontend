@@ -1,3 +1,53 @@
-<div class="feed-content">
-  <app-post-card *ngFor="let post of posts" [post]="post"></app-post-card>
+<div class="feed-container">
+  <!-- Buscador -->
+  <input
+    type="text"
+    placeholder="Buscar publicaciones..."
+    [(ngModel)]="searchQuery"
+    class="search-input"
+  />
+
+  <!-- Posts -->
+  <div *ngFor="let post of filteredPosts()" class="post-card">
+    <div class="post-header">
+      <img [src]="post.avatar" alt="Avatar" class="avatar" />
+      <div>
+        <h3 class="author">{{ post.author }}</h3>
+        <p class="date">{{ post.date }} • {{ post.location || 'Ubicación no disponible' }}</p>
+      </div>
+    </div>
+
+    <h4 class="post-title">{{ post.title }}</h4>
+    <p class="post-content">{{ post.content }}</p>
+    <img *ngIf="post.imageUrl" [src]="post.imageUrl" alt="Post image" class="post-image" />
+
+    <!-- Pregunta debajo de la imagen -->
+    <div *ngIf="post.imageUrl" class="vote-section">
+      <p class="vote-question">¿Estás de acuerdo con este reporte? <span class="vote-count">{{ post.acceptVotes + post.rejectVotes }} votos</span></p>
+      <button [disabled]="post.userVote" (click)="vote(post, 'accept')">Sí ({{ post.acceptVotes }})</button>
+      <button [disabled]="post.userVote" (click)="vote(post, 'reject')">No ({{ post.rejectVotes }})</button>
+    </div>
+
+    <!-- Acciones -->
+    <div class="post-actions">
+      <button (click)="toggleLike(post)">
+        {{ post.liked ? '💖' : '🤍' }} {{ post.likes }}
+      </button>
+      <button (click)="toggleComments(post)">
+        💬 {{ post.comments.length }}
+      </button>
+      <button (click)="toggleBookmark(post)">
+        {{ post.bookmarked ? '🔖' : '📑' }}
+      </button>
+      <button (click)="sharePost(post)">📤 Compartir</button>
+    </div>
+
+    <!-- Comentarios -->
+    <div *ngIf="post.showComments" class="comments-section">
+      <div *ngFor="let comment of post.comments" class="comment">
+        <strong>{{ comment.author }}:</strong> {{ comment.content }}
+      </div>
+      <input type="text" placeholder="Escribe un comentario..." class="comment-input" />
+    </div>
+  </div>
 </div>
