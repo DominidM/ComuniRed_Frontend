@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 
 
 import { LogoSectionComponent } from './logo-section/logo-section.component';
@@ -25,6 +26,8 @@ export class HeaderComponent
 {
   usuario: Soporte = Usuario_soporte[0];
 
+  constructor(private router: Router) {}
+  
   actualizar() {
     console.log('🔄 Actualizando datos...');
   }
@@ -38,6 +41,6 @@ export class HeaderComponent
   }
 
   salir() {
-    console.log('🚪 Cerrando sesión...');
+    this.router.navigate(['/login']);
   }
 }

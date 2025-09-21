@@ -20,15 +20,18 @@ export interface Comentario {
   fecha: Date;
 }
 
+
 export interface Historial {
-  accion: string;
-  autor: string;
-  fecha: Date;
+  id: number;
+  fecha?: Date;       // ahora es opcional
+  mensaje?: string;
+  estado?: 'enviado' | 'observado' | 'en progreso' | 'resuelto';
 }
 
 export interface Reporte {
   id: number;
   cliente: Cliente;
+  soporte: Soporte;
   categoria: string;
   titulo: string;
   descripcion: string;
@@ -48,7 +51,8 @@ export interface Reporte {
 
   reacciones: Reacciones;
   comentarios: Comentario[];
-  historial: Historial[];
+  
+  historial?: Historial[];
 }
 
 export interface Cliente {
@@ -60,6 +64,8 @@ export interface Cliente {
   direccion?: string;
 }
 
+
+
 export const Usuario_soporte: Soporte[] = [
   {
     id: 1,
@@ -67,6 +73,7 @@ export const Usuario_soporte: Soporte[] = [
     avatar_soporte: 'https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757493645/Poses-Perfil-Profesional-Hombresdic.-27-2022-3-819x1024_p76mzs.webp'
   }
 ];
+
 
 export const Usuario_cliente: Cliente[] = [
   { 
@@ -115,11 +122,37 @@ export const Usuario_cliente: Cliente[] = [
   }
 ];
 
+export const historial: Historial[] = [
+  {
+    id: 1,
+    mensaje: 'Reporte recibido y registrado en el sistema',
+    fecha: new Date(2025, 8, 20, 1, 0),
+    estado: 'enviado'
+  },
+  {
+    id: 2,
+    mensaje: 'Se está revisando el problema',
+    fecha: new Date(2025, 8, 20, 1, 5),
+    estado: 'observado'
+  },
+  {
+    id: 3,
+    mensaje: 'Problema en progreso',
+    fecha: new Date(2025, 8, 20, 1, 10),
+    estado: 'en progreso'
+  },
+  {
+    id: 4,
+    mensaje: 'Problema resuelto',
+    fecha: new Date(2025, 8, 20, 1, 15),
+    estado: 'resuelto'
+  }
+];
 export const REPORTES: Reporte[] = [
   {
     id: 1,
     cliente: Usuario_cliente[0],
-
+    soporte: Usuario_soporte[0],
     categoria: 'Alumbrado',
     tipo: 'Infraestructura',
     periodo: 'Esta semana',
@@ -134,11 +167,12 @@ export const REPORTES: Reporte[] = [
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757491814/poste-barrios-altos2_542958_twyi5f.jpg'],
     reacciones: { likes: 5, dislikes: 2, helpful: 3, love: 0, wow: 5, sad: 0, reportes: 3 },
     comentarios: [{ autor: 'María', texto: 'Yo también lo vi', fecha: new Date(2025, 6, 6, 6, 10) }],
-    historial: [{ accion: 'Reporte creado', autor: 'Carlos Ruiz', fecha: new Date(2025, 6, 6, 6, 10) }]
+    historial: historial.filter(h => h.id <= 1)
   },
   {
     id: 2,
     cliente: Usuario_cliente[1],
+    soporte: Usuario_soporte[0],
     categoria: 'Limpieza',
     tipo: 'Ambiental',
     periodo: 'Hoy',
@@ -153,11 +187,13 @@ export const REPORTES: Reporte[] = [
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787551/a09ffa08-24fb-4593-9c48-0183b0fee4bf_bwj8fs.jpg'],
     reacciones: { likes: 5, dislikes: 0, helpful: 3, love: 0, wow: 5, sad: 0, reportes: 2 },
     comentarios: [{ autor: 'Pedro', texto: 'Esto genera mal olor', fecha: new Date(2025, 6, 6, 6, 10) }],
-    historial: [{ accion: 'Reporte creado', autor: 'Lucía Fernández', fecha: new Date(2025, 6, 6, 6, 10) }]
+    historial: historial.filter(h => h.id <= 4)
+    
   },
   {
     id: 3,
     cliente: Usuario_cliente[2],
+    soporte: Usuario_soporte[0],
     categoria: 'Seguridad',
     tipo: 'Seguridad',
     periodo: 'Esta semana',
@@ -172,11 +208,12 @@ export const REPORTES: Reporte[] = [
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787586/203920_394774_mobdrw.webp'],
     reacciones: { likes: 5, dislikes: 0, helpful: 3, love: 0, wow: 1, sad: 0, reportes: 1 },
     comentarios: [{ autor: 'Laura', texto: 'Debemos pedir más patrullaje', fecha: new Date(2025, 6, 6, 6, 10) }],
-    historial: [{ accion: 'Reporte creado', autor: 'Andrés Gómez', fecha: new Date(2025, 6, 6, 6, 10) }]
+    historial: historial.filter(h => h.id <= 4)
   },
   {
     id: 4,
     cliente: Usuario_cliente[3],
+    soporte: Usuario_soporte[0],
     categoria: 'Alumbrado',
     tipo: 'Infraestructura',
     periodo: 'Este mes',
@@ -191,14 +228,12 @@ export const REPORTES: Reporte[] = [
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787597/655663_u3ycdh.webp'],
     reacciones: { likes: 9, dislikes: 4, helpful: 2, love: 1, wow: 7, sad: 1, reportes: 3 },
     comentarios: [{ autor: 'Carlos', texto: 'Gracias por reportar', fecha: new Date(2025, 6, 6, 6, 10) }],
-    historial: [
-      { accion: 'Reporte creado', autor: 'María López', fecha: new Date('2025-08-28') },
-      { accion: 'Problema resuelto', autor: 'Municipalidad', fecha: new Date('2025-08-30') }
-    ]
+    historial: historial.filter(h => h.id <= 4)
   },
   {
     id: 5,
     cliente: Usuario_cliente[4],
+    soporte: Usuario_soporte[0],
     categoria: 'Limpieza',
     tipo: 'Ambiental',
     periodo: 'Hoy',
@@ -213,11 +248,12 @@ export const REPORTES: Reporte[] = [
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787633/images_nzyale.jpg'],
     reacciones: { likes: 12, dislikes: 2, helpful: 4, love: 3, wow: 2, sad: 1, reportes: 3 },
     comentarios: [{ autor: 'Ana', texto: 'Esto atrae animales', fecha: new Date(2025, 6, 6, 6, 10) }],
-    historial: [{ accion: 'Reporte creado', autor: 'Pedro Sánchez', fecha: new Date(2025, 6, 6, 6, 10) }]
+    historial: historial.filter(h => h.id <= 4)
   },
   {
     id: 6,
     cliente: Usuario_cliente[5],
+    soporte: Usuario_soporte[0],
     categoria: 'Parque',
     tipo: 'Seguridad',
     periodo: 'Hoy',
@@ -232,11 +268,12 @@ export const REPORTES: Reporte[] = [
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787635/1502568_ebwuqi.webp'],
     reacciones: { likes: 9, dislikes: 4, helpful: 2, love: 1, wow: 7, sad: 1, reportes: 3 },
     comentarios: [{ autor: 'Luis', texto: 'Podría ser peligroso', fecha: new Date(2025, 6, 6, 6, 10) }],
-    historial: [{ accion: 'Reporte creado', autor: 'Valeria Torres', fecha: new Date(2025, 6, 6, 6, 10) }]
+    historial: historial.filter(h => h.id <= 4)
   },
   {
     id: 7,
     cliente: Usuario_cliente[6],
+    soporte: Usuario_soporte[0],
     categoria: 'Alumbrado',
     tipo: 'Infraestructura',
     periodo: 'Esta semana',
@@ -251,11 +288,12 @@ export const REPORTES: Reporte[] = [
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787831/images_nkrvjf.jpg'],
     reacciones: { likes: 1, dislikes: 6, helpful: 1, love: 1, wow: 2, sad: 1, reportes: 3 },
     comentarios: [{ autor: 'Rosa', texto: 'Zona peligrosa sin luz', fecha: new Date(2025, 6, 6, 6, 10) }],
-    historial: [{ accion: 'Reporte creado', autor: 'Diego Ramos', fecha: new Date(2025, 6, 6, 6, 10) }]
+    historial: historial.filter(h => h.id <= 4)
   },
   {
     id: 8,
     cliente: Usuario_cliente[7],
+    soporte: Usuario_soporte[0],
     categoria: 'Semáforo',
     tipo: 'Infraestructura',
     periodo: 'Hoy',
@@ -270,6 +308,7 @@ export const REPORTES: Reporte[] = [
     imagenes: ['https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757787973/LM5562NESVBZ3IRCHEAWGH4HQM_iyuzva.jpg'],
     reacciones: { likes: 9, dislikes: 4, helpful: 2, love: 1, wow: 7, sad: 1, reportes: 3 },
     comentarios: [{ autor: 'Sofía', texto: 'Deberían repararlo pronto', fecha: new Date(2025, 6, 6, 6, 10) }],
-    historial: [{ accion: 'Reporte creado', autor: 'Ana Morales', fecha: new Date(2025, 6, 6, 6, 10) }]
+    historial: historial.filter(h => h.id <= 4)
   }
 ];
+

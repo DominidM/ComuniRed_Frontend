@@ -1,12 +1,10 @@
-/* ===== CONTENEDOR DE TODAS LAS TARJETAS ===== */
 .container-report-card {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Se ajusta solo */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   padding: 20px;
 }
 
-/* ===== CARD PRINCIPAL ===== */
 .reporte-card {
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -17,7 +15,7 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   background: #fff;
   width: 100%;
-  height: 100%; /* 🔑 ocupa todo el alto disponible dentro de la fila */
+  height: 100%;
 }
 
 .reporte-card:hover {
@@ -25,7 +23,6 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
-/* ===== HEADER ===== */
 .reporte-header {
   display: flex;
   align-items: center;
@@ -51,7 +48,6 @@
   font-size: 0.8rem;
 }
 
-/* ===== IMAGEN PRINCIPAL ===== */
 .imagen-principal {
   display: block;
   width: 100%;
@@ -66,7 +62,6 @@
   transform: scale(1.02);
 }
 
-/* ===== MINIATURAS ===== */
 .imagenes {
   display: flex;
   justify-content: center;
@@ -89,13 +84,12 @@
   transform: scale(1.08);
 }
 
-/* ===== FOOTER ===== */
 .reacciones {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   font-size: 0.9rem;
-  margin-top: auto; /* 🔑 empuja el footer hacia abajo para uniformidad */
+  margin-top: auto;
 }
 
 .botones {
@@ -118,7 +112,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
   .container-report-card {
     grid-template-columns: repeat(3, minmax(250px, 1fr));
@@ -133,7 +126,7 @@
 
 @media (max-width: 600px) {
   .container-report-card {
-    grid-template-columns: 1fr; /* 🔑 ahora se apilan automáticamente */
+    grid-template-columns: 1fr;
   }
 
   .reporte-card {

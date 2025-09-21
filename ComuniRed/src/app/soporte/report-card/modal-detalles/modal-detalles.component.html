@@ -1,57 +1,92 @@
 <div class="modal" *ngIf="isOpen" (click)="cerrarDesdeFondo($event)">
   <div class="modal-contenido" (click)="$event.stopPropagation()">
-    <!-- Botón de cierre (X) -->
+
+    <!-- Botón cerrar -->
     <button class="btn-cerrar-x" (click)="cerrarModal()">✖</button>
 
     <!-- Título del modal -->
     <h3 class="modal-titulo">Detalles del Reporte</h3>
 
-    <!-- Imagenes si existen -->
-    <div class="imagenes" *ngIf="reporte?.imagenes?.length">
+    <!-- Imágenes -->
+    <div class="imagenes" *ngIf="reporte.imagenes.length">
       <img *ngFor="let img of reporte.imagenes"
            [src]="img"
            alt="imagen mini"
            class="imagen-mini">
     </div>
 
+    <!-- Título del reporte -->
     <h2 class="reporte-titulo">{{ reporte.titulo }}</h2>
 
+    <!-- Descripción -->
     <div class="seccion">
       <h4><i class="bi bi-chat-left-dots-fill"></i> Descripción</h4>
-      <p>{{ reporte?.descripcion }}</p>
+      <p>{{ reporte.descripcion }}</p>
     </div>
 
+    <!-- Información del cliente -->
     <div class="seccion">
       <h4><i class="bi bi-person-fill"></i> Información del Cliente</h4>
-      <p><strong>Nombre:</strong> {{ reporte?.cliente?.nombre }}</p>
+      <p><strong>Nombre:</strong> {{ reporte.cliente.nombre }}</p>
       <p *ngIf="reporte?.cliente?.telefono"><strong>Teléfono:</strong> {{ reporte.cliente.telefono }}</p>
       <p *ngIf="reporte?.cliente?.email"><strong>Email:</strong> {{ reporte.cliente.email }}</p>
       <p *ngIf="reporte?.cliente?.direccion"><strong>Dirección:</strong> {{ reporte.cliente.direccion }}</p>
     </div>
 
+    <!-- Ubicación -->
     <div class="seccion">
       <h4><i class="bi bi-geo-alt-fill"></i> Ubicación</h4>
-      <p>{{ reporte?.ubicacion }}</p>
+      <p>Direccion: {{ reporte.ubicacion }}</p>
+      <p *ngIf="reporte.lat && reporte.lng"> Coordenadas: {{ reporte.lat }}, {{ reporte.lng }} </p>
     </div>
 
     <div class="seccion">
-      <h4><i class="bi bi-info-circle-fill"></i> Información Adicional</h4>
-      <p><strong>Estado:</strong> {{ reporte?.estado }}</p>
-      <p><strong>Prioridad:</strong> {{ reporte?.prioridad }}</p>
-      <p><strong>Fecha:</strong> {{ reporte?.fecha | date:'dd/MM/yyyy, h:mm a' }}</p>
+      <h4><i class="bi bi-person-fill"></i> Información del Soporte</h4>
+      <p class="responsable">Responsable: {{ reporte.soporte.nombre }}</p>
+      <p class="fecha-estimada" *ngIf="ultimoHistorial">
+        Fecha estimada de resolución: {{ ultimoHistorial.fecha | date:'dd/MM/yyyy, h:mm a' }}
+      </p>
     </div>
 
+
+    <!-- Reacciones -->
+    <div class="seccion">
+      <h4>Reacciones</h4>
+      <p class="reacciones">
+        <span>👍 {{ reporte.reacciones.likes }}</span>
+        <span>👎 {{ reporte.reacciones.dislikes }}</span>
+        <span>❤️ {{ reporte.reacciones.love }}</span>
+        <span>😮 {{ reporte.reacciones.wow }}</span>
+        <span>😔 {{ reporte.reacciones.sad }}</span>
+        <span>⚠️ {{ reporte.reacciones.reportes }}</span>
+        <span>☑️ {{ reporte.reacciones.helpful }}</span>
+      </p>
+    </div>
+
+    <!-- Progreso de estados -->
+    <div class="seccion progreso">
+      <div class="estado" [class.activo]="getUltimoEstado() === 'enviado'">Pendiente</div>
+      <div class="estado" [class.activo]="getUltimoEstado() === 'observado'">En Proceso</div>
+      <div class="estado" [class.activo]="getUltimoEstado() === 'en progreso'">Resuelto</div>
+      <div class="estado" [class.activo]="getUltimoEstado() === 'resuelto'">Cerrado</div>
+    </div>
+
+    <!-- Historial -->
     <div class="seccion historial" *ngIf="reporte?.historial?.length">
       <h4><i class="bi bi-clock-history"></i> Historial</h4>
       <ul>
         <li *ngFor="let h of reporte.historial">
-          {{ h.accion }} por {{ h.autor }} - <small>{{ h.fecha | date:'short' }}</small>
+          {{ h.mensaje }} - <small>{{ h.fecha | date:'short' }}</small>
+          (<em>{{ h.estado }}</em>)
         </li>
       </ul>
     </div>
 
+    <!-- Footer botones -->
     <div class="modal-footer">
-      <button class="btn btn-cerrar" (click)="cerrarModal()">Cerrar</button>
+      <button class="btn-avanzar" (click)="avanzarProgreso()">Avanzar Progreso</button>
+      <button class="btn-cerrar" (click)="cerrarModal()">Cerrar</button>
     </div>
+
   </div>
 </div>

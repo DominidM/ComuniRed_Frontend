@@ -33,7 +33,6 @@ export class SoporteComponent implements OnInit {
   cliente!:Cliente;
 
   ngOnInit(): void {
-    // Inicializa los reportes al cargar el componente
     this.reportes = REPORTES;
     this.reportesFiltrados = [...this.reportes];
     this.soporte = Usuario_soporte[0];

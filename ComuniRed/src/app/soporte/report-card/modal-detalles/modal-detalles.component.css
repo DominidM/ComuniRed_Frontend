@@ -1,118 +1,200 @@
-/* Fondo oscuro */
+/* Fondo del modal */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.6);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 2000;
-  animation: fadeIn 0.3s ease;
+  align-items: center;
+  z-index: 1000;
 }
 
-/* Card centrado */
+/* Contenido del modal */
 .modal-contenido {
-  position: relative;
-  background: #fff;
-  padding: 20px 25px;
-  border-radius: 12px;
-  width: 480px;
-  max-height: 85vh;
+  background-color: #fff;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  animation: scaleIn 0.3s ease;
+  max-height: 90vh;
+  position: relative;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Botón de cierre (X arriba derecha) */
+/* Botón cerrar superior */
 .btn-cerrar-x {
   position: absolute;
   top: 10px;
-  right: 12px;
-  background: transparent;
+  right: 15px;
   border: none;
+  background: none;
   font-size: 20px;
-  font-weight: bold;
-  color: #666;
   cursor: pointer;
-  transition: color 0.2s ease;
+  color: #444;
+  transition: color 0.2s;
 }
+
 .btn-cerrar-x:hover {
-  color: red;
+  color: #e74c3c;
 }
 
-/* Título */
+/* Títulos */
 .modal-titulo {
+  margin-bottom: 10px;
+  font-size: 22px;
+  font-weight: 600;
   text-align: center;
-  margin-bottom: 15px;
-  font-weight: bold;
-  font-size: 20px;
 }
 
-/* Subtítulo */
 .reporte-titulo {
+  margin: 10px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
   text-align: center;
-  font-size: 18px;
-  margin: 10px 0 20px 0;
-  color: #333;
 }
 
 /* Secciones */
 .seccion {
-  margin-bottom: 15px;
+  margin: 15px 0;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
 }
+
 .seccion h4 {
-  font-size: 15px;
-  margin-bottom: 6px;
+  font-size: 16px;
+  margin-bottom: 5px;
+  color: #34495e;
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #222;
+  gap: 5px;
 }
 
 /* Imágenes mini */
 .imagenes {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   justify-content: center;
   margin-bottom: 15px;
 }
+
 .imagen-mini {
   width: 100px;
-  height: 80px;
+  height: 100px;
   object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
-/* Footer */
+
+
+/* Reacciones */
+.reacciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.reacciones span {
+  background-color: #f2f2f2;
+  padding: 4px 8px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Progreso de estados */
+.progreso {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+}
+
+.estado {
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  border-radius: 5px;
+  background-color: #ecf0f1;
+  color: #7f8c8d;
+  font-weight: 500;
+  margin: 0 5px;
+  transition: all 0.3s;
+}
+
+.estado.activo {
+  background-color: #2ecc71;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Historial */
+.historial ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.historial li {
+  padding: 6px 10px;
+  border-left: 4px solid #3498db;
+  margin-bottom: 8px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.historial li em {
+  font-style: normal;
+  color: #e67e22;
+  font-weight: 600;
+}
+
+/* Footer botones */
 .modal-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  gap: 10px;
   margin-top: 15px;
 }
-.btn-cerrar {
-  padding: 8px 15px;
-  background: #ff4d4d;
+
+.btn-avanzar, .btn-cerrar {
+  padding: 6px 14px;
+  border-radius: 5px;
   border: none;
-  color: white;
-  border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s ease;
-}
-.btn-cerrar:hover {
-  background: #cc0000;
+  font-weight: 600;
+  transition: background-color 0.2s;
 }
 
-/* Animaciones */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.btn-avanzar {
+  background-color: #2980b9;
+  color: #fff;
 }
-@keyframes scaleIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+
+.btn-avanzar:hover {
+  background-color: #1f618d;
+}
+
+.btn-cerrar {
+  background-color: #bdc3c7;
+  color: #2c3e50;
+}
+
+.btn-cerrar:hover {
+  background-color: #95a5a6;
+}
+
+/* Animación de fadeIn */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
