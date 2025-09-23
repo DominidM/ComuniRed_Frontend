@@ -2,12 +2,19 @@
   <div class="navbar-left">
     <span class="logo">ComuniRed</span>
   </div>
-  <div class="navbar-center">
-    <input type="text" placeholder="Buscar" class="search-bar"/>
-  </div>
+  <div class="feed-container">
+  <input
+    type="text"
+    placeholder="Buscar publicaciones..."
+    [(ngModel)]="searchQuery"
+    class="search-input"
+  />
+</div>
   <div class="navbar-right">
     <mat-icon>search</mat-icon>
     <mat-icon>notifications</mat-icon>
     <mat-icon>account_circle</mat-icon>
   </div>
 </nav>
+
+

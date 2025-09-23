@@ -1,12 +1,4 @@
 <div class="feed-container">
-  <!-- Buscador -->
-  <input
-    type="text"
-    placeholder="Buscar publicaciones..."
-    [(ngModel)]="searchQuery"
-    class="search-input"
-  />
-
   <!-- Posts -->
   <div *ngFor="let post of filteredPosts()" class="post-card">
     <div class="post-header">

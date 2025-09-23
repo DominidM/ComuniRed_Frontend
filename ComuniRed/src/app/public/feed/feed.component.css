@@ -56,11 +56,16 @@
 .post-content {
   margin: 0;
   font-size: 14px;
+  line-height: 1.4;
 }
 
+/* 🔥 Ajuste de imágenes */
 .post-image {
   width: 100%;
+  max-height: 400px;   /* límite de altura */
+  object-fit: cover;   /* recorta manteniendo proporción */
   border-radius: 8px;
+  display: block;
 }
 
 .post-actions {
@@ -85,6 +90,7 @@
   font-size: 13px;
   margin-bottom: 4px;
 }
+
 .vote-section {
   margin-top: 12px;
   padding: 8px 0;
@@ -121,4 +127,3 @@
   border: 1px solid #ccc;
   font-size: 13px;
 }
-
