@@ -19,10 +19,69 @@
     </a>
   </nav>
 
-  <!-- Botón principal -->
-  <button mat-stroked-button color="primary" class="sidebar-report-btn">
-    Nuevo Reporte
-  </button>
+<!-- Botón principal -->
+<button mat-stroked-button color="primary" class="sidebar-report-btn" (click)="openModal()">
+  <mat-icon>add</mat-icon>
+  Nuevo Reporte
+</button>
+
+<!-- Modal centrado en la pantalla -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <span class="close-btn" (click)="closeModal()">&times;</span>
+    <h2>Crear Nuevo Reporte</h2>
+
+    <form (ngSubmit)="submitReport()">
+      <!-- Image Upload -->
+      <div>
+        <label>Foto del reporte</label>
+        <div class="image-upload">
+          <ng-container *ngIf="imagePreview; else uploadPlaceholder">
+            <div class="image-preview">
+              <img [src]="imagePreview" alt="Preview" />
+              <button type="button" class="remove-btn" (click)="removeImage()">✕</button>
+            </div>
+          </ng-container>
+          <ng-template #uploadPlaceholder>
+            <label class="upload-placeholder">
+              <span>📷 Toca para subir una foto</span>
+              <input type="file" accept="image/*" (change)="handleImageChange($event)" hidden />
+            </label>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Título -->
+      <div>
+        <input type="text" [(ngModel)]="title" name="title" placeholder="Título del reporte" required />
+      </div>
+
+      <!-- Descripción -->
+      <div>
+        <textarea [(ngModel)]="description" name="description" rows="3" placeholder="Describe el problema..." required></textarea>
+      </div>
+
+      <!-- Categoría -->
+      <div>
+        <select [(ngModel)]="category" name="category" required>
+          <option value="" disabled selected>Selecciona una categoría</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <!-- Ubicación -->
+      <div>
+        <input type="text" [(ngModel)]="location" name="location" placeholder="Ej: Calle 123 con Carrera 45" required />
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button type="button" class="btn-outline" (click)="closeModal()">Cancelar</button>
+        <button type="submit" class="btn-primary">Publicar Reporte</button>
+      </div>
+    </form>
+  </div>
+</div>
 
   <!-- Perfil de usuario -->
   <div class="sidebar-user" *ngIf="user">
