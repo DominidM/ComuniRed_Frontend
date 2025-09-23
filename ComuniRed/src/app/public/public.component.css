@@ -1,54 +1,67 @@
-/* ===== Layout base ===== */
-.public-layout {
-  display: flex;
-  min-height: 100vh;
-  background: #f6f7fa;
-  padding-left: 280px;
-  padding-right: 280px;
-  box-sizing: border-box;
-  width: 100vw;
-  transition: all 0.3s ease;
+/* ===== Contenedor principal ===== */
+.sidenav-container {
+  height: 100vh;
 }
 
-/* Sidebar */
-app-sidebar {
-  flex: 0 0 220px;
-  max-width: 220px;
-  min-width: 220px;
-  transition: all 0.3s ease;
-}
-
-/* Main content */
-.main-content {
-  flex: 1;
-  min-width: 0;
+/* Sidenav-content: sin scroll propio */
+mat-sidenav-content {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   height: 100vh;
   overflow: hidden;
-  transition: all 0.3s ease;
 }
 
-/* Feed area dentro del main */
-.feed-area {
-  flex: 1 1 auto;
+/* Top navbar */
+.top-navbar {
+  flex: 0 0 auto;
+}
+
+/* Layout principal: feed + rightbar */
+.public-layout {
   display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  height: 100%;
-  padding-bottom: 32px;
+  flex: 1;
+  gap: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-/* Rightbar */
+/* Wrapper feed + rightbar */
+.feed-right-wrapper {
+  display: flex;
+  flex: 1;
+  gap: 16px;
+}
+
+/* Feed: único scroll */
+.feed-area {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+/* Rightbar fijo */
 app-rightbar {
   flex: 0 0 400px;
-  max-width: 410px;
-  min-width: 340px;
-  transition: all 0.3s ease;
 }
 
-/* ===== Media Queries ===== */
+.app-sidebar {
+  width: 220px;
+  max-width: 220px;
+  min-width: 220px;
+}
+
+@media (max-width: 900px) {
+  .app-sidebar {
+    width: 220px; /* ancho fijo en modo over */
+    max-width: 220px;
+    min-width: 220px;
+    height: auto; /* deja que crezca según el contenido */
+  }
+}
+
+
+/* Ajustes de padding en desktop */
 @media (max-width: 1400px) {
   .public-layout {
     padding-left: 80px;
@@ -60,47 +73,5 @@ app-rightbar {
   .public-layout {
     padding-left: 0;
     padding-right: 0;
-  }
-  app-rightbar {
-    display: none;
-  }
-}
-
-@media (max-width: 900px) {
-  .public-layout {
-    flex-direction: column;
-  }
-  app-sidebar {
-    display: none;
-  }
-  .main-content {
-    width: 100%;
-    margin: 0;
-  }
-}
-
-/* Móviles (<600px) */
-@media (max-width: 600px) {
-  .main-content {
-    padding: 0;
-  }
-}
-
-/* Angular Material Sidenav */
-.sidenav-container {
-  height: 100vh;
-}
-
-.app-sidebar {
-  width: 220px;
-}
-
-.menu-button {
-  display: none;
-}
-
-@media (max-width: 900px) {
-  .menu-button {
-    display: inline-flex;
   }
 }

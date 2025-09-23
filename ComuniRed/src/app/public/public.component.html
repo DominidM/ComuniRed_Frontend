@@ -1,28 +1,32 @@
 <mat-sidenav-container class="sidenav-container">
-  <!-- Sidebar: aquí ponemos tu componente real -->
-  <mat-sidenav #sidenav mode="side" [opened]="isDesktop" class="app-sidebar">
+  <!-- Sidebar -->
+  <mat-sidenav 
+    #sidenav 
+    [mode]="sidenavMode" 
+    [opened]="sidenavOpened" 
+    class="app-sidebar">
     <app-sidebar></app-sidebar>
   </mat-sidenav>
 
   <!-- Contenido principal -->
   <mat-sidenav-content>
     <nav class="top-navbar">
-      <!-- Botón de menú visible solo en móvil -->
       <button mat-icon-button (click)="sidenav.toggle()" class="menu-button">
         <mat-icon>menu</mat-icon>
       </button>
       <app-navbar></app-navbar>
     </nav>
 
-    <main class="main-content">
-      <div class="feed-area">
-        <router-outlet></router-outlet>
-      </div>
-    </main>
+    <div class="public-layout">
+      <div class="feed-right-wrapper">
+        <!-- Feed -->
+        <div class="feed-area">
+          <router-outlet></router-outlet>
+        </div>
 
-    <!-- Rightbar solo en desktop -->
-    <app-rightbar *ngIf="isDesktop"></app-rightbar>
+        <!-- Rightbar solo desktop -->
+        <app-rightbar *ngIf="isDesktop"></app-rightbar>
+      </div>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">

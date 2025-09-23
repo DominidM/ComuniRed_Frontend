@@ -40,4 +40,13 @@ export class PublicComponent {
   checkScreenSize() {
     this.isDesktop = window.innerWidth > 900;
   }
+   // Método para obtener el mode del sidenav según la pantalla
+  get sidenavMode(): 'side' | 'over' {
+    return this.isDesktop ? 'side' : 'over';
+  }
+
+  // Método para determinar si el sidenav debe abrirse al iniciar
+  get sidenavOpened(): boolean {
+    return this.isDesktop;
+  }
 }

@@ -112,7 +112,13 @@
 /* Responsive: reduce ancho y oculta textos en móvil/tablet */
 @media (max-width: 900px) {
   .sidebar-container {
-    display: none !important;
+    width: 100px; /* ancho completo del sidenav en móvil */
+    padding: 8px 12px;
+  }
+  .sidebar-logo .logo-title,
+  .sidebar-link span,
+  .user-details {
+    display: block; /* opcional: mostrar texto si quieres */
   }
 }
 @media (max-width: 800px) {
