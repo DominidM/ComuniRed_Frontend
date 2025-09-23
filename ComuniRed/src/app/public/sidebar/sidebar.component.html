@@ -1,6 +1,35 @@
-<mat-nav-list>
-  <a mat-list-item *ngFor="let item of menuItems" [routerLink]="item.route">
-    <mat-icon matListIcon>{{ item.icon }}</mat-icon>
-    <span matLine>{{ item.label }}</span>
-  </a>
-</mat-nav-list>
+<div class="sidebar-container">
+  <!-- Logo y nombre -->
+  <div class="sidebar-logo">
+    <div class="logo-circle">CR</div>
+    <span class="logo-title">ComuniRed</span>
+  </div>
+
+  <!-- Menú principal -->
+  <nav class="sidebar-menu">
+    <a 
+      class="sidebar-link"
+      *ngFor="let item of menuItems"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <mat-icon>{{ item.icon }}</mat-icon>
+      <span>{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <!-- Botón principal -->
+  <button mat-stroked-button color="primary" class="sidebar-report-btn">
+    Nuevo Reporte
+  </button>
+
+  <!-- Perfil de usuario -->
+  <div class="sidebar-user" *ngIf="user">
+    <img [src]="user.avatarUrl" alt="avatar" class="user-avatar"/>
+    <div class="user-details">
+      <div class="user-name">{{ user.name }}</div>
+      <div class="user-handle">{{ user.handle }}</div>
+    </div>
+  </div>
+</div>

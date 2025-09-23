@@ -2,35 +2,96 @@
   display: flex;
   min-height: 100vh;
   background: #f6f7fa;
-}
-app-sidebar {
-  flex: 0 0 220px;
-}
-.main-content {
-  flex: 1;
-  padding: 32px 0 0 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #888 #f6f7fa;
-  max-height: 100vh;
-}
-@media (max-width: 700px) {
-  app-sidebar { display: none; }
-  .main-content { padding: 0; }
-  .public-layout { flex-direction: column; }
+  padding-left: 280px;
+  padding-right: 280px;
+  box-sizing: border-box;
+  width: 100vw;
+  transition: padding 0.3s;
 }
 
-/* Estilos para scroll personalizado en navegadores Webkit */
-.main-content::-webkit-scrollbar {
-  width: 8px;
+/* Sidebar y rightbar en desktop */
+app-sidebar {
+  flex: 0 0 220px;
+  max-width: 220px;
+  min-width: 220px;
 }
-.main-content::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Importante: para que el navbar ocupe todo el ancho */
 }
-.main-content::-webkit-scrollbar-track {
+
+app-rightbar {
+  flex: 0 0 400px;
+  max-width: 410px;
+  min-width: 340px;
+}
+
+/* --- RESPONSIVE BREAKPOINTS --- */
+@media (max-width: 1400px) {
+  .public-layout {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+}
+@media (max-width: 1200px) {
+  .public-layout {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  app-rightbar {
+    display: none !important;
+  }
+}
+@media (max-width: 900px) {
+  .public-layout {
+    flex-direction: column;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  app-sidebar {
+    display: none !important;
+  }
+  .main-content {
+    max-width: 100vw;
+    margin: 0;
+    align-items: stretch;
+  }
+}
+@media (max-width: 600px) {
+  .main-content {
+    padding: 0;
+  }
+}
+.public-layout {
+  display: flex;
+  min-height: 100vh;
   background: #f6f7fa;
+  padding-left: 280px;
+  padding-right: 280px;
+  box-sizing: border-box;
+  width: 100vw;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100vh;                 /* Ocupa todo el alto de la ventana */
+  overflow: hidden;              /* Evita doble scroll en main-content */
+}
+
+.feed-area {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;              /* Scroll aquí */
+  height: 100%;                  /* Ocupa todo el alto disponible */
+  padding-bottom: 32px;          /* Espacio al final para no cortar el último post */
 }

@@ -1,14 +1,16 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from './navbar/navbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
+import { RightbarComponent } from './rightbar/rightbar.component';
+import { NavbarComponent } from './navbar/navbar.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-public',
   standalone: true,
   imports: [
-    NavbarComponent,
     SidebarComponent,
+    RightbarComponent,
+    NavbarComponent,
     RouterOutlet
   ],
   templateUrl: './public.component.html',

@@ -13,11 +13,13 @@ import { CrudReaccionComponent } from './admin/crud-reaccion/crud-reaccion.compo
 import { PublicComponent } from './public/public.component';
 import { SoporteComponent } from './soporte/soporte.component';
 
-// Importa los componentes públicos tipo red social
-import { HomeComponent } from './public/home/home.component';
-import { FeedComponent } from './public/feed/feed.component';
+// Componentes públicos tipo red social
+import { FeedComponent } from './public/feed/feed.component'; // importa tu FeedComponent
 import { ProfileComponent } from './public/profile/profile.component';
-import { UserListComponent } from './public/user-list/user-list.component';
+import { TrendingComponent } from './public/trending/trending.component';
+import { NotificationsComponent } from './public/notifications/notifications.component';
+import { SettingsComponent } from './public/settings/settings.component';
+import { HelpComponent } from './public/help/help.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -37,19 +39,20 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
-  {
+   {
     path: 'public',
     component: PublicComponent,
     children: [
-      { path: 'home', component: HomeComponent },
-      { path: 'feed', component: FeedComponent },
+      { path: 'home', component: FeedComponent }, // FeedComponent como principal de /public/home
+      { path: 'trending', component: TrendingComponent },
+      { path: 'notifications', component: NotificationsComponent },
       { path: 'profile/:id', component: ProfileComponent },
-      { path: 'user-list', component: UserListComponent },
+      { path: 'settings', component: SettingsComponent },
+      { path: 'help', component: HelpComponent },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },
-  { 
-    path: 'soporte', 
-    component: SoporteComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' }
+  { path: 'soporte', component: SoporteComponent },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login' }
 ];
