@@ -29,12 +29,12 @@
 <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <span class="close-btn" (click)="closeModal()">&times;</span>
-    <h2>Crear Nuevo Reporte</h2>
+    <h2 class="modal-title">Crear Nuevo Reporte</h2>
 
-    <form (ngSubmit)="submitReport()">
+    <form (ngSubmit)="submitReport()" class="modal-form">
       <!-- Image Upload -->
-      <div>
-        <label>Foto del reporte</label>
+      <div class="form-group">
+        <label class="form-label">Foto del reporte</label>
         <div class="image-upload">
           <ng-container *ngIf="imagePreview; else uploadPlaceholder">
             <div class="image-preview">
@@ -44,7 +44,7 @@
           </ng-container>
           <ng-template #uploadPlaceholder>
             <label class="upload-placeholder">
-              <span>📷 Toca para subir una foto</span>
+              <span>📷 Subir una foto</span>
               <input type="file" accept="image/*" (change)="handleImageChange($event)" hidden />
             </label>
           </ng-template>
@@ -52,37 +52,40 @@
       </div>
 
       <!-- Título -->
-      <div>
-        <input type="text" [(ngModel)]="title" name="title" placeholder="Título del reporte" required />
+      <div class="form-group">
+        <label class="form-label" for="title">Título</label>
+        <input id="title" type="text" [(ngModel)]="title" name="title" placeholder="Hueco en la calle principal" required />
       </div>
 
       <!-- Descripción -->
-      <div>
-        <textarea [(ngModel)]="description" name="description" rows="3" placeholder="Describe el problema..." required></textarea>
+      <div class="form-group">
+        <label class="form-label" for="description">Descripción</label>
+        <textarea id="description" [(ngModel)]="description" name="description" rows="4" placeholder="Describe el problema..." required></textarea>
       </div>
 
       <!-- Categoría -->
-      <div>
-        <select [(ngModel)]="category" name="category" required>
+      <div class="form-group">
+        <label class="form-label" for="category">Categoría</label>
+        <select id="category" [(ngModel)]="category" name="category" required>
           <option value="" disabled selected>Selecciona una categoría</option>
           <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
         </select>
       </div>
 
       <!-- Ubicación -->
-      <div>
-        <input type="text" [(ngModel)]="location" name="location" placeholder="Ej: Calle 123 con Carrera 45" required />
+      <div class="form-group">
+        <label class="form-label" for="location">Ubicación</label>
+        <input id="location" type="text" [(ngModel)]="location" name="location" placeholder="Calle 123 con Carrera 45" required />
       </div>
 
       <!-- Actions -->
-      <div class="actions">
+      <div class="modal-actions">
         <button type="button" class="btn-outline" (click)="closeModal()">Cancelar</button>
         <button type="submit" class="btn-primary">Publicar Reporte</button>
       </div>
     </form>
   </div>
 </div>
-
   <!-- Perfil de usuario -->
   <div class="sidebar-user" *ngIf="user">
     <img [src]="user.avatarUrl" alt="avatar" class="user-avatar"/>
