@@ -26,7 +26,7 @@ mat-sidenav-content {
   padding: 16px;
   gap: 16px;
   box-sizing: border-box;
-  overflow: hidden;
+  min-height: 0; /* importante para scroll en hijos */
 }
 
 /* Wrapper de feed + rightbar (solo desktop) */
@@ -34,6 +34,7 @@ mat-sidenav-content {
   display: flex;
   flex: 1;
   gap: 16px;
+  min-height: 0; /* importante para scroll del feed */
 }
 
 /* Feed scroll */
@@ -41,6 +42,7 @@ mat-sidenav-content {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  min-height: 0; /* clave para que funcione el scroll */
 }
 
 /* Sidebar fijo */
@@ -59,16 +61,20 @@ app-rightbar {
 
 /* Pantallas pequeñas (< 600px, iPhone SE) */
 @media (max-width: 600px) {
+  .public-layout {
+    flex-direction: column;
+  }
+
   .feed-right-wrapper {
-    flex-direction: column; /* apila feed y rightbar */
+    flex-direction: column;
   }
 
   app-rightbar {
-    display: none; /* se oculta en móvil */
+    display: none;
   }
 
   .feed-area {
-    max-height: calc(100vh - 56px);
+    max-height: calc(100vh - 56px); /* navbar fijo */
   }
 
   .app-sidebar {
