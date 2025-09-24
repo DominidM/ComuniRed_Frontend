@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 
 interface Comment {
+  id: string;
   author: string;
   content: string;
+  timestamp: Date;
 }
 
 interface Post {
@@ -37,7 +40,25 @@ interface Category {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './feed.component.html',
-  styleUrls: ['./feed.component.css']
+  styleUrls: ['./feed.component.css'],
+  animations: [
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        animate('300ms ease-in', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ]),
+    trigger('staggerIn', [
+      transition('* => *', [
+        query(':enter', [
+          style({ opacity: 0, transform: 'translateY(20px)' }),
+          stagger(100, [
+            animate('300ms ease-in', style({ opacity: 1, transform: 'translateY(0)' }))
+          ])
+        ], { optional: true })
+      ])
+    ])
+  ]
 })
 export class FeedComponent {
   searchQuery: string = '';
@@ -58,7 +79,7 @@ export class FeedComponent {
       id: '1',
       author: 'María González',
       avatar: 'https://i.pravatar.cc/150?img=1',
-      date: 'hace 2 horas',
+      date: '2025-09-22T12:00:00Z',
       location: 'Av. Javier Prado, Lima',
       title: 'Hueco gigante en la vía principal',
       content: 'Hay un hueco muy profundo que puede dañar los vehículos. Necesitamos reparación urgente.',
@@ -77,7 +98,7 @@ export class FeedComponent {
       id: '2',
       author: 'Carlos Ruiz',
       avatar: 'https://i.pravatar.cc/150?img=2',
-      date: 'hace 5 horas',
+      date: '2025-09-22T08:00:00Z',
       location: 'Parque Central, Lima',
       title: 'Poste de luz dañado',
       content: 'El poste está inclinado y representa un peligro real para los peatones, especialmente de noche.',
@@ -96,7 +117,7 @@ export class FeedComponent {
       id: '3',
       author: 'Ana López',
       avatar: 'https://i.pravatar.cc/150?img=3',
-      date: 'hace 1 día',
+      date: '2025-09-21T09:00:00Z',
       location: 'Colegio San José, Lima',
       title: 'Grafitis vandálicos',
       content: 'Aparecieron nuevos grafitis ofensivos en el muro del colegio. Afecta la imagen del barrio.',
@@ -115,7 +136,7 @@ export class FeedComponent {
       id: '4',
       author: 'Luis Fernández',
       avatar: 'https://i.pravatar.cc/150?img=4',
-      date: 'hace 3 horas',
+      date: '2025-09-22T10:00:00Z',
       location: 'Avenida Arequipa, Lima',
       title: 'Basura acumulada en la vía',
       content: 'Acumulación de basura afecta la circulación y genera malos olores en la zona.',
@@ -134,7 +155,7 @@ export class FeedComponent {
       id: '5',
       author: 'Sofía Ramírez',
       avatar: 'https://i.pravatar.cc/150?img=5',
-      date: 'hace 1 hora',
+      date: '2025-09-23T18:00:00Z',
       location: 'Plaza San Martín, Lima',
       title: 'Semáforo dañado',
       content: 'El semáforo no funciona desde esta mañana, generando caos vehicular.',
@@ -153,7 +174,7 @@ export class FeedComponent {
       id: '6',
       author: 'Pedro Castillo',
       avatar: 'https://i.pravatar.cc/150?img=6',
-      date: 'hace 4 horas',
+      date: '2025-09-22T15:00:00Z',
       location: 'Miraflores, Lima',
       title: 'Baches en la carretera',
       content: 'Varios baches en la avenida principal dificultan la conducción segura.',
@@ -172,7 +193,7 @@ export class FeedComponent {
       id: '7',
       author: 'Valeria Torres',
       avatar: 'https://i.pravatar.cc/150?img=7',
-      date: 'hace 2 días',
+      date: '2025-09-20T21:00:00Z',
       location: 'San Isidro, Lima',
       title: 'Alumbrado público deficiente',
       content: 'Algunas calles no tienen suficiente iluminación, lo que genera inseguridad por las noches.',
@@ -192,10 +213,14 @@ export class FeedComponent {
   toggleLike(post: Post) {
     post.liked = !post.liked;
     post.likes += post.liked ? 1 : -1;
+    if (post.liked) this.showLikeAnimation(post.id);
   }
 
   toggleBookmark(post: Post) {
     post.bookmarked = !post.bookmarked;
+    if (post.bookmarked) {
+      console.log(`Post "${post.title}" guardado en favoritos`);
+    }
   }
 
   toggleComments(post: Post) {
@@ -203,7 +228,7 @@ export class FeedComponent {
   }
 
   vote(post: Post, choice: 'accept' | 'reject') {
-    if (post.userVote === choice) return;
+    if (post.userVote !== null) return;
     if (post.userVote === 'accept') post.acceptVotes--;
     if (post.userVote === 'reject') post.rejectVotes--;
 
@@ -211,15 +236,38 @@ export class FeedComponent {
     if (choice === 'reject') post.rejectVotes++;
 
     post.userVote = choice;
+    console.log(`Voto registrado: ${choice} para "${post.title}"`);
   }
 
   sharePost(post: Post) {
-    alert(`Compartir publicación: ${post.title}`);
+    if (navigator.share) {
+      navigator.share({
+        title: post.title,
+        text: post.content,
+        url: window.location.href
+      }).catch(console.error);
+    } else {
+      const shareText = `${post.title}\n${post.content}\n\nVía ComuniRed`;
+      navigator.clipboard.writeText(shareText).then(() => {
+        console.log('Enlace copiado al portapapeles');
+      }).catch(() => {
+        alert(`Compartir publicación: ${post.title}`);
+      });
+    }
   }
 
   addComment(post: Post, commentContent: string) {
     if (!commentContent.trim()) return;
-    post.comments.push({ author: 'Tu Usuario', content: commentContent });
+
+    const newComment: Comment = {
+      id: Date.now().toString(),
+      author: 'Tu Usuario',
+      content: commentContent.trim(),
+      timestamp: new Date()
+    };
+
+    post.comments.push(newComment);
+    console.log(`Comentario agregado a "${post.title}"`);
   }
 
   filteredPosts(): Post[] {
@@ -229,5 +277,30 @@ export class FeedComponent {
        post.content.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
        (post.location && post.location.toLowerCase().includes(this.searchQuery.toLowerCase())))
     );
+  }
+
+   trackByPostId(index: number, post: any): number | string {
+    return post.id ?? index; // usa post.id si existe, si no el índice
+  }
+
+  // Optimiza la lista de comentarios
+  trackByComment(index: number, comment: any): number | string {
+    return comment.id ?? index; // usa comment.id si existe, si no el índice
+  }
+
+
+  private showLikeAnimation(postId: string) {
+    console.log(`❤️ Like animation for post ${postId}`);
+  }
+
+  formatDate(dateString: string): string {
+    const now = new Date();
+    const postDate = new Date(dateString);
+    const diffInHours = Math.floor((now.getTime() - postDate.getTime()) / (1000 * 60 * 60));
+
+    if (diffInHours < 1) return 'hace unos minutos';
+    if (diffInHours < 24) return `hace ${diffInHours} horas`;
+    if (diffInHours < 48) return 'hace 1 día';
+    return `hace ${Math.floor(diffInHours / 24)} días`;
   }
 }
