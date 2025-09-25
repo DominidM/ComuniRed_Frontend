@@ -1,51 +1,90 @@
+/* Fondo oscuro semi-transparente para el modal */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.7);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(2px);
+  z-index: 1000;
 }
 
-.modal-contenido.modal-mapa {
+/* Caja de contenido del modal */
+.modal-contenido {
   background: #fff;
-  padding: 1rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  max-width: 90%;
+  width: 500px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.25s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Ajuste especial para el modal de mapa */
+.modal-mapa {
   max-width: 600px;
-  width: 95%;
-  animation: fadeIn 0.2s ease-in-out;
 }
 
-.modal-mapa h3 {
-  margin-bottom: 0.5rem;
-  font-size: 1.2rem;
-  color: #222;
+/* Título */
+.modal-contenido h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #333;
+  text-align: center;
 }
 
-iframe {
+/* Contenedor del mapa */
+.map-container {
+  width: 100%;
+  height: 350px;
   border-radius: 8px;
-  border: 1px solid #f0f0f0;
-  margin-bottom: 0.8rem;
-}
-
-.btn-cerrar {
-  padding: 0.5rem 1rem;
-  background: #f5f5f5;
+  overflow: hidden;
   border: 1px solid #ddd;
-  border-radius: 8px;
+}
+
+/* Botón de cerrar */
+.btn-cerrar {
+  background-color: #e74c3c;
+  border: none;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 6px;
   cursor: pointer;
+  align-self: flex-end;
+  transition: background 0.2s ease-in-out;
 }
 
 .btn-cerrar:hover {
-  background: #ebebeb;
+  background-color: #c0392b;
 }
 
+/* Animación de aparición */
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsivo para pantallas pequeñas */
+@media (max-width: 600px) {
+  .modal-contenido {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .map-container {
+    height: 250px;
+  }
 }

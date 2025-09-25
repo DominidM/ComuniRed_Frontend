@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
 
 import { LogoSectionComponent } from './logo-section/logo-section.component';
-//import { AccionesHeaderComponent } from './acciones-header/acciones-header.component';
+import { AccionesHeaderComponent } from './acciones-header/acciones-header.component';
 import { PerfilHeaderComponent } from './perfil-header/perfil-header.component';
 
 
@@ -16,15 +16,16 @@ import { Usuario_soporte, Soporte } from '../ajson/json';
   imports: [
     CommonModule,
     LogoSectionComponent,
-    //AccionesHeaderComponent,
-    PerfilHeaderComponent
+    AccionesHeaderComponent,
+    PerfilHeaderComponent,
+    RouterModule
   ],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent 
 {
-  usuario: Soporte = Usuario_soporte[0];
+  @Input() soporte: Soporte = Usuario_soporte[0];
 
   constructor(private router: Router) {}
   

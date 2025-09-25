@@ -12,7 +12,6 @@
   z-index: 1000;
 }
 
-/* Contenido del modal */
 .modal-contenido {
   background-color: #fff;
   width: 90%;
@@ -26,7 +25,6 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Botón cerrar superior */
 .btn-cerrar-x {
   position: absolute;
   top: 10px;
@@ -43,7 +41,6 @@
   color: #e74c3c;
 }
 
-/* Títulos */
 .modal-titulo {
   margin-bottom: 10px;
   font-size: 22px;
@@ -59,7 +56,6 @@
   text-align: center;
 }
 
-/* Secciones */
 .seccion {
   margin: 15px 0;
   padding: 10px 0;
@@ -75,7 +71,6 @@
   gap: 5px;
 }
 
-/* Imágenes mini */
 .imagenes {
   display: flex;
   flex-wrap: wrap;
@@ -85,16 +80,14 @@
 }
 
 .imagen-mini {
-  width: 100px;
-  height: 100px;
+  width: 400px;
+  height: 250px;
   object-fit: cover;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
 
 
-
-/* Reacciones */
 .reacciones {
   display: flex;
   flex-wrap: wrap;
@@ -111,7 +104,6 @@
   gap: 5px;
 }
 
-/* Progreso de estados */
 .progreso {
   display: flex;
   justify-content: space-between;

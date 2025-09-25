@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { ReportCardComponent } from './report-card/report-card.component';
 import { ReportFiltersComponent } from './report-filters/report-filters.component';
 import { ReportStatsComponent } from './report-stats/report-stats.component';
-import { MapReportComponent } from './map-reports/map-report.component';
+//import { MapReportComponent } from './map-reports/map-report.component';
 import { HeaderComponent } from './header/header.component';
 
 import { Reporte, REPORTES } from './ajson/json';
@@ -18,7 +19,8 @@ import { Cliente, Usuario_cliente } from './ajson/json';
     CommonModule,
     ReportFiltersComponent,
     ReportStatsComponent,
-    MapReportComponent,
+    RouterModule,
+    //MapReportComponent,
     ReportCardComponent,
     HeaderComponent
   ],

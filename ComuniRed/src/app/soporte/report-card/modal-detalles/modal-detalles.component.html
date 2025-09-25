@@ -1,13 +1,10 @@
 <div class="modal" *ngIf="isOpen" (click)="cerrarDesdeFondo($event)">
   <div class="modal-contenido" (click)="$event.stopPropagation()">
 
-    <!-- Botón cerrar -->
     <button class="btn-cerrar-x" (click)="cerrarModal()">✖</button>
 
-    <!-- Título del modal -->
     <h3 class="modal-titulo">Detalles del Reporte</h3>
 
-    <!-- Imágenes -->
     <div class="imagenes" *ngIf="reporte.imagenes.length">
       <img *ngFor="let img of reporte.imagenes"
            [src]="img"
@@ -15,16 +12,14 @@
            class="imagen-mini">
     </div>
 
-    <!-- Título del reporte -->
     <h2 class="reporte-titulo">{{ reporte.titulo }}</h2>
 
-    <!-- Descripción -->
+
     <div class="seccion">
       <h4><i class="bi bi-chat-left-dots-fill"></i> Descripción</h4>
       <p>{{ reporte.descripcion }}</p>
     </div>
 
-    <!-- Información del cliente -->
     <div class="seccion">
       <h4><i class="bi bi-person-fill"></i> Información del Cliente</h4>
       <p><strong>Nombre:</strong> {{ reporte.cliente.nombre }}</p>
@@ -33,7 +28,6 @@
       <p *ngIf="reporte?.cliente?.direccion"><strong>Dirección:</strong> {{ reporte.cliente.direccion }}</p>
     </div>
 
-    <!-- Ubicación -->
     <div class="seccion">
       <h4><i class="bi bi-geo-alt-fill"></i> Ubicación</h4>
       <p>Direccion: {{ reporte.ubicacion }}</p>
@@ -49,7 +43,6 @@
     </div>
 
 
-    <!-- Reacciones -->
     <div class="seccion">
       <h4>Reacciones</h4>
       <p class="reacciones">
@@ -63,7 +56,6 @@
       </p>
     </div>
 
-    <!-- Progreso de estados -->
     <div class="seccion progreso">
       <div class="estado" [class.activo]="getUltimoEstado() === 'enviado'">Pendiente</div>
       <div class="estado" [class.activo]="getUltimoEstado() === 'observado'">En Proceso</div>
@@ -71,7 +63,6 @@
       <div class="estado" [class.activo]="getUltimoEstado() === 'resuelto'">Cerrado</div>
     </div>
 
-    <!-- Historial -->
     <div class="seccion historial" *ngIf="reporte?.historial?.length">
       <h4><i class="bi bi-clock-history"></i> Historial</h4>
       <ul>
@@ -82,7 +73,6 @@
       </ul>
     </div>
 
-    <!-- Footer botones -->
     <div class="modal-footer">
       <button class="btn-avanzar" (click)="avanzarProgreso()">Avanzar Progreso</button>
       <button class="btn-cerrar" (click)="cerrarModal()">Cerrar</button>

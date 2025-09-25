@@ -9,6 +9,12 @@
   font-family: Arial, sans-serif;
 }
 
+.container {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
 @media (max-width: 720px) {
   .header {
     flex-direction: column;

@@ -12,6 +12,9 @@ export interface Soporte {
   id: number;
   nombre: string;
   avatar_soporte: string;
+  email: string;
+  telefono: string;
+  descripcion: string;
 }
 
 export interface Comentario {
@@ -70,7 +73,10 @@ export const Usuario_soporte: Soporte[] = [
   {
     id: 1,
     nombre: 'Carlos Ruiz',
-    avatar_soporte: 'https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757493645/Poses-Perfil-Profesional-Hombresdic.-27-2022-3-819x1024_p76mzs.webp'
+    avatar_soporte: 'https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757493645/Poses-Perfil-Profesional-Hombresdic.-27-2022-3-819x1024_p76mzs.webp',
+    email: 'JuanPerez@gmail.com',
+    telefono: '910200100',
+    descripcion: 'ns',
   }
 ];
 

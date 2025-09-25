@@ -1,10 +1,14 @@
-import { Component, Input, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core';
+/*import { Component, Input, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
 import { Reporte } from '../ajson/json';
+import { CommonModule } from '@angular/common';
+
+import { ModalUbicacionComponent } from '../report-card/modal-ubicacion/modal-ubicacion.component';
 
 @Component({
   selector: 'app-map-reports',
   templateUrl: './map-report.component.html',
+  imports: [CommonModule, ModalUbicacionComponent],
   styleUrls: ['./map-report.component.css']
 })
 export class MapReportComponent implements AfterViewInit, OnChanges {
@@ -94,3 +98,4 @@ export class MapReportComponent implements AfterViewInit, OnChanges {
     });
   }
 }
+*/

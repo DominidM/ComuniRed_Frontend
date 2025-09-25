@@ -2,16 +2,17 @@
 
   <app-logo-section></app-logo-section>
 
-  <!--<app-acciones-header
+  <app-acciones-header
     (actualizar)="actualizar()"
     (exportar)="exportar()">
-  </app-acciones-header>-->
+  </app-acciones-header>
 
 
-  <app-perfil-header
-    [usuario]="usuario"
-    (modificar)="modificar()"
-    (salir)="salir()">
-  </app-perfil-header>
-
+  <div class="container">
+    <app-perfil-header
+      [soporte]="soporte"
+      (modificar)="modificar()"
+      (salir)="salir()">
+    </app-perfil-header>
+  </div>
 </div>

@@ -11,7 +11,9 @@ import { CrudAsignacionComponent } from './admin/crud-asignacion/crud-asignacion
 import { CrudTipoReaccionComponent } from './admin/crud-tipo-reaccion/crud-tipo-reaccion.component';
 import { CrudReaccionComponent } from './admin/crud-reaccion/crud-reaccion.component';
 import { PublicComponent } from './public/public.component';
+
 import { SoporteComponent } from './soporte/soporte.component';
+import { EditarPerfilComponent } from './soporte/header/perfil-header/edit-profile/editar-perfil.component'
 
 // Componentes públicos tipo red social
 import { FeedComponent } from './public/feed/feed.component'; // importa tu FeedComponent
@@ -20,6 +22,7 @@ import { TrendingComponent } from './public/trending/trending.component';
 import { NotificationsComponent } from './public/notifications/notifications.component';
 import { SettingsComponent } from './public/settings/settings.component';
 import { HelpComponent } from './public/help/help.component';
+import { ReportStatsComponent } from './soporte/report-stats/report-stats.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -52,7 +55,17 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },
-  { path: 'soporte', component: SoporteComponent },
+
+    {
+      path: 'soporte',
+    component: SoporteComponent,
+    children: [
+      { path: 'home', component: ReportStatsComponent },
+      { path: 'editar-perfil/:nombre', component: EditarPerfilComponent },
+      { path: '', redirectTo: 'home', pathMatch: 'full' }
+    ]
+  },
+  
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/login' }
 ];

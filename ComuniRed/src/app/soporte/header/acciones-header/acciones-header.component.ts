@@ -1,4 +1,4 @@
-/*import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -20,4 +20,3 @@ export class AccionesHeaderComponent {
     this.exportar.emit();
   }
 }
-*/

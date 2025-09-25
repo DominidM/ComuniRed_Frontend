@@ -1,17 +1,17 @@
 <div class = "soporte-container">
-  <app-header></app-header> <!-- Usa el selector correcto -->
+  <app-header [soporte]="soporte"></app-header>
 
   <div class="contenedor-soporte">
-    <!-- ESTADÍSTICAS -->
+
+    <router-outlet></router-outlet>
+    
     <app-report-stats [reportes]="reportesFiltrados"></app-report-stats>
 
-        <!-- FILTROS -->
     <app-report-filters 
       [reportes]="reportes" 
       (filtrar)="aplicarFiltro($event)">
     </app-report-filters>
 
-    <!-- TARJETAS DE REPORTES -->
     <div class="container-report-card">
       <app-report-card
         *ngFor="let rep of reportesFiltrados"
@@ -21,8 +21,6 @@
         (seleccionar)="seleccionarReporte(rep)">
       </app-report-card>
     </div>
-
-    <app-map-reports [reportes]="reportesFiltrados"></app-map-reports>
 
   </div>
 </div>

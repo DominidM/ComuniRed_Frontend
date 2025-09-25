@@ -20,6 +20,7 @@ export class ReportCardComponent {
   mostrarDetalles = false;
   mostrarUbicacion = false;
   imagenSeleccionada: string | null = null; 
+  reporteSeleccionado?: Reporte;
 
   abrirDetalles(event: Event) {
     event.stopPropagation();
