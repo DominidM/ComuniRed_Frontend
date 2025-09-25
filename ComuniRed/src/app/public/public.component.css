@@ -74,12 +74,12 @@ app-rightbar {
   }
 
   .feed-area {
-    max-height: calc(100vh - 56px); /* navbar fijo */
+    max-height: calc(100vh - 80px); /* navbar fijo */
   }
 
   .app-sidebar {
     width: 80%;
-    max-width: 280px;
+    max-width: 290px;
   }
 }
 

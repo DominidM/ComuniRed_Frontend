@@ -10,7 +10,7 @@
   box-sizing: border-box;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* Cambiado de visible a hidden */
 }
 
 .sidebar-container::before {
@@ -27,9 +27,10 @@
 .sidebar-logo {
   display: flex;
   align-items: center;
-  margin: 0 20px 32px 20px;
+  margin: 0 20px 30px 20px; /* Reducido de 32px a 24px */
   padding: 8px 0;
   position: relative;
+  flex-shrink: 0; /* Evita que se comprima */
 }
 
 .logo-circle {
@@ -54,7 +55,7 @@
 }
 
 .logo-title {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   color: #1e293b;
   letter-spacing: -0.025em;
@@ -64,24 +65,34 @@
 .sidebar-menu {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 24px;
-  padding: 0 12px;
+  gap: 10px; /* Reducido de 4px a 2px */
+  margin-bottom: 20px; /* Reducido de 24px a 16px */
+  padding: 4px 10px;
+  flex: 1; /* Permite que ocupe el espacio disponible */
+  overflow-y: auto; /* Solo scroll vertical en el menú si es necesario */
+  overflow-x: hidden;
+}
+
+/* Ocultar scrollbar del menú */
+.sidebar-menu::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
 }
 
 .sidebar-link {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   font-size: 15px;
   font-weight: 500;
   color: #64748b;
   text-decoration: none;
-  padding: 12px 16px;
+  padding: 10px 16px; /* Reducido de 12px a 10px */
   border-radius: 12px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  flex-shrink: 0; /* Evita que se compriman */
 }
 
 .sidebar-link::before {
@@ -102,7 +113,7 @@
 }
 
 .sidebar-link.active::before {
-  opacity: 0.12;
+  opacity: 0.2;
 }
 
 .sidebar-link:hover {
@@ -122,16 +133,20 @@
   height: 20px;
   position: relative;
   z-index: 1;
+  flex-shrink: 0; /* Evita que el icono se comprima */
 }
 
 .sidebar-link span {
   position: relative;
   z-index: 1;
+  white-space: nowrap; /* Evita que el texto se corte */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ===== BOTÓN DE REPORTE MEJORADO ===== */
 .sidebar-report-btn {
-  margin: 0 16px 24px 16px;
+  margin: 0 16px 16px 16px; /* Reducido margen inferior de 24px a 16px */
   width: calc(100% - 32px);
   border-radius: 16px;
   height: 44px;
@@ -145,6 +160,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  flex-shrink: 0; /* Evita que se comprima */
 }
 
 .sidebar-report-btn::before {
@@ -174,7 +190,7 @@
 /* ===== PERFIL DE USUARIO MEJORADO ===== */
 .sidebar-user {
   margin-top: auto;
-  padding: 16px 20px 20px 20px;
+  padding: 16px 20px 16px 20px; /* Reducido padding inferior de 20px a 16px */
   display: flex;
   align-items: center;
   gap: 12px;
@@ -182,6 +198,7 @@
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
   transition: all 0.2s ease;
   cursor: pointer;
+  flex-shrink: 0; /* Evita que se comprima */
 }
 
 .sidebar-user:hover {
@@ -195,6 +212,7 @@
   object-fit: cover;
   border: 2px solid #e2e8f0;
   transition: all 0.2s ease;
+  flex-shrink: 0; /* Evita que se comprima */
 }
 
 .sidebar-user:hover .user-avatar {
@@ -206,6 +224,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 0; /* Permite que el texto se trunque correctamente */
 }
 
 .user-name {
@@ -213,11 +232,17 @@
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-handle {
   font-size: 12px;
   color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ===== MODAL MEJORADO ===== */
@@ -235,6 +260,7 @@
   z-index: 1000;
   padding: 20px;
   animation: fadeIn 0.3s ease;
+  overflow-y: auto; /* Solo el modal puede hacer scroll si es necesario */
 }
 
 .modal-content {
@@ -459,15 +485,15 @@ textarea {
   }
   
   .sidebar-logo {
-    margin: 0 16px 24px 16px;
+    margin: 0 16px 20px 16px; /* Reducido */
   }
   
   .sidebar-menu {
-    padding: 0 8px;
+    padding: 0 12px;
   }
   
   .sidebar-report-btn {
-    margin: 0 12px 20px 12px;
+    margin: 0 12px 16px 12px; /* Reducido */
     width: calc(100% - 24px);
   }
 }
@@ -487,7 +513,7 @@ textarea {
   
   .sidebar-logo {
     justify-content: center;
-    margin: 0 0 20px 0;
+    margin: 0 0 16px 0; /* Reducido */
     padding: 12px 0;
   }
   
@@ -496,19 +522,19 @@ textarea {
   }
   
   .sidebar-menu {
-    padding: 0 8px;
+    padding: 6px 11px;
   }
   
   .sidebar-link {
     justify-content: center;
-    padding: 12px;
+    padding: 10px; /* Reducido */
   }
   
   .sidebar-report-btn {
     width: 48px !important;
     height: 48px;
     min-width: 48px !important;
-    margin: 0 8px 16px 8px;
+    margin: 0 8px 12px 8px; /* Reducido */
     font-size: 0;
     border-radius: 50%;
     padding: 0;
@@ -523,7 +549,7 @@ textarea {
   
   .sidebar-user {
     justify-content: center;
-    padding: 12px 8px 16px 8px;
+    padding: 12px 8px 12px 8px; /* Reducido */
   }
   
   .user-avatar {
@@ -559,4 +585,35 @@ textarea {
 
 .sidebar-container:hover .sidebar-link:hover {
   opacity: 1;
+}
+
+/* ===== OCULTAR SCROLLBARS SOLO EN SIDEBAR ===== */
+.sidebar-menu::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.sidebar-menu {
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Modal scrollbar también oculta */
+.modal-content::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.modal-content {
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Asegurar que no haya overflow horizontal SOLO en sidebar */
+.sidebar-container {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.sidebar-container > * {
+  max-width: 100%;
+  box-sizing: border-box;
 }

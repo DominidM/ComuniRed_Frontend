@@ -66,11 +66,13 @@
 @media (max-width: 900px) {
   .feed-navbar-tab {
     font-size: 1em;
-    padding: 0 0 10px 0;
+    padding: 10px 0 10px 0;
     margin-right: 4px;
+    height: 38px;
+
   }
   .feed-navbar-tab.active::after {
     width: 24px;
-    height: 2px;
+    height: 5px;
   }
 }
