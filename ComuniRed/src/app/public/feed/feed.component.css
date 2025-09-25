@@ -46,8 +46,8 @@
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 8px 0;
-  margin-bottom: 16px;
+  padding: 2px 0;
+  margin-bottom: 12px;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }

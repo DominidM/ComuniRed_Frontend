@@ -10,17 +10,17 @@
 
   <!-- Contenido principal -->
   <mat-sidenav-content>
-    <nav class="top-navbar">
-      <button mat-icon-button (click)="sidenav.toggle()" class="menu-button">
-        <mat-icon>menu</mat-icon>
-      </button>
-      <app-navbar></app-navbar>
-    </nav>
-
+    
     <div class="public-layout">
       <div class="feed-right-wrapper">
         <!-- Feed -->
         <div class="feed-area">
+            <nav class="top-navbar">
+              <button mat-icon-button (click)="sidenav.toggle()" class="menu-button">
+                <mat-icon>menu</mat-icon>
+              </button>
+              <app-navbar></app-navbar>
+            </nav>
           <router-outlet></router-outlet>
         </div>
 
