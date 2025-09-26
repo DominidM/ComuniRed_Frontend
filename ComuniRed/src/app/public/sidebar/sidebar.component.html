@@ -91,12 +91,18 @@
     </form>
   </div>
 </div>
-  <!-- Perfil de usuario -->
-  <div class="sidebar-user" *ngIf="user">
-    <img [src]="user.avatarUrl" alt="avatar" class="user-avatar"/>
-    <div class="user-details">
-      <div class="user-name">{{ user.name }}</div>
-      <div class="user-handle">{{ user.handle }}</div>
-    </div>
+ <!-- Perfil de usuario (dentro de .sidebar-container) -->
+<div class="sidebar-user" *ngIf="user" (click)="toggleMenu()">
+  <img [src]="user.avatarUrl" alt="avatar" class="user-avatar"/>
+  <div class="user-details">
+    <div class="user-name">{{ user.name }}</div>
+    <div class="user-handle">{{ user.handle }}</div>
+  </div>
+
+  <!-- Menú desplegable: queda dentro del sidebar-user -->
+  <div class="user-menu" *ngIf="mostrarMenu" (click)="$event.stopPropagation()">
+    <button (click)="onModificar(); $event.stopPropagation()">Modificar</button>
+    <button (click)="onSalir(); $event.stopPropagation()">Cerrar sesión</button>
   </div>
 </div>
+
