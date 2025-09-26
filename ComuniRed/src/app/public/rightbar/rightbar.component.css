@@ -145,8 +145,37 @@
   background: #444;
 }
 
-@media (max-width: 1200px) {
-  .rightbar-container {
-    display: none !important;
+
+/* ===== RESPONSIVE ===== */
+
+/* Pantallas pequeñas (< 600px, iPhone SE) */
+@media (max-width: 600px) {
+  .public-layout {
+    flex-direction: column;
+  }
+
+  .feed-right-wrapper {
+    flex-direction: column;
+  }
+
+  app-rightbar {
+    display: none;
+  }
+
+  .feed-area {
+    max-height: calc(100vh - 80px); /* navbar fijo */
+  }
+
+  .app-sidebar {
+    width: 80%;
+    max-width: 290px;
+  }
+}
+
+/* Tablets */
+@media (min-width: 601px) and (max-width: 1024px) {
+  app-rightbar {
+    flex: 0 0 200px;
+    max-width: 200px;
   }
 }
