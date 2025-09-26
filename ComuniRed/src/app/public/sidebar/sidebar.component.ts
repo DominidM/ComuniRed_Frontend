@@ -26,6 +26,9 @@ interface Report {
 })
 export class SidebarComponent {
   showModal = false;
+  mostrarMenu = false;
+  constructor(private router: Router) {}
+
 
   // Modal Form State
   title = '';
@@ -100,4 +103,18 @@ export class SidebarComponent {
     handle: '@tuusuario',
     avatarUrl: 'https://randomuser.me/api/portraits/men/1.jpg'
   };
+  // ==================== Menú usuario ====================
+  toggleMenu() {
+    this.mostrarMenu = !this.mostrarMenu;
+  }
+
+  onModificar() {
+    console.log('Modificar perfil');
+  }
+
+  onSalir() {
+    console.log('Cerrar sesión');
+    this.mostrarMenu = false;
+    this.router.navigate(['/login']);  
+  }
 }
