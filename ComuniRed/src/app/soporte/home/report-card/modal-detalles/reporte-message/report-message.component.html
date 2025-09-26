@@ -1,0 +1,8 @@
+<div class="enviar-mensaje-contenedor">
+  <h4>Enviar Mensaje</h4>
+  <textarea [(ngModel)]="mensaje" placeholder="Escribe tu mensaje..."></textarea>
+  <div class="acciones">
+    <button class="btn-enviar" (click)="enviar()">Enviar</button>
+    <button class="btn-cancelar" (click)="cerrar.emit()">Cancelar</button>
+  </div>
+</div>

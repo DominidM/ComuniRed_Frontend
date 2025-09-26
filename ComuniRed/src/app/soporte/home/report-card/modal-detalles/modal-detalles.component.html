@@ -14,7 +14,6 @@
 
     <h2 class="reporte-titulo">{{ reporte.titulo }}</h2>
 
-
     <div class="seccion">
       <h4><i class="bi bi-chat-left-dots-fill"></i> Descripción</h4>
       <p>{{ reporte.descripcion }}</p>
@@ -42,7 +41,6 @@
       </p>
     </div>
 
-
     <div class="seccion">
       <h4>Reacciones</h4>
       <p class="reacciones">
@@ -56,12 +54,16 @@
       </p>
     </div>
 
-    <div class="seccion progreso">
-      <div class="estado" [class.activo]="getUltimoEstado() === 'enviado'">Pendiente</div>
-      <div class="estado" [class.activo]="getUltimoEstado() === 'observado'">En Proceso</div>
-      <div class="estado" [class.activo]="getUltimoEstado() === 'en progreso'">Resuelto</div>
-      <div class="estado" [class.activo]="getUltimoEstado() === 'resuelto'">Cerrado</div>
+    <div class="seccion selector-estado">
+      <label>Estado del Reporte:</label>
+      <select [(ngModel)]="ultimoEstadoModal" (ngModelChange)="cambiarEstado($event)">
+        <option value="enviado">Pendiente</option>
+        <option value="observado">En Proceso</option>
+        <option value="en progreso">Resuelto</option>
+        <option value="resuelto">Cerrado</option>
+      </select>
     </div>
+
 
     <div class="seccion historial" *ngIf="reporte?.historial?.length">
       <h4><i class="bi bi-clock-history"></i> Historial</h4>
@@ -72,6 +74,17 @@
         </li>
       </ul>
     </div>
+
+    <div class="seccion enviar-mensaje">
+      <button class="btn-enviar-mensaje" (click)="abrirEnvioMensaje()">✉️ Enviar Mensaje</button>
+    </div>
+
+    <app-enviar-mensaje 
+      *ngIf="mostrarEnvioMensaje"
+      [reporte]="reporte"
+      (cerrar)="cerrarEnvioMensaje()"
+      (mensajeEnviado)="agregarMensajeAlHistorial($event)">
+    </app-enviar-mensaje>
 
     <div class="modal-footer">
       <button class="btn-avanzar" (click)="avanzarProgreso()">Avanzar Progreso</button>

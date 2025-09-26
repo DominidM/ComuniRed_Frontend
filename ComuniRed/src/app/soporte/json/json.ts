@@ -44,7 +44,7 @@ export interface Comentario {
 
 export interface Historial {
   id: number;
-  fecha?: Date;       // ahora es opcional
+  fecha?: Date;
   mensaje?: string;
   estado?: 'enviado' | 'observado' | 'en progreso' | 'resuelto';
 }

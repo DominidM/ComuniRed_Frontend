@@ -1,38 +1,67 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // <-- Import necesario para ngModel
 import { HttpClient } from '@angular/common/http';
 import { Reporte } from '../../../json/json';
+import { EnviarMensajeComponent } from './reporte-message/report-message.component';
 
 type Estado = 'enviado' | 'observado' | 'en progreso' | 'resuelto';
 
 @Component({
   selector: 'app-modal-detalles',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, EnviarMensajeComponent], // <-- FormsModule agregado
   templateUrl: './modal-detalles.component.html',
   styleUrls: ['./modal-detalles.component.css']
 })
 export class ModalDetallesComponent implements OnInit {
   @Input() reporte!: Reporte;
-  @Output() cerrar = new EventEmitter<void>();
   @Input() isOpen: boolean = false;
+  @Output() cerrar = new EventEmitter<void>();
 
   ultimoEstadoModal: Estado | null = null;
+  mostrarEnvioMensaje: boolean = false;
 
   private http: HttpClient = inject(HttpClient);
   private googleMapsApiKey = 'TU_API_KEY_DE_GOOGLE_MAPS';
 
   ngOnInit(): void {
+    // Si no hay lat/lng, obtenerlas desde la dirección
     if (this.reporte.ubicacion && (this.reporte.lat === undefined || this.reporte.lng === undefined)) {
       this.obtenerCoordenadas(this.reporte.ubicacion);
     }
 
+    // Obtener el último estado del historial o establecer 'enviado'
     this.ultimoEstadoModal = this.reporte.historial?.length
       ? (this.reporte.historial[this.reporte.historial.length - 1].estado ?? null)
       : 'enviado';
   }
 
+  // Abrir/Cerrar componente de mensaje
+  abrirEnvioMensaje() {
+    this.mostrarEnvioMensaje = true;
+  }
 
+  cerrarEnvioMensaje() {
+    this.mostrarEnvioMensaje = false;
+  }
+
+  agregarMensajeAlHistorial(event: { mensaje: string, estado?: string }) {
+    if (!this.reporte.historial) this.reporte.historial = [];
+
+    const estado = (event.estado || 'enviado') as Estado;
+
+    this.reporte.historial.push({
+      id: this.reporte.historial.length + 1,
+      fecha: new Date(),
+      mensaje: event.mensaje,
+      estado: estado
+    });
+
+    this.ultimoEstadoModal = estado;
+  }
+
+  // Cerrar modal
   cerrarModal(): void {
     this.cerrar.emit();
   }
@@ -55,16 +84,24 @@ export class ModalDetallesComponent implements OnInit {
             console.warn('No se encontraron coordenadas para esta dirección:', direccion);
           }
         },
-        error: (error) => {
-          console.error('Error al obtener coordenadas:', error);
-        }
+        error: (error) => console.error('Error al obtener coordenadas:', error)
       });
   }
 
-  getUltimoEstado(): Estado | null {
-    return this.ultimoEstadoModal;
+  cambiarEstado(nuevoEstado: string) {
+    const estado = nuevoEstado as Estado;
+    this.ultimoEstadoModal = estado;
+
+    if (!this.reporte.historial) this.reporte.historial = [];
+    this.reporte.historial.push({
+      id: this.reporte.historial.length + 1,
+      fecha: new Date(),
+      mensaje: `Estado cambiado a ${estado}`,
+      estado: estado
+    });
   }
 
+  // Avanzar al siguiente estado
   avanzarProgreso(): void {
     const estados: Estado[] = ['enviado', 'observado', 'en progreso', 'resuelto'];
     const ultimo = this.ultimoEstadoModal || 'enviado';
@@ -73,8 +110,6 @@ export class ModalDetallesComponent implements OnInit {
     if (index === -1 || index === estados.length - 1) return;
 
     const siguiente = estados[index + 1];
-
-
     this.ultimoEstadoModal = siguiente;
 
     if (!this.reporte.historial) this.reporte.historial = [];
@@ -86,10 +121,11 @@ export class ModalDetallesComponent implements OnInit {
     });
   }
 
+  // Obtener el último historial
   get ultimoHistorial() {
-  if (this.reporte?.historial?.length) {
-    return this.reporte.historial[this.reporte.historial.length - 1];
+    if (this.reporte?.historial?.length) {
+      return this.reporte.historial[this.reporte.historial.length - 1];
+    }
+    return null;
   }
-  return null;
-}
 }

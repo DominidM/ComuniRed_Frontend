@@ -59,7 +59,7 @@
 
   <div class="modal-imagen" *ngIf="imagenSeleccionada" (click)="cerrarImagenCompleta()">
     <div class="modal-contenido-imagen" (click)="$event.stopPropagation()">
-      <img [src]="imagenSeleccionada" alt="Imagen completa">
+      <img [src]="imagenSeleccionada" alt="Imagen completa" class="imagen-completa">
       <button class="btn-cerrar" (click)="cerrarImagenCompleta()">✖</button>
     </div>
   </div>
