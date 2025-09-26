@@ -22,6 +22,7 @@ mat-sidenav-content {
 .public-layout {
   flex: 1;
   display: flex;
+  justify-content: flex-start;
   flex-direction: column; /* En móviles: columna */
   padding: 16px;
   gap: 16px;
@@ -33,13 +34,13 @@ mat-sidenav-content {
 .feed-right-wrapper {
   display: flex;
   flex: 1;
-  gap: 16px;
+  gap: 8px;
   min-height: 0; /* importante para scroll del feed */
 }
 
 /* Feed scroll */
 .feed-area {
-  flex: 1;
+  flex: 3;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   min-height: 0; /* clave para que funcione el scroll */
@@ -52,9 +53,7 @@ mat-sidenav-content {
 
 /* Rightbar fijo */
 app-rightbar {
-  flex: 0 0 300px;
-  max-width: 300px;
-  min-width: 250px;
+  flex: 1;
 }
 
 /* ===== RESPONSIVE ===== */

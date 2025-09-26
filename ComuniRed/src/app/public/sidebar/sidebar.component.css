@@ -473,10 +473,11 @@ textarea {
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 900px) {
+@media (max-width: 500px) {
   .sidebar-container {
-    width: 220px;
-    padding: 12px 0 0 0;
+    width: auto;
+    min-width: 180px; 
+    max-width: 240px;
   }
   
   .sidebar-logo {
@@ -493,11 +494,10 @@ textarea {
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 100px) {
   .sidebar-container {
-    width: 64px;
-    min-width: 64px;
-    padding: 8px 0 0 0;
+    width: auto;
+    
   }
   
   .sidebar-logo .logo-title,

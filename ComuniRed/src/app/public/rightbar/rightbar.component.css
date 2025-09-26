@@ -1,17 +1,19 @@
 .rightbar-container {
   width: 100%;
   max-width: 400px;
-  min-width: 340px;
+  min-width: 360px;
   background: #fafbfc;
   border-left: 1px solid #e8e8e8;
   height: 100vh;
-  padding: 24px 22px 0 22px;
+  padding: 24px 16px 0 16px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 24px;
   position: relative;
+  margin-right: 0px; 
 }
+
 
 /* Sección */
 .rightbar-section {
@@ -124,8 +126,8 @@
 /* Botón de accesibilidad */
 .rightbar-accessibility-btn {
   position: absolute;
-  right: 18px;
-  bottom: 18px;
+  right: 50px;
+  bottom: 150px;
   background: #222;
   color: #fff;
   border: none;
