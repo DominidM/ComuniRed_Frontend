@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Reporte } from '../../ajson/json';
+import { Reporte } from '../../../json/json';
 
 type Estado = 'enviado' | 'observado' | 'en progreso' | 'resuelto';
 

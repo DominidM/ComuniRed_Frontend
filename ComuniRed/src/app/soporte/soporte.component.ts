@@ -1,51 +1,36 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 
-import { ReportCardComponent } from './report-card/report-card.component';
-import { ReportFiltersComponent } from './report-filters/report-filters.component';
-import { ReportStatsComponent } from './report-stats/report-stats.component';
-//import { MapReportComponent } from './map-reports/map-report.component';
+import { Soporte, Usuario_soporte } from './json/json';
 import { HeaderComponent } from './header/header.component';
-
-import { Reporte, REPORTES } from './ajson/json';
-import { Soporte, Usuario_soporte } from './ajson/json';
-import { Cliente, Usuario_cliente } from './ajson/json';
 
 @Component({
   selector: 'app-soporte',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReportFiltersComponent,
-    ReportStatsComponent,
-    RouterModule,
-    //MapReportComponent,
-    ReportCardComponent,
-    HeaderComponent
-  ],
+  imports: [CommonModule, RouterModule, HeaderComponent],
   templateUrl: './soporte.component.html',
   styleUrls: ['./soporte.component.css']
 })
 export class SoporteComponent implements OnInit {
-  reportes: Reporte[] = [];
-  reportesFiltrados: Reporte[] = [];
-  reporteSeleccionado?: Reporte = undefined;
-  soporte!:Soporte;
-  cliente!:Cliente;
+  
+  soporte: Soporte = Usuario_soporte[0];
+
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
-    this.reportes = REPORTES;
-    this.reportesFiltrados = [...this.reportes];
-    this.soporte = Usuario_soporte[0];
-    this.cliente = Usuario_cliente[0];
+    console.log('Soporte cargado:', this.soporte);
   }
 
-  seleccionarReporte(reporte: Reporte) {
-    this.reporteSeleccionado = reporte;
+  onModificarPerfil() 
+  {
+    this.router.navigate(['/soporte/editar-perfil', this.soporte.id]);
   }
-
-  aplicarFiltro(filtrados: Reporte[]) {
-    this.reportesFiltrados = filtrados;
+  onPrincipal()
+  {
+    this.router.navigate(['/soporte/home']);
+  }
+  onSalir() 
+  {
+    this.router.navigate(['/login']);
   }
 }

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Reporte, Cliente, Soporte } from '../ajson/json';
+import { Reporte, Cliente, Soporte } from '../../json/json';
 import { ModalDetallesComponent } from './modal-detalles/modal-detalles.component';
 import { ModalUbicacionComponent } from './modal-ubicacion/modal-ubicacion.component';
 

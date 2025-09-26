@@ -1,8 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-
-import { Soporte } from '../../ajson/json';
+import { Soporte } from '../../json/json';
 
 @Component({
   selector: 'app-perfil-header',
@@ -14,25 +12,32 @@ import { Soporte } from '../../ajson/json';
 export class PerfilHeaderComponent {
   @Input() soporte!: Soporte;
 
+  @Output() principal = new EventEmitter<void>();
   @Output() modificar = new EventEmitter<void>();
   @Output() salir = new EventEmitter<void>();
 
   mostrarMenu = false;
-  constructor(private router: Router) {}
 
   toggleMenu() {
     this.mostrarMenu = !this.mostrarMenu;
   }
 
+  private cerrarMenu() {
+    this.mostrarMenu = false;
+  }
+
+  onPrincipal() {
+    this.principal.emit();
+    this.cerrarMenu();
+  }
+
   onModificar() {
     this.modificar.emit();
-    this.mostrarMenu = false;
-
-    this.router.navigate(['/soporte/editar-perfil', this.soporte.id]);
+    this.cerrarMenu();
   }
 
   onSalir() {
     this.salir.emit();
-    this.mostrarMenu = false;
+    this.cerrarMenu();
   }
 }

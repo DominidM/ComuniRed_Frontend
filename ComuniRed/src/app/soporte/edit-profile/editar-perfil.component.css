@@ -1,0 +1,163 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  background: #f3f4f6;
+  padding: 2rem;
+}
+
+.editar-perfil-container {
+  width: 100%;
+  max-width: 700px; /* ✅ Ajustado a 700px */
+  background: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', sans-serif;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Scrollbar */
+.editar-perfil-container::-webkit-scrollbar {
+  width: 8px;
+}
+.editar-perfil-container::-webkit-scrollbar-track {
+  background: #fff;
+  border-radius: 10px;
+}
+.editar-perfil-container::-webkit-scrollbar-thumb {
+  background: #a3a3a3;
+  border-radius: 10px;
+}
+.editar-perfil-container::-webkit-scrollbar-thumb:hover {
+  background: #737373;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 1.8rem;
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: #1a1a1a;
+}
+
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.avatar-preview {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e5e7eb;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* ✅ 2 columnas */
+  gap: 1.5rem 1.2rem; /* Filas y columnas separadas */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+input,
+textarea {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  outline: none;
+  background: #fff;
+  transition: border 0.2s ease, background 0.2s ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+input[readonly] {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+  border: 1px solid #d1d5db;
+}
+
+/* Sección Responsable */
+.responsable-section {
+  grid-column: 1 / -1; /* ✅ Ocupa el ancho completo */
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 1rem;
+  background: #fafafa;
+}
+
+.responsable-section legend {
+  font-weight: 600;
+  color: #1a1a1a;
+  padding: 0 8px;
+}
+
+.acciones {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-guardar,
+.btn-cancelar {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+}
+
+.btn-guardar {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+}
+
+.btn-guardar:hover {
+  background: #1e40af;
+}
+
+.btn-cancelar {
+  background: #fff;
+  color: #1a1a1a;
+  border: 2px solid #1a1a1a;
+}
+
+.btn-cancelar:hover {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+/* ✅ Responsivo */
+@media (max-width: 600px) {
+  form {
+    grid-template-columns: 1fr; /* ✅ Una sola columna en móviles */
+  }
+}

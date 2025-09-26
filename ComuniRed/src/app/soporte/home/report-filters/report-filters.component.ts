@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Reporte } from '../ajson/json';
+import { Reporte } from '../../json/json';
 
 @Component({
   selector: 'app-report-filters',

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Usuario_soporte, Soporte } from '../../../ajson/json';
+import { Usuario_soporte, Soporte } from '../json/json';
 
 @Component({
   selector: 'app-editar-perfil',
@@ -13,17 +13,24 @@ import { Usuario_soporte, Soporte } from '../../../ajson/json';
 })
 export class EditarPerfilComponent implements OnInit {
   soporte!: Soporte;
+  original!: Soporte;
 
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    this.soporte = Usuario_soporte.find(u => u.id.toString() === id) || Usuario_soporte[0];
+    this.soporte =
+      Usuario_soporte.find((u) => u.id.toString() === id) || Usuario_soporte[0];
+
+    this.original = { ...this.soporte };
   }
 
-  cambiarAvatar(event: Event) {
+  cambiarAvatar(event: Event) 
+  {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
+
+    if (input.files && input.files.length > 0) 
+    {
       const reader = new FileReader();
       reader.onload = () => {
         this.soporte.avatar_soporte = reader.result as string;
@@ -32,14 +39,26 @@ export class EditarPerfilComponent implements OnInit {
     }
   }
 
+  hayCambios(): boolean 
+  {
+    return JSON.stringify(this.soporte) !== JSON.stringify(this.original);
+  }
+
   guardarCambios() {
-    console.log('Usuario actualizado:', this.soporte);
-    alert('Perfil actualizado con éxito ✅');
+    const index = Usuario_soporte.findIndex((u) => u.id === this.soporte.id);
+    if (index !== -1) 
+    {
+      Usuario_soporte[index] = { ...this.soporte };
+      this.original = { ...this.soporte }; 
+      alert('✅ Perfil actualizado con éxito');
+    } 
+    else {
+      alert('❌ No se encontró el usuario para actualizar');
+    }
   }
 
   cancelar() {
-    const original = Usuario_soporte.find(u => u.id === this.soporte.id) || Usuario_soporte[0];
-    this.soporte = { ...original }; // Restablecer valores originales
-    alert('Cambios cancelados ❌');
+    this.soporte = { ...this.original };
   }
 }
+5

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
-import { Reporte } from '../../ajson/json';
+import { Reporte } from '../../../json/json';
 
 @Component({
   selector: 'app-modal-ubicacion',

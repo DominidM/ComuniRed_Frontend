@@ -1,26 +1,10 @@
-<div class = "soporte-container">
-  <app-header [soporte]="soporte"></app-header>
+<div class="soporte-container">
 
-  <div class="contenedor-soporte">
+  <app-header [soporte]="soporte" 
+              (modificar)="onModificarPerfil()" 
+              (home)="onPrincipal()"
+              (salir)="onSalir()">
+  </app-header>
 
-    <router-outlet></router-outlet>
-    
-    <app-report-stats [reportes]="reportesFiltrados"></app-report-stats>
-
-    <app-report-filters 
-      [reportes]="reportes" 
-      (filtrar)="aplicarFiltro($event)">
-    </app-report-filters>
-
-    <div class="container-report-card">
-      <app-report-card
-        *ngFor="let rep of reportesFiltrados"
-        [reporte]="rep"
-        [cliente]="rep.cliente"
-        [soporte]="soporte"
-        (seleccionar)="seleccionarReporte(rep)">
-      </app-report-card>
-    </div>
-
-  </div>
+  <router-outlet></router-outlet>
 </div>

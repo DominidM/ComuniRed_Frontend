@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Reporte } from '../ajson/json';
+import { Reporte } from '../../json/json';
 
 @Component({
   selector: 'app-report-stats',

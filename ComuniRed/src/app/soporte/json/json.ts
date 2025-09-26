@@ -10,11 +10,29 @@ export interface Reacciones {
 
 export interface Soporte {
   id: number;
+ 
   nombre: string;
+  apellido: string;
+
+  username: string;
+  
   avatar_soporte: string;
   email: string;
   telefono: string;
-  descripcion: string;
+
+  turno: 'Dia' | 'Tarde' | 'noche';
+
+  fecha_ingreso: Date;
+  fecha_nacimiento: Date;
+
+  estado: 'activo' | 'inactivo';
+
+  responsable?: {
+    nombres: string;
+    apellidos: string;
+    telefono: string;
+    relacion?: string;
+  };
 }
 
 export interface Comentario {
@@ -72,13 +90,64 @@ export interface Cliente {
 export const Usuario_soporte: Soporte[] = [
   {
     id: 1,
-    nombre: 'Carlos Ruiz',
-    avatar_soporte: 'https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757493645/Poses-Perfil-Profesional-Hombresdic.-27-2022-3-819x1024_p76mzs.webp',
-    email: 'JuanPerez@gmail.com',
-    telefono: '910200100',
-    descripcion: 'ns',
+    nombre: "Carlos",
+    apellido: "Ramírez",
+    username: "carlos.ramirez",
+    avatar_soporte: "https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757493645/Poses-Perfil-Profesional-Hombresdic.-27-2022-3-819x1024_p76mzs.webp",
+    email: "carlos.ramirez@gmail.com",
+    telefono: "+51 987 654 321",
+    turno: "Dia",
+    fecha_ingreso: new Date("2023-05-10"),
+    fecha_nacimiento: new Date("1990-03-15"),
+    estado: "activo",
+    responsable: {
+      nombres: "Luis",
+      apellidos: "Ramírez",
+      telefono: "+51 912 345 678",
+      relacion: "Hermano"
+    }
+  },
+  {
+    id: 2,
+    nombre: "María",
+    apellido: "Fernández",
+    username: "maria.fernandez",
+    avatar_soporte: "assets/avatars/maria.png",
+    email: "maria.fernandez@example.com",
+    telefono: "+51 976 123 456",
+    turno: "Tarde",
+    fecha_ingreso: new Date("2022-08-15"),
+    fecha_nacimiento: new Date("1995-07-20"),
+    estado: "activo",
+    responsable: {
+      nombres: "Ana",
+      apellidos: "Fernández",
+      telefono: "+51 934 876 543",
+      relacion: "Madre"
+    }
+  },
+  {
+    id: 3,
+    nombre: "Jorge",
+    apellido: "Salazar",
+    username: "jorge.salazar",
+    avatar_soporte: "assets/avatars/jorge.png",
+    email: "jorge.salazar@example.com",
+    telefono: "+51 965 432 198",
+    turno: "noche",
+    fecha_ingreso: new Date("2021-11-30"),
+    fecha_nacimiento: new Date("1988-12-05"),
+    estado: "inactivo",
+    responsable: {
+      nombres: "Pedro",
+      apellidos: "Salazar",
+      telefono: "+51 923 567 890",
+      relacion: "Padre"
+    }
   }
 ];
+
+
 
 
 export const Usuario_cliente: Cliente[] = [
