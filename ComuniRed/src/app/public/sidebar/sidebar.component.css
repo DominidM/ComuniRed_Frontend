@@ -27,39 +27,34 @@
 .sidebar-logo {
   display: flex;
   align-items: center;
-  margin: 0 20px 30px 20px; /* Reducido de 32px a 24px */
-  padding: 8px 0;
-  position: relative;
-  flex-shrink: 0; /* Evita que se comprima */
+  gap: 0.8rem;
+  padding: 1rem;
 }
 
 .logo-circle {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border-radius: 12px;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-  margin-right: 12px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-  transition: all 0.3s ease;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-.logo-circle:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+.logo-circle .logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .logo-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1e293b;
-  letter-spacing: -0.025em;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
 }
+
 
 /* ===== MENÚ PRINCIPAL MEJORADO ===== */
 .sidebar-menu {
