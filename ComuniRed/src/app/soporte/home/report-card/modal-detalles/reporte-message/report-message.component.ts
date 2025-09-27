@@ -20,13 +20,10 @@ export class EnviarMensajeComponent {
   enviar() {
     if (!this.mensaje.trim()) return;
 
-    // Emitimos el mensaje hacia el componente padre
     this.mensajeEnviado.emit({ mensaje: this.mensaje, estado: this.reporte.historial?.length ? this.reporte.historial[this.reporte.historial.length - 1].estado : 'enviado' });
 
-    // Limpiamos el textarea
     this.mensaje = '';
 
-    // Cerramos el modal de mensaje
     this.cerrar.emit();
   }
 }

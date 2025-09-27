@@ -12,7 +12,7 @@ import { Usuario_soporte, Soporte } from '../json/json';
   styleUrls: ['./editar-perfil.component.css'],
 })
 export class EditarPerfilComponent implements OnInit {
-  soporte!: Soporte;
+  soporte: Soporte = Usuario_soporte[0] ;
   original!: Soporte;
 
   constructor(private route: ActivatedRoute) {}
@@ -50,10 +50,10 @@ export class EditarPerfilComponent implements OnInit {
     {
       Usuario_soporte[index] = { ...this.soporte };
       this.original = { ...this.soporte }; 
-      alert('✅ Perfil actualizado con éxito');
+      alert('Perfil actualizado con éxito');
     } 
     else {
-      alert('❌ No se encontró el usuario para actualizar');
+      alert('No se encontró el usuario para actualizar');
     }
   }
 

@@ -36,13 +36,13 @@ export class ModalUbicacionComponent implements AfterViewInit, OnChanges {
   cerrarModal(): void {
     this.cerrar.emit();
     if (this.map) {
-      this.map.remove(); // ✅ Destruir el mapa al cerrar modal
+      this.map.remove();
     }
   }
 
   private inicializarMapa() {
     if (this.map) {
-      this.map.remove(); // ✅ evitar error si el mapa ya existe
+      this.map.remove();
     }
 
     this.map = L.map('mapa', {

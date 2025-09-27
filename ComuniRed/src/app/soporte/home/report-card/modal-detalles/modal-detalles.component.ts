@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // <-- Import necesario para ngModel
+import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Reporte } from '../../../json/json';
 import { EnviarMensajeComponent } from './reporte-message/report-message.component';
@@ -10,7 +10,7 @@ type Estado = 'enviado' | 'observado' | 'en progreso' | 'resuelto';
 @Component({
   selector: 'app-modal-detalles',
   standalone: true,
-  imports: [CommonModule, FormsModule, EnviarMensajeComponent], // <-- FormsModule agregado
+  imports: [CommonModule, FormsModule, EnviarMensajeComponent],
   templateUrl: './modal-detalles.component.html',
   styleUrls: ['./modal-detalles.component.css']
 })
@@ -25,19 +25,17 @@ export class ModalDetallesComponent implements OnInit {
   private http: HttpClient = inject(HttpClient);
   private googleMapsApiKey = 'TU_API_KEY_DE_GOOGLE_MAPS';
 
-  ngOnInit(): void {
-    // Si no hay lat/lng, obtenerlas desde la dirección
+  ngOnInit(): void 
+  {
     if (this.reporte.ubicacion && (this.reporte.lat === undefined || this.reporte.lng === undefined)) {
       this.obtenerCoordenadas(this.reporte.ubicacion);
     }
 
-    // Obtener el último estado del historial o establecer 'enviado'
     this.ultimoEstadoModal = this.reporte.historial?.length
       ? (this.reporte.historial[this.reporte.historial.length - 1].estado ?? null)
       : 'enviado';
   }
 
-  // Abrir/Cerrar componente de mensaje
   abrirEnvioMensaje() {
     this.mostrarEnvioMensaje = true;
   }

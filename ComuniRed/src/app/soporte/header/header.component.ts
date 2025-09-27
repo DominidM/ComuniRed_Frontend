@@ -22,7 +22,7 @@ import { Usuario_soporte, Soporte } from '../json/json';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  @Input() soporte: Soporte = Usuario_soporte[1];
+  @Input() soporte: Soporte = Usuario_soporte[0];
 
   constructor(private router: Router) {}
   

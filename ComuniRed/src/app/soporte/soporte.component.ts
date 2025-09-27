@@ -13,7 +13,7 @@ import { HeaderComponent } from './header/header.component';
 })
 export class SoporteComponent implements OnInit {
   
-  soporte: Soporte = Usuario_soporte[0];
+  soporte: Soporte = Usuario_soporte[0]; //
 
   constructor(private router: Router) {}
 
