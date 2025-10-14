@@ -29,18 +29,36 @@ export class CrudRolComponent {
     this.loadRoles();
   }
 
-  trackByRolId(index: number, rol: any): any {
-    return rol.id;
+  trackByRolId(index: number, rol: Rol): any {
+    console.log('trackBy - index:', index, 'rol:', rol, 'rol.id:', rol.id);
+    return rol.id || index; // Fallback al index si no hay ID
   }
 
+
   loadRoles() {
-    this.rolService.obtenerRoles(this.page, this.size).subscribe(pageData => {
-      this.roles = pageData.content;
-      this.allRoles = pageData.content; // Guarda copia sin filtrar
-      this.totalPages = pageData.totalPages;
-      this.totalElements = pageData.totalElements;
+    console.log('=== DEBUG LOADROLES ===');
+    console.log('Cargando roles - page:', this.page, 'size:', this.size);
+    
+    this.rolService.obtenerRoles(this.page, this.size).subscribe({
+      next: (data) => {
+        console.log('Datos recibidos del backend:', data);
+        console.log('Roles content:', data.content);
+        
+        // Debug cada rol individual
+        data.content.forEach((rol, index) => {
+          console.log(`Rol ${index}:`, rol);
+          console.log(`Rol ${index} ID:`, rol.id, 'tipo:', typeof rol.id);
+        });
+        
+        this.roles = data.content;
+        this.totalElements = data.totalElements;
+        this.totalPages = data.totalPages;
+      },
+      error: (error) => {
+        console.error('Error cargando roles:', error);
+      }
     });
-  }
+}
 
   onPageSizeChange(event: any) {
     this.size = +event.target.value;
@@ -75,29 +93,70 @@ export class CrudRolComponent {
   }
 
   saveRol() {
-    // Aquí solo agregamos localmente, pero deberías llamar a tu service para guardar en backend
     if (!this.rolData.nombre) return;
-
     if (this.editingRol) {
-      const idx = this.roles.findIndex(r => r.nombre === this.editingRol!.nombre);
-      if (idx >= 0) {
-        this.roles[idx] = { ...this.editingRol, ...this.rolData } as Rol;
-      }
+      // Editar en backend
+      this.rolService.editarRol(this.editingRol.id!, this.rolData.nombre!, this.rolData.descripcion || '').subscribe(() => {
+        this.loadRoles();
+        this.closeModal();
+      });
     } else {
-      this.roles.push({
-        nombre: this.rolData.nombre!,
-        descripcion: this.rolData.descripcion || '',
+      // Crear en backend
+      this.rolService.crearRol(this.rolData.nombre!, this.rolData.descripcion || '').subscribe(() => {
+        this.loadRoles();
+        this.closeModal();
       });
     }
-    this.closeModal();
   }
 
+// En tu crud-rol.component.ts, modifica el método deleteRol:
+
   deleteRol(rol: Rol) {
-    if (confirm(`¿Seguro que deseas eliminar el rol "${rol.nombre}"?`)) {
-      this.roles = this.roles.filter(r => r.nombre !== rol.nombre);
-      this.allRoles = this.allRoles.filter(r => r.nombre !== rol.nombre);
+    console.log('=== DEBUG DELETEROL ===');
+    console.log('1. Objeto rol recibido:', rol);
+    console.log('2. Tipo del objeto rol:', typeof rol);
+    console.log('3. rol.id:', rol.id);
+    console.log('4. Tipo de rol.id:', typeof rol.id);
+    console.log('5. rol.id === undefined?', rol.id === undefined);
+    console.log('6. rol.id === null?', rol.id === null);
+    console.log('7. rol.id === ""?', rol.id === "");
+    console.log('8. JSON.stringify(rol):', JSON.stringify(rol));
+    console.log('9. Object.keys(rol):', Object.keys(rol));
+    console.log('10. rol.hasOwnProperty("id"):', rol.hasOwnProperty('id'));
+    
+    if (confirm('¿Estás seguro de que quieres eliminar este rol?')) {
+      const id = rol.id;
+      console.log('11. ID extraído:', id);
+      console.log('12. Tipo del ID extraído:', typeof id);
+      console.log('13. ID convertido a string:', String(id));
+      console.log('14. ID length:', id ? id.length : 'N/A');
+      
+      // Validación adicional
+      if (!id || id === undefined || id === null || id === '') {
+        alert('Error: ID del rol no válido');
+        console.error('ID inválido detectado');
+        return;
+      }
+      
+      this.rolService.eliminarRol(String(id)).subscribe({
+        next: (result) => {
+          console.log('Resultado de eliminación:', result);
+          if (result) {
+            console.log('Rol eliminado exitosamente');
+            this.loadRoles();
+          }
+        },
+        error: (error) => {
+          console.error('Error completo:', error);
+          console.error('Error message:', error.message);
+          console.error('Error graphQLErrors:', error.graphQLErrors);
+          alert(`Error al eliminar rol: ${error.message || 'Error interno del servidor'}`);
+        }
+      });
     }
   }
+
+
 
   closeModal() {
     this.showModal = false;
@@ -106,7 +165,6 @@ export class CrudRolComponent {
   }
 
   buscarRol() {
-    // Búsqueda local sobre la página actual
     if (this.searchText.trim() === '') {
       this.roles = [...this.allRoles];
     } else {

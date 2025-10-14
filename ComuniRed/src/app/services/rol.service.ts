@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface Rol {
+  id: string;
   nombre: string;
   descripcion: string;
-  id?: string;
 }
 
 export interface RolPage {
@@ -38,10 +38,58 @@ export class RolService {
           }
         }
       `,
-      variables: {
-        page,
-        size
-      }
-    }).pipe(map(result => result.data?.obtenerRoles as RolPage));
+      variables: { page, size },
+      fetchPolicy: 'network-only'
+    }).pipe(
+      map(result => result.data?.obtenerRoles as RolPage)
+    );
+  }
+
+  crearRol(nombre: string, descripcion: string): Observable<Rol> {
+    return this.apollo.mutate<{ crearRol: Rol }>({
+      mutation: gql`
+        mutation ($nombre: String!, $descripcion: String) {
+          crearRol(nombre: $nombre, descripcion: $descripcion) {
+            id
+            nombre
+            descripcion
+          }
+        }
+      `,
+      variables: { nombre, descripcion }
+    }).pipe(
+      map(result => result.data?.crearRol as Rol)
+    );
+  }
+
+  editarRol(id: string, nombre: string, descripcion: string): Observable<Rol> {
+    return this.apollo.mutate<{ editarRol: Rol }>({
+      mutation: gql`
+        mutation ($id: ID!, $nombre: String!, $descripcion: String) {
+          editarRol(id: $id, nombre: $nombre, descripcion: $descripcion) {
+            id
+            nombre
+            descripcion
+          }
+        }
+      `,
+      variables: { id, nombre, descripcion }
+    }).pipe(
+      map(result => result.data?.editarRol as Rol)
+    );
+  }
+
+  eliminarRol(id: string): Observable<boolean> {
+    return this.apollo.mutate<{ eliminarRol: boolean }>({
+      mutation: gql`
+        mutation ($id: ID!) {
+          eliminarRol(id: $id)
+        }
+      `,
+      variables: { id },
+      errorPolicy: 'all'
+    }).pipe(
+      map(result => result.data?.eliminarRol as boolean)
+    );
   }
 }
