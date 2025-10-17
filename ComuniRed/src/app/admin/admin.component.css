@@ -1,3 +1,4 @@
+/* ---------- Base admin styles (original + polished) ---------- */
 .admin-root {
   display: flex;
   min-height: 100vh;
@@ -398,6 +399,114 @@ main {
   box-shadow: 0 8px 20px rgba(86, 123, 247, 0.4);
 }
 
+/* ---------- Gestión DB group styles (added) ---------- */
+
+/* group button (top-level) */
+.menu-group .group-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #d1d5db;
+  padding: 8px 1px;
+  font-size: 1.05em;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  transition: all 0.25s ease;
+  gap: 8px;
+}
+
+/* chevron */
+.menu-group .chev {
+  font-size: 0.9em;
+  opacity: 0.95;
+  transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+  color: #c7c9ff;
+}
+
+/* rotated chevron */
+.menu-group .chev.rotated {
+  transform: rotate(180deg);
+}
+
+/* hover state for group button */
+.menu-group .group-btn:hover {
+  transform: translateX(6px);
+  color: #fff;
+  background: linear-gradient(90deg, rgba(92,107,246,0.1), rgba(139,92,246,0.02));
+  border-left-color: #4f4cf5;
+}
+
+/* child list container (collapsed by default) */
+.menu-group .group-list {
+  list-style: none;
+  margin: 6px 0 12px 0;
+  padding: 4px 0 8px 12px; /* indent children */
+  background: transparent;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 320ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease, transform 240ms ease;
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* when the group is open */
+.menu-group.open .group-list,
+.menu-group[aria-expanded="true"] .group-list,
+.menu-group.open .group-list li {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* allow opening via class binding */
+.menu-group.open .group-list {
+  max-height: 480px; /* adjust if you expect many items */
+}
+
+/* child items styling (indented) */
+.menu-group .group-list li {
+  padding: 12px 28px;
+  color: #cbd5e1;
+  font-weight: 600;
+  font-size: 1.0em;
+  border-left: 4px solid transparent;
+  transition: all 0.22s ease;
+  margin: 6px 0;
+  display: block;
+  position: relative;
+}
+
+/* hover and active states for child items */
+.menu-group .group-list li:hover,
+.menu-group .group-list li.router-link-active,
+.menu-group .group-list li.active {
+  transform: translateX(6px);
+  color: #fff;
+  border-left-color: #6f6bf7;
+  background: linear-gradient(90deg, rgba(92,107,246,0.08), rgba(139,92,246,0.02));
+  box-shadow: inset 0 0 18px rgba(139,92,246,0.06);
+}
+
+/* small left indicator for nested items */
+.menu-group .group-list li::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(135deg, #5f5cf6 0%, #8b92fa 100%);
+  transition: width 0.2s ease;
+}
+
+/* ensure relative positioning so ::before works */
+.menu-group .group-list li { position: relative; }
+
+/* responsive adjustments */
 @media (max-width: 768px) {
   .admin-sidebar {
     width: 220px;
@@ -418,4 +527,15 @@ main {
   .chatbot-window {
     width: 320px;
   }
+
+  .menu-group .group-btn { padding: 12px 20px; font-size: 1em; }
+  .menu-group .group-list li { padding: 10px 18px; font-size: 0.98em; }
 }
+
+/* accessibility focus */
+.menu-group .group-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 6px rgba(95, 92, 246, 0.12);
+  border-left-color: #736dfb;
+}
+

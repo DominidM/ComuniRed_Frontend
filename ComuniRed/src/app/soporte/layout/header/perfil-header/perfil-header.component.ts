@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Soporte, Usuario_soporte } from '../../json/json';
+import { Soporte, Usuario_soporte } from '../../../json/json';
 
 @Component({
   selector: 'app-perfil-header',
