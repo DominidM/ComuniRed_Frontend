@@ -2,15 +2,62 @@
   <!-- Sidebar -->
   <aside class="admin-sidebar">
     <div class="admin-logo">ComuniRed</div>
+
     <ul>
       <li [routerLink]="['/admin/dashboard']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</li>
-      <li [routerLink]="['/admin/rol']" routerLinkActive="active">Gestión Roles</li>
-      <li [routerLink]="['/admin/usuario']" routerLinkActive="active">Gestión Usuarios</li>
-      <li [routerLink]="['/admin/estado-queja']" routerLinkActive="active">Gestión Estados Queja</li>
-      <li [routerLink]="['/admin/queja']" routerLinkActive="active">Gestión Quejas</li>
-      <li [routerLink]="['/admin/asignacion']" routerLinkActive="active">Gestión Asignaciones</li>
-      <li [routerLink]="['/admin/tipo-reaccion']" routerLinkActive="active">Gestión Tipos Reacción</li>
-      <li [routerLink]="['/admin/reaccion']" routerLinkActive="active">Gestión Reacciones</li>
+      <li [routerLink]="['/admin/reporte-export']" routerLinkActive="active">Exportar / Generar PDFs</li>
+
+
+      <!-- Auditoría y configuración (admin-only) -->
+      <li *ngIf="isAdmin" [routerLink]="['/admin/auditoria']" routerLinkActive="active">Auditoría / Logs</li>
+      <li *ngIf="isAdmin" [routerLink]="['/admin/configuracion']" routerLinkActive="active">Configuración del Sistema</li>
+
+      <!-- Soporte (visible si es soporte) -->
+      <li *ngIf="isSoporte">
+        <a [routerLink]="['/soporte/home']" routerLinkActive="active">Bandeja Soporte</a>
+      </li>
+
+
+
+      
+      <!-- Gestión DB: visible solo para admins -->
+      <li *ngIf="isAdmin" class="menu-group" [class.open]="gestionOpen">
+        <button class="group-btn" (click)="toggleGestion()" [attr.aria-expanded]="gestionOpen">
+          Gestión DB
+          <span class="chev" [class.rotated]="gestionOpen">▾</span>
+        </button>
+
+        <ul class="group-list" [attr.aria-hidden]="!gestionOpen">
+          <li [routerLink]="['/admin/rol']" routerLinkActive="active">Gestión Roles</li>
+          <li [routerLink]="['/admin/usuario']" routerLinkActive="active">Gestión Usuarios</li>
+          <li [routerLink]="['/admin/categoria']" routerLinkActive="active">Gestión Categorías</li>
+          <li [routerLink]="['/admin/estado-queja']" routerLinkActive="active">Gestión Estados Queja</li>
+          <li [routerLink]="['/admin/queja']" routerLinkActive="active">Gestión Quejas</li>
+          <li [routerLink]="['/admin/asignacion']" routerLinkActive="active">Gestión Asignaciones</li>
+          <li [routerLink]="['/admin/tipo-reaccion']" routerLinkActive="active">Gestión Tipos Reacción</li>
+          <li [routerLink]="['/admin/reaccion']" routerLinkActive="active">Gestión Reacciones</li>
+        </ul>
+      </li>
+
+      <!-- Herramientas (admin-only) -->
+      <li *ngIf="isAdmin" class="menu-group" [class.open]="toolsOpen">
+        <button class="group-btn" (click)="toggleTools()" [attr.aria-expanded]="toolsOpen">
+          Herramientas
+          <span class="chev" [class.rotated]="toolsOpen">▾</span>
+        </button>
+        <ul class="group-list" [attr.aria-hidden]="!toolsOpen">
+          <li [routerLink]="['/admin/seed']" routerLinkActive="active">Correr seeds / Poblado</li>
+          <li [routerLink]="['/admin/backups']" routerLinkActive="active">Backups / Restore</li>
+          <li [routerLink]="['/admin/job-monitor']" routerLinkActive="active">Monitor de Jobs / Tareas</li>
+          <li [routerLink]="['/admin/exports']" routerLinkActive="active">Historial de Exportes</li>
+        </ul>
+      </li>
+
+      
+      <!-- Public / quick links -->
+      <li *ngIf="isAdmin || isSoporte">
+        <a [routerLink]="['/public/home']" routerLinkActive="active">Ver sitio público</a>
+      </li>
     </ul>
   </aside>
 
@@ -19,7 +66,7 @@
     <header class="admin-navbar">
       <input class="admin-search" type="text" placeholder="Buscar en todo el sistema..." />
       <div class="admin-user-info">
-        <span>{{ userEmail }}</span>
+        <span>{{ userDisplay }}</span>
         <button class="admin-logout" (click)="logout()">Cerrar Sesión</button>
       </div>
     </header>

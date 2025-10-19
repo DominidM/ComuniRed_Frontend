@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { gql } from 'apollo-angular';
 
 export interface Usuario {
@@ -43,6 +43,7 @@ export interface UsuarioPage {
   size: number;
 }
 
+/* Queries / Mutations existentes */
 const OBTENER_USUARIOS = gql`
   query ObtenerUsuarios($page: Int!, $size: Int!) {
     obtenerUsuarios(page: $page, size: $size) {
@@ -156,30 +157,38 @@ const ELIMINAR_USUARIO = gql`
   }
 `;
 
+/*
+  LOGIN: actualizado para devolver token + usuario (si tu backend lo soporta).
+*/
 const LOGIN = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
-      id
-      nombre
-      apellido
-      dni
-      numero_telefono
-      edad
-      sexo
-      distrito
-      codigo_postal
-      direccion
-      email
-      rol_id
+      token
+      usuario {
+        id
+        nombre
+        apellido
+        email
+        rol_id
+      }
     }
   }
 `;
+
+/* Resultado esperado de login */
+export interface LoginResult {
+  token?: string;
+  usuario?: Usuario | null;
+}
+
+/* Llave localStorage (puedes cambiar si ya usas otra) */
+export const TOKEN_KEY = 'comunired_token';
+export const USER_KEY = 'comunired_user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsuarioService {
-  
   constructor(private apollo: Apollo) {}
 
   obtenerUsuarios(page: number, size: number): Observable<UsuarioPage> {
@@ -256,12 +265,91 @@ export class UsuarioService {
     );
   }
 
-  login(email: string, password: string): Observable<Usuario> {
-    return this.apollo.mutate<{ login: Usuario }>({
+  login(email: string, password: string): Observable<LoginResult> {
+    return this.apollo.mutate<{ login: { token?: string; usuario?: Usuario } }>({
       mutation: LOGIN,
       variables: { email, password }
     }).pipe(
-      map(result => result.data!.login)
+      map(result => {
+        const payload = result.data?.login;
+        return {
+          token: payload?.token,
+          usuario: payload?.usuario ?? null
+        };
+      })
     );
+  }
+
+  loginAndStore(email: string, password: string): Observable<LoginResult> {
+    return this.login(email, password).pipe(
+      tap(res => {
+        if (res?.token) this.saveToken(res.token);
+        if (res?.usuario) this.saveUser(res.usuario);
+      })
+    );
+  }
+
+  saveToken(token: string) {
+    try {
+      localStorage.setItem(TOKEN_KEY, token);
+    } catch (e) {
+      console.warn('No se pudo guardar token en localStorage', e);
+    }
+  }
+
+  getToken(): string | null {
+    try {
+      return localStorage.getItem(TOKEN_KEY);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  saveUser(user: Usuario) {
+    try {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    } catch (e) {
+      console.warn('No se pudo guardar usuario en localStorage', e);
+    }
+  }
+
+  getUser(): Usuario | null {
+    try {
+      const raw = localStorage.getItem(USER_KEY);
+      return raw ? (JSON.parse(raw) as Usuario) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  logout() {
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+    } catch (e) {
+      // ignore
+    }
+
+    // Intenta limpiar / resetear cache de Apollo (sin forzar errores si no existe)
+    try {
+      const client: any = (this.apollo as any).client || (this.apollo as any).getClient?.();
+      if (client) {
+        client.clearStore?.(); // limpia cache
+        client.resetStore?.(); // resetea store
+      }
+    } catch (err) {
+      console.warn('No se pudo limpiar Apollo store', err);
+    }
+  }
+
+  isLoggedIn(): boolean {
+    const t = this.getToken();
+    return !!t && t.length > 0;
+  }
+
+  getRoles(): string[] {
+    const u = this.getUser();
+    if (!u) return [];
+    return u.rol_id ? [u.rol_id] : [];
   }
 }

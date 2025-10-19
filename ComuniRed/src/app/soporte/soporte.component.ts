@@ -1,36 +1,42 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
-import { Soporte, Usuario_soporte } from './json/json';
-import { HeaderComponent } from './header/header.component';
+import { UsuarioService } from '../services/usuario.service';
+import { HeaderComponent } from './layout/header/header.component';
 
 @Component({
   selector: 'app-soporte',
+  standalone: true,
   imports: [CommonModule, RouterModule, HeaderComponent],
   templateUrl: './soporte.component.html',
   styleUrls: ['./soporte.component.css']
 })
 export class SoporteComponent implements OnInit {
-  
-  soporte: Soporte = Usuario_soporte[0]; //
+  // soporte será pasado al header
+  soporte: any = null;
 
-  constructor(private router: Router) {}
+  constructor(
+    private usuarioService: UsuarioService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    console.log('Soporte cargado:', this.soporte);
+    // carga usuario guardado y pásalo al header
+    this.soporte = this.usuarioService.getUser();
+    // opcional: forzar login si no hay token
+    // if (!this.usuarioService.isLoggedIn()) { this.router.navigate(['/login']); }
   }
 
-  onModificarPerfil() 
-  {
-    this.router.navigate(['/soporte/editar-perfil', this.soporte.id]);
+  onModificarPerfil() {
+    this.router.navigate(['/soporte/editar-perfil', this.soporte?.nombre ?? '']);
   }
-  onPrincipal()
-  {
+
+  onPrincipal() {
     this.router.navigate(['/soporte/home']);
   }
-  onSalir() 
-  {
+
+  onSalir() {
+    this.usuarioService.logout();
     this.router.navigate(['/login']);
   }
 }
