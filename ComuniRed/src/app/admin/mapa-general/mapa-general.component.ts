@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import * as L from 'leaflet';
 
 interface Queja {
   id: string;
@@ -7,8 +8,10 @@ interface Queja {
   ubicacion: string;
   categoria: string;
   estado: string;
-  posX: number; // Posición X en porcentaje (0-100) - En producción usar lat/lng
-  posY: number; // Posición Y en porcentaje (0-100) - En producción usar lat/lng
+  lat: number;
+  lng: number;
+  posX?: number;
+  posY?: number;
 }
 
 interface Categoria {
@@ -21,39 +24,19 @@ interface Estado {
   color: string;
 }
 
-/*
- * NOTA PARA INTEGRACIÓN CON MAPA REAL DE LIMA:
- * 
- * Para usar un mapa real de Lima, Perú, puedes integrar:
- * 
- * 1. Leaflet (Recomendado - Open Source):
- *    npm install leaflet @types/leaflet
- *    Centro: [-12.0464, -77.0428] (Lima, Perú)
- *    Zoom inicial: 12
- * 
- * 2. Google Maps:
- *    Centro: { lat: -12.0464, lng: -77.0428 }
- *    Restricción de límites para Lima Metropolitana
- * 
- * 3. Mapbox:
- *    Centro: [-77.0428, -12.0464]
- *    Estilo personalizado para Perú
- * 
- * Coordenadas de ejemplo para Lima:
- * - Miraflores: -12.1191, -77.0349
- * - San Isidro: -12.0956, -77.0364
- * - Cercado: -12.0464, -77.0428
- */
-
 @Component({
   selector: 'app-mapa-general',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './mapa-general.component.html',
-  styleUrl: './mapa-general.component.css'
+  styleUrls: ['./mapa-general.component.css']
 })
-export class MapaGeneralComponent implements OnInit {
-  // Datos de categorías
+export class MapaGeneralComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('mapaCanvas', { static: false }) mapContainer!: ElementRef<HTMLDivElement>;
+
+  private map!: L.Map;
+  private markersLayer!: L.LayerGroup;
+
   categorias: Categoria[] = [
     { nombre: 'Baches', color: '#ef4444' },
     { nombre: 'Alumbrado Público', color: '#f59e0b' },
@@ -62,7 +45,6 @@ export class MapaGeneralComponent implements OnInit {
     { nombre: 'Señalización', color: '#8b5cf6' }
   ];
 
-  // Datos de estados
   estados: Estado[] = [
     { nombre: 'Pendiente', color: '#f59e0b' },
     { nombre: 'En Proceso', color: '#3b82f6' },
@@ -70,129 +52,115 @@ export class MapaGeneralComponent implements OnInit {
     { nombre: 'Rechazada', color: '#ef4444' }
   ];
 
-  // Datos de quejas de ejemplo - Ajustadas para Lima, Perú
-  // Coordenadas simuladas dentro de los límites de Lima Metropolitana
   quejas: Queja[] = [
-    {
-      id: '1',
-      titulo: 'Bache gigante en Av. Principal',
-      ubicacion: 'Av. Principal #123, Col. Centro',
-      categoria: 'Baches',
-      estado: 'En Proceso',
-      posX: 45,
-      posY: 40
-    },
-    {
-      id: '2',
-      titulo: 'Falta de iluminación en parque',
-      ubicacion: 'Parque Central, Col. Roma',
-      categoria: 'Alumbrado Público',
-      estado: 'Pendiente',
-      posX: 60,
-      posY: 35
-    },
-    {
-      id: '3',
-      titulo: 'Fuga de agua en la calle',
-      ubicacion: 'Calle Insurgentes #456',
-      categoria: 'Alcantarillado',
-      estado: 'Resuelta',
-      posX: 50,
-      posY: 55
-    },
-    {
-      id: '4',
-      titulo: 'Señal de alto vandalizada',
-      ubicacion: 'Esquina Reforma y Juárez',
-      categoria: 'Señalización',
-      estado: 'Pendiente',
-      posX: 40,
-      posY: 65
-    },
-    {
-      id: '5',
-      titulo: 'Acumulación de basura',
-      ubicacion: 'Col. Condesa, Calle Ámsterdam',
-      categoria: 'Basura',
-      estado: 'En Proceso',
-      posX: 70,
-      posY: 50
-    },
-    // Quejas adicionales para Lima
-    {
-      id: '6',
-      titulo: 'Poste de luz caído',
-      ubicacion: 'Av. Arequipa, Miraflores',
-      categoria: 'Alumbrado Público',
-      estado: 'Pendiente',
-      posX: 55,
-      posY: 45
-    },
-    {
-      id: '7',
-      titulo: 'Basura acumulada',
-      ubicacion: 'Jr. Lampa, Cercado de Lima',
-      categoria: 'Basura',
-      estado: 'Resuelta',
-      posX: 35,
-      posY: 30
-    }
+    { id: '1', titulo: 'Bache gigante en Av. Principal', ubicacion: 'Av. Principal #123, Cercado de Lima', categoria: 'Baches', estado: 'En Proceso', lat: -12.0464, lng: -77.0428 },
+    { id: '2', titulo: 'Falta de iluminación en parque', ubicacion: 'Parque Central, Col. Roma', categoria: 'Alumbrado Público', estado: 'Pendiente', lat: -12.0750, lng: -77.0250 },
+    { id: '3', titulo: 'Fuga de agua en la calle', ubicacion: 'Calle Insurgentes #456', categoria: 'Alcantarillado', estado: 'Resuelta', lat: -12.0500, lng: -77.0450 },
+    { id: '4', titulo: 'Señal de alto vandalizada', ubicacion: 'Esquina Reforma y Juárez', categoria: 'Señalización', estado: 'Pendiente', lat: -12.0400, lng: -77.0500 },
+    { id: '5', titulo: 'Acumulación de basura', ubicacion: 'Col. Condesa (sim), Calle Ámsterdam', categoria: 'Basura', estado: 'En Proceso', lat: -12.1191, lng: -77.0349 },
+    { id: '6', titulo: 'Poste de luz caído', ubicacion: 'Av. Arequipa, Miraflores', categoria: 'Alumbrado Público', estado: 'Pendiente', lat: -12.1200, lng: -77.0300 },
+    { id: '7', titulo: 'Basura acumulada', ubicacion: 'Jr. Lampa, Cercado de Lima', categoria: 'Basura', estado: 'Resuelta', lat: -12.0450, lng: -77.0330 }
   ];
 
-  // Filtros
   selectedCategoria: string = 'todas';
   selectedEstado: string = 'todos';
   quejasFiltradas: Queja[] = [];
   quejasTotal: number = 0;
-
-  // Tooltip
-  tooltipQueja: Queja | null = null;
 
   ngOnInit(): void {
     this.quejasTotal = this.quejas.length;
     this.quejasFiltradas = [...this.quejas];
   }
 
-  // Filtrar por categoría
+  ngAfterViewInit(): void {
+    // Inicializa el mapa Leaflet
+    this.map = L.map(this.mapContainer.nativeElement, {
+      center: [-12.0464, -77.0428],
+      zoom: 12,
+      zoomControl: true
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(this.map);
+
+    this.markersLayer = L.layerGroup().addTo(this.map);
+    this.updateMapMarkers();
+  }
+
+  ngOnDestroy(): void {
+    if (this.map) this.map.remove();
+  }
+
   filterByCategoria(categoria: string): void {
     this.selectedCategoria = categoria;
     this.applyFilters();
   }
 
-  // Filtrar por estado
   filterByEstado(estado: string): void {
     this.selectedEstado = estado;
     this.applyFilters();
   }
 
-  // Aplicar filtros combinados
   applyFilters(): void {
-    this.quejasFiltradas = this.quejas.filter(queja => {
-      const matchCategoria = this.selectedCategoria === 'todas' || queja.categoria === this.selectedCategoria;
-      const matchEstado = this.selectedEstado === 'todos' || queja.estado === this.selectedEstado;
+    this.quejasFiltradas = this.quejas.filter(q => {
+      const matchCategoria = this.selectedCategoria === 'todas' || q.categoria === this.selectedCategoria;
+      const matchEstado = this.selectedEstado === 'todos' || q.estado === this.selectedEstado;
       return matchCategoria && matchEstado;
     });
+    this.updateMapMarkers();
   }
 
-  // Obtener color de categoría
   getCategoriaColor(categoria: string): string {
     const cat = this.categorias.find(c => c.nombre === categoria);
     return cat ? cat.color : '#6b7280';
   }
 
-  // Obtener color de estado
   getEstadoColor(estado: string): string {
     const est = this.estados.find(e => e.nombre === estado);
     return est ? est.color : '#6b7280';
   }
 
-  // Mostrar tooltip
-  showTooltip(queja: Queja): void {
-    this.tooltipQueja = queja;
-  }
+  private updateMapMarkers(): void {
+    if (!this.markersLayer) return;
+    this.markersLayer.clearLayers();
 
-  // Ocultar tooltip
-  hideTooltip(): void {
-    this.tooltipQueja = null;
+    this.quejasFiltradas.forEach(queja => {
+      const color = this.getCategoriaColor(queja.categoria);
+      const estadoColor = this.getEstadoColor(queja.estado);
+
+      const marker = L.circleMarker([queja.lat, queja.lng], {
+        radius: 10,
+        color,
+        weight: 2,
+        fillColor: '#fff',
+        fillOpacity: 1
+      });
+
+      const popupHtml = `
+        <div style="font-size:14px">
+          <strong>${queja.titulo}</strong><br/>
+          <small>${queja.ubicacion}</small><br/>
+          <div style="margin-top:6px;">
+            <span style="display:inline-block;padding:4px 8px;border-radius:12px;background:${estadoColor};color:#fff;font-size:12px">
+              ${queja.estado}
+            </span>
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml);
+      marker.on('mouseover', () => marker.openPopup());
+      marker.on('mouseout', () => marker.closePopup());
+      marker.addTo(this.markersLayer);
+    });
+
+    if (this.quejasFiltradas.length === 1) {
+      const q = this.quejasFiltradas[0];
+      this.map.setView([q.lat, q.lng], 14);
+    } else if (this.quejasFiltradas.length > 1) {
+      const bounds = L.latLngBounds(this.quejasFiltradas.map(q => [q.lat, q.lng] as [number, number]));
+      this.map.fitBounds(bounds.pad(0.2));
+    }
   }
 }
