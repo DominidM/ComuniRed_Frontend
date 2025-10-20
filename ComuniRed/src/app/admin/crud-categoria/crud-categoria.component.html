@@ -1,1 +1,39 @@
-<p>crud-categoria works!</p>
+<div class="crud-container">
+  <h2>Gestión de Categorías</h2>
+
+  <div class="formulario">
+    <input type="text" [(ngModel)]="nombre" placeholder="Nombre" />
+    <input type="text" [(ngModel)]="descripcion" placeholder="Descripción" />
+    <label>
+      <input type="checkbox" [(ngModel)]="activo" /> Activo
+    </label>
+    <button (click)="guardarCategoria()">
+      {{ idSeleccionado ? 'Actualizar' : 'Crear' }}
+    </button>
+    <button (click)="limpiarCampos()">Limpiar</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cat of categorias">
+        <td>{{ cat.id }}</td>
+        <td>{{ cat.nombre }}</td>
+        <td>{{ cat.descripcion }}</td>
+        <td>{{ cat.activo ? 'Sí' : 'No' }}</td>
+        <td>
+          <button (click)="editarCategoria(cat)">Editar</button>
+          <button (click)="eliminarCategoria(cat.id)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
