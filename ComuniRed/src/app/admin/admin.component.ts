@@ -268,4 +268,9 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
       }, 50);
     }
   }
+
+  exportPdf(): void {
+    // Navigate to the export/report page (adjust route if different)
+    this.router.navigate(['/admin/reporte-export']);
+  }
 }

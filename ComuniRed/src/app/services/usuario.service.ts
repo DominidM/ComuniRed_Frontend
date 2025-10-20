@@ -16,7 +16,7 @@ export interface Usuario {
   codigo_postal: string;
   direccion: string;
   email: string;
-  password?: string; // Opcional para no enviarlo en respuestas
+  password?: string;
   rol_id: string;
 }
 
@@ -31,7 +31,7 @@ export interface UsuarioInput {
   codigo_postal?: string;
   direccion?: string;
   email: string;
-  password: string;
+  password?: string;
   rol_id: string;
 }
 
@@ -43,7 +43,7 @@ export interface UsuarioPage {
   size: number;
 }
 
-/* Queries / Mutations existentes */
+/* Queries / Mutations */
 const OBTENER_USUARIOS = gql`
   query ObtenerUsuarios($page: Int!, $size: Int!) {
     obtenerUsuarios(page: $page, size: $size) {
@@ -89,7 +89,7 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
 `;
 
 const OBTENER_USUARIO_POR_ID = gql`
-  query ObtenerUsuarioPorId($id: String!) {
+  query ObtenerUsuarioPorId($id: ID!) {
     obtenerUsuarioPorId(id: $id) {
       id
       nombre
@@ -108,7 +108,7 @@ const OBTENER_USUARIO_POR_ID = gql`
 `;
 
 const CONTAR_USUARIOS_POR_ROL = gql`
-  query ContarUsuariosPorRol($rol_id: String!) {
+  query ContarUsuariosPorRol($rol_id: ID!) {
     contarUsuariosPorRol(rol_id: $rol_id)
   }
 `;
@@ -133,7 +133,7 @@ const CREAR_USUARIO = gql`
 `;
 
 const ACTUALIZAR_USUARIO = gql`
-  mutation ActualizarUsuario($id: String!, $usuario: UsuarioInput!) {
+  mutation ActualizarUsuario($id: ID!, $usuario: UsuarioInput!) {
     actualizarUsuario(id: $id, usuario: $usuario) {
       id
       nombre
@@ -152,14 +152,11 @@ const ACTUALIZAR_USUARIO = gql`
 `;
 
 const ELIMINAR_USUARIO = gql`
-  mutation EliminarUsuario($id: String!) {
+  mutation EliminarUsuario($id: ID!) {
     eliminarUsuario(id: $id)
   }
 `;
 
-/*
-  LOGIN: actualizado para devolver token + usuario (si tu backend lo soporta).
-*/
 const LOGIN = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -175,13 +172,11 @@ const LOGIN = gql`
   }
 `;
 
-/* Resultado esperado de login */
 export interface LoginResult {
   token?: string;
   usuario?: Usuario | null;
 }
 
-/* Llave localStorage (puedes cambiar si ya usas otra) */
 export const TOKEN_KEY = 'comunired_token';
 export const USER_KEY = 'comunired_user';
 
@@ -192,27 +187,54 @@ export class UsuarioService {
   constructor(private apollo: Apollo) {}
 
   obtenerUsuarios(page: number, size: number): Observable<UsuarioPage> {
+    // Observa el resultado crudo y regístralo en consola para depuración.
     return this.apollo.watchQuery<{ obtenerUsuarios: UsuarioPage }>({
       query: OBTENER_USUARIOS,
-      variables: { page, size }
+      variables: { page, size },
+      fetchPolicy: 'network-only',
+      errorPolicy: 'all'  // permite obtener data parcial si hay errores
     }).valueChanges.pipe(
-      map(result => result.data.obtenerUsuarios)
+      tap((rawResult) => {
+        // Log detallado para depuración: datos + errores
+        console.debug('[UsuarioService] Apollo raw result:', rawResult);
+        if ((rawResult as any).errors && (rawResult as any).errors.length > 0) {
+          console.warn('[UsuarioService] GraphQL errors:', (rawResult as any).errors);
+        }
+      }),
+      map(result => {
+        // Asegurarse de devolver la data si existe, o estructura vacía si no.
+        if (result && result.data && result.data.obtenerUsuarios) {
+          return result.data.obtenerUsuarios;
+        }
+        // Si no hay datos, devolver estructura vacía en lugar de null para evitar fallos en UI.
+        return {
+          content: [],
+          totalElements: 0,
+          totalPages: 0,
+          number: page,
+          size: size
+        } as UsuarioPage;
+      })
     );
   }
 
   obtenerTodosLosUsuarios(): Observable<Usuario[]> {
     return this.apollo.watchQuery<{ obtenerTodosLosUsuarios: Usuario[] }>({
-      query: OBTENER_TODOS_LOS_USUARIOS
+      query: OBTENER_TODOS_LOS_USUARIOS,
+      fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      map(result => result.data.obtenerTodosLosUsuarios)
+      tap(raw => console.debug('[UsuarioService] obtenerTodos raw:', raw)),
+      map(result => result.data?.obtenerTodosLosUsuarios || [])
     );
   }
 
   obtenerUsuarioPorId(id: string): Observable<Usuario> {
     return this.apollo.watchQuery<{ obtenerUsuarioPorId: Usuario }>({
       query: OBTENER_USUARIO_POR_ID,
-      variables: { id }
+      variables: { id },
+      fetchPolicy: 'network-only'
     }).valueChanges.pipe(
+      tap(raw => console.debug('[UsuarioService] obtenerUsuarioPorId raw:', raw)),
       map(result => result.data.obtenerUsuarioPorId)
     );
   }
@@ -220,8 +242,10 @@ export class UsuarioService {
   contarUsuariosPorRol(rolId: string): Observable<number> {
     return this.apollo.watchQuery<{ contarUsuariosPorRol: number }>({
       query: CONTAR_USUARIOS_POR_ROL,
-      variables: { rol_id: rolId }
+      variables: { rol_id: rolId },
+      fetchPolicy: 'network-only'
     }).valueChanges.pipe(
+      tap(raw => console.debug('[UsuarioService] contarUsuariosPorRol raw:', raw)),
       map(result => result.data.contarUsuariosPorRol)
     );
   }
@@ -235,6 +259,7 @@ export class UsuarioService {
         { query: OBTENER_TODOS_LOS_USUARIOS }
       ]
     }).pipe(
+      tap(raw => console.debug('[UsuarioService] crearUsuario raw:', raw)),
       map(result => result.data!.crearUsuario)
     );
   }
@@ -248,6 +273,7 @@ export class UsuarioService {
         { query: OBTENER_TODOS_LOS_USUARIOS }
       ]
     }).pipe(
+      tap(raw => console.debug('[UsuarioService] actualizarUsuario raw:', raw)),
       map(result => result.data!.actualizarUsuario)
     );
   }
@@ -261,15 +287,17 @@ export class UsuarioService {
         { query: OBTENER_TODOS_LOS_USUARIOS }
       ]
     }).pipe(
+      tap(raw => console.debug('[UsuarioService] eliminarUsuario raw:', raw)),
       map(result => result.data!.eliminarUsuario)
     );
   }
 
-  login(email: string, password: string): Observable<LoginResult> {
+  login(email: string, password: string) {
     return this.apollo.mutate<{ login: { token?: string; usuario?: Usuario } }>({
       mutation: LOGIN,
       variables: { email, password }
     }).pipe(
+      tap(raw => console.debug('[UsuarioService] login raw:', raw)),
       map(result => {
         const payload = result.data?.login;
         return {
@@ -280,7 +308,7 @@ export class UsuarioService {
     );
   }
 
-  loginAndStore(email: string, password: string): Observable<LoginResult> {
+  loginAndStore(email: string, password: string) {
     return this.login(email, password).pipe(
       tap(res => {
         if (res?.token) this.saveToken(res.token);
@@ -330,12 +358,11 @@ export class UsuarioService {
       // ignore
     }
 
-    // Intenta limpiar / resetear cache de Apollo (sin forzar errores si no existe)
     try {
       const client: any = (this.apollo as any).client || (this.apollo as any).getClient?.();
       if (client) {
-        client.clearStore?.(); // limpia cache
-        client.resetStore?.(); // resetea store
+        client.clearStore?.();
+        client.resetStore?.();
       }
     } catch (err) {
       console.warn('No se pudo limpiar Apollo store', err);

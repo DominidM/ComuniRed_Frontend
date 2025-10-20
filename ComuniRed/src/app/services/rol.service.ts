@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 export interface Rol {
   id: string;
   nombre: string;
-  descripcion: string;
+  descripcion?: string;
 }
 
 export interface RolPage {
@@ -42,6 +42,30 @@ export class RolService {
       fetchPolicy: 'network-only'
     }).pipe(
       map(result => result.data?.obtenerRoles as RolPage)
+    );
+  }
+
+  // Helper: obtener todos los roles (sin paginar) — usado por el frontend para selects
+  obtenerTodosLosRoles(): Observable<Rol[]> {
+    console.log('[RolService] Ejecutando query obtenerTodosLosRoles...');
+    return this.apollo.query<{ obtenerTodosLosRoles: Rol[] }>({
+      query: gql`
+        query ObtenerTodosLosRoles {
+          obtenerTodosLosRoles {
+            id
+            nombre
+            descripcion
+          }
+        }
+      `,
+      fetchPolicy: 'network-only'
+    }).pipe(
+      map(result => {
+        console.log('[RolService] Respuesta completa de Apollo:', result);
+        const roles = result.data?.obtenerTodosLosRoles ?? [];
+        console.log('[RolService] Roles extraídos:', roles);
+        return roles;
+      })
     );
   }
 
