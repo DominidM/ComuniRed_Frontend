@@ -30,6 +30,9 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
   chatMessages: ChatMessage[] = [];
   private shouldScrollToBottom = false;
 
+  // Theme toggle
+  isDarkMode = false;
+
   // Gestión DB and tools toggles
   gestionOpen = false;
   toolsOpen = false;
@@ -59,6 +62,13 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
   ngOnInit(): void {
     // listen for storage changes (login/logout in other tabs)
     window.addEventListener('storage', this.windowStorageListener);
+    
+    // Cargar preferencia de tema
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      this.isDarkMode = true;
+      document.documentElement.classList.add('dark-mode');
+    }
   }
 
   ngAfterViewInit(): void {
@@ -90,6 +100,19 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
 
   ngOnDestroy(): void {
     window.removeEventListener('storage', this.windowStorageListener);
+  }
+
+  // Toggle theme (dark/light mode)
+  toggleTheme() {
+    this.isDarkMode = !this.isDarkMode;
+    
+    if (this.isDarkMode) {
+      document.documentElement.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+      localStorage.setItem('theme', 'light');
+    }
   }
 
   // Mostrar el email o nombre del usuario guardado en localStorage por UsuarioService

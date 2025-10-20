@@ -281,6 +281,29 @@
   font-size: 0.95em;
 }
 
+/* Theme Toggle Button */
+.admin-theme-toggle {
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.admin-theme-toggle:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+}
+
+.admin-theme-toggle svg {
+  display: block;
+}
+
 .admin-logout {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: #fff;
@@ -475,6 +498,136 @@
 .chatbot-send:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(95, 92, 246, 0.3);
+}
+
+/* ---------- DARK MODE ---------- */
+.dark-mode .admin-root {
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+}
+
+.dark-mode .cr-sidebar {
+  background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
+  color: #e2e8f0;
+  border-right-color: #4a5568;
+}
+
+.dark-mode .cr-logo {
+  color: #a5b4fc;
+  border-bottom-color: #4a5568;
+  background: linear-gradient(135deg, #1e293b 0%, #2d3748 100%);
+}
+
+.dark-mode .cr-section-title {
+  color: #718096;
+}
+
+.dark-mode .menu-link {
+  color: #cbd5e0;
+}
+
+.dark-mode .menu-link .icon {
+  background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+}
+
+.dark-mode .menu-link:hover {
+  background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+  color: #a5b4fc;
+}
+
+.dark-mode .menu-link:hover .icon {
+  background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+}
+
+.dark-mode .menu-link.active {
+  background: linear-gradient(135deg, #5f5cf6 0%, #7c7ef8 100%);
+  color: #ffffff;
+}
+
+.dark-mode .cr-sep {
+  background: linear-gradient(90deg, transparent 0%, #4a5568 50%, transparent 100%);
+}
+
+.dark-mode .cr-cta {
+  border-top-color: #4a5568;
+  background: linear-gradient(180deg, #1e293b 0%, #2d3748 100%);
+}
+
+.dark-mode .admin-navbar {
+  background: #2d3748;
+  border-bottom-color: #4a5568;
+}
+
+.dark-mode .admin-search {
+  background: #1a202c;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-mode .admin-search::placeholder {
+  color: #718096;
+}
+
+.dark-mode .admin-search:focus {
+  background: #374151;
+  border-color: #5f5cf6;
+}
+
+.dark-mode .user-name {
+  color: #e2e8f0;
+}
+
+.dark-mode .admin-theme-toggle {
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-mode .admin-theme-toggle:hover {
+  background: #374151;
+  border-color: #718096;
+}
+
+.dark-mode .admin-main {
+  background: #1a202c;
+}
+
+.dark-mode .admin-content {
+  color: #e2e8f0;
+}
+
+.dark-mode .chatbot-window {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.dark-mode .chatbot-messages {
+  background: #1a202c;
+}
+
+.dark-mode .chat-message .message-content {
+  background: #374151;
+  color: #e2e8f0;
+  border-color: #4a5568;
+}
+
+.dark-mode .chat-message.user .message-content {
+  background: linear-gradient(135deg, #5f5cf6 0%, #8b96fa 100%);
+  color: #ffffff;
+}
+
+.dark-mode .chatbot-input-area {
+  background: #2d3748;
+  border-top-color: #4a5568;
+}
+
+.dark-mode .chatbot-input {
+  background: #1a202c;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-mode .chatbot-input:focus {
+  background: #374151;
+  border-color: #5f5cf6;
 }
 
 /* ---------- RESPONSIVE ---------- */
