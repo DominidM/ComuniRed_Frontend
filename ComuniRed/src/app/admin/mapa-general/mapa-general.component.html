@@ -1,5 +1,4 @@
 <div class="mapa-container">
-  <!-- Header -->
   <div class="mapa-header">
     <div>
       <h1 class="mapa-title">Mapa General</h1>
@@ -8,7 +7,6 @@
   </div>
 
   <div class="mapa-content">
-    <!-- Sidebar Filtros -->
     <aside class="filtros-sidebar">
       <div class="filtros-header">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -17,55 +15,33 @@
         <h3>Filtros</h3>
       </div>
 
-      <!-- Filtro Categoría -->
       <div class="filtro-section">
         <label class="filtro-label">Categoría</label>
         <div class="filtro-options">
-          <button 
-            class="filtro-option" 
-            [class.active]="selectedCategoria === 'todas'"
-            (click)="filterByCategoria('todas')">
-            Todas
-          </button>
-          <button 
-            *ngFor="let cat of categorias" 
-            class="filtro-option"
-            [class.active]="selectedCategoria === cat.nombre"
-            (click)="filterByCategoria(cat.nombre)">
+          <button class="filtro-option" [class.active]="selectedCategoria === 'todas'" (click)="filterByCategoria('todas')">Todas</button>
+          <button *ngFor="let cat of categorias" class="filtro-option" [class.active]="selectedCategoria === cat.nombre" (click)="filterByCategoria(cat.nombre)">
             <span class="cat-dot" [style.background-color]="cat.color"></span>
             {{ cat.nombre }}
           </button>
         </div>
       </div>
 
-      <!-- Filtro Estado -->
       <div class="filtro-section">
         <label class="filtro-label">Estado</label>
         <div class="filtro-options">
-          <button 
-            class="filtro-option"
-            [class.active]="selectedEstado === 'todos'"
-            (click)="filterByEstado('todos')">
-            Todos
-          </button>
-          <button 
-            *ngFor="let est of estados" 
-            class="filtro-option"
-            [class.active]="selectedEstado === est.nombre"
-            (click)="filterByEstado(est.nombre)">
+          <button class="filtro-option" [class.active]="selectedEstado === 'todos'" (click)="filterByEstado('todos')">Todos</button>
+          <button *ngFor="let est of estados" class="filtro-option" [class.active]="selectedEstado === est.nombre" (click)="filterByEstado(est.nombre)">
             <span class="cat-dot" [style.background-color]="est.color"></span>
             {{ est.nombre }}
           </button>
         </div>
       </div>
 
-      <!-- Contador -->
       <div class="filtro-counter">
         Mostrando {{ quejasFiltradas.length }} de {{ quejasTotal }} quejas
       </div>
     </aside>
 
-    <!-- Mapa Principal -->
     <div class="mapa-principal">
       <div class="mapa-card">
         <div class="mapa-card-header">
@@ -73,72 +49,10 @@
           <p>Ubicación de las quejas en el mapa</p>
         </div>
 
-        <div class="mapa-canvas" #mapaCanvas>
-          <!-- Quejas visualizadas como pines -->
-          <div 
-            *ngFor="let queja of quejasFiltradas; let i = index" 
-            class="queja-pin"
-            [style.left.%]="queja.posX"
-            [style.top.%]="queja.posY"
-            [attr.data-categoria]="queja.categoria"
-            (mouseenter)="showTooltip(queja)"
-            (mouseleave)="hideTooltip()">
-            
-            <div class="pin-marker" [style.border-color]="getCategoriaColor(queja.categoria)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-            </div>
-
-            <!-- Tooltip card -->
-            <div class="queja-tooltip" *ngIf="tooltipQueja === queja">
-              <div class="tooltip-header">
-                <div class="tooltip-icon" [style.background-color]="getCategoriaColor(queja.categoria)">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                    <circle cx="12" cy="10" r="3"/>
-                  </svg>
-                </div>
-                <div class="tooltip-content">
-                  <h4>{{ queja.titulo }}</h4>
-                  <p class="tooltip-ubicacion">{{ queja.ubicacion }}</p>
-                </div>
-              </div>
-              <div class="tooltip-badge" [style.background-color]="getEstadoColor(queja.estado)">
-                {{ queja.estado }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Marcador de vista del mapa (decorativo) -->
-          <div class="map-marker-placeholder">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
-              <circle cx="12" cy="12" r="10"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-          </div>
+        <div class="mapa-canvas">
+          <!-- Contenedor definitivo para Leaflet -->
+          <div #mapaCanvas class="leaflet-map"></div>
         </div>
-
-        <!-- Info Footer -->
-        <div class="mapa-info">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="16" x2="12" y2="12"/>
-            <line x1="12" y1="8" x2="12.01" y2="8"/>
-          </svg>
-          <p>
-            <strong>Nota:</strong> Esta es una representación visual de las quejas. 
-            En producción, se integrará con servicios de mapas como Google Maps, Mapbox o Leaflet 
-            para mostrar las ubicaciones exactas en un mapa interactivo.
-          </p>
-        </div>
-      </div>
-
-      <!-- Vista de mapa alternativa (texto) -->
-      <div class="vista-mapa-info">
-        <h4>Vista de mapa</h4>
-        <p>Integración con mapas interactivos próximamente</p>
       </div>
     </div>
   </div>

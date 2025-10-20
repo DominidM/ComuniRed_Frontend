@@ -369,3 +369,21 @@
     height: 400px;
   }
 }
+
+.mapa-container { padding: 18px; font-family: Inter, Roboto, Arial, sans-serif; }
+.mapa-content { display: flex; gap: 18px; align-items: flex-start; }
+.filtros-sidebar { width: 260px; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.mapa-principal { flex: 1; }
+.mapa-card { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.mapa-card-header { margin-bottom: 12px; }
+.mapa-canvas { background: linear-gradient(180deg,#f8fafc,#f1f5f9); border-radius: 8px; padding: 2px; min-height: 220px; display:flex; align-items:stretch; }
+.leaflet-map { width: 100%; height: 620px; border-radius: 6px; }
+
+/* filtros */
+.filtro-section { margin-bottom: 12px; }
+.filtro-label { font-size: 12px; color: #6b7280; display:block; margin-bottom:8px; text-transform:uppercase; }
+.filtro-option { display:flex; align-items:center; gap:8px; width:100%; padding:8px 10px; border-radius:8px; border: none; background: #f8fafc; margin-bottom:6px; cursor:pointer; text-align:left; }
+.filtro-option.active { outline: 2px solid #6366f1; background: #fff; }
+.cat-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
+.filtro-counter { margin-top: 12px; text-align:center; padding:8px; background:#f1f5f9; border-radius:8px; }
+.mapa-info { margin-top: 28px; display:flex; gap:1px; align-items:center; color:#6b7280; }
