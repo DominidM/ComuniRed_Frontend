@@ -5,6 +5,7 @@ import { AdminComponent } from './admin/admin.component';
 import { DashboardComponent } from './admin/dashboard/dashboard.component';
 import { CrudRolComponent } from './admin/crud-rol/crud-rol.component';
 import { CrudUsuarioComponent } from './admin/crud-usuario/crud-usuario.component';
+
 import { CrudEstadoQuejaComponent } from './admin/crud-estado-queja/crud-estado-queja.component';
 import { CrudQuejaComponent } from './admin/crud-queja/crud-queja.component';
 import { CrudAsignacionComponent } from './admin/crud-asignacion/crud-asignacion.component';

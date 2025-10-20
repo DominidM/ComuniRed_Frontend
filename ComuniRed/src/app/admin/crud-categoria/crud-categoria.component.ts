@@ -20,6 +20,8 @@ export class CrudCategoriaComponent implements OnInit {
   nombre: string = '';
   descripcion: string = '';
   activo: boolean = true;
+  nombreBuscado: string = '';
+
 
   constructor(private categoriaService: CategoriaService) {}
 
@@ -85,6 +87,23 @@ export class CrudCategoriaComponent implements OnInit {
       });
     }
   }
+
+  buscarCategoria(): void {
+  if (!this.nombreBuscado.trim()) {
+    // Si no hay texto, mostrar todas las categorías
+    this.obtenerCategorias();
+    return;
+  }
+
+  this.categoriaService.buscarCategoriaPorNombre(this.nombreBuscado)
+    .subscribe({
+      next: (categoria) => {
+        // Si encuentra categoría, la mostramos en un array, si no, array vacío
+        this.categorias = categoria ? [categoria] : [];
+      },
+      error: (err) => console.error('Error al buscar categoría:', err)
+    });
+}
 
   // 🔹 Limpiar el formulario
   limpiarCampos(): void {

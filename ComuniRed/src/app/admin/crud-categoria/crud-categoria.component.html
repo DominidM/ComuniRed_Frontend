@@ -2,6 +2,13 @@
   <h2>Gestión de Categorías</h2>
 
   <div class="formulario">
+<div class="crud-categoria-header">
+  <input type="text" [(ngModel)]="nombreBuscado" placeholder="Buscar por nombre" (keyup.enter)="buscarCategoria()">
+  <button (click)="buscarCategoria()">Buscar</button>
+  <button (click)="obtenerCategorias()">Mostrar todos</button>
+</div>
+
+
     <input type="text" [(ngModel)]="nombre" placeholder="Nombre" />
     <input type="text" [(ngModel)]="descripcion" placeholder="Descripción" />
     <label>

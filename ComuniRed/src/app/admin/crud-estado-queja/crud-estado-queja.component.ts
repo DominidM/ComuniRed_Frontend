@@ -1,74 +1,114 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// import { EstadoQuejaService } from '../../services/estado-queja.service'; // Crea tu servicio real
-
-interface EstadoQueja {
-  id: number;
-  nombre: string;
-  descripcion?: string;
-}
+import { EstadosQuejaService, EstadoQueja } from '../../services/estado-queja.service';
 
 @Component({
   selector: 'app-crud-estado-queja',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './crud-estado-queja.component.html',
-  styleUrls: ['./crud-estado-queja.component.css']
+  styleUrls: ['./crud-estado-queja.component.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule]
 })
 export class CrudEstadoQuejaComponent implements OnInit {
-  estados: EstadoQueja[] = [];
-  showModal = false;
-  editingEstado: EstadoQueja | null = null;
-  estadoData: Partial<EstadoQueja> = {};
 
-  // constructor(private estadoQuejaService: EstadoQuejaService) {}
-  constructor() {}
+  estados: EstadoQueja[] = [];
+  modalVisible = false;
+  modoEdicion = false;
+  estadoActual: EstadoQueja = { id: '', clave: '', nombre: '', descripcion: '', orden: 1 };
+  nombreBuscado: string = '';
+
+
+  constructor(private estadosService: EstadosQuejaService) {}
 
   ngOnInit(): void {
-    this.loadEstados();
+    this.obtenerEstados();
   }
 
-  loadEstados() {
-    // Ejemplo con tu servicio real:
-    // this.estadoQuejaService.getEstados().subscribe(data => { this.estados = data; });
-    // Demo:
-    this.estados = [];
+  obtenerEstados() {
+    this.estadosService.listarEstadosQueja().subscribe({
+      next: (data: EstadoQueja[]) => this.estados = data,
+      error: (err) => console.error('Error al obtener estados:', err)
+    });
   }
 
-  openAddModal() {
-    this.editingEstado = null;
-    this.estadoData = {};
-    this.showModal = true;
+  abrirModal() {
+    this.modoEdicion = false;
+    this.estadoActual = { id: '', clave: '', nombre: '', descripcion: '', orden: 1 };
+    this.modalVisible = true;
   }
 
-  openEditModal(estado: EstadoQueja) {
-    this.editingEstado = estado;
-    this.estadoData = { ...estado };
-    this.showModal = true;
+  cerrarModal() {
+    this.modalVisible = false;
   }
 
-  saveEstado() {
-    if (!this.estadoData.nombre) return;
-    if (this.editingEstado) {
-      // Actualiza en tu API
-      // this.estadoQuejaService.updateEstado(this.editingEstado.id, this.estadoData).subscribe(() => this.loadEstados());
+  editarEstado(estado: EstadoQueja) {
+    this.modoEdicion = true;
+    this.estadoActual = { ...estado };
+    this.modalVisible = true;
+  }
+
+  guardarEstado() {
+    if (this.modoEdicion) {
+      this.estadosService.actualizarEstadoQueja(
+        this.estadoActual.id,
+        this.estadoActual.clave,
+        this.estadoActual.nombre,
+        this.estadoActual.descripcion ?? '',
+        this.estadoActual.orden
+      ).subscribe({
+        next: () => {
+          this.obtenerEstados();
+          this.cerrarModal();
+        },
+        error: (err) => console.error('Error al actualizar:', err)
+      });
     } else {
-      // Inserta en tu API
-      // this.estadoQuejaService.createEstado(this.estadoData).subscribe(() => this.loadEstados());
+      this.estadosService.crearEstadoQueja(
+        this.estadoActual.clave,
+        this.estadoActual.nombre,
+        this.estadoActual.descripcion ?? '',
+        this.estadoActual.orden
+      ).subscribe({
+        next: () => {
+          this.obtenerEstados();
+          this.cerrarModal();
+        },
+        error: (err) => console.error('Error al crear:', err)
+      });
     }
-    this.closeModal();
   }
 
-  deleteEstado(estado: EstadoQueja) {
-    if (confirm(`¿Seguro que deseas eliminar el estado "${estado.nombre}"?`)) {
-      // this.estadoQuejaService.deleteEstado(estado.id).subscribe(() => this.loadEstados());
-    }
+buscar() {
+  if (!this.nombreBuscado.trim()) {
+    this.obtenerEstados();
+    return;
   }
 
-  closeModal() {
-    this.showModal = false;
-    this.editingEstado = null;
-    this.estadoData = {};
+  this.estadosService.buscarEstadoPorNombre(this.nombreBuscado)
+    .subscribe(
+      estado => {
+        // Si existe, lo ponemos en un array de un solo elemento
+        this.estados = estado ? [estado] : [];
+      },
+      error => console.error(error)
+    );
+}
+
+
+
+
+
+
+
+
+
+  eliminarEstado(id: string) {
+    if (confirm('¿Deseas eliminar este estado de queja?')) {
+      this.estadosService.eliminarEstadoQueja(id).subscribe({
+        next: () => this.obtenerEstados(),
+        error: (err) => console.error('Error al eliminar:', err)
+      });
+    }
   }
 }
