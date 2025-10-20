@@ -10,11 +10,15 @@ import { CrudQuejaComponent } from './admin/crud-queja/crud-queja.component';
 import { CrudAsignacionComponent } from './admin/crud-asignacion/crud-asignacion.component';
 import { CrudTipoReaccionComponent } from './admin/crud-tipo-reaccion/crud-tipo-reaccion.component';
 import { CrudReaccionComponent } from './admin/crud-reaccion/crud-reaccion.component';
+import { CrudCategoriaComponent } from './admin/crud-categoria/crud-categoria.component';
+import { CrudComentarioComponent } from './admin/crud-comentario/crud-comentario.component';
 import { PublicComponent } from './public/public.component';
 
 import { SoporteComponent } from './soporte/soporte.component';
 import { EditarPerfilComponent } from './soporte/edit-profile/editar-perfil.component';
 import { SoporteHomeComponent } from './soporte/home/soporte-home.component';
+import { ReportStatsComponent } from './soporte/home/report-stats/report-stats.component';
+
 // Componentes públicos tipo red social
 import { FeedComponent } from './public/feed/feed.component';
 import { ProfileComponent } from './public/profile/profile.component';
@@ -22,25 +26,11 @@ import { TrendingComponent } from './public/trending/trending.component';
 import { NotificationsComponent } from './public/notifications/notifications.component';
 import { SettingsComponent } from './public/settings/settings.component';
 import { HelpComponent } from './public/help/help.component';
-import { ReportStatsComponent } from './soporte/home/report-stats/report-stats.component';
 
-import { AuthGuard } from './guards/auth.guard';
-
-/*
-  Notes:
-  - AuthGuard expects UsuarioService.getToken() and UsuarioService.getRoles() to be available.
-  - Use role IDs or role names consistently. Below I used role IDs (examples you provided earlier).
-  - If you want to protect every child route under a parent, apply canActivateChild on the parent (used below).
-  - The new admin routes referenced in the sidebar are added below. If the corresponding components
-    don't exist yet create lightweight placeholder components with the matching class names/paths.
-*/
-
-// New admin components referenced in the sidebar/menu (ensure these components exist or create placeholders):
+// Reportes y exportaciones
 import { ReportExportComponent } from './admin/report-export/report-export.component';
 import { AdminReportsComponent } from './admin/admin-reports/admin-reports.component';
 import { ExportCsvComponent } from './admin/export-csv/export-csv.component';
-import { CrudCategoriaComponent } from './admin/crud-categoria/crud-categoria.component';
-import { CrudComentarioComponent } from './admin/crud-comentario/crud-comentario.component';
 
 // Tools / maintenance components
 import { SeedComponent } from './admin/tools/seed/seed.component';
@@ -52,6 +42,11 @@ import { ExportsHistoryComponent } from './admin/tools/exports-history/exports-h
 import { AuditoriaComponent } from './admin/auditoria/auditoria.component';
 import { ConfiguracionComponent } from './admin/configuracion/configuracion.component';
 
+import { MapaGeneralComponent } from './admin/mapa-general/mapa-general.component';
+import { CrudEvidenciaComponent } from './admin/crud-evidencia/crud-evidencia.component';
+
+import { AuthGuard } from './guards/auth.guard';
+
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
@@ -61,33 +56,40 @@ export const routes: Routes = [
     path: 'admin',
     component: AdminComponent,
     canActivateChild: [AuthGuard],
-    data: { roles: ['68ca68c40bc4d9ca3267b667'] }, // admin rol_id (adjust if you use role names)
+    data: { roles: ['68ca68c40bc4d9ca3267b667'] },
     children: [
+      // Principal
       { path: 'dashboard', component: DashboardComponent },
+      { path: 'mapa', component: MapaGeneralComponent },
 
-      // Quick reports / exports
+      // Gestión de Quejas
+      { path: 'queja', component: CrudQuejaComponent },
+      { path: 'asignacion', component: CrudAsignacionComponent },
+      { path: 'comentarios', component: CrudComentarioComponent },
+      { path: 'evidencias', component: CrudEvidenciaComponent },
+
+      // Configuración
+      { path: 'categoria', component: CrudCategoriaComponent },
+      { path: 'estado-queja', component: CrudEstadoQuejaComponent },
+      { path: 'reaccion', component: CrudReaccionComponent },
+      { path: 'tipo-reaccion', component: CrudTipoReaccionComponent },
+
+      // Usuarios y Permisos
+      { path: 'usuario', component: CrudUsuarioComponent },
+      { path: 'rol', component: CrudRolComponent },
+
+      // Reportes y Exportaciones
       { path: 'reporte-export', component: ReportExportComponent },
       { path: 'reportes', component: AdminReportsComponent },
       { path: 'export-csv', component: ExportCsvComponent },
 
-      // CRUD / Gestión DB
-      { path: 'rol', component: CrudRolComponent },
-      { path: 'usuario', component: CrudUsuarioComponent },
-      { path: 'categoria', component: CrudCategoriaComponent },
-      { path: 'estado-queja', component: CrudEstadoQuejaComponent },
-      { path: 'queja', component: CrudQuejaComponent },
-      { path: 'asignacion', component: CrudAsignacionComponent },
-      { path: 'tipo-reaccion', component: CrudTipoReaccionComponent },
-      { path: 'reaccion', component: CrudReaccionComponent },
-      { path: 'comentario', component: CrudComentarioComponent },
-
-      // Tools / maintenance (admin-only)
+      // Tools / Mantenimiento
       { path: 'seed', component: SeedComponent },
       { path: 'backups', component: BackupsComponent },
       { path: 'job-monitor', component: JobMonitorComponent },
       { path: 'exports-history', component: ExportsHistoryComponent },
 
-      // Audit & Config
+      // Auditoría y Configuración
       { path: 'auditoria', component: AuditoriaComponent },
       { path: 'configuracion', component: ConfiguracionComponent },
 
@@ -115,17 +117,16 @@ export const routes: Routes = [
     path: 'soporte',
     component: SoporteComponent,
     canActivateChild: [AuthGuard],
-    data: { roles: ['68ca68bb0bc4d9ca3267b665'] }, // soporte rol_id (adjust if needed)
+    data: { roles: ['68ca68bb0bc4d9ca3267b665'] },
     children: [
       { path: 'home', component: SoporteHomeComponent },
       { path: 'editar-perfil/:nombre', component: EditarPerfilComponent },
       { path: 'report-stats', component: ReportStatsComponent },
-      // add other soporte children here and protect them via route data if needed
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },
 
-  // Default route -> redirect to login (or change to /public/home if you prefer)
+  // Default route
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 
   // Fallback

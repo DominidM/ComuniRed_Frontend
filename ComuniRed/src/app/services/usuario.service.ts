@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { gql } from 'apollo-angular';
 
@@ -184,7 +184,17 @@ export const USER_KEY = 'comunired_user';
   providedIn: 'root'
 })
 export class UsuarioService {
-  constructor(private apollo: Apollo) {}
+  private apiBase = '/graphql'; // (not used directly by Apollo queries, kept for completeness)
+
+  // BehaviorSubject que mantiene el contador global de usuarios (inicial 0)
+  private userCountSubject = new BehaviorSubject<number>(0);
+  public userCount$ = this.userCountSubject.asObservable();
+
+  constructor(private apollo: Apollo) {
+    // Inicializar el contador al crear el servicio
+    // No bloquear el constructor: la llamada internamente suscribe y actualiza el BehaviorSubject
+    this.refreshUserCount();
+  }
 
   obtenerUsuarios(page: number, size: number): Observable<UsuarioPage> {
     // Observa el resultado crudo y regístralo en consola para depuración.
@@ -260,6 +270,7 @@ export class UsuarioService {
       ]
     }).pipe(
       tap(raw => console.debug('[UsuarioService] crearUsuario raw:', raw)),
+      tap(() => this.refreshUserCount()), // actualizar contador tras crear
       map(result => result.data!.crearUsuario)
     );
   }
@@ -274,6 +285,7 @@ export class UsuarioService {
       ]
     }).pipe(
       tap(raw => console.debug('[UsuarioService] actualizarUsuario raw:', raw)),
+      tap(() => this.refreshUserCount()), // actualizar contador por si hubo cambios
       map(result => result.data!.actualizarUsuario)
     );
   }
@@ -288,6 +300,7 @@ export class UsuarioService {
       ]
     }).pipe(
       tap(raw => console.debug('[UsuarioService] eliminarUsuario raw:', raw)),
+      tap(() => this.refreshUserCount()), // actualizar contador tras eliminar
       map(result => result.data!.eliminarUsuario)
     );
   }
@@ -378,5 +391,26 @@ export class UsuarioService {
     const u = this.getUser();
     if (!u) return [];
     return u.rol_id ? [u.rol_id] : [];
+  }
+
+  /**
+   * Fuerza la recarga del contador de usuarios. Usa la query paginada para leer totalElements
+   * sin necesidad de traer todos los usuarios. Actualiza el BehaviorSubject userCountSubject.
+   */
+  refreshUserCount(): void {
+    // Llamamos a la query paginada (page=0,size=1) y leemos totalElements
+    this.obtenerUsuarios(0, 1)
+      .pipe(
+        map(page => page?.totalElements ?? (page?.content?.length ?? 0))
+      )
+      .subscribe({
+        next: (count: number) => {
+          this.userCountSubject.next(count);
+          console.debug('[UsuarioService] userCount refreshed:', count);
+        },
+        error: (err) => {
+          console.warn('No se pudo refrescar el contador de usuarios:', err);
+        }
+      });
   }
 }
