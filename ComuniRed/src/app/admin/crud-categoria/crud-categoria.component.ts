@@ -13,15 +13,24 @@ import { CategoriaService, Categoria } from '../../services/categoria.service';
   templateUrl: './crud-categoria.component.html',
   styleUrls: ['./crud-categoria.component.css']
 })
+
 export class CrudCategoriaComponent implements OnInit {
 
   categorias: Categoria[] = [];
+  allCategorias: Categoria[] = [];
   idSeleccionado: string | null = null;
   nombre: string = '';
   descripcion: string = '';
   activo: boolean = true;
   nombreBuscado: string = '';
 
+  showModal: boolean = false;
+  editingCategoria: boolean = false;
+
+  // 👇 NUEVAS variables para paginación
+  pageSize: number = 5;
+  pageSizes: number[] = [5, 10, 20, 50];
+  totalCategorias: number = 0;
 
   constructor(private categoriaService: CategoriaService) {}
 
@@ -32,9 +41,24 @@ export class CrudCategoriaComponent implements OnInit {
   // 🔹 Obtener todas las categorías
   obtenerCategorias(): void {
     this.categoriaService.listarCategorias().subscribe({
-      next: (cats) => this.categorias = cats,
+      next: (cats) => {
+        this.allCategorias = cats; // Guardar todas
+        this.totalCategorias = cats.length;
+        this.aplicarFiltro(); // Aplicar filtro de cantidad
+      },
       error: (err) => console.error('Error al obtener categorías:', err)
     });
+  }
+
+  // 👇 NUEVO método para cambiar el tamaño de página
+  onPageSizeChange(event: any): void {
+    this.pageSize = +event.target.value;
+    this.aplicarFiltro();
+  }
+
+  // 👇 NUEVO método para aplicar filtro de cantidad
+  aplicarFiltro(): void {
+    this.categorias = this.allCategorias.slice(0, this.pageSize);
   }
 
   // 🔹 Crear o actualizar categoría
@@ -73,6 +97,8 @@ export class CrudCategoriaComponent implements OnInit {
     this.nombre = cat.nombre;
     this.descripcion = cat.descripcion;
     this.activo = cat.activo;
+    this.editingCategoria = true;
+    this.showModal = true;
   }
 
   // 🔹 Eliminar categoría
@@ -88,28 +114,44 @@ export class CrudCategoriaComponent implements OnInit {
     }
   }
 
+  // 👇 MODIFICADO para trabajar con filtro
   buscarCategoria(): void {
-  if (!this.nombreBuscado.trim()) {
-    // Si no hay texto, mostrar todas las categorías
-    this.obtenerCategorias();
-    return;
+    if (!this.nombreBuscado.trim()) {
+      this.aplicarFiltro(); // Restaurar filtro
+      return;
+    }
+
+    this.categoriaService.buscarCategoriaPorNombre(this.nombreBuscado)
+      .subscribe({
+        next: (categoria) => {
+          this.categorias = categoria ? [categoria] : [];
+        },
+        error: (err) => console.error('Error al buscar categoría:', err)
+      });
   }
 
-  this.categoriaService.buscarCategoriaPorNombre(this.nombreBuscado)
-    .subscribe({
-      next: (categoria) => {
-        // Si encuentra categoría, la mostramos en un array, si no, array vacío
-        this.categorias = categoria ? [categoria] : [];
-      },
-      error: (err) => console.error('Error al buscar categoría:', err)
-    });
-}
+  openAddModal(): void {
+    this.idSeleccionado = null;
+    this.nombre = '';
+    this.descripcion = '';
+    this.activo = true;
+    this.editingCategoria = false;
+    this.showModal = true;
+  }
 
-  // 🔹 Limpiar el formulario
+  closeModal(): void {
+    this.showModal = false;
+  }
+
+  trackByCategoriaId(index: number, cat: Categoria): string {
+    return cat.id;
+  }
+
   limpiarCampos(): void {
     this.idSeleccionado = null;
     this.nombre = '';
     this.descripcion = '';
     this.activo = true;
+    this.closeModal();
   }
 }

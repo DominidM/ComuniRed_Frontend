@@ -1,76 +1,178 @@
 <div class="crud-estado-queja-root">
-  <!-- Header -->
-  <div class="crud-estado-queja-header">
-    <h2>Gestión de Estados de Queja</h2>
-    <button class="btn-primary" (click)="abrirModal()">Nuevo Estado</button>
-  </div>
+  <div class="crud-estado-queja-card">
+    <!-- Header -->
+    <div class="crud-estado-queja-header">
+      <h2>Gestión de Estados de Queja</h2>
+      <button class="btn-primary" (click)="abrirModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nuevo Estado
+      </button>
+    </div>
 
-<input type="text" [(ngModel)]="nombreBuscado" placeholder="Buscar por nombre" (keyup.enter)="buscar()">
-<button (click)="buscar()">Buscar</button>
-<button (click)="obtenerEstados()">Mostrar todos</button>
+    <div class="crud-estado-queja-controls-row">
+      <div class="crud-estado-queja-search-box">
+        <input type="text" [(ngModel)]="nombreBuscado" placeholder="Buscar por nombre..." (keyup.enter)="buscar()" />
+
+        <button class="crud-estado-queja-search-btn" (click)="buscar()" aria-label="Buscar estado">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </div>
+      <div class="crud-estado-queja-show-select">
+        <label for="pageSize">por página</label>
+        <select id="pageSize" (change)="onPageSizeChange($event)" [value]="pageSize">
+          <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+        </select>
+        <span>Total: {{ totalEstados }}</span>
+      </div>
+    </div>
+
+  
+    <div *ngIf="estados && estados.length > 0; else noEstados">
+      <table class="crud-estado-queja-table">
+        <thead>
+          <tr>
+            <th style="display: none;">ID</th>
+            <th>Clave</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Orden</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let estado of estados; trackBy: trackByEstadoId">
+            <td style="display: none;">{{ estado.id }}</td>
+            <td>
+              <div class="estado-clave">{{ estado.clave }}</div>
+            </td>
+            <td>
+              <div class="estado-nombre">{{ estado.nombre }}</div>
+            </td>
+            <td>
+              <div class="estado-descripcion">{{ estado.descripcion }}</div>
+            </td>
+            <td>
+              <span class="orden-badge">{{ estado.orden }}</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-edit" (click)="editarEstado(estado)" title="Editar estado">
+                  Editar
+                </button>
+                <button class="btn-delete" (click)="eliminarEstado(estado.id)" title="Eliminar estado">
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
 
-  <!-- Tabla de estados -->
-  <table class="crud-estado-queja-table">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Clave</th>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Orden</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let estado of estados">
-        <td>{{ estado.id }}</td>
-        <td>{{ estado.clave }}</td>
-        <td>{{ estado.nombre }}</td>
-        <td>{{ estado.descripcion }}</td>
-        <td>{{ estado.orden }}</td>
-        <td>
-          <button class="btn-edit" (click)="editarEstado(estado)">Editar</button>
-          <button class="btn-delete" (click)="eliminarEstado(estado.id)">Eliminar</button>
-        </td>
-      </tr>
-      <tr *ngIf="estados.length === 0">
-        <td colspan="6">No hay estados disponibles.</td>
-      </tr>
-    </tbody>
-  </table>
+    <ng-template #noEstados>
+      <div class="crud-estado-queja-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #000000;">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <p>No hay estados de queja registrados</p>
+        <button class="btn-primary" (click)="abrirModal()" style="margin-top: 1rem;">
+          Crear primer estado
+        </button>
+      </div>
+    </ng-template>
 
-  <!-- Modal -->
-  <div class="crud-estado-queja-modal" [style.display]="modalVisible ? 'flex' : 'none'">
-    <div class="crud-estado-queja-modal-content">
-      <h3>{{ modoEdicion ? 'Editar Estado de Queja' : 'Nuevo Estado de Queja' }}</h3>
-
-      <form (ngSubmit)="guardarEstado()">
-        <div class="form-group">
-          <label for="clave">Clave</label>
-          <input id="clave" [(ngModel)]="estadoActual.clave" name="clave" type="text" placeholder="Ej: pendiente" required />
-        </div>
-
-        <div class="form-group">
-          <label for="nombre">Nombre</label>
-          <input id="nombre" [(ngModel)]="estadoActual.nombre" name="nombre" type="text" placeholder="Ej: Pendiente" required />
-        </div>
-
-        <div class="form-group">
-          <label for="descripcion">Descripción</label>
-          <textarea id="descripcion" [(ngModel)]="estadoActual.descripcion" name="descripcion" placeholder="Ej: Queja recibida, esperando revisión"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="orden">Orden</label>
-          <input id="orden" [(ngModel)]="estadoActual.orden" name="orden" type="number" min="1" placeholder="Ej: 1" required />
-        </div>
-
-        <div class="crud-estado-queja-modal-actions">
-          <button type="submit" class="btn-primary">{{ modoEdicion ? 'Actualizar' : 'Guardar' }}</button>
-          <button type="button" class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
-        </div>
-      </form>
+    <!-- Modal Formulario -->
+    <div class="crud-estado-queja-modal" *ngIf="modalVisible" (click)="cerrarModal()">
+      <div class="crud-estado-queja-modal-content" (click)="$event.stopPropagation()">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          {{ modoEdicion ? 'Editar Estado de Queja' : 'Nuevo Estado de Queja' }}
+        </h3>
+        
+        <form (ngSubmit)="guardarEstado()" #estadoForm="ngForm">
+          <div class="form-group">
+            <label for="clave">Clave</label>
+            <input 
+              id="clave" 
+              name="clave" 
+              type="text"
+              [(ngModel)]="estadoActual.clave" 
+              required 
+              placeholder="Clave estado de queja..."
+              autocomplete="off"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input 
+              id="nombre" 
+              name="nombre" 
+              type="text"
+              [(ngModel)]="estadoActual.nombre" 
+              required 
+              placeholder="Nombre estado de queja..."
+              autocomplete="off"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <textarea 
+              id="descripcion" 
+              name="descripcion"
+              [(ngModel)]="estadoActual.descripcion" 
+              placeholder="Describe el estado de la queja..."
+              autocomplete="off"
+              rows="3"
+            ></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="orden">Orden</label>
+            <input 
+              id="orden" 
+              name="orden" 
+              type="number"
+              [(ngModel)]="estadoActual.orden" 
+              required 
+              min="1"
+              placeholder="Ej: 1, 2, 3..."
+              autocomplete="off"
+            />
+          </div>
+          
+          <div class="crud-estado-queja-modal-actions">
+            <button type="button" class="btn-cancel" (click)="cerrarModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="!estadoForm.valid">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20,6 9,17 4,12"></polyline>
+              </svg>
+              {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
