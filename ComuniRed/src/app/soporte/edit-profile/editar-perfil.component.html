@@ -1,0 +1,82 @@
+<div class="container">
+  <div class="editar-perfil-container">
+    <h2>Editar Perfil</h2>
+
+    <div class="avatar-section">
+      <img [src]="soporte.avatar_soporte" alt="avatar" class="avatar-preview" />
+      <input type="file" (change)="cambiarAvatar($event)" />
+    </div>
+
+    <form (ngSubmit)="guardarCambios()">
+
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" [(ngModel)]="soporte.nombre" name="nombre" required />
+      </div>
+
+      <div class="form-group">
+        <label>Apellido</label>
+        <input type="text" [(ngModel)]="soporte.apellido" name="apellido" required />
+      </div>
+
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" [(ngModel)]="soporte.username" name="username" required />
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="soporte.email" name="email" required />
+      </div>
+
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="tel" [(ngModel)]="soporte.telefono" name="telefono" />
+      </div>
+
+      <div class="form-group">
+        <label>Turno</label>
+        <input type="text" [value]="soporte.turno" readonly />
+      </div>
+
+      <div class="form-group">
+        <label>Fecha Nacimiento</label>
+        <input type="date" [value]="soporte.fecha_nacimiento | date:'yyyy-MM-dd'" readonly />
+      </div>
+
+      <div class="form-group">
+        <label>Fecha de ingreso</label>
+        <input type="date" [value]="soporte.fecha_ingreso | date:'yyyy-MM-dd'" readonly />
+      </div>
+
+      <fieldset class="responsable-section">
+        <legend>Responsable de Contacto</legend>
+
+        <div class="form-group">
+          <label>Nombres</label>
+          <input type="text" [value]="soporte.responsable?.nombres" readonly />
+        </div>
+
+        <div class="form-group">
+          <label>Apellidos</label>
+          <input type="text" [value]="soporte.responsable?.apellidos" readonly />
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" [value]="soporte.responsable?.telefono" readonly />
+        </div>
+
+        <div class="form-group" *ngIf="soporte.responsable?.relacion">
+          <label>Relación</label>
+          <input type="text" [value]="soporte.responsable?.relacion" readonly />
+        </div>
+      </fieldset>
+
+      <div class="acciones">
+        <button type="submit" class="btn-guardar">Guardar</button>
+        <button type="button" class="btn-cancelar" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

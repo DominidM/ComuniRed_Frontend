@@ -1,0 +1,13 @@
+<div class="perfil" (click)="toggleMenu()">
+  <img [src]="soporte.avatar_soporte" alt="avatar" class="avatar">
+  <div class="user-info">
+    <span class="nombre">{{ soporte.nombre }}</span>
+    <span class="estado">En línea</span>
+  </div>
+
+  <div class="menu" *ngIf="mostrarMenu">
+    <button (click)="onPrincipal()">Principal</button>
+    <button (click)="onModificar()">Modificar</button>
+    <button (click)="onSalir()">Salir</button>
+  </div>
+</div>

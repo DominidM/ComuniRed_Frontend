@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { gql } from 'apollo-angular';
 
 export interface Usuario {
@@ -16,7 +16,7 @@ export interface Usuario {
   codigo_postal: string;
   direccion: string;
   email: string;
-  password?: string; // Opcional para no enviarlo en respuestas
+  password?: string;
   rol_id: string;
 }
 
@@ -31,7 +31,7 @@ export interface UsuarioInput {
   codigo_postal?: string;
   direccion?: string;
   email: string;
-  password: string;
+  password?: string;
   rol_id: string;
 }
 
@@ -43,6 +43,7 @@ export interface UsuarioPage {
   size: number;
 }
 
+/* Queries / Mutations */
 const OBTENER_USUARIOS = gql`
   query ObtenerUsuarios($page: Int!, $size: Int!) {
     obtenerUsuarios(page: $page, size: $size) {
@@ -88,7 +89,7 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
 `;
 
 const OBTENER_USUARIO_POR_ID = gql`
-  query ObtenerUsuarioPorId($id: String!) {
+  query ObtenerUsuarioPorId($id: ID!) {
     obtenerUsuarioPorId(id: $id) {
       id
       nombre
@@ -107,7 +108,7 @@ const OBTENER_USUARIO_POR_ID = gql`
 `;
 
 const CONTAR_USUARIOS_POR_ROL = gql`
-  query ContarUsuariosPorRol($rol_id: String!) {
+  query ContarUsuariosPorRol($rol_id: ID!) {
     contarUsuariosPorRol(rol_id: $rol_id)
   }
 `;
@@ -132,7 +133,7 @@ const CREAR_USUARIO = gql`
 `;
 
 const ACTUALIZAR_USUARIO = gql`
-  mutation ActualizarUsuario($id: String!, $usuario: UsuarioInput!) {
+  mutation ActualizarUsuario($id: ID!, $usuario: UsuarioInput!) {
     actualizarUsuario(id: $id, usuario: $usuario) {
       id
       nombre
@@ -151,7 +152,7 @@ const ACTUALIZAR_USUARIO = gql`
 `;
 
 const ELIMINAR_USUARIO = gql`
-  mutation EliminarUsuario($id: String!) {
+  mutation EliminarUsuario($id: ID!) {
     eliminarUsuario(id: $id)
   }
 `;
@@ -159,51 +160,91 @@ const ELIMINAR_USUARIO = gql`
 const LOGIN = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
-      id
-      nombre
-      apellido
-      dni
-      numero_telefono
-      edad
-      sexo
-      distrito
-      codigo_postal
-      direccion
-      email
-      rol_id
+      token
+      usuario {
+        id
+        nombre
+        apellido
+        email
+        rol_id
+      }
     }
   }
 `;
+
+export interface LoginResult {
+  token?: string;
+  usuario?: Usuario | null;
+}
+
+export const TOKEN_KEY = 'comunired_token';
+export const USER_KEY = 'comunired_user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsuarioService {
-  
-  constructor(private apollo: Apollo) {}
+  private apiBase = '/graphql'; // (not used directly by Apollo queries, kept for completeness)
+
+  // BehaviorSubject que mantiene el contador global de usuarios (inicial 0)
+  private userCountSubject = new BehaviorSubject<number>(0);
+  public userCount$ = this.userCountSubject.asObservable();
+
+  constructor(private apollo: Apollo) {
+    // Inicializar el contador al crear el servicio
+    // No bloquear el constructor: la llamada internamente suscribe y actualiza el BehaviorSubject
+    this.refreshUserCount();
+  }
 
   obtenerUsuarios(page: number, size: number): Observable<UsuarioPage> {
+    // Observa el resultado crudo y regístralo en consola para depuración.
     return this.apollo.watchQuery<{ obtenerUsuarios: UsuarioPage }>({
       query: OBTENER_USUARIOS,
-      variables: { page, size }
+      variables: { page, size },
+      fetchPolicy: 'network-only',
+      errorPolicy: 'all'  // permite obtener data parcial si hay errores
     }).valueChanges.pipe(
-      map(result => result.data.obtenerUsuarios)
+      tap((rawResult) => {
+        // Log detallado para depuración: datos + errores
+        console.debug('[UsuarioService] Apollo raw result:', rawResult);
+        if ((rawResult as any).errors && (rawResult as any).errors.length > 0) {
+          console.warn('[UsuarioService] GraphQL errors:', (rawResult as any).errors);
+        }
+      }),
+      map(result => {
+        // Asegurarse de devolver la data si existe, o estructura vacía si no.
+        if (result && result.data && result.data.obtenerUsuarios) {
+          return result.data.obtenerUsuarios;
+        }
+        // Si no hay datos, devolver estructura vacía en lugar de null para evitar fallos en UI.
+        return {
+          content: [],
+          totalElements: 0,
+          totalPages: 0,
+          number: page,
+          size: size
+        } as UsuarioPage;
+      })
     );
   }
 
   obtenerTodosLosUsuarios(): Observable<Usuario[]> {
     return this.apollo.watchQuery<{ obtenerTodosLosUsuarios: Usuario[] }>({
-      query: OBTENER_TODOS_LOS_USUARIOS
+      query: OBTENER_TODOS_LOS_USUARIOS,
+      fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      map(result => result.data.obtenerTodosLosUsuarios)
+      tap(raw => console.debug('[UsuarioService] obtenerTodos raw:', raw)),
+      map(result => result.data?.obtenerTodosLosUsuarios || [])
     );
   }
 
   obtenerUsuarioPorId(id: string): Observable<Usuario> {
     return this.apollo.watchQuery<{ obtenerUsuarioPorId: Usuario }>({
       query: OBTENER_USUARIO_POR_ID,
-      variables: { id }
+      variables: { id },
+      fetchPolicy: 'network-only'
     }).valueChanges.pipe(
+      tap(raw => console.debug('[UsuarioService] obtenerUsuarioPorId raw:', raw)),
       map(result => result.data.obtenerUsuarioPorId)
     );
   }
@@ -211,8 +252,10 @@ export class UsuarioService {
   contarUsuariosPorRol(rolId: string): Observable<number> {
     return this.apollo.watchQuery<{ contarUsuariosPorRol: number }>({
       query: CONTAR_USUARIOS_POR_ROL,
-      variables: { rol_id: rolId }
+      variables: { rol_id: rolId },
+      fetchPolicy: 'network-only'
     }).valueChanges.pipe(
+      tap(raw => console.debug('[UsuarioService] contarUsuariosPorRol raw:', raw)),
       map(result => result.data.contarUsuariosPorRol)
     );
   }
@@ -226,6 +269,8 @@ export class UsuarioService {
         { query: OBTENER_TODOS_LOS_USUARIOS }
       ]
     }).pipe(
+      tap(raw => console.debug('[UsuarioService] crearUsuario raw:', raw)),
+      tap(() => this.refreshUserCount()), // actualizar contador tras crear
       map(result => result.data!.crearUsuario)
     );
   }
@@ -239,6 +284,8 @@ export class UsuarioService {
         { query: OBTENER_TODOS_LOS_USUARIOS }
       ]
     }).pipe(
+      tap(raw => console.debug('[UsuarioService] actualizarUsuario raw:', raw)),
+      tap(() => this.refreshUserCount()), // actualizar contador por si hubo cambios
       map(result => result.data!.actualizarUsuario)
     );
   }
@@ -252,16 +299,118 @@ export class UsuarioService {
         { query: OBTENER_TODOS_LOS_USUARIOS }
       ]
     }).pipe(
+      tap(raw => console.debug('[UsuarioService] eliminarUsuario raw:', raw)),
+      tap(() => this.refreshUserCount()), // actualizar contador tras eliminar
       map(result => result.data!.eliminarUsuario)
     );
   }
 
-  login(email: string, password: string): Observable<Usuario> {
-    return this.apollo.mutate<{ login: Usuario }>({
+  login(email: string, password: string) {
+    return this.apollo.mutate<{ login: { token?: string; usuario?: Usuario } }>({
       mutation: LOGIN,
       variables: { email, password }
     }).pipe(
-      map(result => result.data!.login)
+      tap(raw => console.debug('[UsuarioService] login raw:', raw)),
+      map(result => {
+        const payload = result.data?.login;
+        return {
+          token: payload?.token,
+          usuario: payload?.usuario ?? null
+        };
+      })
     );
+  }
+
+  loginAndStore(email: string, password: string) {
+    return this.login(email, password).pipe(
+      tap(res => {
+        if (res?.token) this.saveToken(res.token);
+        if (res?.usuario) this.saveUser(res.usuario);
+      })
+    );
+  }
+
+  saveToken(token: string) {
+    try {
+      localStorage.setItem(TOKEN_KEY, token);
+    } catch (e) {
+      console.warn('No se pudo guardar token en localStorage', e);
+    }
+  }
+
+  getToken(): string | null {
+    try {
+      return localStorage.getItem(TOKEN_KEY);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  saveUser(user: Usuario) {
+    try {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    } catch (e) {
+      console.warn('No se pudo guardar usuario en localStorage', e);
+    }
+  }
+
+  getUser(): Usuario | null {
+    try {
+      const raw = localStorage.getItem(USER_KEY);
+      return raw ? (JSON.parse(raw) as Usuario) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  logout() {
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+    } catch (e) {
+      // ignore
+    }
+
+    try {
+      const client: any = (this.apollo as any).client || (this.apollo as any).getClient?.();
+      if (client) {
+        client.clearStore?.();
+        client.resetStore?.();
+      }
+    } catch (err) {
+      console.warn('No se pudo limpiar Apollo store', err);
+    }
+  }
+
+  isLoggedIn(): boolean {
+    const t = this.getToken();
+    return !!t && t.length > 0;
+  }
+
+  getRoles(): string[] {
+    const u = this.getUser();
+    if (!u) return [];
+    return u.rol_id ? [u.rol_id] : [];
+  }
+
+  /**
+   * Fuerza la recarga del contador de usuarios. Usa la query paginada para leer totalElements
+   * sin necesidad de traer todos los usuarios. Actualiza el BehaviorSubject userCountSubject.
+   */
+  refreshUserCount(): void {
+    // Llamamos a la query paginada (page=0,size=1) y leemos totalElements
+    this.obtenerUsuarios(0, 1)
+      .pipe(
+        map(page => page?.totalElements ?? (page?.content?.length ?? 0))
+      )
+      .subscribe({
+        next: (count: number) => {
+          this.userCountSubject.next(count);
+          console.debug('[UsuarioService] userCount refreshed:', count);
+        },
+        error: (err) => {
+          console.warn('No se pudo refrescar el contador de usuarios:', err);
+        }
+      });
   }
 }

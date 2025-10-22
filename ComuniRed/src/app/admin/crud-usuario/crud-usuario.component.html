@@ -48,36 +48,15 @@
         <tbody>
           <tr *ngFor="let usuario of usuarios; trackBy: trackByUsuarioId">
             <td style="display: none;">{{ usuario.id }}</td>
-            <td>
-              <div class="user-name">{{ usuario.nombre }}</div>
-            </td>
-            <td>
-              <div class="user-lastname">{{ usuario.apellido }}</div>
-            </td>
-            <td>
-              <div class="user-role">{{ getRolNombre(usuario.rol_id) }}</div>
-            </td>
-            <td>
-              <div class="user-dni">{{ usuario.dni }}</div>
-            </td>
-            <td>
-              <div class="user-district">{{ usuario.distrito }}</div>
-            </td>
+            <td><div class="user-name">{{ usuario.nombre }}</div></td>
+            <td><div class="user-lastname">{{ usuario.apellido }}</div></td>
+            <td><div class="user-role">{{ getRolNombre(usuario.rol_id) }}</div></td>
+            <td><div class="user-dni">{{ usuario.dni }}</div></td>
+            <td><div class="user-district">{{ usuario.distrito }}</div></td>
             <td>
               <div class="action-buttons">
-                <button class="btn-edit" (click)="openEditModal(usuario)" title="Editar usuario">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                  </svg>
-                  Editar
-                </button>
-                <button class="btn-delete" (click)="deleteUsuario(usuario)" title="Eliminar usuario">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="3,6 5,6 21,6"></polyline>
-                    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
-                  </svg>
-                  Eliminar
-                </button>
+                <button class="btn-edit" (click)="openEditModal(usuario)" title="Editar usuario">Editar</button>
+                <button class="btn-delete" (click)="deleteUsuario(usuario)" title="Eliminar usuario">Eliminar</button>
               </div>
             </td>
           </tr>
@@ -92,9 +71,7 @@
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
         <p>No hay usuarios registrados</p>
-        <button class="btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">
-          Crear primer usuario
-        </button>
+        <button class="btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">Crear primer usuario</button>
       </div>
     </ng-template>
 
@@ -113,88 +90,42 @@
     <!-- Modal Formulario -->
     <div class="crud-usuario-modal" *ngIf="showModal" (click)="closeModal()">
       <div class="crud-usuario-modal-content" (click)="$event.stopPropagation()">
-        <h3>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          {{ editingUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}
-        </h3>
-        
-        <form (ngSubmit)="saveUsuario()" #usuarioForm="ngForm">
+        <h3>{{ editingUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
+
+        <form (ngSubmit)="saveUsuario(usuarioForm)" #usuarioForm="ngForm">
+          <!-- Nombre / Apellido -->
           <div class="form-row">
             <div class="form-group">
               <label for="nombre">Nombre *</label>
-              <input 
-                id="nombre" 
-                name="nombre" 
-                type="text"
-                [(ngModel)]="usuarioData.nombre" 
-                required 
-                placeholder="Nombre del usuario"
-                autocomplete="off"
-              />
+              <input id="nombre" name="nombre" type="text" [(ngModel)]="usuarioData.nombre" required placeholder="Nombre del usuario" autocomplete="off"/>
             </div>
             <div class="form-group">
               <label for="apellido">Apellido *</label>
-              <input 
-                id="apellido" 
-                name="apellido" 
-                type="text"
-                [(ngModel)]="usuarioData.apellido" 
-                required 
-                placeholder="Apellido del usuario"
-                autocomplete="off"
-              />
+              <input id="apellido" name="apellido" type="text" [(ngModel)]="usuarioData.apellido" required placeholder="Apellido del usuario" autocomplete="off"/>
             </div>
           </div>
 
+          <!-- DNI / Teléfono -->
           <div class="form-row">
             <div class="form-group">
               <label for="dni">DNI</label>
-              <input 
-                id="dni" 
-                name="dni" 
-                type="text"
-                [(ngModel)]="usuarioData.dni" 
-                placeholder="12345678"
-                autocomplete="off"
-                maxlength="8"
-              />
+              <input id="dni" name="dni" type="text" [(ngModel)]="usuarioData.dni" placeholder="12345678" maxlength="8" (input)="onNumericInput($event,'dni',8)"/>
             </div>
             <div class="form-group">
               <label for="numero_telefono">Teléfono</label>
-              <input 
-                id="numero_telefono" 
-                name="numero_telefono" 
-                type="text"
-                [(ngModel)]="usuarioData.numero_telefono" 
-                placeholder="987654321"
-                autocomplete="off"
-              />
+              <input id="numero_telefono" name="numero_telefono" type="text" [(ngModel)]="usuarioData.numero_telefono" placeholder="987654321" maxlength="15" (input)="onTelefonoInput($event)"/>
             </div>
           </div>
 
+          <!-- Edad / Sexo -->
           <div class="form-row">
             <div class="form-group">
               <label for="edad">Edad</label>
-              <input 
-                id="edad" 
-                name="edad" 
-                type="number"
-                [(ngModel)]="usuarioData.edad" 
-                placeholder="25"
-                min="0"
-                max="120"
-              />
+              <input id="edad" name="edad" type="number" [(ngModel)]="usuarioData.edad" min="0" max="120"/>
             </div>
             <div class="form-group">
               <label for="sexo">Sexo</label>
-              <select 
-                id="sexo" 
-                name="sexo" 
-                [(ngModel)]="usuarioData.sexo"
-              >
+              <select id="sexo" name="sexo" [(ngModel)]="usuarioData.sexo">
                 <option value="">Seleccionar...</option>
                 <option value="M">Masculino</option>
                 <option value="F">Femenino</option>
@@ -202,96 +133,47 @@
             </div>
           </div>
 
+          <!-- Distrito / Código Postal -->
           <div class="form-row">
             <div class="form-group">
               <label for="distrito">Distrito</label>
-              <input 
-                id="distrito" 
-                name="distrito" 
-                type="text"
-                [(ngModel)]="usuarioData.distrito" 
-                placeholder="Ej: San Isidro, Miraflores..."
-                autocomplete="off"
-              />
+              <input id="distrito" name="distrito" type="text" [(ngModel)]="usuarioData.distrito" placeholder="Ej: Miraflores" autocomplete="off"/>
             </div>
             <div class="form-group">
               <label for="codigo_postal">Código Postal</label>
-              <input 
-                id="codigo_postal" 
-                name="codigo_postal" 
-                type="text"
-                [(ngModel)]="usuarioData.codigo_postal" 
-                placeholder="15074"
-                autocomplete="off"
-              />
+              <input id="codigo_postal" name="codigo_postal" type="text" [(ngModel)]="usuarioData.codigo_postal" placeholder="15074" maxlength="10" autocomplete="off"/>
             </div>
           </div>
 
+          <!-- Dirección / Email -->
           <div class="form-group">
             <label for="direccion">Dirección</label>
-            <input 
-              id="direccion" 
-              name="direccion" 
-              type="text"
-              [(ngModel)]="usuarioData.direccion" 
-              placeholder="Av. Ejemplo 123"
-              autocomplete="off"
-            />
+            <input id="direccion" name="direccion" type="text" [(ngModel)]="usuarioData.direccion"/>
           </div>
 
           <div class="form-group">
             <label for="email">Email *</label>
-            <input 
-              id="email" 
-              name="email" 
-              type="email"
-              [(ngModel)]="usuarioData.email" 
-              required 
-              placeholder="usuario@ejemplo.com"
-              autocomplete="off"
-            />
+            <input id="email" name="email" type="email" [(ngModel)]="usuarioData.email" required/>
           </div>
 
+          <!-- Password / Rol -->
           <div class="form-row">
             <div class="form-group">
               <label for="password">Contraseña {{ !editingUsuario ? '*' : '' }}</label>
-              <input 
-                id="password" 
-                name="password" 
-                type="password"
-                [(ngModel)]="usuarioData.password" 
-                [required]="!editingUsuario"
-                placeholder="Contraseña del usuario"
-                autocomplete="new-password"
-              />
+              <input id="password" name="password" type="password" [(ngModel)]="usuarioData.password" [required]="!editingUsuario"/>
             </div>
             <div class="form-group">
-              <label for="rol_id">Rol ID</label>
-              <input 
-                id="rol_id" 
-                name="rol_id" 
-                type="text"
-                [(ngModel)]="usuarioData.rol_id" 
-                placeholder="ID del rol"
-                autocomplete="off"
-              />
+              <label for="rol_id">Rol *</label>
+              <select id="rol_id" name="rol_id" [(ngModel)]="usuarioData.rol_id" required>
+                <option value="">Seleccionar rol...</option>
+                <option *ngFor="let r of roles" [value]="r.id">{{ r.nombre }}</option>
+              </select>
             </div>
           </div>
-          
+
           <div class="crud-usuario-modal-actions">
-            <button type="button" class="btn-cancel" (click)="closeModal()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-              Cancelar
-            </button>
-            <button type="submit" class="btn-primary" [disabled]="!usuarioForm.valid">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20,6 9,17 4,12"></polyline>
-              </svg>
-              {{ editingUsuario ? 'Actualizar' : 'Guardar' }}
-            </button>
+            <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+            <button type="submit" class="btn-primary" [disabled]="!usuarioForm.form.valid || saving">{{ editingUsuario ? 'Actualizar' : 'Guardar' }}</button>
           </div>
         </form>
       </div>

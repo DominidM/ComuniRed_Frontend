@@ -24,85 +24,86 @@
     </a>
   </nav>
 
-<!-- Botón principal -->
-<button mat-stroked-button color="primary" class="sidebar-report-btn" (click)="openModal()">
-  <mat-icon>add</mat-icon>
-  Nuevo Reporte
-</button>
+  <!-- Botón principal -->
+  <button mat-stroked-button color="primary" class="sidebar-report-btn" (click)="openModal()">
+    <mat-icon>add</mat-icon>
+    Nuevo Reporte
+  </button>
 
-<!-- Modal centrado en la pantalla -->
-<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <span class="close-btn" (click)="closeModal()">&times;</span>
-    <h2 class="modal-title">Crear Nuevo Reporte</h2>
+  <!-- Modal centrado en la pantalla -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <span class="close-btn" (click)="closeModal()">&times;</span>
+      <h2 class="modal-title">Crear Nuevo Reporte</h2>
 
-    <form (ngSubmit)="submitReport()" class="modal-form">
-      <!-- Image Upload -->
-      <div class="form-group">
-        <label class="form-label">Foto del reporte</label>
-        <div class="image-upload">
-          <ng-container *ngIf="imagePreview; else uploadPlaceholder">
-            <div class="image-preview">
-              <img [src]="imagePreview" alt="Preview" />
-              <button type="button" class="remove-btn" (click)="removeImage()">✕</button>
-            </div>
-          </ng-container>
-          <ng-template #uploadPlaceholder>
-            <label class="upload-placeholder">
-              <span>📷 Subir una foto</span>
-              <input type="file" accept="image/*" (change)="handleImageChange($event)" hidden />
-            </label>
-          </ng-template>
+      <form (ngSubmit)="submitReport()" class="modal-form">
+        <!-- Image Upload -->
+        <div class="form-group">
+          <label class="form-label">Foto del reporte</label>
+          <div class="image-upload">
+            <ng-container *ngIf="imagePreview; else uploadPlaceholder">
+              <div class="image-preview">
+                <img [src]="imagePreview" alt="Preview" />
+                <button type="button" class="remove-btn" (click)="removeImage()">✕</button>
+              </div>
+            </ng-container>
+            <ng-template #uploadPlaceholder>
+              <label class="upload-placeholder">
+                <span>📷 Subir una foto</span>
+                <input type="file" accept="image/*" (change)="handleImageChange($event)" hidden />
+              </label>
+            </ng-template>
+          </div>
         </div>
-      </div>
 
-      <!-- Título -->
-      <div class="form-group">
-        <label class="form-label" for="title">Título</label>
-        <input id="title" type="text" [(ngModel)]="title" name="title" placeholder="Hueco en la calle principal" required />
-      </div>
+        <!-- Título -->
+        <div class="form-group">
+          <label class="form-label" for="title">Título</label>
+          <input id="title" type="text" [(ngModel)]="title" name="title" placeholder="Hueco en la calle principal" required />
+        </div>
 
-      <!-- Descripción -->
-      <div class="form-group">
-        <label class="form-label" for="description">Descripción</label>
-        <textarea id="description" [(ngModel)]="description" name="description" rows="4" placeholder="Describe el problema..." required></textarea>
-      </div>
+        <!-- Descripción -->
+        <div class="form-group">
+          <label class="form-label" for="description">Descripción</label>
+          <textarea id="description" [(ngModel)]="description" name="description" rows="4" placeholder="Describe el problema..." required></textarea>
+        </div>
 
-      <!-- Categoría -->
-      <div class="form-group">
-        <label class="form-label" for="category">Categoría</label>
-        <select id="category" [(ngModel)]="category" name="category" required>
-          <option value="" disabled selected>Selecciona una categoría</option>
-          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-        </select>
-      </div>
+        <!-- Categoría -->
+        <div class="form-group">
+          <label class="form-label" for="category">Categoría</label>
+          <select id="category" [(ngModel)]="category" name="category" required>
+            <option value="" disabled selected>Selecciona una categoría</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
 
-      <!-- Ubicación -->
-      <div class="form-group">
-        <label class="form-label" for="location">Ubicación</label>
-        <input id="location" type="text" [(ngModel)]="location" name="location" placeholder="Calle 123 con Carrera 45" required />
-      </div>
+        <!-- Ubicación -->
+        <div class="form-group">
+          <label class="form-label" for="location">Ubicación</label>
+          <input id="location" type="text" [(ngModel)]="location" name="location" placeholder="Calle 123 con Carrera 45" required />
+        </div>
 
-      <!-- Actions -->
-      <div class="modal-actions">
-        <button type="button" class="btn-outline" (click)="closeModal()">Cancelar</button>
-        <button type="submit" class="btn-primary">Publicar Reporte</button>
-      </div>
-    </form>
+        <!-- Actions -->
+        <div class="modal-actions">
+          <button type="button" class="btn-outline" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn-primary">Publicar Reporte</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Perfil de usuario (dentro de .sidebar-container) -->
+  <div class="sidebar-user" *ngIf="user" (click)="toggleMenu()">
+    <img [src]="user.avatarUrl" alt="avatar" class="user-avatar"/>
+    <div class="user-details">
+      <div class="user-name">{{ user.name }}</div>
+      <div class="user-handle">{{ user.handle }}</div>
+    </div>
+
+    <!-- Menú desplegable: queda dentro del sidebar-user -->
+    <div class="user-menu" *ngIf="mostrarMenu" (click)="$event.stopPropagation()">
+      <button (click)="onModificar(); $event.stopPropagation()">Modificar</button>
+      <button (click)="onSalir(); $event.stopPropagation()">Cerrar sesión</button>
+    </div>
   </div>
 </div>
- <!-- Perfil de usuario (dentro de .sidebar-container) -->
-<div class="sidebar-user" *ngIf="user" (click)="toggleMenu()">
-  <img [src]="user.avatarUrl" alt="avatar" class="user-avatar"/>
-  <div class="user-details">
-    <div class="user-name">{{ user.name }}</div>
-    <div class="user-handle">{{ user.handle }}</div>
-  </div>
-
-  <!-- Menú desplegable: queda dentro del sidebar-user -->
-  <div class="user-menu" *ngIf="mostrarMenu" (click)="$event.stopPropagation()">
-    <button (click)="onModificar(); $event.stopPropagation()">Modificar</button>
-    <button (click)="onSalir(); $event.stopPropagation()">Cerrar sesión</button>
-  </div>
-</div>
-

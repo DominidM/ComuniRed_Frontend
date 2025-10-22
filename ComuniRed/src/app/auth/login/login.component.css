@@ -123,6 +123,13 @@ form input[type="password"]:focus {
   box-shadow: 0 0 0 3px rgba(16, 100, 255, 0.1);
 }
 
+form input[type="email"]:disabled,
+form input[type="password"]:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .login-options {
   display: flex;
   justify-content: space-between;
@@ -153,14 +160,113 @@ form button {
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
   margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-form button:hover {
+form button:hover:not(:disabled) {
   background: #0854d4;
 }
 
-form button:active {
+form button:active:not(:disabled) {
   transform: translateY(1px);
+}
+
+form button:disabled {
+  background: #9ab8f0;
+  cursor: not-allowed;
+}
+
+/* Spinner para el botón */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   SNACKBAR NOTIFICATIONS - ANIMACIONES MEJORADAS
+   ============================================ */
+
+.snackbar {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: #10b981;
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  font-size: 15px;
+  z-index: 10000;
+  min-width: 280px;
+  max-width: 400px;
+  
+  /* Animación de entrada suave */
+  animation: slideInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+             fadeOut 0.3s ease-in 2.7s forwards;
+  
+  /* Backdrop blur para efecto moderno */
+  backdrop-filter: blur(10px);
+}
+
+.snackbar.error {
+  background: #ef4444;
+  animation: slideInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+             shake 0.5s ease-in-out 0.2s,
+             fadeOut 0.3s ease-in 2.7s forwards;
+}
+
+.snackbar-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Animación de entrada desde arriba */
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Animación de salida suave */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+/* Animación de shake para errores */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
 }
 
 /* Estilos específicos para Angular */
@@ -199,6 +305,15 @@ form button:active {
   
   form {
     padding: 32px 24px;
+    max-width: none;
+  }
+  
+  /* Ajustar snackbar en móvil */
+  .snackbar {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    min-width: auto;
     max-width: none;
   }
 }

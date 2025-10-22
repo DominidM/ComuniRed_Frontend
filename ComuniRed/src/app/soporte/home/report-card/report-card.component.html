@@ -1,0 +1,79 @@
+<div class="container-report-card">
+  <div class="reporte-card" [ngClass]="getEstadoClase()" [class.expanded]="mostrarDetalles">
+
+    <div class="reporte-header">
+      <img [src]="cliente.avatar_cliente" alt="avatar" class="avatar">
+      <div class="usuario-info">
+        <h4>{{ reporte.titulo }}</h4>
+        <small>👤 {{ cliente.nombre }}</small>
+      </div>
+    </div>
+
+    <img *ngIf="reporte.imagenPrincipal"
+        [src]="reporte.imagenPrincipal"
+        alt="imagen principal"
+        class="imagen-principal"
+        (click)="abrirImagenCompleta(reporte.imagenPrincipal)">
+
+    <div class="imagenes" *ngIf="reporte.imagenes.length">
+      <img *ngFor="let img of reporte.imagenes"
+          [src]="img"
+          alt="imagen mini"
+          class="imagen-mini"
+          (click)="abrirImagenCompleta(img)">
+    </div>
+
+    <div class="reporte-body">
+      <p>
+        <strong><i class="bi bi-file-earmark-text"></i> :</strong> {{ reporte.descripcion }}
+      </p>
+      <p>
+        <strong><i class="bi bi-geo-alt-fill"></i> :</strong> {{ reporte.ubicacion }}
+      </p>
+      <p *ngIf="cliente.telefono">
+        <strong><i class="bi bi-telephone-fill"></i> :</strong> {{ cliente.telefono }}
+      </p>
+      <p>
+        <strong><i class="bi bi-calendar-event"></i> :</strong> {{ reporte.fecha | date:'dd/MM/yyyy, h:mm a' }}
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="reporte-footer">
+      <div class="reacciones">
+        👍 {{ reporte.reacciones.likes }}
+        👎 {{ reporte.reacciones.dislikes }}
+        ❤️ {{ reporte.reacciones.love }}
+        😮 {{ reporte.reacciones.wow }}
+        😔 {{ reporte.reacciones.sad }}
+        ⚠️ {{ reporte.reacciones.reportes }}
+        ☑️ {{ reporte.reacciones.helpful }}
+      </div>
+
+      <div class="botones">
+        <button class="btn btn-detalles" (click)="abrirDetalles($event)">👁 Ver Detalles</button>
+        <button class="btn btn-ubicacion" (click)="abrirUbicacion($event)">📍 Ver Ubicación</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-imagen" *ngIf="imagenSeleccionada" (click)="cerrarImagenCompleta()">
+    <div class="modal-contenido-imagen" (click)="$event.stopPropagation()">
+      <img [src]="imagenSeleccionada" alt="Imagen completa" class="imagen-completa">
+      <button class="btn-cerrar" (click)="cerrarImagenCompleta()">✖</button>
+    </div>
+  </div>
+
+  <app-modal-detalles
+    [reporte]="reporte"
+    [isOpen]="mostrarDetalles"
+    (cerrar)="cerrarDetalles()">
+  </app-modal-detalles>
+
+  <app-modal-ubicacion
+    *ngIf="mostrarUbicacion"
+    [reporte]="reporte"
+    (cerrar)="cerrarUbicacion()">
+  </app-modal-ubicacion>
+
+</div>

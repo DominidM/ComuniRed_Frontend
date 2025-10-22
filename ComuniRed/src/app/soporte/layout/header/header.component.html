@@ -1,0 +1,20 @@
+<div class="header">
+
+  <app-logo-section></app-logo-section>
+
+  <app-acciones-header
+    (actualizar)="actualizar()"
+    (exportar)="exportar()">
+  </app-acciones-header>
+
+
+  <div class="container">
+    <app-perfil-header
+      [soporte]="soporte"
+      (modificar)="modificar()"
+      (principal)="principal()"
+      (salir)="salir()">
+    </app-perfil-header>
+  </div>
+
+</div>

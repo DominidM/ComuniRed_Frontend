@@ -3,31 +3,89 @@
     <form (ngSubmit)="register()" #form="ngForm" autocomplete="off">
       <h2>Registro</h2>
       <p>Crea tu cuenta para acceder a la comunidad</p>
+      
       <div class="form-row">
         <div class="form-group">
-          <label>Nombre</label>
-          <input type="text" [(ngModel)]="usuarioData.nombre" name="nombre" required autocomplete="off" />
+          <label>Nombre <span class="required">*</span></label>
+          <input 
+            type="text" 
+            [(ngModel)]="usuarioData.nombre" 
+            name="nombre" 
+            required 
+            autocomplete="off"
+            (blur)="validateNombre()"
+            (input)="validateNombre()"
+            [class.error]="errors['nombre']"
+          />
+          <span class="error-message" *ngIf="errors['nombre']">{{ errors['nombre'] }}</span>
         </div>
+        
         <div class="form-group">
-          <label>Apellido</label>
-          <input type="text" [(ngModel)]="usuarioData.apellido" name="apellido" required autocomplete="off" />
+          <label>Apellido <span class="required">*</span></label>
+          <input 
+            type="text" 
+            [(ngModel)]="usuarioData.apellido" 
+            name="apellido" 
+            required 
+            autocomplete="off"
+            (blur)="validateApellido()"
+            (input)="validateApellido()"
+            [class.error]="errors['apellido']"
+          />
+          <span class="error-message" *ngIf="errors['apellido']">{{ errors['apellido'] }}</span>
         </div>
       </div>
+      
       <div class="form-row">
         <div class="form-group">
           <label>DNI</label>
-          <input type="text" [(ngModel)]="usuarioData.dni" name="dni" autocomplete="off" />
+          <input 
+            type="text" 
+            [(ngModel)]="usuarioData.dni" 
+            name="dni" 
+            autocomplete="off"
+            placeholder="8 dígitos"
+            maxlength="8"
+            (input)="validateDni()"
+            [class.error]="errors['dni']"
+          />
+          <span class="error-message" *ngIf="errors['dni']">{{ errors['dni'] }}</span>
         </div>
+        
         <div class="form-group">
           <label>Teléfono</label>
-          <input type="text" [(ngModel)]="usuarioData.numero_telefono" name="numero_telefono" autocomplete="off" />
+          <input 
+            type="text" 
+            [(ngModel)]="usuarioData.numero_telefono" 
+            name="numero_telefono" 
+            autocomplete="off"
+            placeholder="9-15 dígitos"
+            maxlength="15"
+            (input)="validateTelefono()"
+            [class.error]="errors['numero_telefono']"
+          />
+          <span class="error-message" *ngIf="errors['numero_telefono']">{{ errors['numero_telefono'] }}</span>
         </div>
       </div>
+      
       <div class="form-row">
         <div class="form-group">
           <label>Edad</label>
-          <input type="number" [(ngModel)]="usuarioData.edad" name="edad" autocomplete="off" />
+          <input 
+            type="number" 
+            [(ngModel)]="usuarioData.edad" 
+            name="edad" 
+            autocomplete="off"
+            min="18"
+            max="120"
+            placeholder="18-120"
+            (blur)="validateEdad()"
+            (input)="validateEdad()"
+            [class.error]="errors['edad']"
+          />
+          <span class="error-message" *ngIf="errors['edad']">{{ errors['edad'] }}</span>
         </div>
+        
         <div class="form-group">
           <label>Sexo</label>
           <select [(ngModel)]="usuarioData.sexo" name="sexo">
@@ -37,53 +95,114 @@
           </select>
         </div>
       </div>
+      
       <div class="form-row">
         <div class="form-group">
           <label>Distrito</label>
-          <input type="text" [(ngModel)]="usuarioData.distrito" name="distrito" autocomplete="off" />
+          <input 
+            type="text" 
+            [(ngModel)]="usuarioData.distrito" 
+            name="distrito" 
+            autocomplete="off"
+            maxlength="100"
+            (input)="validateDistrito()"
+            [class.error]="errors['distrito']"
+          />
+          <span class="error-message" *ngIf="errors['distrito']">{{ errors['distrito'] }}</span>
         </div>
+        
         <div class="form-group">
           <label>Código Postal</label>
-          <input type="text" [(ngModel)]="usuarioData.codigo_postal" name="codigo_postal" autocomplete="off" />
+          <input 
+            type="text" 
+            [(ngModel)]="usuarioData.codigo_postal" 
+            name="codigo_postal" 
+            autocomplete="off"
+            placeholder="5 dígitos"
+            maxlength="5"
+            (input)="validateCodigoPostal()"
+            [class.error]="errors['codigo_postal']"
+          />
+          <span class="error-message" *ngIf="errors['codigo_postal']">{{ errors['codigo_postal'] }}</span>
         </div>
       </div>
+      
       <div class="form-row">
         <div class="form-group" style="width:100%">
           <label>Dirección</label>
-          <input type="text" [(ngModel)]="usuarioData.direccion" name="direccion" autocomplete="off" />
+          <input 
+            type="text" 
+            [(ngModel)]="usuarioData.direccion" 
+            name="direccion" 
+            autocomplete="off"
+            maxlength="200"
+            (input)="validateDireccion()"
+            [class.error]="errors['direccion']"
+          />
+          <span class="error-message" *ngIf="errors['direccion']">{{ errors['direccion'] }}</span>
         </div>
       </div>
+      
       <div class="form-row">
         <div class="form-group">
-          <label>Email</label>
-          <input type="email" [(ngModel)]="usuarioData.email" name="email" required autocomplete="off" />
+          <label>Email <span class="required">*</span></label>
+          <input 
+            type="email" 
+            [(ngModel)]="usuarioData.email" 
+            name="email" 
+            required 
+            autocomplete="off"
+            placeholder="correo@ejemplo.com"
+            (blur)="validateEmail()"
+            (input)="validateEmail()"
+            [class.error]="errors['email']"
+          />
+          <span class="error-message" *ngIf="errors['email']">{{ errors['email'] }}</span>
         </div>
+        
         <div class="form-group">
-          <label>Contraseña</label>
-          <input type="password" [(ngModel)]="usuarioData.password" name="password" required autocomplete="off" />
+          <label>Contraseña <span class="required">*</span></label>
+          <input 
+            type="password" 
+            [(ngModel)]="usuarioData.password" 
+            name="password" 
+            required 
+            autocomplete="off"
+            placeholder="Mínimo 6 caracteres"
+            maxlength="50"
+            (blur)="validatePassword()"
+            (input)="validatePassword()"
+            [class.error]="errors['password']"
+          />
+          <span class="error-message" *ngIf="errors['password']">{{ errors['password'] }}</span>
         </div>
       </div>
-      <button type="submit" [disabled]="form.invalid || isLoading">
+      
+      <button type="submit" [disabled]="!isFormValid() || isLoading">
         <ng-container *ngIf="!isLoading">Registrarse</ng-container>
         <ng-container *ngIf="isLoading">
           <span class="spinner"></span> Procesando...
         </ng-container>
       </button>
+      
       <div class="register-options">
         <a routerLink="/login">¿Ya tienes cuenta? Inicia sesión</a>
       </div>
     </form>
+    
     <!-- Flotante de éxito -->
     <div class="snackbar" *ngIf="showSuccess">
       <span class="snackbar-icon">✔️</span>
       ¡Usuario creado exitosamente!
     </div>
+    
     <!-- Flotante de error -->
     <div class="snackbar error" *ngIf="showError">
       <span class="snackbar-icon">❌</span>
       {{ showError }}
     </div>
   </div>
+  
   <div class="register-left">
     <img src="https://res.cloudinary.com/dxuk9bogw/image/upload/v1757488558/2YMJBJZ7ABFARCOAEINHGMPBQE_oauma2.avif" alt="Imagen lateral" />
   </div>

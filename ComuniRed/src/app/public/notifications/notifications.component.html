@@ -1,1 +1,12 @@
-<p>notifications works!</p>
+<div class="notifications-container">
+  <h2>Notificaciones</h2>
+  <div class="notification-card" *ngFor="let n of notifications">
+    <div class="notification-icon">
+      <img [src]="n.icon" alt="icono">
+    </div>
+    <div class="notification-content">
+      <p class="notification-text">{{ n.text }}</p>
+      <span class="notification-time">{{ n.time }}</span>
+    </div>
+  </div>
+</div>

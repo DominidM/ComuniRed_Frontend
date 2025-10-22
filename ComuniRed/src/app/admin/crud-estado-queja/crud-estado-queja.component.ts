@@ -1,74 +1,175 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// import { EstadoQuejaService } from '../../services/estado-queja.service'; // Crea tu servicio real
-
-interface EstadoQueja {
-  id: number;
-  nombre: string;
-  descripcion?: string;
-}
+import { EstadosQuejaService, EstadoQueja } from '../../services/estado-queja.service';
 
 @Component({
   selector: 'app-crud-estado-queja',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './crud-estado-queja.component.html',
-  styleUrls: ['./crud-estado-queja.component.css']
+  styleUrls: ['./crud-estado-queja.component.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule]
 })
 export class CrudEstadoQuejaComponent implements OnInit {
-  estados: EstadoQueja[] = [];
-  showModal = false;
-  editingEstado: EstadoQueja | null = null;
-  estadoData: Partial<EstadoQueja> = {};
 
-  // constructor(private estadoQuejaService: EstadoQuejaService) {}
-  constructor() {}
+  estados: EstadoQueja[] = [];
+  allEstados: EstadoQueja[] = []; // Para guardar todos los estados
+  modalVisible = false;
+  modoEdicion = false;
+  estadoActual: EstadoQueja = { id: '', clave: '', nombre: '', descripcion: '', orden: 1 };
+  nombreBuscado: string = '';
+
+  // Variables para paginación
+  pageSize: number = 5;
+  pageSizes: number[] = [5, 10, 20, 50];
+  totalEstados: number = 0;
+
+  constructor(private estadosService: EstadosQuejaService) {}
 
   ngOnInit(): void {
-    this.loadEstados();
+    this.obtenerEstados();
   }
 
-  loadEstados() {
-    // Ejemplo con tu servicio real:
-    // this.estadoQuejaService.getEstados().subscribe(data => { this.estados = data; });
-    // Demo:
-    this.estados = [];
+  // TrackBy para optimizar el *ngFor
+  trackByEstadoId(index: number, estado: EstadoQueja): any {
+    console.log('trackBy - index:', index, 'estado:', estado, 'estado.id:', estado.id);
+    return estado.id || index;
   }
 
-  openAddModal() {
-    this.editingEstado = null;
-    this.estadoData = {};
-    this.showModal = true;
+  // Obtener todos los estados
+  obtenerEstados() {
+    console.log('=== DEBUG OBTENER ESTADOS ===');
+    this.estadosService.listarEstadosQueja().subscribe({
+      next: (data: EstadoQueja[]) => {
+        console.log('Estados recibidos del backend:', data);
+        data.forEach((estado, index) => {
+          console.log(`Estado ${index}:`, estado);
+          console.log(`Estado ${index} ID:`, estado.id, 'tipo:', typeof estado.id);
+        });
+        this.allEstados = data;
+        this.totalEstados = data.length;
+        this.aplicarFiltro();
+        this.nombreBuscado = ''; // Limpiar búsqueda
+      },
+      error: (err) => console.error('Error al obtener estados:', err)
+    });
   }
 
-  openEditModal(estado: EstadoQueja) {
-    this.editingEstado = estado;
-    this.estadoData = { ...estado };
-    this.showModal = true;
+  // Cambiar tamaño de página
+  onPageSizeChange(event: any): void {
+    this.pageSize = +event.target.value;
+    this.aplicarFiltro();
   }
 
-  saveEstado() {
-    if (!this.estadoData.nombre) return;
-    if (this.editingEstado) {
-      // Actualiza en tu API
-      // this.estadoQuejaService.updateEstado(this.editingEstado.id, this.estadoData).subscribe(() => this.loadEstados());
+  // Aplicar filtro de cantidad
+  aplicarFiltro(): void {
+    this.estados = this.allEstados.slice(0, this.pageSize);
+  }
+
+  // Abrir modal para nuevo estado
+  abrirModal() {
+    this.modoEdicion = false;
+    this.estadoActual = { id: '', clave: '', nombre: '', descripcion: '', orden: 1 };
+    this.modalVisible = true;
+  }
+
+  // Cerrar modal
+  cerrarModal() {
+    this.modalVisible = false;
+  }
+
+  // Editar estado
+  editarEstado(estado: EstadoQueja) {
+    this.modoEdicion = true;
+    this.estadoActual = { ...estado };
+    this.modalVisible = true;
+  }
+
+  // Guardar estado (crear o actualizar)
+  guardarEstado() {
+    if (this.modoEdicion) {
+      this.estadosService.actualizarEstadoQueja(
+        this.estadoActual.id,
+        this.estadoActual.clave,
+        this.estadoActual.nombre,
+        this.estadoActual.descripcion ?? '',
+        this.estadoActual.orden
+      ).subscribe({
+        next: () => {
+          console.log('Estado actualizado exitosamente');
+          this.obtenerEstados();
+          this.cerrarModal();
+        },
+        error: (err) => {
+          console.error('Error al actualizar:', err);
+          alert('Error al actualizar el estado');
+        }
+      });
     } else {
-      // Inserta en tu API
-      // this.estadoQuejaService.createEstado(this.estadoData).subscribe(() => this.loadEstados());
+      this.estadosService.crearEstadoQueja(
+        this.estadoActual.clave,
+        this.estadoActual.nombre,
+        this.estadoActual.descripcion ?? '',
+        this.estadoActual.orden
+      ).subscribe({
+        next: () => {
+          console.log('Estado creado exitosamente');
+          this.obtenerEstados();
+          this.cerrarModal();
+        },
+        error: (err) => {
+          console.error('Error al crear:', err);
+          alert('Error al crear el estado');
+        }
+      });
     }
-    this.closeModal();
   }
 
-  deleteEstado(estado: EstadoQueja) {
-    if (confirm(`¿Seguro que deseas eliminar el estado "${estado.nombre}"?`)) {
-      // this.estadoQuejaService.deleteEstado(estado.id).subscribe(() => this.loadEstados());
+  // Buscar estado por nombre
+  buscar() {
+    if (!this.nombreBuscado.trim()) {
+      this.aplicarFiltro(); // Restaurar filtro
+      return;
     }
+
+    this.estadosService.buscarEstadoPorNombre(this.nombreBuscado)
+      .subscribe({
+        next: (estado) => {
+          console.log('Estado encontrado:', estado);
+          this.estados = estado ? [estado] : [];
+        },
+        error: (err) => {
+          console.error('Error al buscar estado:', err);
+          this.estados = [];
+        }
+      });
   }
 
-  closeModal() {
-    this.showModal = false;
-    this.editingEstado = null;
-    this.estadoData = {};
+  // Eliminar estado
+  eliminarEstado(id: string) {
+    console.log('=== DEBUG ELIMINAR ESTADO ===');
+    console.log('1. ID a eliminar:', id);
+    console.log('2. Tipo de ID:', typeof id);
+
+    if (confirm('¿Deseas eliminar este estado de queja?')) {
+      if (!id || id === undefined || id === null || id === '') {
+        alert('Error: ID de estado no válido');
+        console.error('ID inválido detectado');
+        return;
+      }
+
+      this.estadosService.eliminarEstadoQueja(String(id)).subscribe({
+        next: (result) => {
+          console.log('Resultado de eliminación:', result);
+          console.log('Estado eliminado exitosamente');
+          this.obtenerEstados();
+        },
+        error: (err) => {
+          console.error('Error completo:', err);
+          console.error('Error message:', err.message);
+          alert(`Error al eliminar estado: ${err.message || 'Error interno del servidor'}`);
+        }
+      });
+    }
   }
 }

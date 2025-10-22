@@ -1,70 +1,115 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, map } from 'rxjs';
+
 
 export interface EstadoQueja {
-  id: number;
+  id: string;
+  clave: string;
   nombre: string;
   descripcion?: string;
+  orden: number;
 }
 
-@Injectable({ providedIn: 'root' })
-export class EstadoQuejaService {
+@Injectable({
+  providedIn: 'root'
+})
+export class EstadosQuejaService {
+
   constructor(private apollo: Apollo) {}
 
-  getAll(): Observable<EstadoQueja[]> {
-    return this.apollo.query<{ estadosQueja: EstadoQueja[] }>({
+  listarEstadosQueja(): Observable<any[]> {
+    return this.apollo.watchQuery({
       query: gql`
         query {
-          estadosQueja {
+          listarEstados {
             id
+            clave
             nombre
             descripcion
+            orden
           }
         }
       `
-    }).pipe(map(result => result.data.estadosQueja));
+    }).valueChanges.pipe(
+      map((result: any) => result.data.listarEstados)
+    );
   }
 
-  create(estado: Partial<EstadoQueja>): Observable<EstadoQueja> {
-    return this.apollo.mutate<{ createEstadoQueja: EstadoQueja }>({
+  crearEstadoQueja(clave: string, nombre: string, descripcion: string, orden: number): Observable<any> {
+    return this.apollo.mutate({
       mutation: gql`
-        mutation($input: EstadoQuejaInput!) {
-          createEstadoQueja(input: $input) {
+        mutation($clave: String!, $nombre: String!, $descripcion: String, $orden: Int!) {
+          crearEstado(
+            clave: $clave,
+            nombre: $nombre,
+            descripcion: $descripcion,
+            orden: $orden
+          ) {
             id
+            clave
             nombre
             descripcion
+            orden
           }
         }
       `,
-      variables: { input: estado }
-    }).pipe(map(result => result.data!.createEstadoQueja));
+      variables: { clave, nombre, descripcion, orden }
+    });
   }
 
-  update(id: number, estado: Partial<EstadoQueja>): Observable<EstadoQueja> {
-    return this.apollo.mutate<{ updateEstadoQueja: EstadoQueja }>({
+  actualizarEstadoQueja(id: string, clave: string, nombre: string, descripcion: string, orden: number): Observable<any> {
+    return this.apollo.mutate({
       mutation: gql`
-        mutation($id: ID!, $input: EstadoQuejaInput!) {
-          updateEstadoQueja(id: $id, input: $input) {
+        mutation($id: ID!, $clave: String!, $nombre: String!, $descripcion: String, $orden: Int!) {
+          actualizarEstado(
+            id: $id,
+            clave: $clave,
+            nombre: $nombre,
+            descripcion: $descripcion,
+            orden: $orden
+          ) {
             id
+            clave
             nombre
             descripcion
+            orden
           }
         }
       `,
-      variables: { id, input: estado }
-    }).pipe(map(result => result.data!.updateEstadoQueja));
+      variables: { id, clave, nombre, descripcion, orden }
+    });
   }
 
-  delete(id: number): Observable<boolean> {
-    return this.apollo.mutate<{ deleteEstadoQueja: boolean }>({
+buscarEstadoPorNombre(nombre: string): Observable<EstadoQueja | null> {
+  return this.apollo.watchQuery({
+    query: gql`
+      query($nombre: String!) {
+        buscarEstadoPorNombre(nombre: $nombre) {
+          id
+          clave
+          nombre
+          descripcion
+          orden
+        }
+      }
+    `,
+    variables: { nombre }
+  }).valueChanges.pipe(
+    map((result: any) => result.data.buscarEstadoPorNombre) // <-- devuelve un objeto o null
+  );
+}
+
+
+
+  eliminarEstadoQueja(id: string): Observable<any> {
+    return this.apollo.mutate({
       mutation: gql`
         mutation($id: ID!) {
-          deleteEstadoQueja(id: $id)
+          eliminarEstado(id: $id)
         }
       `,
       variables: { id }
-    }).pipe(map(result => result.data!.deleteEstadoQueja));
+    });
   }
 }

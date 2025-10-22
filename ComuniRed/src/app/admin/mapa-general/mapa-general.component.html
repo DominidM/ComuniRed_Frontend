@@ -1,0 +1,59 @@
+<div class="mapa-container">
+  <div class="mapa-header">
+    <div>
+      <h1 class="mapa-title">Mapa General</h1>
+      <p class="mapa-subtitle">Visualización geográfica de todas las quejas</p>
+    </div>
+  </div>
+
+  <div class="mapa-content">
+    <aside class="filtros-sidebar">
+      <div class="filtros-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        <h3>Filtros</h3>
+      </div>
+
+      <div class="filtro-section">
+        <label class="filtro-label">Categoría</label>
+        <div class="filtro-options">
+          <button class="filtro-option" [class.active]="selectedCategoria === 'todas'" (click)="filterByCategoria('todas')">Todas</button>
+          <button *ngFor="let cat of categorias" class="filtro-option" [class.active]="selectedCategoria === cat.nombre" (click)="filterByCategoria(cat.nombre)">
+            <span class="cat-dot" [style.background-color]="cat.color"></span>
+            {{ cat.nombre }}
+          </button>
+        </div>
+      </div>
+
+      <div class="filtro-section">
+        <label class="filtro-label">Estado</label>
+        <div class="filtro-options">
+          <button class="filtro-option" [class.active]="selectedEstado === 'todos'" (click)="filterByEstado('todos')">Todos</button>
+          <button *ngFor="let est of estados" class="filtro-option" [class.active]="selectedEstado === est.nombre" (click)="filterByEstado(est.nombre)">
+            <span class="cat-dot" [style.background-color]="est.color"></span>
+            {{ est.nombre }}
+          </button>
+        </div>
+      </div>
+
+      <div class="filtro-counter">
+        Mostrando {{ quejasFiltradas.length }} de {{ quejasTotal }} quejas
+      </div>
+    </aside>
+
+    <div class="mapa-principal">
+      <div class="mapa-card">
+        <div class="mapa-card-header">
+          <h3>Mapa Interactivo</h3>
+          <p>Ubicación de las quejas en el mapa</p>
+        </div>
+
+        <div class="mapa-canvas">
+          <!-- Contenedor definitivo para Leaflet -->
+          <div #mapaCanvas class="leaflet-map"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

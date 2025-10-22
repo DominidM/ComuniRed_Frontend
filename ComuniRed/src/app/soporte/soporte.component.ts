@@ -1,51 +1,42 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-
-import { ReportCardComponent } from './report-card/report-card.component';
-import { ReportFiltersComponent } from './report-filters/report-filters.component';
-import { ReportStatsComponent } from './report-stats/report-stats.component';
-//import { MapReportComponent } from './map-reports/map-report.component';
-import { HeaderComponent } from './header/header.component';
-
-import { Reporte, REPORTES } from './ajson/json';
-import { Soporte, Usuario_soporte } from './ajson/json';
-import { Cliente, Usuario_cliente } from './ajson/json';
+import { UsuarioService } from '../services/usuario.service';
+import { HeaderComponent } from './layout/header/header.component';
 
 @Component({
   selector: 'app-soporte',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReportFiltersComponent,
-    ReportStatsComponent,
-    RouterModule,
-    //MapReportComponent,
-    ReportCardComponent,
-    HeaderComponent
-  ],
+  imports: [CommonModule, RouterModule, HeaderComponent],
   templateUrl: './soporte.component.html',
   styleUrls: ['./soporte.component.css']
 })
 export class SoporteComponent implements OnInit {
-  reportes: Reporte[] = [];
-  reportesFiltrados: Reporte[] = [];
-  reporteSeleccionado?: Reporte = undefined;
-  soporte!:Soporte;
-  cliente!:Cliente;
+  // soporte será pasado al header
+  soporte: any = null;
+
+  constructor(
+    private usuarioService: UsuarioService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.reportes = REPORTES;
-    this.reportesFiltrados = [...this.reportes];
-    this.soporte = Usuario_soporte[0];
-    this.cliente = Usuario_cliente[0];
+    // carga usuario guardado y pásalo al header
+    this.soporte = this.usuarioService.getUser();
+    // opcional: forzar login si no hay token
+    // if (!this.usuarioService.isLoggedIn()) { this.router.navigate(['/login']); }
   }
 
-  seleccionarReporte(reporte: Reporte) {
-    this.reporteSeleccionado = reporte;
+  onModificarPerfil() {
+    this.router.navigate(['/soporte/editar-perfil', this.soporte?.nombre ?? '']);
   }
 
-  aplicarFiltro(filtrados: Reporte[]) {
-    this.reportesFiltrados = filtrados;
+  onPrincipal() {
+    this.router.navigate(['/soporte/home']);
+  }
+
+  onSalir() {
+    this.usuarioService.logout();
+    this.router.navigate(['/login']);
   }
 }
