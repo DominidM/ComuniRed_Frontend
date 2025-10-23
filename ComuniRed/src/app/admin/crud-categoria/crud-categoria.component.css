@@ -56,7 +56,6 @@
   line-height: 1.25;
 }
 
-/* --- Buscador y controles superiores --- */
 .crud-rol-controls-row {
   display: flex;
   align-items: center;
@@ -121,7 +120,6 @@
   stroke: var(--primary-color);
 }
 
-/* Mostrar por página y total */
 .crud-rol-show-select {
   display: flex;
   align-items: center;
@@ -151,7 +149,6 @@
   font-weight: 600;
 }
 
-/* --- Botones principales --- */
 .btn-primary {
   background: white;
   border: 1.5px solid var(--success-color);
@@ -189,7 +186,6 @@
   transform: none;
 }
 
-/* --- Tabla --- */
 .crud-rol-table {
   width: 100%;
   border-collapse: separate;
@@ -235,7 +231,6 @@
   border-right: none;
 }
 
-/* Filas alternadas (zebra striping) */
 .crud-rol-table tbody tr:nth-child(even) td {
   background: var(--gray-50);
 }
@@ -253,13 +248,11 @@
   border-bottom: none;
 }
 
-/* Ocultar columna ID */
 .crud-rol-table th:first-child,
 .crud-rol-table td:first-child {
   display: none;
 }
 
-/* Badge de estado Activo/Inactivo */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -286,7 +279,6 @@
   line-height: 1.5;
 }
 
-/* --- Botones de acción --- */
 .action-buttons {
   display: flex;
   gap: 0.5rem;
@@ -350,7 +342,6 @@
   background: rgb(120, 20, 20);
 }
 
-/* --- Estado vacío --- */
 .crud-rol-empty {
   padding: 3rem 2rem;
   text-align: center;
@@ -363,7 +354,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* --- Modal --- */
 .crud-rol-modal {
   position: fixed;
   top: 0;
@@ -416,7 +406,6 @@
   gap: 0.5rem;
 }
 
-/* --- Formulario --- */
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -451,7 +440,6 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* Checkbox personalizado */
 .checkbox-label {
   display: flex;
   align-items: center;
@@ -473,7 +461,6 @@
   color: var(--gray-700);
 }
 
-/* --- Acciones del modal --- */
 .crud-rol-modal-actions {
   display: flex;
   align-items: center;
@@ -507,7 +494,66 @@
   transform: none;
 }
 
-/* Remover animaciones innecesarias */
+.crud-rol-pagination-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 1.5rem 0 0 0;
+  padding: 0.75rem 2rem 0.5rem 2rem;
+  gap: 1rem;
+}
+
+.crud-rol-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: transparent;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  font-size: 1rem;
+  box-shadow: none;
+}
+
+.crud-rol-pagination-info {
+  color: var(--gray-900);
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.crud-rol-pagination-btn {
+  background: transparent;
+  border: none;
+  color: var(--gray-900);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  transition: color 0.15s;
+}
+
+.crud-rol-pagination-btn:hover:not(:disabled) {
+  color: var(--primary-color);
+}
+
+.crud-rol-pagination-btn:disabled {
+  color: var(--gray-400);
+  cursor: not-allowed;
+}
+
+.crud-rol-pagination-btn b {
+  font-weight: bold;
+}
+
+.crud-rol-pagination-count {
+  text-align: center;
+  color: var(--gray-700);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
 .crud-rol-table tbody tr {
   animation: none;
   opacity: 1;
@@ -577,5 +623,28 @@
     margin-left: 0;
     margin-top: 0.5rem;
     justify-content: flex-end;
+  }
+
+  .crud-rol-pagination-row {
+    padding: 0.75rem 0.5rem 0.5rem 0.5rem;
+    gap: 0.5rem;
+  }
+  
+  .crud-rol-pagination {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .crud-rol-pagination-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .crud-rol-pagination-info {
+    font-size: 0.9rem;
+  }
+  
+  .crud-rol-pagination-count {
+    font-size: 0.85rem;
   }
 }

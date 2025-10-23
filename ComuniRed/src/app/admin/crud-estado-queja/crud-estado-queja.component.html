@@ -32,8 +32,7 @@
       </div>
     </div>
 
-  
-    <div *ngIf="estados && estados.length > 0; else noEstados">
+    <div *ngIf="paginatedEstados && paginatedEstados.length > 0; else noEstados">
       <table class="crud-estado-queja-table">
         <thead>
           <tr>
@@ -46,7 +45,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let estado of estados; trackBy: trackByEstadoId">
+          <tr *ngFor="let estado of paginatedEstados; trackBy: trackByEstadoId">
             <td style="display: none;">{{ estado.id }}</td>
             <td>
               <div class="estado-clave">{{ estado.clave }}</div>
@@ -75,7 +74,7 @@
       </table>
     </div>
 
-
+    <!-- Mensaje cuando no hay estados -->
     <ng-template #noEstados>
       <div class="crud-estado-queja-empty">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #000000;">
@@ -91,6 +90,24 @@
         </button>
       </div>
     </ng-template>
+
+    <!-- Paginación -->
+    <div class="crud-estado-queja-pagination-row" *ngIf="allEstados.length > 0">
+      <div class="crud-estado-queja-pagination">
+        <button class="crud-estado-queja-pagination-btn" (click)="cambiarPagina(currentPage - 1)" [disabled]="currentPage === 1">
+          <b>&lt; Anterior</b>
+        </button>
+        <span class="crud-estado-queja-pagination-info">
+          <b>Página {{ currentPage }} de {{ totalPages }}</b>
+        </span>
+        <button class="crud-estado-queja-pagination-btn" (click)="cambiarPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
+          <b>Siguiente &gt;</b>
+        </button>
+      </div>
+      <div class="crud-estado-queja-pagination-count">
+        <span>Mostrando {{ paginatedEstados.length }} de {{ allEstados.length }} datos.</span>
+      </div>
+    </div>
 
     <!-- Modal Formulario -->
     <div class="crud-estado-queja-modal" *ngIf="modalVisible" (click)="cerrarModal()">
@@ -112,7 +129,7 @@
               type="text"
               [(ngModel)]="estadoActual.clave" 
               required 
-              placeholder="Clave estado de queja..."
+              placeholder="Ej: pendiente, en_proceso, resuelto..."
               autocomplete="off"
             />
           </div>
@@ -125,7 +142,7 @@
               type="text"
               [(ngModel)]="estadoActual.nombre" 
               required 
-              placeholder="Nombre estado de queja..."
+              placeholder="Ej: Pendiente, En Proceso, Resuelto..."
               autocomplete="off"
             />
           </div>

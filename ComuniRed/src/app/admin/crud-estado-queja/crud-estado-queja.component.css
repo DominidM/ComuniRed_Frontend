@@ -46,6 +46,7 @@
   box-shadow: none;
   border-radius: 0;
 }
+
 .crud-estado-queja-header h2 {
   margin: 0;
   font-size: 1.875rem;
@@ -55,7 +56,6 @@
   line-height: 1.25;
 }
 
-/* --- Buscador y controles superiores --- */
 .crud-estado-queja-controls-row {
   display: flex;
   align-items: center;
@@ -87,6 +87,7 @@
   width: 100%;
   padding: 0.5rem 0.5rem 0.5rem 0;
 }
+
 .crud-estado-queja-search-btn {
   background: transparent;
   border: none;
@@ -119,7 +120,6 @@
   stroke: var(--primary-color);
 }
 
-/* Mostrar por página y total */
 .crud-estado-queja-show-select {
   display: flex;
   align-items: center;
@@ -141,10 +141,13 @@
   font-size: 1rem;
   color: var(--gray-900);
   font-weight: 500;
+  cursor: pointer;
 }
 
-
-/* Agregar después de .crud-estado-queja-show-select span */
+.crud-estado-queja-show-select span {
+  color: var(--gray-700);
+  font-weight: 600;
+}
 
 .estado-clave,
 .estado-nombre,
@@ -165,7 +168,6 @@
   min-width: 2rem;
 }
 
-/* Textarea en el formulario */
 .form-group textarea {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -191,10 +193,9 @@
 }
 
 .crud-estado-queja-card {
-  /* Si quieres un contenedor con fondo blanco como categorías */
   background: transparent;
 }
-/* --- Resto de tu CSS original --- */
+
 .btn-primary {
   background: white;
   border: 1.5px solid var(--success-color);
@@ -215,7 +216,7 @@
 
 .btn-primary:hover {
   background: var(--success-color);
-  color: rgb(65, 161, 73);
+  color: white;
   box-shadow: 0 4px 8px rgba(5, 150, 104, 0.678);
   transform: translateY(-1px) scale(1.03);
 }
@@ -224,6 +225,12 @@
   outline: 2px solid transparent;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(40, 182, 137, 0.705);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .crud-estado-queja-table {
@@ -271,7 +278,6 @@
   border-right: none;
 }
 
-/* Filas alternadas (zebra striping) */
 .crud-estado-queja-table tbody tr:nth-child(even) td {
   background: var(--gray-50);
 }
@@ -289,7 +295,6 @@
   border-bottom: none;
 }
 
-/* Ocultar columna ID */
 .crud-estado-queja-table th:first-child,
 .crud-estado-queja-table td:first-child {
   display: none;
@@ -323,39 +328,42 @@
 .btn-edit {
   background: var(--success-color);
   color: rgb(76, 85, 218);
+  border-color: rgb(76, 85, 218);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(5, 150, 105, 0.25);
 }
 
 .btn-edit:hover {
-  background: rgb(82, 92, 185);
-  border-color: var(--success-color);
-  color: var(--success-color);
+  background: rgb(56, 65, 180);
+  border-color: rgb(56, 65, 180);
+  color: white;
 }
 
 .btn-edit:active {
   transform: translateY(0);
-  background: var(--success-hover);
+  background: rgb(40, 50, 150);
 }
 
 .btn-delete {
   background: var(--danger-color);
   color: rgb(167, 38, 38);
+  border-color: rgb(167, 38, 38);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(220, 38, 38, 0.25);
 }
 
 .btn-delete:hover {
-  background: rgb(202, 44, 44);
-  border-color: var(--danger-color);
-  color: var(--danger-color);
+  background: rgb(140, 30, 30);
+  border-color: rgb(140, 30, 30);
+  color: white;
 }
 
 .btn-delete:active {
   transform: translateY(0);
-  background: var(--danger-hover);
+  background: rgb(120, 20, 20);
 }
 
+/* Estado vacío */
 .crud-estado-queja-empty {
   padding: 3rem 2rem;
   text-align: center;
@@ -368,6 +376,7 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* --- Modal --- */
 .crud-estado-queja-modal {
   position: fixed;
   top: 0;
@@ -383,12 +392,8 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .crud-estado-queja-modal-content {
@@ -469,7 +474,7 @@
 }
 
 .btn-cancel {
-  background: rgba(226, 9, 9, 0.801);
+  background: white;
   color: var(--gray-700);
   border: 1px solid var(--gray-300);
   border-radius: var(--border-radius);
@@ -491,7 +496,6 @@
   transform: none;
 }
 
-/* PAGINACIÓN CENTRADA */
 .crud-estado-queja-pagination-row {
   width: 100%;
   display: flex;
@@ -548,7 +552,11 @@
   font-weight: 500;
 }
 
-/* Mejoras responsivas */
+.crud-estado-queja-table tbody tr {
+  animation: none;
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
   .crud-estado-queja-header {
     flex-direction: column;
@@ -595,21 +603,31 @@
     justify-content: center;
   }
 
-  /* Responsivo controles superiores */
   .crud-estado-queja-controls-row {
     flex-direction: column;
     gap: 1rem;
     margin: 0 0.5rem 1rem 0.5rem;
     align-items: stretch;
   }
+  
   .crud-estado-queja-search-box {
     margin-right: 0;
     margin-bottom: 0.5rem;
     max-width: 100%;
   }
+  
   .crud-estado-queja-show-select {
     margin-left: 0;
     margin-top: 0.5rem;
     justify-content: flex-end;
+  }
+
+  .crud-estado-queja-pagination-row {
+    padding: 0.75rem 0.5rem 0.5rem 0.5rem;
+    gap: 0.5rem;
+  }
+  
+  .crud-estado-queja-pagination-count {
+    font-size: 0.95rem;
   }
 }

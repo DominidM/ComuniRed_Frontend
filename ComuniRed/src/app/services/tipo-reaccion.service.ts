@@ -4,67 +4,120 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface TipoReaccion {
-  id: number;
-  nombre: string;
-  icono?: string;
+  id: string;
+  key: string;
+  label: string;
+  activo: boolean;
+  orden: number;
 }
 
 @Injectable({ providedIn: 'root' })
 export class TipoReaccionService {
   constructor(private apollo: Apollo) {}
 
+  // Listar todos
   getAll(): Observable<TipoReaccion[]> {
-    return this.apollo.query<{ tiposReaccion: TipoReaccion[] }>({
-      query: gql`
-        query {
-          tiposReaccion {
-            id
-            nombre
-            icono
+    return this.apollo
+      .watchQuery<{ listarTiposReaccion: TipoReaccion[] }>({
+        query: gql`
+          query {
+            listarTiposReaccion {
+              id
+              key
+              label
+              activo
+              orden
+            }
           }
-        }
-      `
-    }).pipe(map(result => result.data.tiposReaccion));
+        `,
+        fetchPolicy: 'network-only'
+      })
+      .valueChanges.pipe(map(result => result.data.listarTiposReaccion));
   }
 
+  // Buscar por label
+  buscarPorNombre(label: string): Observable<TipoReaccion | null> {
+    return this.apollo
+      .watchQuery<{ buscarTipoReaccionPorLabel: TipoReaccion | null }>({
+        query: gql`
+          query BuscarTipoReaccionPorLabel($label: String!) {
+            buscarTipoReaccionPorLabel(label: $label) {
+              id
+              key
+              label
+              activo
+              orden
+            }
+          }
+        `,
+        variables: { label },
+        fetchPolicy: 'network-only'
+      })
+      .valueChanges.pipe(map(result => result.data.buscarTipoReaccionPorLabel));
+  }
+
+  // Crear
   create(tipo: Partial<TipoReaccion>): Observable<TipoReaccion> {
-    return this.apollo.mutate<{ createTipoReaccion: TipoReaccion }>({
-      mutation: gql`
-        mutation($input: TipoReaccionInput!) {
-          createTipoReaccion(input: $input) {
-            id
-            nombre
-            icono
+    return this.apollo
+      .mutate<{ crearTipoReaccion: TipoReaccion }>({
+        mutation: gql`
+          mutation($key: String!, $label: String!, $activo: Boolean!, $orden: Int!) {
+            crearTipoReaccion(key: $key, label: $label, activo: $activo, orden: $orden) {
+              id
+              key
+              label
+              activo
+              orden
+            }
           }
+        `,
+        variables: {
+          key: tipo.key!,
+          label: tipo.label!,
+          activo: tipo.activo ?? true,
+          orden: tipo.orden ?? 1
         }
-      `,
-      variables: { input: tipo }
-    }).pipe(map(result => result.data!.createTipoReaccion));
+      })
+      .pipe(map(result => result.data!.crearTipoReaccion));
   }
 
-  update(id: number, tipo: Partial<TipoReaccion>): Observable<TipoReaccion> {
-    return this.apollo.mutate<{ updateTipoReaccion: TipoReaccion }>({
-      mutation: gql`
-        mutation($id: ID!, $input: TipoReaccionInput!) {
-          updateTipoReaccion(id: $id, input: $input) {
-            id
-            nombre
-            icono
+  // Actualizar - CAMBIO AQUÍ: String! → ID!
+  update(id: string, tipo: Partial<TipoReaccion>): Observable<TipoReaccion> {
+    return this.apollo
+      .mutate<{ actualizarTipoReaccion: TipoReaccion }>({
+        mutation: gql`
+          mutation($id: ID!, $key: String!, $label: String!, $activo: Boolean!, $orden: Int!) {
+            actualizarTipoReaccion(id: $id, key: $key, label: $label, activo: $activo, orden: $orden) {
+              id
+              key
+              label
+              activo
+              orden
+            }
           }
+        `,
+        variables: {
+          id: id,
+          key: tipo.key!,
+          label: tipo.label!,
+          activo: tipo.activo ?? true,
+          orden: tipo.orden ?? 1
         }
-      `,
-      variables: { id, input: tipo }
-    }).pipe(map(result => result.data!.updateTipoReaccion));
+      })
+      .pipe(map(result => result.data!.actualizarTipoReaccion));
   }
 
-  delete(id: number): Observable<boolean> {
-    return this.apollo.mutate<{ deleteTipoReaccion: boolean }>({
-      mutation: gql`
-        mutation($id: ID!) {
-          deleteTipoReaccion(id: $id)
-        }
-      `,
-      variables: { id }
-    }).pipe(map(result => result.data!.deleteTipoReaccion));
+  // Eliminar - CAMBIO AQUÍ: String! → ID!
+  delete(id: string): Observable<boolean> {
+    return this.apollo
+      .mutate<{ eliminarTipoReaccion: boolean }>({
+        mutation: gql`
+          mutation($id: ID!) {
+            eliminarTipoReaccion(id: $id)
+          }
+        `,
+        variables: { id }
+      })
+      .pipe(map(result => result.data?.eliminarTipoReaccion ?? false));
   }
 }
