@@ -1,0 +1,76 @@
+<!-- Floating button -->
+<button class="chat-fab" aria-label="Mensajes" (click)="togglePanel()" mat-button>
+  <span class="fab-icon">💬</span>
+  <span class="fab-badge" *ngIf="totalUnread > 0">{{ totalUnread }}</span>
+</button>
+
+<!-- Panel -->
+<div class="chat-panel" [class.open]="panelOpen" [class.expanded]="expanded" role="dialog" aria-label="Mensajes">
+  <div class="chat-header">
+    <div class="chat-title">
+      <span class="chat-icon">💬</span>
+      <div>
+        <div class="title-main">Mensajes</div>
+        <div class="title-sub">{{ conversations.length }} conversaciones</div>
+      </div>
+    </div>
+
+    <div class="chat-header-actions">
+      <button class="icon-btn" (click)="toggleExpand()" title="Expandir / Contraer" aria-label="Expandir">
+        <mat-icon>open_in_full</mat-icon>
+      </button>
+      <button class="icon-btn" (click)="closePanel()" title="Cerrar" aria-label="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="chat-body">
+    <div class="chat-search">
+      <input type="text" placeholder="Buscar conversaciones..." [(ngModel)]="query" />
+    </div>
+
+    <div class="conversations-list">
+      <button *ngFor="let conv of filteredConversations()" class="conv-item" (click)="openConversation(conv)">
+        <div class="conv-left">
+          <div class="conv-avatar" [title]="conv.name">
+            <img *ngIf="conv.avatarUrl" [src]="conv.avatarUrl" alt="{{conv.name}}" />
+            <span *ngIf="!conv.avatarUrl">{{conv.initials}}</span>
+          </div>
+        </div>
+
+        <div class="conv-middle">
+          <div class="conv-name">{{ conv.name }}</div>
+          <div class="conv-last">{{ conv.lastMessage }}</div>
+        </div>
+
+        <div class="conv-right">
+          <div class="conv-time">{{ conv.time }}</div>
+          <div class="conv-unread" *ngIf="conv.unread > 0">{{ conv.unread }}</div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <div class="chat-footer" *ngIf="activeConversation">
+    <div class="chat-footer-header">
+      <div class="conv-small">
+        <div class="conv-avatar-small">
+          <span *ngIf="!activeConversation.avatarUrl">{{ activeConversation.initials }}</span>
+          <img *ngIf="activeConversation.avatarUrl" [src]="activeConversation.avatarUrl" />
+        </div>
+        <div class="conv-meta">
+          <div class="conv-name">{{ activeConversation.name }}</div>
+          <div class="conv-sub">Conectado</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="send-row">
+      <input #msgInput type="text" placeholder="Escribe un mensaje..." />
+      <button mat-button class="send-btn" (click)="sendMessage(activeConversation!, msgInput)" aria-label="Enviar">
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,6 @@
 import { Component, HostListener } from '@angular/core';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { RightbarComponent } from './rightbar/rightbar.component';
 import { NavbarComponent } from './navbar/navbar.component';
@@ -13,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [
     CommonModule,
-    NgIf,
+    FormsModule,          // <-- necesario para ngModel usado en Navbar (si Navbar no es standalone/importa FormsModule)
     SidebarComponent,
     RightbarComponent,
     NavbarComponent,

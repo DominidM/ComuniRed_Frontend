@@ -1,147 +1,166 @@
+<!-- Feed main container -->
 <div class="feed-container">
-  <!-- Barra de búsqueda mejorada -->
-  <div class="search-container">
-    <div class="search-icon">🔍</div>
-    <input 
-      type="text" 
-      [(ngModel)]="searchQuery"
-      placeholder="Buscar reportes, ubicaciones o usuarios..." 
-      class="search-input"
-    />
-  </div>
 
-  <!-- Filtros de categorías -->
-  <div class="categories-filter">
-    <button 
-      *ngFor="let category of categories" 
-      class="category-chip"
-      [class.active]="selectedCategory === category.name"
-      (click)="selectedCategory = category.name"
-    >
-      <span>{{ category.icon }}</span>
-      {{ category.name }}
-    </button>
+  <!-- Create / report card (top) -->
+  <div class="create-card card">
+    <div class="create-top">
+      <div class="create-avatar">
+        <img src="https://ui-avatars.com/api/?name=JP&background=0b1220&color=fff" alt="avatar" />
+      </div>
+      <button class="create-input" aria-label="Crear reporte">
+        ¿Qué problema de infraestructura quieres reportar?
+      </button>
+    </div>
+
+    <div class="create-sep"></div>
+
+    <div class="create-actions">
+      <button class="create-action" type="button">
+        <span class="create-icon">🖼️</span>
+        <span>Foto/Video</span>
+      </button>
+      <button class="create-action" type="button">
+        <span class="create-icon">📍</span>
+        <span>Ubicación</span>
+      </button>
+    </div>
   </div>
 
   <!-- Posts -->
-  <div *ngFor="let post of filteredPosts(); trackBy: trackByPostId" class="post-card">
-    <!-- Header del post -->
-    <div class="post-header">
-      <div class="avatar-container">
-        <img [src]="post.avatar" [alt]="post.author" class="avatar" />
-      </div>
-      <div class="post-info">
-        <h3 class="author">{{ post.author }}</h3>
-        <div class="post-meta">
-          <span>{{ post.date }}</span>
-          <span *ngIf="post.location" class="location">
+  <ng-container *ngIf="filteredPosts().length > 0; else emptyState">
+    <div *ngFor="let post of filteredPosts(); trackBy: trackByPostId" class="post-card">
+      <!-- Header -->
+      <div class="post-header">
+        <div class="avatar-container">
+          <img [src]="post.avatar" [alt]="post.author" class="avatar" />
+        </div>
+
+        <div class="post-info">
+          <div class="post-title-row">
+            <div>
+              <div class="post-author">{{ post.author }}</div>
+              <div class="post-meta">
+                <span class="post-date">{{ post.date }}</span>
+                <ng-container *ngIf="post.location">
+                  <span class="dot-sep">•</span>
+                  <span class="post-location">📍 {{ post.location }}</span>
+                </ng-container>
+              </div>
+            </div>
+
+            <button class="post-menu" aria-label="Más opciones">⋯</button>
+          </div>
+
+          <h3 class="post-heading">{{ post.title }}</h3>
+          <p class="post-text">{{ post.content }}</p>
+
+          <div class="post-tags">
+            <span class="tag category-tag">{{ post.category }}</span>
+            <span *ngIf="post.status" class="tag status-tag">{{ post.status }}</span>
+          </div>
+
+          <div *ngIf="post.location" class="post-location-line">
             <span class="location-icon">📍</span>
-            {{ post.location }}
-          </span>
-          <span class="category-badge">{{ post.category }}</span>
+            <span class="location-text">{{ post.location }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image / placeholder -->
+      <div class="post-image-wrapper">
+        <ng-container *ngIf="post.imageUrl; else imagePlaceholder">
+          <img [src]="post.imageUrl" [alt]="post.title" class="post-image" />
+        </ng-container>
+
+        <ng-template #imagePlaceholder>
+          <div class="image-placeholder">
+            <div class="image-placeholder-icon">🖼️</div>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Vote section (if image exists) -->
+      <div *ngIf="post.imageUrl" class="vote-section">
+        <div class="vote-question">
+          ¿Estás de acuerdo con este reporte?
+          <span class="vote-count">{{ post.acceptVotes + post.rejectVotes }} votos</span>
+        </div>
+
+        <div class="vote-buttons">
+          <button
+            class="vote-btn accept"
+            [class.voted]="post.userVote === 'accept'"
+            [disabled]="post.userVote !== null"
+            (click)="vote(post, 'accept')"
+          >
+            ✅ Sí ({{ post.acceptVotes }})
+          </button>
+
+          <button
+            class="vote-btn reject"
+            [class.voted]="post.userVote === 'reject'"
+            [disabled]="post.userVote !== null"
+            (click)="vote(post, 'reject')"
+          >
+            ❌ No ({{ post.rejectVotes }})
+          </button>
+        </div>
+      </div>
+
+      <!-- Actions row -->
+      <div class="post-actions">
+        <div class="left-actions">
+          <button class="action-btn" [class.liked]="post.liked" (click)="toggleLike(post)">
+            <span class="action-emoji">{{ post.liked ? '❤️' : '🤍' }}</span>
+            <span class="action-text">{{ post.likes }}</span>
+          </button>
+
+          <button class="action-btn" (click)="toggleComments(post)">
+            <span class="action-emoji">💬</span>
+            <span class="action-text">{{ post.comments.length }}</span>
+          </button>
+        </div>
+
+        <div class="right-actions">
+          <button class="action-btn" (click)="toggleBookmark(post)" [class.bookmarked]="post.bookmarked">
+            <span class="action-emoji">{{ post.bookmarked ? '🔖' : '📑' }}</span>
+            <span class="action-text">Guardar</span>
+          </button>
+
+          <button class="action-btn" (click)="sharePost(post)">
+            <span class="action-emoji">📤</span>
+            <span class="action-text">Compartir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div *ngIf="post.showComments" class="comments-section">
+        <div *ngFor="let comment of post.comments; trackBy: trackByComment" class="comment">
+          <strong>{{ comment.author }}:</strong> {{ comment.content }}
+        </div>
+
+        <div class="comment-input-container">
+          <input
+            #commentInput
+            type="text"
+            class="comment-input"
+            placeholder="Escribe un comentario..."
+            (keyup.enter)="addComment(post, commentInput.value); commentInput.value = ''"
+          />
         </div>
       </div>
     </div>
+  </ng-container>
 
-    <!-- Contenido del post -->
-    <h4 class="post-title">{{ post.title }}</h4>
-    <p class="post-content">{{ post.content }}</p>
-
-    <!-- Imagen del post -->
-    <div *ngIf="post.imageUrl" class="post-image-container">
-      <img [src]="post.imageUrl" [alt]="post.title" class="post-image" />
-      <div class="image-overlay"></div>
-    </div>
-
-    <!-- Sección de votación -->
-    <div *ngIf="post.imageUrl" class="vote-section">
-      <div class="vote-question">
-        ¿Estás de acuerdo con este reporte?
-        <span class="vote-count">{{ post.acceptVotes + post.rejectVotes }} votos</span>
-      </div>
-      <div class="vote-buttons">
-        <button 
-          class="vote-btn accept"
-          [class.voted]="post.userVote === 'accept'"
-          [disabled]="post.userVote !== null"
-          (click)="vote(post, 'accept')"
-        >
-          <span>✅</span>
-          Sí ({{ post.acceptVotes }})
-        </button>
-        <button 
-          class="vote-btn reject"
-          [class.voted]="post.userVote === 'reject'"
-          [disabled]="post.userVote !== null"
-          (click)="vote(post, 'reject')"
-        >
-          <span>❌</span>
-          No ({{ post.rejectVotes }})
-        </button>
+  <!-- Empty state -->
+  <ng-template #emptyState>
+    <div class="no-posts">
+      <div class="no-posts-inner">
+        <div class="no-posts-icon">🔍</div>
+        <h3>No se encontraron reportes</h3>
+        <p>Intenta cambiar los filtros o términos de búsqueda</p>
       </div>
     </div>
-
-    <!-- Acciones del post -->
-    <div class="post-actions">
-      <button 
-        class="action-btn"
-        [class.liked]="post.liked"
-        (click)="toggleLike(post)"
-      >
-        <span>{{ post.liked ? '❤️' : '🤍' }}</span>
-        {{ post.likes }}
-      </button>
-      
-      <button 
-        class="action-btn"
-        (click)="toggleComments(post)"
-      >
-        <span>💬</span>
-        {{ post.comments.length }}
-      </button>
-      
-      <button 
-        class="action-btn"
-        [class.bookmarked]="post.bookmarked"
-        (click)="toggleBookmark(post)"
-      >
-        <span>{{ post.bookmarked ? '🔖' : '📑' }}</span>
-        Guardar
-      </button>
-      
-      <button 
-        class="action-btn"
-        (click)="sharePost(post)"
-      >
-        <span>📤</span>
-        Compartir
-      </button>
-    </div>
-
-    <!-- Sección de comentarios -->
-    <div *ngIf="post.showComments" class="comments-section">
-      <div *ngFor="let comment of post.comments; trackBy: trackByComment" class="comment">
-        <strong>{{ comment.author }}:</strong> {{ comment.content }}
-      </div>
-      
-      <div class="comment-input-container">
-        <input 
-          type="text" 
-          #commentInput
-          placeholder="Escribe un comentario..." 
-          class="comment-input"
-          (keyup.enter)="addComment(post, commentInput.value); commentInput.value = ''"
-        />
-      </div>
-    </div>
-  </div>
-
-  <!-- Mensaje cuando no hay posts -->
-  <div *ngIf="filteredPosts().length === 0" class="no-posts">
-    <div style="text-align: center; padding: 40px; color: #657786;">
-      <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
-      <h3>No se encontraron reportes</h3>
-      <p>Intenta cambiar los filtros o términos de búsqueda</p>
-    </div>
-  </div>
+  </ng-template>
 </div>

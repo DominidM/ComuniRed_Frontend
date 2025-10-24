@@ -1,78 +1,126 @@
-.feed-navbar {
-  width: 100%;
+:host {
+  display: block;
+  font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Navbar container */
+.cr-navbar {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 18px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(15,23,42,0.04);
+  box-shadow: 0 1px 0 rgba(15,23,42,0.02);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+/* Left: logo */
+.cr-navbar__left { display:flex; align-items:center; min-width:160px; }
+.cr-logo {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 8px 10px;
+}
+.cr-logo__icon {
+  display:block;
+  width:46px;
+  height:46px;
+  border-radius:6px;
+  object-fit:cover;
+}
+.cr-logo__text {
+  font-weight: 700;
+  color: #0b3b36;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+/* Center: search */
+.cr-navbar__center {
+  flex: 1;
   display: flex;
   justify-content: center;
-  gap: 0;
+}
+.cr-search {
+  width: 740px;
+  max-width: calc(100% - 40px);
+  display:flex;
+  align-items:center;
+  gap:20px;
+  background: #f2f4f6;
+  padding: 6px 12px;
+  border-radius: 22px;
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,0.02);
+}
+.cr-search__icon { flex: 0 0 18px; }
+.cr-search input {
+  border: none;
   background: transparent;
-  padding: 0;
-  position: relative;
-  z-index: 1;
+  outline: none;
+  width: 100%;
+  font-size: 16px;
+  color: #2b2f35;
 }
 
-.feed-navbar-tab {
-  flex: 1 1 0;
-  position: relative;
-  padding: 10px 0 14px 0;
-  background: #fff;
-  border: 1px solid #e8eaf0;
-  outline: none;
-  font-size: 1.13em;
-  font-weight: 600;
-  color: #5a5a5a;
+/* Right: controls */
+.cr-navbar__right {
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  min-width: 220px;
+  justify-content: flex-end;
+}
+
+/* generic icon button */
+.cr-btn {
+  position: relative; /* AGREGADO: necesario para posicionar el badge */
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:40px;
+  width:40px;
+  border-radius: 10px;
+  border: 0;
+  background: transparent;
   cursor: pointer;
-  transition: color 0.18s, background 0.18s, box-shadow 0.18s;
-  letter-spacing: 0.01em;
-  box-shadow: 0 2px 8px #ededed22;
-  margin-bottom: -1px;
-  margin-right: 8px;
+}
+.cr-btn:focus { outline: 2px solid rgba(11,59,54,0.12); outline-offset: 2px; }
+
+/* notification badge */
+.cr-badge {
+  position: absolute; /* CAMBIADO: de relative a absolute */
+  top: -2px; /* CAMBIADO: posicionamiento desde arriba */
+  right: -2px; /* CAMBIADO: posicionamiento desde la derecha */
+  display: flex; /* CAMBIADO: mejor para centrar */
+  align-items: center;
+  justify-content: center;
+  background: #e02424;
+  color: #ffffff;
+  min-width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: 600; /* AGREGADO: más legible */
+  border-radius: 999px;
+  padding: 0 5px;
+  box-shadow: 0 2px 4px rgba(224, 36, 36, 0.3);
+  border: 2px solid #ffffff; /* AGREGADO: separa del icono */
 }
 
-.feed-navbar-tab:last-child {
-  margin-right: 0;
-}
+/* avatar button */
+.cr-btn--avatar { width:44px; height:44px; padding: 0; border-radius:50%; overflow:hidden; }
+.cr-avatar { width:100%; height:100%; object-fit:cover; display:block; }
 
-.feed-navbar-tab.active {
-  color: #1976d2;
-  background: #fff;
-  border-bottom: none;
-  box-shadow: 0 2px 8px #1976d211;
-}
-
-.feed-navbar-tab.active::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: -3px;
-  width: 34px;
-  height: 3px;
-  background: #1976d2;
-  border-radius: 4px 4px 0 0;
-}
-
-.feed-navbar-tab:not(.active) {
-  color: #7d8186;
-  background: #fff;
-  opacity: 1;
-}
-
-.feed-navbar-tab:focus {
-  outline: none;
-  color: #1976d2;
-  background: #f7fafe;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .feed-navbar-tab {
-    font-size: 1em;
-    padding: 10px 0 10px 0;
-    margin-right: 4px;
-    height: 38px;
-
-  }
-  .feed-navbar-tab.active::after {
-    width: 24px;
-    height: 5px;
-  }
+/* small screens adjustments */
+@media (max-width: 780px) {
+  .cr-search { width: 100%; max-width: 420px; }
+  .cr-navbar__left { min-width: 120px; }
+  .cr-logo__text { display:none; }
 }

@@ -6,14 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { UsuarioService } from '../../services/usuario.service';
 
-interface Report {
-  title: string;
-  description: string;
-  category: string;
-  location: string;
-  image?: File;
-}
-
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -40,11 +32,12 @@ export class SidebarComponent implements OnInit {
   imagePreview: string | null = null;
   categories = ['Vías', 'Alumbrado', 'Grafitis', 'Semáforos', 'Otros'];
 
+  // menu: changed "Notificaciones" to "Reels" as requested
   menuItems = [
     { label: 'Inicio', icon: 'home', route: '/public/home' },
     { label: 'Tendencias', icon: 'trending_up', route: '/public/trending' },
-    { label: 'Notificaciones', icon: 'notifications', route: '/public/notifications' },
-    { label: 'Perfil', icon: 'person', route: '/public/profile/1' },
+    { label: 'Reels', icon: 'video_library', route: '/public/reels' },
+    { label: 'Perfil', icon: 'person', route: '/public/profile/1', soft: true },
     { label: 'Configuración', icon: 'settings', route: '/public/settings' },
     { label: 'Ayuda', icon: 'help_outline', route: '/public/help' },
   ];
@@ -111,7 +104,7 @@ export class SidebarComponent implements OnInit {
   submitReport() {
     if (!this.title || !this.description || !this.category || !this.location) return;
 
-    const report: Report = {
+    const report = {
       title: this.title,
       description: this.description,
       category: this.category,
@@ -148,5 +141,12 @@ export class SidebarComponent implements OnInit {
     this.usuarioService.logout();
     this.mostrarMenu = false;
     this.router.navigate(['/login']);
+  }
+
+  // helper si necesitas marcar ícono activo con lógica propia
+  isActive(item: any) {
+    // si usas routerLinkActive, no es necesario; esta función puede
+    // comprobar la ruta actual y devolver true si coincide.
+    return false;
   }
 }

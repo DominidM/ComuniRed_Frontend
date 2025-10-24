@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 
 interface Comment {
@@ -28,17 +27,13 @@ interface Post {
   acceptVotes: number;
   rejectVotes: number;
   userVote: 'accept' | 'reject' | null;
-}
-
-interface Category {
-  name: string;
-  icon: string;
+  status?: string;
 }
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.css'],
   animations: [
@@ -61,19 +56,7 @@ interface Category {
   ]
 })
 export class FeedComponent {
-  searchQuery: string = '';
-  selectedCategory: string = 'Todos';
-
-  categories: Category[] = [
-    { name: 'Todos', icon: '🌐' },
-    { name: 'Vías', icon: '🛣️' },
-    { name: 'Postes', icon: '💡' },
-    { name: 'Grafitis', icon: '🎨' },
-    { name: 'Alumbrado', icon: '🔦' },
-    { name: 'Semáforos', icon: '🚦' },
-    { name: 'Basura', icon: '🗑️' },
-  ];
-
+  // posts de ejemplo
   posts: Post[] = [
     {
       id: '1',
@@ -92,7 +75,8 @@ export class FeedComponent {
       bookmarked: false,
       acceptVotes: 23,
       rejectVotes: 3,
-      userVote: null
+      userVote: null,
+      status: 'En Proceso'
     },
     {
       id: '2',
@@ -270,24 +254,81 @@ export class FeedComponent {
     console.log(`Comentario agregado a "${post.title}"`);
   }
 
-  filteredPosts(): Post[] {
-    return this.posts.filter(post =>
-      (this.selectedCategory === 'Todos' || post.category === this.selectedCategory) &&
-      (post.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-       post.content.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-       (post.location && post.location.toLowerCase().includes(this.searchQuery.toLowerCase())))
-    );
+  // Downloads: fetch blob + helpers
+  private async fetchBlob(url: string): Promise<Blob | null> {
+    try {
+      const res = await fetch(url, { mode: 'cors' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.blob();
+    } catch (err) {
+      console.error('fetchBlob error:', err);
+      return null;
+    }
   }
 
-   trackByPostId(index: number, post: any): number | string {
+  async downloadImage(post: Post) {
+    if (!post.imageUrl) {
+      alert('No hay imagen disponible para descargar.');
+      return;
+    }
+
+    const blob = await this.fetchBlob(post.imageUrl);
+    if (!blob) {
+      alert('No se pudo descargar la imagen. Revisa la consola para más detalles.');
+      return;
+    }
+
+    const urlParts = post.imageUrl.split('?')[0].split('.');
+    const ext = urlParts.length ? urlParts[urlParts.length - 1] : 'jpg';
+    const safeExt = ext.length > 5 ? 'jpg' : ext;
+    const filename = `${post.id || 'reporte'}.${safeExt}`;
+
+    const blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(blobUrl);
+  }
+
+  downloadPostJson(post: Post) {
+    const data = {
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      author: post.author,
+      date: post.date,
+      location: post.location,
+      category: post.category,
+      acceptVotes: post.acceptVotes,
+      rejectVotes: post.rejectVotes,
+      likes: post.likes
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${post.id || 'report'}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // simplified: return the posts array directly since search/categories were removed from UI
+  filteredPosts(): Post[] {
+    return this.posts;
+  }
+
+  trackByPostId(index: number, post: any): number | string {
     return post.id ?? index; // usa post.id si existe, si no el índice
   }
 
-  // Optimiza la lista de comentarios
   trackByComment(index: number, comment: any): number | string {
     return comment.id ?? index; // usa comment.id si existe, si no el índice
   }
-
 
   private showLikeAnimation(postId: string) {
     console.log(`❤️ Like animation for post ${postId}`);

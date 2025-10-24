@@ -1,3 +1,6 @@
+<app-navbar></app-navbar>
+
+
 <mat-sidenav-container class="sidenav-container">
   <!-- Sidebar -->
   <mat-sidenav 
@@ -15,12 +18,6 @@
       <div class="feed-right-wrapper">
         <!-- Feed -->
         <div class="feed-area">
-            <nav class="top-navbar">
-              <button mat-icon-button (click)="sidenav.toggle()" class="menu-button">
-                <mat-icon>menu</mat-icon>
-              </button>
-              <app-navbar></app-navbar>
-            </nav>
           <router-outlet></router-outlet>
         </div>
 
