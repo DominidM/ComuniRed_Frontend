@@ -1,1 +1,133 @@
-<p>help works!</p>
+<div class="help-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-header">
+        <div class="hero-icon">?</div>
+        <div class="hero-text">
+          <h1>Centro de Ayuda</h1>
+          <p>Encuentra respuestas a tus preguntas</p>
+        </div>
+      </div>
+      
+      <!-- Search Bar -->
+      <div class="search-container">
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Busca tu pregunta aquí..."
+          [(ngModel)]="searchQuery"
+        >
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="categories-section">
+    <div class="categories-grid">
+      @for (category of categories; track category.id) {
+        <div class="category-card">
+          <div class="category-icon">{{ category.icon }}</div>
+          <h3>{{ category.name }}</h3>
+          <p>{{ category.description }}</p>
+          <button class="view-more-btn" (click)="viewMore(category.id)">Ver más →</button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="faq-container">
+      <h2>Preguntas Frecuentes</h2>
+      
+      @if (filteredFAQs.length > 0) {
+        <div class="faq-list">
+          @for (faq of filteredFAQs; track faq.id) {
+            <div class="faq-item">
+              <button 
+                class="faq-question"
+                (click)="toggleFAQ(faq)"
+                [class.expanded]="faq.expanded"
+              >
+                <span>{{ faq.question }}</span>
+                <span class="faq-icon">{{ faq.expanded ? '−' : '+' }}</span>
+              </button>
+              
+              @if (faq.expanded) {
+                <div class="faq-answer">
+                  {{ faq.answer }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="no-results">
+          <p>No se encontraron resultados para "{{ searchQuery }}"</p>
+          <p class="no-results-hint">Intenta con otras palabras clave</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section">
+    <div class="contact-container">
+      <h2>¿No encontraste lo que buscabas?</h2>
+      <p>Ponte en contacto con nuestro equipo de soporte</p>
+      
+      <form class="contact-form" (ngSubmit)="submitContactForm($event)">
+        <div class="form-group">
+          <label for="name">Nombre</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Correo Electrónico</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="subject">Asunto</label>
+          <input type="text" id="subject" name="subject" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="message">Mensaje</label>
+          <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        
+        <button type="submit" class="submit-button">Enviar Mensaje</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Support Info Section -->
+  <section class="support-info-section">
+    <div class="support-info-container">
+      <h2>Información de Soporte</h2>
+      <div class="support-info-grid">
+        <div class="support-info-card">
+          <div class="info-icon">☎</div>
+          <h3>Teléfono</h3>
+          <p>+1 (555) 123-4567</p>
+          <p class="info-hours">Lun - Vie: 9:00 - 18:00</p>
+        </div>
+        
+        <div class="support-info-card">
+          <div class="info-icon">✉</div>
+          <h3>Correo Electrónico</h3>
+          <p class="info-hours">Respuesta en 24 horas</p>
+        </div>
+        
+        <div class="support-info-card">
+          <div class="info-icon">◉</div>
+          <h3>Chat en Vivo</h3>
+          <p>Disponible en línea</p>
+          <p class="info-hours">Lun - Vie: 10:00 - 17:00</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
