@@ -693,3 +693,50 @@
     justify-content: center;
   }
 }
+
+/* Estilos para la imagen de perfil */
+.imagen-perfil {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.imagen-perfil .form-label {
+  font-weight: bold;
+  color: #1b5e20; /* verde oscuro coherente con tus tonos */
+}
+
+.imagen-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.imagen-preview .preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0px 0px 10px rgba(27, 94, 32, 0.3); /* sombra verde suave */
+  border: 3px solid #66bb6a; /* verde medio */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.imagen-preview .preview:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 0px 15px rgba(27, 94, 32, 0.4);
+}
+
+.archivo-input {
+  background-color: #e8f5e9; /* fondo verde muy claro */
+  border: 1px solid #66bb6a;
+  border-radius: 10px;
+  padding: 6px;
+  width: 80%;
+  max-width: 250px;
+  margin: 0 auto;
+  display: block;
+}
+
+
+

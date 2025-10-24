@@ -2,19 +2,18 @@
 
   <app-logo-section></app-logo-section>
 
-  <app-acciones-header
-    (actualizar)="actualizar()"
-    (exportar)="exportar()">
-  </app-acciones-header>
-
-
-  <div class="container">
-    <app-perfil-header
-      [soporte]="soporte"
-      (modificar)="modificar()"
-      (principal)="principal()"
-      (salir)="salir()">
-    </app-perfil-header>
+  <div class="app-acciones">
+    <app-acciones-header
+      (exportar)="exportar()"
+      (actualizar)="actualizar()">
+    </app-acciones-header>
   </div>
 
+  <div class="app-perfil">
+    <app-perfil-header
+      (modificar)="onModificar()"
+      (principal)="onPrincipal()"
+      (salir)="onSalir()">
+    </app-perfil-header>
+  </div>
 </div>

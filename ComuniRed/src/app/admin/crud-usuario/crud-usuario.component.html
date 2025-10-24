@@ -93,7 +93,36 @@
         <h3>{{ editingUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
 
         <form (ngSubmit)="saveUsuario(usuarioForm)" #usuarioForm="ngForm">
-          <!-- Nombre / Apellido -->
+
+        <div class="form-group imagen-perfil">
+          <label for="foto_perfil" class="form-label">Foto de Perfil</label>
+
+          <div class="imagen-preview">
+            <img
+              [src]="imagenPreview || usuarioData.foto_perfil || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'"
+              alt="Foto de perfil"
+              class="preview"
+            />
+          </div>
+
+          <input
+            type="file"
+            id="foto_perfil"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="form-control archivo-input"
+          />
+
+          <button
+            *ngIf="imagenPreview || usuarioData.foto_perfil"
+            type="button"
+            class="btn-quitar-foto"
+            (click)="quitarFoto()"
+          >
+            Quitar foto
+          </button>
+        </div>
+
           <div class="form-row">
             <div class="form-group">
               <label for="nombre">Nombre *</label>

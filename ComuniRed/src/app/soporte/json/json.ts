@@ -16,7 +16,6 @@ export interface Soporte {
 
   username: string;
   
-  avatar_soporte: string;
   email: string;
   telefono: string;
 
@@ -93,7 +92,6 @@ export const Usuario_soporte: Soporte[] = [
     nombre: "Carlos",
     apellido: "Ramírez",
     username: "carlos.ramirez",
-    avatar_soporte: "https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757493645/Poses-Perfil-Profesional-Hombresdic.-27-2022-3-819x1024_p76mzs.webp",
     email: "carlos.ramirez@gmail.com",
     telefono: "+51 987 654 321",
     turno: "Dia",
@@ -112,7 +110,6 @@ export const Usuario_soporte: Soporte[] = [
     nombre: "María",
     apellido: "Fernández",
     username: "maria.fernandez",
-    avatar_soporte: "assets/avatars/maria.png",
     email: "maria.fernandez@example.com",
     telefono: "+51 976 123 456",
     turno: "Tarde",
@@ -131,7 +128,6 @@ export const Usuario_soporte: Soporte[] = [
     nombre: "Jorge",
     apellido: "Salazar",
     username: "jorge.salazar",
-    avatar_soporte: "assets/avatars/jorge.png",
     email: "jorge.salazar@example.com",
     telefono: "+51 965 432 198",
     turno: "noche",

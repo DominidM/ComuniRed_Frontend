@@ -6,6 +6,7 @@ import { gql } from 'apollo-angular';
 
 export interface Usuario {
   id: string;
+  foto_perfil?: string;
   nombre: string;
   apellido: string;
   dni: string;
@@ -21,6 +22,7 @@ export interface Usuario {
 }
 
 export interface UsuarioInput {
+  foto_perfil?: string;
   nombre: string;
   apellido: string;
   dni?: string;
@@ -49,6 +51,7 @@ const OBTENER_USUARIOS = gql`
     obtenerUsuarios(page: $page, size: $size) {
       content {
         id
+        foto_perfil
         nombre
         apellido
         dni
@@ -73,6 +76,7 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
   query ObtenerTodosLosUsuarios {
     obtenerTodosLosUsuarios {
       id
+      foto_perfil
       nombre
       apellido
       dni
@@ -92,6 +96,7 @@ const OBTENER_USUARIO_POR_ID = gql`
   query ObtenerUsuarioPorId($id: ID!) {
     obtenerUsuarioPorId(id: $id) {
       id
+      foto_perfil
       nombre
       apellido
       dni
@@ -117,6 +122,7 @@ const CREAR_USUARIO = gql`
   mutation CrearUsuario($usuario: UsuarioInput!) {
     crearUsuario(usuario: $usuario) {
       id
+      foto_perfil
       nombre
       apellido
       dni
@@ -136,6 +142,7 @@ const ACTUALIZAR_USUARIO = gql`
   mutation ActualizarUsuario($id: ID!, $usuario: UsuarioInput!) {
     actualizarUsuario(id: $id, usuario: $usuario) {
       id
+      foto_perfil
       nombre
       apellido
       dni
@@ -163,6 +170,7 @@ const LOGIN = gql`
       token
       usuario {
         id
+        foto_perfil
         nombre
         apellido
         email
@@ -184,39 +192,37 @@ export const USER_KEY = 'comunired_user';
   providedIn: 'root'
 })
 export class UsuarioService {
-  private apiBase = '/graphql'; // (not used directly by Apollo queries, kept for completeness)
+  private apiBase = '/graphql';
 
   // BehaviorSubject que mantiene el contador global de usuarios (inicial 0)
   private userCountSubject = new BehaviorSubject<number>(0);
+  
+  private usuarioSubject = new BehaviorSubject<Usuario | null>(this.getUser());
+  public usuario$ = this.usuarioSubject.asObservable();
+
   public userCount$ = this.userCountSubject.asObservable();
 
   constructor(private apollo: Apollo) {
-    // Inicializar el contador al crear el servicio
-    // No bloquear el constructor: la llamada internamente suscribe y actualiza el BehaviorSubject
     this.refreshUserCount();
   }
 
   obtenerUsuarios(page: number, size: number): Observable<UsuarioPage> {
-    // Observa el resultado crudo y regístralo en consola para depuración.
     return this.apollo.watchQuery<{ obtenerUsuarios: UsuarioPage }>({
       query: OBTENER_USUARIOS,
       variables: { page, size },
       fetchPolicy: 'network-only',
-      errorPolicy: 'all'  // permite obtener data parcial si hay errores
+      errorPolicy: 'all'
     }).valueChanges.pipe(
       tap((rawResult) => {
-        // Log detallado para depuración: datos + errores
         console.debug('[UsuarioService] Apollo raw result:', rawResult);
         if ((rawResult as any).errors && (rawResult as any).errors.length > 0) {
           console.warn('[UsuarioService] GraphQL errors:', (rawResult as any).errors);
         }
       }),
       map(result => {
-        // Asegurarse de devolver la data si existe, o estructura vacía si no.
         if (result && result.data && result.data.obtenerUsuarios) {
           return result.data.obtenerUsuarios;
         }
-        // Si no hay datos, devolver estructura vacía en lugar de null para evitar fallos en UI.
         return {
           content: [],
           totalElements: 0,
@@ -270,7 +276,7 @@ export class UsuarioService {
       ]
     }).pipe(
       tap(raw => console.debug('[UsuarioService] crearUsuario raw:', raw)),
-      tap(() => this.refreshUserCount()), // actualizar contador tras crear
+      tap(() => this.refreshUserCount()),
       map(result => result.data!.crearUsuario)
     );
   }
@@ -285,7 +291,7 @@ export class UsuarioService {
       ]
     }).pipe(
       tap(raw => console.debug('[UsuarioService] actualizarUsuario raw:', raw)),
-      tap(() => this.refreshUserCount()), // actualizar contador por si hubo cambios
+      tap(() => this.refreshUserCount()),
       map(result => result.data!.actualizarUsuario)
     );
   }
@@ -300,7 +306,7 @@ export class UsuarioService {
       ]
     }).pipe(
       tap(raw => console.debug('[UsuarioService] eliminarUsuario raw:', raw)),
-      tap(() => this.refreshUserCount()), // actualizar contador tras eliminar
+      tap(() => this.refreshUserCount()),
       map(result => result.data!.eliminarUsuario)
     );
   }
@@ -349,6 +355,7 @@ export class UsuarioService {
   saveUser(user: Usuario) {
     try {
       localStorage.setItem(USER_KEY, JSON.stringify(user));
+      this.usuarioSubject.next(user);
     } catch (e) {
       console.warn('No se pudo guardar usuario en localStorage', e);
     }
@@ -367,9 +374,8 @@ export class UsuarioService {
     try {
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
-    } catch (e) {
-      // ignore
-    }
+      this.usuarioSubject.next(null); // <-- 🔁 limpiar usuario en memoria
+    } catch (e) {}
 
     try {
       const client: any = (this.apollo as any).client || (this.apollo as any).getClient?.();
@@ -382,6 +388,7 @@ export class UsuarioService {
     }
   }
 
+
   isLoggedIn(): boolean {
     const t = this.getToken();
     return !!t && t.length > 0;
@@ -393,12 +400,7 @@ export class UsuarioService {
     return u.rol_id ? [u.rol_id] : [];
   }
 
-  /**
-   * Fuerza la recarga del contador de usuarios. Usa la query paginada para leer totalElements
-   * sin necesidad de traer todos los usuarios. Actualiza el BehaviorSubject userCountSubject.
-   */
   refreshUserCount(): void {
-    // Llamamos a la query paginada (page=0,size=1) y leemos totalElements
     this.obtenerUsuarios(0, 1)
       .pipe(
         map(page => page?.totalElements ?? (page?.content?.length ?? 0))

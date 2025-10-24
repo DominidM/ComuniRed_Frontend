@@ -1,17 +1,35 @@
+.perfil-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  background: #fff;
+}
+
+/* === PERFIL === */
 .perfil {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   position: relative;
   cursor: pointer;
+  transition: background 0.2s ease-in-out;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+.perfil:hover {
+  background: #f7f7f7;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px solid #eaeaea;
 }
 
 .user-info {
@@ -21,8 +39,9 @@
 }
 
 .nombre {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 0.9rem;
+  color: #222;
 }
 
 .estado {
@@ -30,28 +49,32 @@
   color: #28a745;
 }
 
+/* === MENÚ DESPLEGABLE === */
 .menu {
   position: absolute;
-  top: 50px;
+  top: 55px;
   right: 0;
-  background: white;
+  background: #fff;
   border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 0.6rem;
+  padding: 0.4rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   z-index: 100;
-  animation: fadeIn 0.2s ease-in-out;
+  animation: fadeIn 0.25s ease-in-out;
+  min-width: 150px;
 }
 
 .menu button {
   background: none;
   border: none;
-  padding: 0.5rem;
+  padding: 0.6rem 0.8rem;
   text-align: left;
   cursor: pointer;
   font-size: 0.9rem;
+  border-radius: 6px;
+  transition: background 0.2s;
 }
 
 .menu button:hover {

@@ -65,7 +65,6 @@
   background-color: #c0392b;
 }
 
-/* Animación de aparición */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -77,7 +76,6 @@
   }
 }
 
-/* Responsivo para pantallas pequeñas */
 @media (max-width: 600px) {
   .modal-contenido {
     width: 95%;

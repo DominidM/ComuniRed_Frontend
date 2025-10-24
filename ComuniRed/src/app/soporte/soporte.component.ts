@@ -12,7 +12,7 @@ import { HeaderComponent } from './layout/header/header.component';
   styleUrls: ['./soporte.component.css']
 })
 export class SoporteComponent implements OnInit {
-  // soporte será pasado al header
+
   soporte: any = null;
 
   constructor(

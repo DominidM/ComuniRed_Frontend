@@ -16,6 +16,11 @@ export class CrudUsuarioComponent implements OnInit {
   usuarios: Usuario[] = [];
   allUsuarios: Usuario[] = [];
   roles: Rol[] = [];
+  fotoPreview: string | null = null;
+  imagenPreview: string | ArrayBuffer | null = null;
+  fotoPerfilFile: File | null = null;
+  defaultFoto = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+
   private rolesMap = new Map<string, string>();
 
   showModal = false;
@@ -126,6 +131,52 @@ export class CrudUsuarioComponent implements OnInit {
     });
   }
 
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.fotoPerfilFile = file;
+
+      const reader = new FileReader();
+      reader.onload = () => (this.imagenPreview = reader.result);
+      reader.readAsDataURL(file);
+    }
+  }
+  onFotoSeleccionada(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const archivo = input.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.fotoPreview = reader.result as string;
+      // guardamos temporalmente la imagen base64 en usuarioData
+      this.usuarioData.foto_perfil = this.fotoPreview;
+    };
+    reader.readAsDataURL(archivo);
+  }
+
+  quitarFoto() {
+    this.fotoPreview = this.defaultFoto;
+    this.imagenPreview = null;
+    this.fotoPerfilFile = null;
+
+    if (this.usuarioData) {
+      this.usuarioData.foto_perfil = this.defaultFoto;
+    }
+  }
+
+  private limpiarImagen() {
+    this.fotoPreview = null;
+    this.imagenPreview = null;
+    this.fotoPerfilFile = null;
+    if (this.usuarioData) {
+      this.usuarioData.foto_perfil = '';
+    }
+  }
+
+
+
   /**
    * Resolve a rol_id to a display name using the rolesMap.
    * Returns an empty string if name not found (so UI doesn't show raw id).
@@ -170,18 +221,24 @@ export class CrudUsuarioComponent implements OnInit {
   openAddModal() {
     this.editingUsuario = null;
     this.usuarioData = {};
+    this.fotoPreview = this.defaultFoto
     this.showModal = true;
   }
 
   openEditModal(usuario: Usuario) {
-    // Copy to avoid two-way binding mutating the table entry until saved
     this.editingUsuario = usuario;
     this.usuarioData = { ...usuario } as any;
-    // if roles were normalized, ensure form select has a value (no extra action needed)
-    // Don't include password in the edit form unless the user wants to change it
+
+    // Si el usuario tiene una foto, úsala; si no, usa la imagen por defecto
+    this.fotoPreview = usuario.foto_perfil && usuario.foto_perfil.trim() !== ''
+      ? usuario.foto_perfil
+      : this.defaultFoto;
+
+    // Quita password si existe (solo por seguridad)
     if ('password' in this.usuarioData) {
       delete (this.usuarioData as any).password;
     }
+
     this.showModal = true;
   }
 
@@ -242,7 +299,6 @@ export class CrudUsuarioComponent implements OnInit {
     this.saving = true;
     this.errorMessage = null;
 
-    // Construir payload del tipo esperado por la API (UsuarioInput)
     const payload: UsuarioInput = {
       nombre: this.usuarioData.nombre!,
       apellido: this.usuarioData.apellido!,
@@ -255,7 +311,10 @@ export class CrudUsuarioComponent implements OnInit {
       codigo_postal: (this.usuarioData as any).codigo_postal ?? '',
       direccion: this.usuarioData.direccion ?? '',
       rol_id: this.usuarioData.rol_id ?? '',
+      foto_perfil: this.usuarioData.foto_perfil ?? '',
     };
+
+
 
     // Añadir password si existe y no es vacío
     if (this.usuarioData.password && String(this.usuarioData.password).trim() !== '') {
@@ -328,7 +387,9 @@ export class CrudUsuarioComponent implements OnInit {
     this.showModal = false;
     this.editingUsuario = null;
     this.usuarioData = {};
+    this.limpiarImagen();
   }
+
 
   buscarUsuario() {
     const q = this.searchText?.trim().toLowerCase() ?? '';

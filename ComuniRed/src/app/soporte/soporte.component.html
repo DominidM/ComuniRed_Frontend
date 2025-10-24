@@ -1,5 +1,4 @@
 <div class="soporte-container">
-  <!-- Header: emite (modificar),(home),(salir) y recibe [soporte] -->
   <app-header
     [soporte]="soporte"
     (modificar)="onModificarPerfil()"
@@ -7,6 +6,5 @@
     (salir)="onSalir()">
   </app-header>
 
-  <!-- Mantén el router-outlet para las vistas hijas (home, editar-perfil, etc.) -->
   <router-outlet></router-outlet>
 </div>
