@@ -1,91 +1,110 @@
 <div class="trending-container">
-  <!-- Header -->
   <div class="trending-header">
-    <h1>Tendencias</h1>
-    <p>Descubre los eventos más populares en este momento</p>
+    <div class="trending-header-icon">📈</div>
+    <div class="trending-header-content">
+      <h1>Tendencias</h1>
+      <p>Lo más relevante en tu comunidad</p>
+    </div>
   </div>
 
-  <div class="search-section">
-    <input
-      type="text"
-      class="search-input"
-      placeholder="Buscar eventos..."
-      [(ngModel)]="busqueda"
-      (input)="buscar()"
-    />
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-label">Más Popular Hoy</div>
+      <div class="stat-value">Acumulación de basura</div>
+      <div class="stat-description">Reportes activos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-label">Total de Reportes</div>
+      <div class="stat-value">4</div>
+      <div class="stat-description">Esta semana</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🏷️</div>
+      <div class="stat-label">Categoría Top</div>
+      <div class="stat-value">Baches</div>
+      <div class="stat-description">Más reportada</div>
+    </div>
   </div>
 
-  <div class="category-filter">
-    @for (categoria of categorias; track categoria) {
-      <button
-        class="category-btn"
-        [class.active]="categoriaSeleccionada === categoria"
-        (click)="seleccionarCategoria(categoria)"
-      >
-        {{ categoria }}
-      </button>
-    }
+  <div class="filter-section">
+    <button 
+      class="filter-button" 
+      [class.active]="isViewActive('populares')"
+      (click)="changeView('populares')">
+      🔥 Más Populares
+    </button>
+    <button 
+      class="filter-button" 
+      [class.active]="isViewActive('recientes')"
+      (click)="changeView('recientes')">
+      ⏰ Recientes
+    </button>
+    <button 
+      class="filter-button" 
+      [class.active]="isViewActive('categorias')"
+      (click)="changeView('categorias')">
+      📂 Por Categoría
+    </button>
   </div>
 
-  <div class="eventos-grid">
-    @if (eventosFiltrados.length > 0) {
-      @for (evento of eventosFiltrados; track evento.id) {
-        <div class="evento-card">
-          <div class="evento-imagen">
-            <img [src]="evento.imagen" [alt]="evento.titulo" />
-            <span class="categoria-badge">{{ evento.categoria }}</span>
+  <div *ngIf="currentView !== 'categorias'" class="reportes-view">
+    <div class="trending-list">
+      <div *ngFor="let reporte of getReportes()" class="trending-item">
+        <div class="trending-number">{{ reporte.numero }}</div>
+        <div class="trending-content">
+          <h3>{{ reporte.titulo }}</h3>
+          <p class="trending-description">{{ reporte.descripcion }}</p>
+          <div class="trending-tags">
+            <span *ngFor="let tag of reporte.tags" class="tag" [ngClass]="tag.toLowerCase().replace(' ', '-')">{{ tag }}</span>
           </div>
-
-          <div class="evento-contenido">
-            <h3>{{ evento.titulo }}</h3>
-            <p class="evento-fecha">📅 {{ evento.fecha }}</p>
-
-            <div class="evento-stats">
-              <span>❤️ {{ formatearNumero(evento.likes) }}</span>
-              <span>💬 {{ formatearNumero(evento.comentarios) }}</span>
-              <span>📤 {{ formatearNumero(evento.compartidos) }}</span>
-              <span>💾 {{ formatearNumero(evento.guardados) }}</span>
-            </div>
-
-            <div class="evento-acciones">
-              <button
-                class="btn-accion"
-                [class.active]="evento.liked"
-                (click)="toggleLike(evento)"
-                title="Me gusta"
-              >
-                ❤️
-              </button>
-              <button
-                class="btn-accion"
-                (click)="comentar(evento)"
-                title="Comentar"
-              >
-                💬
-              </button>
-              <button
-                class="btn-accion"
-                (click)="compartir(evento)"
-                title="Compartir"
-              >
-                📤
-              </button>
-              <button
-                class="btn-accion"
-                [class.active]="evento.saved"
-                (click)="toggleSave(evento)"
-                title="Guardar"
-              >
-                💾
-              </button>
-            </div>
+          <div class="trending-meta">
+            <div class="meta-item">👍 {{ reporte.likes }}</div>
+            <div class="meta-item">💬 {{ reporte.comentarios }}</div>
+            <div class="trending-location">📍 {{ reporte.ubicacion }}</div>
           </div>
         </div>
-      }
-    } @else {
-      <div class="no-resultados">
-        <p>No se encontraron eventos que coincidan con tu búsqueda.</p>
       </div>
-    }
+    </div>
+  </div>
+
+  <div *ngIf="currentView === 'categorias'" class="categorias-view">
+    <div class="categories-grid">
+      <div class="category-card baches-category">
+        <div class="category-icon">🚗</div>
+        <div class="category-name">Baches</div>
+        <div class="category-count">1 reportes</div>
+        <div class="category-description">Problemas en el pavimento de calles y avenidas</div>
+      </div>
+
+      <div class="category-card alumbrado-category">
+        <div class="category-icon">💡</div>
+        <div class="category-name">Alumbrado Público</div>
+        <div class="category-count">1 reportes</div>
+        <div class="category-description">Fallos en el sistema de iluminación</div>
+      </div>
+
+      <div class="category-card alcantarillado-category">
+        <div class="category-icon">💧</div>
+        <div class="category-name">Alcantarillado</div>
+        <div class="category-count">1 reportes</div>
+        <div class="category-description">Problemas de drenaje y alcantarillado</div>
+      </div>
+
+      <div class="category-card basura-category">
+        <div class="category-icon">🗑️</div>
+        <div class="category-name">Basura</div>
+        <div class="category-count">1 reportes</div>
+        <div class="category-description">Acumulación de residuos</div>
+      </div>
+
+      <div class="category-card senalizacion-category">
+        <div class="category-icon">⚠️</div>
+        <div class="category-name">Señalización</div>
+        <div class="category-count">1 reportes</div>
+        <div class="category-description">Falta o deterioro de señales de tránsito</div>
+      </div>
+    </div>
   </div>
 </div>

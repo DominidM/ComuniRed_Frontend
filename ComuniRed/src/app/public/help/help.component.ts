@@ -20,7 +20,7 @@ interface Category {
   selector: "app-help",
   imports: [CommonModule, FormsModule],
   templateUrl: "./help.component.html",
-  styleUrl: "./help.component.css",
+  styleUrls: ["./help.component.css"], // Fixed unexpected token `\` by correcting styleUrl to styleUrls
 })
 export class HelpComponent {
   searchQuery = ""
@@ -29,83 +29,72 @@ export class HelpComponent {
   categories: Category[] = [
     {
       id: 1,
-      name: "Primeros Pasos",
-      icon: "🚀",
-      description: "Aprende lo básico para comenzar",
+      name: "Guía para Nuevos Usuarios",
+      icon: "📱",
+      description: "Aprende lo básico de ComuniRed",
     },
     {
       id: 2,
-      name: "Cuenta y Perfil",
-      icon: "👤",
-      description: "Gestiona tu cuenta y configuración",
+      name: "Tutoriales en Video",
+      icon: "🎥",
+      description: "Videos paso a paso",
     },
     {
       id: 3,
-      name: "Seguridad",
-      icon: "🔒",
-      description: "Información sobre seguridad y privacidad",
-    },
-    {
-      id: 4,
-      name: "Facturación",
-      icon: "💳",
-      description: "Preguntas sobre pagos y suscripciones",
-    },
-    {
-      id: 5,
-      name: "Soporte Técnico",
-      icon: "⚙️",
-      description: "Resuelve problemas técnicos",
-    },
-    {
-      id: 6,
-      name: "Contacto",
-      icon: "📧",
-      description: "Ponte en contacto con nuestro equipo",
+      name: "Comunidad y Foros",
+      icon: "👥",
+      description: "Conecta con otros usuarios",
     },
   ]
 
   faqs: FAQ[] = [
     {
       id: 1,
-      question: "¿Cómo creo una cuenta?",
+      question: "¿Cómo creo un nuevo reporte?",
       answer:
-        'Para crear una cuenta, haz clic en el botón "Registrarse" en la página principal. Completa el formulario con tu correo electrónico y contraseña, luego verifica tu correo para activar tu cuenta.',
+        'Para crear un nuevo reporte, haz clic en el botón "Crear Reporte" en la página principal. Completa el formulario con los detalles del reporte y selecciona la categoría correspondiente.',
       expanded: false,
     },
     {
       id: 2,
-      question: "¿Cómo cambio mi contraseña?",
+      question: "¿Cómo sé si mi reporte fue atendido?",
       answer:
-        'Ve a tu perfil, selecciona "Configuración de seguridad" y haz clic en "Cambiar contraseña". Ingresa tu contraseña actual y la nueva contraseña dos veces para confirmar.',
+        "Puedes ver el estado de tu reporte en tu panel de control. Recibirás notificaciones por correo electrónico cuando haya actualizaciones en tu reporte.",
       expanded: false,
     },
     {
       id: 3,
-      question: "¿Cuáles son los métodos de pago aceptados?",
+      question: "¿Puedo reportar de forma anónima?",
       answer:
-        "Aceptamos tarjetas de crédito (Visa, Mastercard, American Express), transferencias bancarias y billeteras digitales. Todos los pagos son procesados de forma segura.",
+        "Sí, puedes reportar de forma anónima si lo prefieres. Simplemente selecciona la opción de reporte anónimo al crear tu reporte.",
       expanded: false,
     },
     {
       id: 4,
-      question: "¿Puedo cancelar mi suscripción en cualquier momento?",
+      question: "¿Qué tipo de problemas puedo reportar?",
       answer:
-        "Sí, puedes cancelar tu suscripción en cualquier momento desde tu panel de control. La cancelación será efectiva al final de tu período de facturación actual.",
+        'Puedes reportar problemas de infraestructura como baches, falta de iluminación, problemas de alcantarillado, acumulación de basura, señalización deteriorada, entre otros.',
       expanded: false,
     },
-    {
+     {
       id: 5,
-      question: "¿Cómo recupero mi cuenta si olvido mi contraseña?",
+      question: "¿Cuánto tiempo tarda en resolverse un reporte?",
       answer:
-        'En la página de inicio de sesión, haz clic en "¿Olvidaste tu contraseña?". Ingresa tu correo electrónico y recibirás un enlace para restablecer tu contraseña.',
+        'El tiempo de resolución depende de la complejidad y prioridad del problema. Los reportes urgentes suelen atenderse más rápidamente. Recibirás actualizaciones sobre el progreso.',
+      expanded: false,
+    },
+      {
+      id: 6,
+      question: "¿Cómo adjunto fotos a mi reporte?",
+      answer:
+        'Sí, puedes y debes adjuntar fotos que evidencien el problema. Esto ayuda a las autoridades a entender mejor la situación y priorizar la atención.',
       expanded: false,
     },
     {
       id: 6,
-      question: "¿Qué debo hacer si encuentro un error?",
+      question: "¿Qué significan las reacciones?",
       answer:
-        "Si encuentras un error, por favor contacta a nuestro equipo de soporte con una descripción detallada del problema. Incluye capturas de pantalla si es posible para ayudarnos a resolver el problema más rápidamente.",
+        'Las reacciones permiten a la comunidad expresar que un problema también les afecta ("Me afecta"), marcar urgencia ("Urgente") o verificar que existe ("Verificado"). Más reacciones pueden aumentar la prioridad.',
       expanded: false,
     },
   ]
@@ -116,6 +105,11 @@ export class HelpComponent {
 
   selectCategory(categoryId: number): void {
     this.selectedCategory = this.selectedCategory === categoryId ? null : categoryId
+  }
+
+  viewMore(categoryId: number): void {
+    console.log("Ver más para categoría:", categoryId)
+    // Add navigation or modal logic here
   }
 
   submitContactForm(event: any): void {

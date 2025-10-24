@@ -1,137 +1,130 @@
 import { Component, type OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
-import { FormsModule } from "@angular/forms"
 
-interface Evento {
+interface TrendingItem {
   id: number
-  titulo: string
-  categoria: string
-  fecha: string
-  imagen: string
-  likes: number
-  comentarios: number
-  compartidos: number
-  guardados: number
-  liked: boolean
-  saved: boolean
+  nombre: string
+  cantidad: number
+  porcentaje: number
 }
 
 @Component({
   selector: "app-trending",
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: "./trending.component.html",
   styleUrls: ["./trending.component.css"],
-  standalone: true,
-  imports: [CommonModule, FormsModule],
 })
 export class TrendingComponent implements OnInit {
-  eventos: Evento[] = [
+  currentView = "populares"
+
+  trendingData: TrendingItem[] = [
+    { id: 1, nombre: "Vías", cantidad: 245, porcentaje: 35 },
+    { id: 2, nombre: "Alumbrado", cantidad: 180, porcentaje: 26 },
+    { id: 3, nombre: "Agua", cantidad: 165, porcentaje: 24 },
+    { id: 4, nombre: "Limpieza", cantidad: 95, porcentaje: 14 },
+    { id: 5, nombre: "Tránsito", cantidad: 15, porcentaje: 2 },
+  ]
+
+  reportesRecientes = [
     {
-      id: 1,
-      titulo: "Concierto de Rock en Vivo",
-      categoria: "Música",
-      fecha: "2024-12-15",
-      imagen: "https://via.placeholder.com/300x200?text=Concierto+Rock",
-      likes: 1250,
-      comentarios: 89,
-      compartidos: 342,
-      guardados: 156,
-      liked: false,
-      saved: false,
-    },
-    {
-      id: 2,
-      titulo: "Festival de Cine Internacional",
-      categoria: "Cine",
-      fecha: "2024-12-20",
-      imagen: "https://via.placeholder.com/300x200?text=Festival+Cine",
-      likes: 2100,
-      comentarios: 234,
-      compartidos: 567,
-      guardados: 289,
-      liked: false,
-      saved: false,
+      id: 4,
+      numero: "#4",
+      titulo: "Bache gigante en Av. Principal",
+      descripcion: "Hay un bache muy grande que ha causado varios accidentes. Necesita atención urgente.",
+      tags: ["Baches", "En Proceso"],
+      likes: 80,
+      comentarios: 8,
+      ubicacion: "Av. Principal #123, Col. Centro",
     },
     {
       id: 3,
-      titulo: "Maratón Benéfico por la Salud",
-      categoria: "Deportes",
-      fecha: "2024-12-10",
-      imagen: "https://via.placeholder.com/300x200?text=Maraton",
-      likes: 890,
-      comentarios: 45,
-      compartidos: 123,
-      guardados: 67,
-      liked: false,
-      saved: false,
+      numero: "#3",
+      titulo: "Falta de iluminación en parque",
+      descripcion: "El parque está completamente oscuro por las noches, representa un peligro.",
+      tags: ["Alumbrado Público", "Pendiente"],
+      likes: 101,
+      comentarios: 15,
+      ubicacion: "Parque Central, Col. Roma",
     },
     {
-      id: 4,
-      titulo: "Exposición de Arte Moderno",
-      categoria: "Arte",
-      fecha: "2024-12-25",
-      imagen: "https://via.placeholder.com/300x200?text=Exposicion+Arte",
-      likes: 1567,
-      comentarios: 178,
-      compartidos: 456,
-      guardados: 234,
-      liked: false,
-      saved: false,
+      id: 2,
+      numero: "#2",
+      titulo: "Fuga de agua en la calle",
+      descripcion: "Hay una fuga de agua considerable que está inundando la calle.",
+      tags: ["Alcantarillado", "Resuelta"],
+      likes: 168,
+      comentarios: 22,
+      ubicacion: "Calle Insurgentes #456",
+    },
+    {
+      id: 1,
+      numero: "#1",
+      titulo: "Acumulación de basura",
+      descripcion: "Hace una semana que no pasa el camión recolector de basura.",
+      tags: ["Basura", "En Proceso"],
+      likes: 169,
+      comentarios: 31,
+      ubicacion: "Col. Condesa, Calle Amsterdam",
     },
   ]
 
-  eventosFiltrados: Evento[] = []
-  categorias: string[] = ["Todos", "Música", "Cine", "Deportes", "Arte"]
-  categoriaSeleccionada = "Todos"
-  busqueda = ""
+  reportesPopulares = [
+    {
+      id: 1,
+      numero: "#1",
+      titulo: "Acumulación de basura",
+      descripcion: "Hace una semana que no pasa el camión recolector de basura.",
+      tags: ["Basura", "En Proceso"],
+      likes: 169,
+      comentarios: 31,
+      ubicacion: "Col. Condesa, Calle Amsterdam",
+    },
+    {
+      id: 2,
+      numero: "#2",
+      titulo: "Fuga de agua en la calle",
+      descripcion: "Hay una fuga de agua considerable que está inundando la calle.",
+      tags: ["Alcantarillado", "Resuelta"],
+      likes: 168,
+      comentarios: 22,
+      ubicacion: "Calle Insurgentes #456",
+    },
+    {
+      id: 3,
+      numero: "#3",
+      titulo: "Falta de iluminación en parque",
+      descripcion: "El parque está completamente oscuro por las noches, representa un peligro.",
+      tags: ["Alumbrado Público", "Pendiente"],
+      likes: 101,
+      comentarios: 15,
+      ubicacion: "Parque Central, Col. Roma",
+    },
+    {
+      id: 4,
+      numero: "#4",
+      titulo: "Bache gigante en Av. Principal",
+      descripcion: "Hay un bache muy grande que ha causado varios accidentes. Necesita atención urgente.",
+      tags: ["Baches", "En Proceso"],
+      likes: 80,
+      comentarios: 8,
+      ubicacion: "Av. Principal #123, Col. Centro",
+    },
+  ]
 
-  ngOnInit(): void {
-    this.filtrarEventos()
+  constructor() {}
+
+  ngOnInit(): void {}
+
+  changeView(view: string): void {
+    this.currentView = view
   }
 
-  filtrarEventos(): void {
-    this.eventosFiltrados = this.eventos.filter((evento) => {
-      const cumpleCategoria = this.categoriaSeleccionada === "Todos" || evento.categoria === this.categoriaSeleccionada
-      const cumpleBusqueda = evento.titulo.toLowerCase().includes(this.busqueda.toLowerCase())
-      return cumpleCategoria && cumpleBusqueda
-    })
+  isViewActive(view: string): boolean {
+    return this.currentView === view
   }
 
-  seleccionarCategoria(categoria: string): void {
-    this.categoriaSeleccionada = categoria
-    this.filtrarEventos()
-  }
-
-  buscar(): void {
-    this.filtrarEventos()
-  }
-
-  toggleLike(evento: Evento): void {
-    evento.liked = !evento.liked
-    evento.likes += evento.liked ? 1 : -1
-  }
-
-  toggleSave(evento: Evento): void {
-    evento.saved = !evento.saved
-    evento.guardados += evento.saved ? 1 : -1
-  }
-
-  compartir(evento: Evento): void {
-    evento.compartidos++
-    alert(`Compartiendo: ${evento.titulo}`)
-  }
-
-  comentar(evento: Evento): void {
-    alert(`Comentando en: ${evento.titulo}`)
-  }
-
-  formatearNumero(num: number): string {
-    if (num >= 1000) {
-      return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K"
-    }
-    return num.toString()
-  }
-
-  formatearTitulo(texto: string): string {
-    return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase()
+  getReportes() {
+    return this.currentView === "recientes" ? this.reportesRecientes : this.reportesPopulares
   }
 }

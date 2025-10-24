@@ -2,35 +2,35 @@
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-content">
-      <h1>Centro de Ayuda</h1>
-      <p>Encuentra respuestas a tus preguntas y obtén soporte</p>
+      <div class="hero-header">
+        <div class="hero-icon">?</div>
+        <div class="hero-text">
+          <h1>Centro de Ayuda</h1>
+          <p>Encuentra respuestas a tus preguntas</p>
+        </div>
+      </div>
       
       <!-- Search Bar -->
       <div class="search-container">
         <input 
           type="text" 
           class="search-input" 
-          placeholder="Busca en nuestro centro de ayuda..."
+          placeholder="Busca tu pregunta aquí..."
           [(ngModel)]="searchQuery"
         >
-        <button class="search-button">🔍</button>
       </div>
     </div>
   </section>
 
   <!-- Categories Section -->
   <section class="categories-section">
-    <h2>Categorías de Ayuda</h2>
     <div class="categories-grid">
       @for (category of categories; track category.id) {
-        <div 
-          class="category-card"
-          (click)="selectCategory(category.id)"
-          [class.active]="selectedCategory === category.id"
-        >
+        <div class="category-card">
           <div class="category-icon">{{ category.icon }}</div>
           <h3>{{ category.name }}</h3>
           <p>{{ category.description }}</p>
+          <button class="view-more-btn" (click)="viewMore(category.id)">Ver más →</button>
         </div>
       }
     </div>
@@ -74,7 +74,7 @@
   <!-- Contact Section -->
   <section class="contact-section">
     <div class="contact-container">
-      <h2>¿No encontraste lo que buscas?</h2>
+      <h2>¿No encontraste lo que buscabas?</h2>
       <p>Ponte en contacto con nuestro equipo de soporte</p>
       
       <form class="contact-form" (ngSubmit)="submitContactForm($event)">
@@ -109,20 +109,20 @@
       <h2>Información de Soporte</h2>
       <div class="support-info-grid">
         <div class="support-info-card">
-          <div class="info-icon">📞</div>
+          <div class="info-icon">☎</div>
           <h3>Teléfono</h3>
           <p>+1 (555) 123-4567</p>
           <p class="info-hours">Lun - Vie: 9:00 - 18:00</p>
         </div>
         
         <div class="support-info-card">
-          <div class="info-icon">📧</div>
+          <div class="info-icon">✉</div>
           <h3>Correo Electrónico</h3>
           <p class="info-hours">Respuesta en 24 horas</p>
         </div>
         
         <div class="support-info-card">
-          <div class="info-icon">💬</div>
+          <div class="info-icon">◉</div>
           <h3>Chat en Vivo</h3>
           <p>Disponible en línea</p>
           <p class="info-hours">Lun - Vie: 10:00 - 17:00</p>
