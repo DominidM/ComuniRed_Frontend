@@ -1,1 +1,91 @@
-<p>trending works!</p>
+<div class="trending-container">
+  <!-- Header -->
+  <div class="trending-header">
+    <h1>Tendencias</h1>
+    <p>Descubre los eventos más populares en este momento</p>
+  </div>
+
+  <div class="search-section">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Buscar eventos..."
+      [(ngModel)]="busqueda"
+      (input)="buscar()"
+    />
+  </div>
+
+  <div class="category-filter">
+    @for (categoria of categorias; track categoria) {
+      <button
+        class="category-btn"
+        [class.active]="categoriaSeleccionada === categoria"
+        (click)="seleccionarCategoria(categoria)"
+      >
+        {{ categoria }}
+      </button>
+    }
+  </div>
+
+  <div class="eventos-grid">
+    @if (eventosFiltrados.length > 0) {
+      @for (evento of eventosFiltrados; track evento.id) {
+        <div class="evento-card">
+          <div class="evento-imagen">
+            <img [src]="evento.imagen" [alt]="evento.titulo" />
+            <span class="categoria-badge">{{ evento.categoria }}</span>
+          </div>
+
+          <div class="evento-contenido">
+            <h3>{{ evento.titulo }}</h3>
+            <p class="evento-fecha">📅 {{ evento.fecha }}</p>
+
+            <div class="evento-stats">
+              <span>❤️ {{ formatearNumero(evento.likes) }}</span>
+              <span>💬 {{ formatearNumero(evento.comentarios) }}</span>
+              <span>📤 {{ formatearNumero(evento.compartidos) }}</span>
+              <span>💾 {{ formatearNumero(evento.guardados) }}</span>
+            </div>
+
+            <div class="evento-acciones">
+              <button
+                class="btn-accion"
+                [class.active]="evento.liked"
+                (click)="toggleLike(evento)"
+                title="Me gusta"
+              >
+                ❤️
+              </button>
+              <button
+                class="btn-accion"
+                (click)="comentar(evento)"
+                title="Comentar"
+              >
+                💬
+              </button>
+              <button
+                class="btn-accion"
+                (click)="compartir(evento)"
+                title="Compartir"
+              >
+                📤
+              </button>
+              <button
+                class="btn-accion"
+                [class.active]="evento.saved"
+                (click)="toggleSave(evento)"
+                title="Guardar"
+              >
+                💾
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="no-resultados">
+        <p>No se encontraron eventos que coincidan con tu búsqueda.</p>
+      </div>
+    }
+  </div>
+</div>
