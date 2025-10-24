@@ -11,7 +11,7 @@
       <label>Contraseña</label>
       <input type="password" [(ngModel)]="password" name="password" required autocomplete="off" [disabled]="isLoading" />
       <div class="login-options">
-        <a href="#">¿Olvidaste tu contraseña?</a>
+        <a routerLink="/olvide-clave">¿Olvidaste tu contraseña?</a>
         <a routerLink="/register">Regístrate</a>
       </div>
       <button type="submit" [disabled]="form.invalid || isLoading">

@@ -1,0 +1,77 @@
+<div class="olvide-container">
+  <div class="olvide-card">
+    <h2>Recuperar Contraseña</h2>
+    <p *ngIf="pasoActual === 1">Ingresa tu correo para enviarte un código de verificación.</p>
+    <p *ngIf="pasoActual === 2">Revisa tu correo e ingresa el código que te enviamos.</p>
+    <p *ngIf="pasoActual === 3">Crea tu nueva contraseña.</p>
+
+    <!-- Paso 1: Ingresar correo -->
+    <form *ngIf="pasoActual === 1" #formCorreo="ngForm" (ngSubmit)="enviarCodigo(formCorreo)">
+      <label for="correo">Correo electrónico</label>
+      <input type="email" id="correo" name="correo" [(ngModel)]="correo" required [disabled]="isLoading" />
+      <button type="submit" [disabled]="formCorreo.invalid || isLoading">
+        {{ isLoading ? 'Enviando...' : 'Enviar código' }}
+      </button>
+
+      <div class="volver">
+        <a routerLink="/login">← Volver al menú principal</a>
+      </div>
+    </form>
+
+    <!-- Paso 2: Verificar código -->
+    <form *ngIf="pasoActual === 2" #formCodigo="ngForm" (ngSubmit)="verificarCodigo(formCodigo)">
+      <label for="codigo">Código recibido (6 dígitos)</label>
+      <input 
+        type="text" 
+        id="codigo" 
+        name="codigo" 
+        [(ngModel)]="codigo" 
+        required 
+        maxlength="6"
+        [disabled]="isLoading" 
+        placeholder="123456" />
+      <button type="submit" [disabled]="formCodigo.invalid || isLoading">
+        {{ isLoading ? 'Verificando...' : 'Verificar código' }}
+      </button>
+
+      <div class="volver">
+        <a (click)="volverPaso(1)" style="cursor: pointer;">← Volver</a>
+      </div>
+    </form>
+
+    <!-- Paso 3: Cambiar contraseña -->
+    <form *ngIf="pasoActual === 3" #formClave="ngForm" (ngSubmit)="cambiarClave(formClave)">
+      <label for="nuevaClave">Nueva contraseña (mínimo 6 caracteres)</label>
+      <input 
+        type="password" 
+        id="nuevaClave" 
+        name="nuevaClave" 
+        [(ngModel)]="nuevaClave" 
+        required 
+        minlength="6"
+        [disabled]="isLoading" />
+
+      <label for="confirmarClave">Confirmar contraseña</label>
+      <input 
+        type="password" 
+        id="confirmarClave" 
+        name="confirmarClave" 
+        [(ngModel)]="confirmarClave" 
+        required 
+        minlength="6"
+        [disabled]="isLoading" />
+
+      <button type="submit" [disabled]="formClave.invalid || isLoading">
+        {{ isLoading ? 'Guardando...' : 'Cambiar contraseña' }}
+      </button>
+
+      <div class="volver">
+        <a (click)="volverPaso(2)" style="cursor: pointer;">← Volver</a>
+      </div>
+    </form>
+
+    <!-- Mensajes -->
+    <div class="mensaje-exito" *ngIf="mensaje">{{ mensaje }}</div>
+    <div class="mensaje-error" *ngIf="error">{{ error }}</div>
+  </div>
+</div>

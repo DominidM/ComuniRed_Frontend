@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
+import { OlvideClaveComponent } from './auth/olvide-clave/olvide-clave.component';
+
 import { AdminComponent } from './admin/admin.component';
 import { DashboardComponent } from './admin/dashboard/dashboard.component';
 import { CrudRolComponent } from './admin/crud-rol/crud-rol.component';
@@ -51,7 +53,7 @@ import { AuthGuard } from './guards/auth.guard';
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-
+  { path: 'olvide-clave', component: OlvideClaveComponent },
   // Admin area: protected, only users with ADMIN role_id can access children
   {
     path: 'admin',

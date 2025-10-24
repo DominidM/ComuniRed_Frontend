@@ -178,7 +178,30 @@ const LOGIN = gql`
       }
     }
   }
-`;
+  `;
+
+  const SOLICITAR_CODIGO_RECUPERACION = gql`
+    mutation SolicitarCodigoRecuperacion($email: String!) {
+      solicitarCodigoRecuperacion(email: $email)
+    }
+  `;
+
+  const VERIFICAR_CODIGO_RECUPERACION = gql`
+    mutation VerificarCodigoRecuperacion($email: String!, $codigo: String!) {
+      verificarCodigoRecuperacion(email: $email, codigo: $codigo)
+    }
+  `;
+
+  const CAMBIAR_PASSWORD_CON_CODIGO = gql`
+    mutation CambiarPasswordConCodigo($email: String!, $codigo: String!, $nuevaPassword: String!) {
+      cambiarPasswordConCodigo(email: $email, codigo: $codigo, nuevaPassword: $nuevaPassword)
+    }
+  `;
+
+export interface LoginResult {
+  token?: string;
+  usuario?: Usuario | null;
+}
 
 export interface LoginResult {
   token?: string;
@@ -415,4 +438,53 @@ export class UsuarioService {
         }
       });
   }
+  
+  /**
+   * Solicita un código de recuperación que se envía al email del usuario
+   * @param email Email del usuario
+   * @returns Observable<boolean> true si se envió correctamente
+   */
+  solicitarCodigoRecuperacion(email: string): Observable<boolean> {
+    return this.apollo.mutate<{ solicitarCodigoRecuperacion: boolean }>({
+      mutation: SOLICITAR_CODIGO_RECUPERACION,
+      variables: { email }
+    }).pipe(
+      tap(raw => console.debug('[UsuarioService] solicitarCodigoRecuperacion raw:', raw)),
+      map(result => result.data?.solicitarCodigoRecuperacion ?? false)
+    );
+  }
+
+  /**
+   * Verifica si un código de recuperación es válido
+   * @param email Email del usuario
+   * @param codigo Código de 6 dígitos recibido por email
+   * @returns Observable<boolean> true si el código es válido
+   */
+  verificarCodigoRecuperacion(email: string, codigo: string): Observable<boolean> {
+    return this.apollo.mutate<{ verificarCodigoRecuperacion: boolean }>({
+      mutation: VERIFICAR_CODIGO_RECUPERACION,
+      variables: { email, codigo }
+    }).pipe(
+      tap(raw => console.debug('[UsuarioService] verificarCodigoRecuperacion raw:', raw)),
+      map(result => result.data?.verificarCodigoRecuperacion ?? false)
+    );
+  }
+
+  /**
+   * Cambia la contraseña del usuario usando el código de recuperación
+   * @param email Email del usuario
+   * @param codigo Código de 6 dígitos
+   * @param nuevaPassword Nueva contraseña
+   * @returns Observable<boolean> true si se cambió correctamente
+   */
+  cambiarPasswordConCodigo(email: string, codigo: string, nuevaPassword: string): Observable<boolean> {
+    return this.apollo.mutate<{ cambiarPasswordConCodigo: boolean }>({
+      mutation: CAMBIAR_PASSWORD_CON_CODIGO,
+      variables: { email, codigo, nuevaPassword }
+    }).pipe(
+      tap(raw => console.debug('[UsuarioService] cambiarPasswordConCodigo raw:', raw)),
+      map(result => result.data?.cambiarPasswordConCodigo ?? false)
+    );
+  }
+  
 }
