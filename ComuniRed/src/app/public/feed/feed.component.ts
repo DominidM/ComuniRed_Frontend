@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
+import { UsuarioService } from '../../services/usuario.service';
 
 interface Comment {
   id: string;
@@ -56,7 +57,25 @@ interface Post {
   ]
 })
 export class FeedComponent {
-  // posts de ejemplo
+  
+  user: { name: string; avatarUrl: string } | null = null;
+
+  constructor(private usuarioService: UsuarioService) {}
+
+    ngOnInit(): void {
+    const u = this.usuarioService.getUser();
+    if (u) 
+    {
+
+      const avatar = (u as any).foto_perfil || 'assets/img/default-avatar.png'; // foto o imagen por defecto
+
+      this.user = {name: 'Usuario', avatarUrl: avatar};
+    } 
+    else 
+    {
+      this.user = {name: 'Usuario', avatarUrl: 'assets/img/default-avatar.png'};
+    }
+  }
   posts: Post[] = [
     {
       id: '1',

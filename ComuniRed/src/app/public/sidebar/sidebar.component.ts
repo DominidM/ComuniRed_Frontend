@@ -58,7 +58,7 @@ export class SidebarComponent implements OnInit {
       const nombre = (u as any).nombre ?? '';
       const apellido = (u as any).apellido ?? '';
       const email = (u as any).email ?? '';
-      const avatar = (u as any).avatar_soporte ?? (u as any).avatar_cliente ?? 'https://randomuser.me/api/portraits/lego/1.jpg';
+      const avatar = (u as any).foto_perfil ?? '';
       this.user = {
         name: `${nombre} ${apellido}`.trim() || email,
         handle: email ? `@${email.split('@')[0]}` : '',

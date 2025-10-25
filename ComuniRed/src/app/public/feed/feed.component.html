@@ -5,7 +5,7 @@
   <div class="create-card card">
     <div class="create-top">
       <div class="create-avatar">
-        <img src="https://ui-avatars.com/api/?name=JP&background=0b1220&color=fff" alt="avatar" />
+        <img [src]="user?.avatarUrl" alt="{{ user?.name }}" class="user-avatar" />
       </div>
       <button class="create-input" aria-label="Crear reporte">
         ¿Qué problema de infraestructura quieres reportar?

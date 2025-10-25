@@ -2,14 +2,19 @@
   <div class="profile-header">
     <div class="header-background"></div>
     <div class="profile-info">
-      <div class="avatar">JP</div>
+      <div class="avatar">
+        <img [src]="user?.foto_perfil" alt="Foto de perfil" class="avatar-img" />
+      </div>
       <div class="user-details">
-        <h1 class="user-name">Juan Pérez</h1>
+        <h1 class="user-name">{{ user?.nombre }} {{ user?.apellido }}</h1>
+        <p class="user-email">{{ user?.email }}</p>
+      </div>
+
         <div class="user-meta">
           <span class="member-date">📅 Miembro desde Oct 2025</span>
           <span class="role">Usuario</span>
         </div>
-      </div>
+        
       <button class="edit-profile-btn">✏️ Editar Perfil</button>
     </div>
   </div>
