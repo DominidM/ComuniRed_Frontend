@@ -1,11 +1,21 @@
-<h3>Privacidad</h3>
-<p class="muted">Controla quién puede ver tu información.</p>
+<div class="config-container">
+  <div class="tab-content">
+    <div class="section-header">
+      <h2>Configuración de Privacidad</h2>
+      <p>Controla quién puede ver tu información</p>
+    </div>
 
-<div class="privacy-list">
-  <label><input type="checkbox" [(ngModel)]="showProfile" name="showProfile" /> Mostrar perfil públicamente</label>
-  <label><input type="checkbox" [(ngModel)]="showActivity" name="showActivity" /> Mostrar actividad</label>
-</div>
-
-<div class="actions">
-  <button class="btn primary" (click)="save()">Guardar</button>
+    <div class="privacy-list">
+      <div class="privacy-item" *ngFor="let setting of privacySettings">
+        <div class="privacy-info">
+          <h3>{{ setting.titulo }}</h3>
+          <p>{{ setting.descripcion }}</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" [checked]="setting.activo" (change)="togglePrivacy(setting.id)">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
 </div>
