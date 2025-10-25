@@ -1,12 +1,27 @@
-<h3>Notificaciones</h3>
-<p class="muted">Configura cómo quieres recibir notificaciones.</p>
+<div class="config-container">
 
-<div class="notif-list">
-  <label><input type="checkbox" [(ngModel)]="email" name="email" /> Email</label>
-  <label><input type="checkbox" [(ngModel)]="push" name="push" /> Push</label>
-  <label><input type="checkbox" [(ngModel)]="sms" name="sms" /> SMS</label>
-</div>
+  <div class="tab-content">
+    <div class="section-header">
+      <h2>Preferencias de Notificaciones</h2>
+      <p>Controla cómo y cuándo recibes notificaciones</p>
+    </div>
 
-<div class="actions">
-  <button class="btn primary" (click)="save()">Guardar</button>
+    <div class="notifications-list">
+      <div class="notification-item" *ngFor="let notif of notificaciones">
+        <div class="notification-info">
+          <h3>{{ notif.titulo }}</h3>
+          <p>{{ notif.descripcion }}</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" [checked]="notif.activo" (change)="toggleNotification(notif.id)">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn-cancel" (click)="cancel()">Cancelar</button>
+      <button type="button" class="btn-save" (click)="save()">Guardar Cambios</button>
+    </div>
+  </div>
 </div>
