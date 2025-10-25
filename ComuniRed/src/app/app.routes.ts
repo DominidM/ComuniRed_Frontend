@@ -49,6 +49,7 @@ import { MapaGeneralComponent } from './admin/mapa-general/mapa-general.componen
 import { CrudEvidenciaComponent } from './admin/crud-evidencia/crud-evidencia.component';
 
 import { AuthGuard } from './guards/auth.guard';
+import { ReelsComponent } from './public/reels/reels.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -107,6 +108,7 @@ export const routes: Routes = [
     children: [
       { path: 'home', component: FeedComponent },
       { path: 'trending', component: TrendingComponent },
+      { path: 'reels', component: ReelsComponent },
       { path: 'notifications', component: NotificationsComponent },
       { path: 'profile/:id', component: ProfileComponent },
       { path: 'settings', component: SettingsComponent },
