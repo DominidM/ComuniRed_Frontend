@@ -19,6 +19,9 @@ export interface Usuario {
   email: string;
   password?: string;
   rol_id: string;
+
+  fecha_nacimiento?: string;
+  fecha_registro?: string;
 }
 
 export interface UsuarioInput {
@@ -35,6 +38,9 @@ export interface UsuarioInput {
   email: string;
   password?: string;
   rol_id: string;
+
+  fecha_nacimiento?: string;
+
 }
 
 export interface UsuarioPage {
@@ -63,6 +69,8 @@ const OBTENER_USUARIOS = gql`
         direccion
         email
         rol_id
+        fecha_nacimiento
+        fecha_registro
       }
       totalElements
       totalPages
@@ -88,6 +96,8 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
       direccion
       email
       rol_id
+      fecha_nacimiento
+      fecha_registro
     }
   }
 `;
@@ -108,6 +118,8 @@ const OBTENER_USUARIO_POR_ID = gql`
       direccion
       email
       rol_id
+      fecha_nacimiento
+      fecha_registro
     }
   }
 `;
@@ -134,6 +146,8 @@ const CREAR_USUARIO = gql`
       direccion
       email
       rol_id
+      fecha_nacimiento
+      fecha_registro
     }
   }
 `;
@@ -154,6 +168,8 @@ const ACTUALIZAR_USUARIO = gql`
       direccion
       email
       rol_id
+      fecha_nacimiento
+      fecha_registro
     }
   }
 `;
@@ -197,11 +213,6 @@ const LOGIN = gql`
       cambiarPasswordConCodigo(email: $email, codigo: $codigo, nuevaPassword: $nuevaPassword)
     }
   `;
-
-export interface LoginResult {
-  token?: string;
-  usuario?: Usuario | null;
-}
 
 export interface LoginResult {
   token?: string;
@@ -397,7 +408,7 @@ export class UsuarioService {
     try {
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
-      this.usuarioSubject.next(null); // <-- 🔁 limpiar usuario en memoria
+      this.usuarioSubject.next(null);
     } catch (e) {}
 
     try {

@@ -1,0 +1,24 @@
+.privacy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.btn.primary {
+  background: #071133;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+}

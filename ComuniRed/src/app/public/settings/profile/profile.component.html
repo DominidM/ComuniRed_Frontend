@@ -1,0 +1,62 @@
+<div class="profile-container">
+  <h2>Editar Perfil</h2>
+
+  <div class="profile-main">
+    <div class="avatar-section">
+      <img [src]="foto_perfil_url" alt="Foto de perfil" class="avatar-lg" />
+      <button type="button" class="btn-change-photo">Cambiar Foto</button>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="save()" class="profile-form">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" formControlName="nombre" />
+      </div>
+      <div class="form-group">
+        <label>Apellido</label>
+        <input type="text" formControlName="apellido" />
+      </div>
+
+      <div class="form-group">
+        <label>DNI</label>
+        <input type="text" formControlName="dni" />
+      </div>
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="text" formControlName="numero_telefono" />
+      </div>
+
+      <div class="form-group">
+        <label>Edad</label>
+        <input type="number" formControlName="edad" />
+      </div>
+      <div class="form-group">
+        <label>Sexo</label>
+        <input type="text" formControlName="sexo" />
+      </div>
+
+      <div class="form-group">
+        <label>Distrito</label>
+        <input type="text" formControlName="distrito" />
+      </div>
+      <div class="form-group">
+        <label>Código Postal</label>
+        <input type="text" formControlName="codigo_postal" />
+      </div>
+
+      <div class="form-group">
+        <label>Dirección</label>
+        <input type="text" formControlName="direccion" />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" formControlName="email" />
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-save">Guardar</button>
+        <button type="button" class="btn-cancel" (click)="cancel()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

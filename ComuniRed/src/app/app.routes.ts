@@ -27,8 +27,16 @@ import { FeedComponent } from './public/feed/feed.component';
 import { ProfileComponent } from './public/profile/profile.component';
 import { TrendingComponent } from './public/trending/trending.component';
 import { NotificationsComponent } from './public/notifications/notifications.component';
-import { SettingsComponent } from './public/settings/settings.component';
 import { HelpComponent } from './public/help/help.component';
+
+
+import { SettingsComponent } from './public/settings/settings.component';
+
+import { SettingsNotificationsComponent } from './public/settings/notifications/notifications.component';
+import { SettingsPrivacyComponent } from './public/settings/privacy/privacy.component';
+import { SettingsSecurityComponent } from './public/settings/security/security.component';
+import { SettingsProfileComponent } from './public/settings/profile/profile.component';
+
 
 // Reportes y exportaciones
 import { ReportExportComponent } from './admin/report-export/report-export.component';
@@ -111,11 +119,24 @@ export const routes: Routes = [
       { path: 'reels', component: ReelsComponent },
       { path: 'notifications', component: NotificationsComponent },
       { path: 'profile/:id', component: ProfileComponent },
-      { path: 'settings', component: SettingsComponent },
       { path: 'help', component: HelpComponent },
+
+      {
+        path: 'settings',
+        component: SettingsComponent,
+        children: [
+          { path: '', redirectTo: 'profile', pathMatch: 'full' },
+          { path: 'profile', component: SettingsProfileComponent },
+          { path: 'notifications', component: SettingsNotificationsComponent },
+          { path: 'privacy', component: SettingsPrivacyComponent },
+          { path: 'security', component: SettingsSecurityComponent }
+        ]
+      },
+
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },
+
 
   // Soporte area: protected, only soporte role can access children
   {

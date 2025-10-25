@@ -16,16 +16,13 @@ export class CrudUsuarioComponent implements OnInit {
   usuarios: Usuario[] = [];
   allUsuarios: Usuario[] = [];
   roles: Rol[] = [];
-  fotoPreview: string | null = null;
-  imagenPreview: string | ArrayBuffer | null = null;
-  fotoPerfilFile: File | null = null;
+  imagenPreview: string | null = null;
   defaultFoto = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
   private rolesMap = new Map<string, string>();
 
   showModal = false;
   editingUsuario: Usuario | null = null;
-  // Incluimos codigo_postal y distrito en usuarioData (Partial permite campos faltantes)
   usuarioData: Partial<Usuario & { codigo_postal?: string }> = {};
   page = 0;
   size = 5;
@@ -43,7 +40,6 @@ export class CrudUsuarioComponent implements OnInit {
   constructor(private usuarioService: UsuarioService, private rolService: RolService) {}
 
   ngOnInit() {
-    // Load roles first so we can resolve names when loading users
     this.loadRoles()
       .then(() => this.loadUsuarios())
       .catch(() => this.loadUsuarios());
@@ -54,28 +50,52 @@ export class CrudUsuarioComponent implements OnInit {
   }
 
   // ---------- Usuarios ----------
-  loadUsuarios() {
-    this.loading = true;
-    this.errorMessage = null;
-    this.usuarioService
-      .obtenerUsuarios(this.page, this.size)
-      .pipe(finalize(() => (this.loading = false)))
-      .subscribe({
-        next: (pageData: UsuarioPage) => {
-          this.usuarios = pageData.content || [];
-          // keep a copy for searching/filtering locally
-          this.allUsuarios = pageData.content ? [...pageData.content] : [];
-          this.totalPages = pageData.totalPages ?? 1;
-          this.totalElements = pageData.totalElements ?? this.allUsuarios.length;
+loadUsuarios() {
+  this.loading = true;
+  this.errorMessage = null;
 
-          console.log('[Usuarios] recibidos', this.usuarios);
-        },
-        error: (err: any) => {
-          console.error('Error al cargar usuarios', err);
-          this.errorMessage = 'Error al cargar usuarios. Revisa la consola.';
-        },
-      });
-  }
+  this.usuarioService
+    .obtenerUsuarios(this.page, this.size)
+    .pipe(finalize(() => (this.loading = false)))
+    .subscribe({
+      next: (pageData: UsuarioPage) => {
+        // Validamos que venga contenido
+        if (!pageData || !pageData.content) {
+          console.warn('⚠️ No se recibieron usuarios del backend.');
+          this.usuarios = [];
+          this.allUsuarios = [];
+          return;
+        }
+
+        // Procesamos cada usuario y normalizamos la fecha
+        this.usuarios = pageData.content.map((u) => {
+          // Validamos si llega la fecha_nacimiento
+          if (!u.fecha_nacimiento) {
+            console.warn(`⚠️ Usuario sin fecha de nacimiento: ${u.nombre} ${u.apellido}`);
+          } else {
+            console.log(`📅 Fecha de nacimiento recibida (${u.nombre}):`, u.fecha_nacimiento);
+            // Convertir al formato YYYY-MM-DD si viene como ISO
+            if (u.fecha_nacimiento.includes('T')) {
+              u.fecha_nacimiento = u.fecha_nacimiento.substring(0, 10);
+            }
+          }
+          return u;
+        });
+
+        // Clonamos los datos para búsqueda/paginación
+        this.allUsuarios = [...this.usuarios];
+        this.totalPages = pageData.totalPages ?? 1;
+        this.totalElements = pageData.totalElements ?? this.allUsuarios.length;
+
+        console.log('[Usuarios] recibidos:', this.usuarios);
+      },
+      error: (err: any) => {
+        console.error('Error al cargar usuarios', err);
+        this.errorMessage = 'Error al cargar usuarios. Revisa la consola.';
+      },
+    });
+}
+
 
   onPageSizeChange(event: any) {
     const newSize = +event.target.value;
@@ -101,12 +121,10 @@ export class CrudUsuarioComponent implements OnInit {
   }
 
   // ---------- Roles ----------
-  // Load roles and normalize ids so template can lookup names reliably
   async loadRoles(): Promise<void> {
     return new Promise((resolve) => {
       this.rolService.obtenerTodosLosRoles().subscribe({
         next: (rlist: Rol[]) => {
-          // normalize: ensure each role has an `id` value (use _id if backend returns that)
           this.roles = (rlist || []).map((r: any) => ({
             id: (r as any).id ?? (r as any)._id ?? '',
             nombre: r.nombre,
@@ -116,85 +134,67 @@ export class CrudUsuarioComponent implements OnInit {
           this.roles.forEach((r) => {
             if (r && r.id) this.rolesMap.set(String(r.id), r.nombre);
           });
-
           console.log('[Roles] cargados:', this.roles);
           console.log('[RolesMap]:', Array.from(this.rolesMap.entries()));
-
           resolve();
         },
         error: (err: any) => {
           console.warn('No se pudieron cargar roles', err);
-          // continue even if roles fails (so UI still shows users)
           resolve();
         },
       });
     });
   }
 
-
+  // ---------- Manejo de Imágenes ----------
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      this.fotoPerfilFile = file;
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor selecciona un archivo de imagen válido');
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('La imagen no debe superar los 5MB');
+        return;
+      }
 
       const reader = new FileReader();
-      reader.onload = () => (this.imagenPreview = reader.result);
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        this.imagenPreview = base64String;
+        this.usuarioData.foto_perfil = base64String;
+      };
       reader.readAsDataURL(file);
     }
   }
-  onFotoSeleccionada(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-
-    const archivo = input.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.fotoPreview = reader.result as string;
-      // guardamos temporalmente la imagen base64 en usuarioData
-      this.usuarioData.foto_perfil = this.fotoPreview;
-    };
-    reader.readAsDataURL(archivo);
-  }
 
   quitarFoto() {
-    this.fotoPreview = this.defaultFoto;
     this.imagenPreview = null;
-    this.fotoPerfilFile = null;
-
-    if (this.usuarioData) {
-      this.usuarioData.foto_perfil = this.defaultFoto;
-    }
+    this.usuarioData.foto_perfil = '';
   }
 
   private limpiarImagen() {
-    this.fotoPreview = null;
     this.imagenPreview = null;
-    this.fotoPerfilFile = null;
     if (this.usuarioData) {
       this.usuarioData.foto_perfil = '';
     }
   }
 
-
-
-  /**
-   * Resolve a rol_id to a display name using the rolesMap.
-   * Returns an empty string if name not found (so UI doesn't show raw id).
-   */
+  // ---------- Roles ----------
   getRolNombre(rolId?: string | null): string {
     if (!rolId) return 'Sin rol';
     const key = String(rolId).trim();
 
     console.log(`[getRolNombre] Buscando rol_id: "${key}"`);
 
-    // direct match
     const direct = this.rolesMap.get(key);
     if (direct) {
       console.log(`[getRolNombre] Match directo encontrado: "${direct}"`);
       return direct;
     }
 
-    // try normalize ObjectId("...") pattern
     const m = key.match(/ObjectId\("(.*)"\)/);
     const normalized = m ? m[1] : key;
     const direct2 = this.rolesMap.get(normalized);
@@ -203,7 +203,6 @@ export class CrudUsuarioComponent implements OnInit {
       return direct2;
     }
 
-    // partial match fallback (match by suffix)
     const suffix = normalized.slice(-12);
     for (const [k, v] of this.rolesMap) {
       if (k.endsWith(suffix) || k.includes(suffix)) {
@@ -213,28 +212,47 @@ export class CrudUsuarioComponent implements OnInit {
     }
 
     console.warn(`[getRolNombre] No se encontró nombre para rol_id: "${key}"`);
-    // fallback: return the rol_id to debug
     return key;
   }
 
-  // ---------- Modal / CRUD ----------
   openAddModal() {
     this.editingUsuario = null;
     this.usuarioData = {};
-    this.fotoPreview = this.defaultFoto
+
+    const now = new Date();
+    const localISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+
+    this.usuarioData.fecha_registro = localISO;
+    this.usuarioData.fecha_nacimiento = '';
+
+    this.imagenPreview = null;
     this.showModal = true;
   }
+
 
   openEditModal(usuario: Usuario) {
     this.editingUsuario = usuario;
     this.usuarioData = { ...usuario } as any;
 
-    // Si el usuario tiene una foto, úsala; si no, usa la imagen por defecto
-    this.fotoPreview = usuario.foto_perfil && usuario.foto_perfil.trim() !== ''
-      ? usuario.foto_perfil
-      : this.defaultFoto;
+    // Convertir fecha_registro para mostrar correctamente en el input datetime-local
+    if (usuario.fecha_registro) {
+      const fecha = new Date(usuario.fecha_registro);
+      const localISO = new Date(fecha.getTime() - fecha.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+      this.usuarioData.fecha_registro = localISO;
+    }
 
-    // Quita password si existe (solo por seguridad)
+    if (usuario.foto_perfil && usuario.foto_perfil.trim() !== '') {
+      this.imagenPreview = usuario.foto_perfil;
+      this.usuarioData.foto_perfil = usuario.foto_perfil;
+    } else {
+      this.imagenPreview = null;
+      this.usuarioData.foto_perfil = '';
+    }
+
     if ('password' in this.usuarioData) {
       delete (this.usuarioData as any).password;
     }
@@ -276,9 +294,6 @@ export class CrudUsuarioComponent implements OnInit {
     const cp = (this.usuarioData.codigo_postal ?? '').toString().trim();
     if (cp && cp.length !== 5) return 'El código postal debe tener 5 dígitos';
 
-    const edad = this.usuarioData.edad;
-    if (edad !== undefined && (typeof edad !== 'number' || edad < 0 || edad > 120)) return 'Edad inválida';
-
     if (!this.editingUsuario) {
       const pwd = (this.usuarioData.password ?? '').toString();
       if (!pwd || pwd.trim().length < 6) return 'La contraseña es obligatoria y debe tener al menos 6 caracteres';
@@ -305,7 +320,6 @@ export class CrudUsuarioComponent implements OnInit {
       email: this.usuarioData.email!,
       dni: this.usuarioData.dni ?? '',
       numero_telefono: this.usuarioData.numero_telefono ?? '',
-      edad: this.usuarioData.edad ?? 0,
       sexo: this.usuarioData.sexo ?? '',
       distrito: this.usuarioData.distrito ?? '',
       codigo_postal: (this.usuarioData as any).codigo_postal ?? '',
@@ -315,47 +329,47 @@ export class CrudUsuarioComponent implements OnInit {
     };
 
 
+    if (this.usuarioData.password && String(this.usuarioData.password).trim() !== '') {
+      (payload as any).password = this.usuarioData.password;
+    }
 
-    // Añadir password si existe y no es vacío
     if (this.usuarioData.password && String(this.usuarioData.password).trim() !== '') {
       (payload as any).password = this.usuarioData.password;
     }
 
     if (this.editingUsuario && this.editingUsuario.id) {
-      const id = this.editingUsuario.id;
-      this.usuarioService
-        .actualizarUsuario(id, payload)
-        .pipe(finalize(() => (this.saving = false)))
-        .subscribe({
-          next: () => {
-            // recargar desde servidor para mantener coherencia con paginación/contadores
-            this.loadUsuarios();
-            this.closeModal();
-          },
-          error: (err: any) => {
-            console.error('Error actualizando usuario', err);
-            this.errorMessage = 'Error al actualizar el usuario.';
-            alert(this.errorMessage);
-          },
-        });
-    } else {
-      // create new
-      this.usuarioService
-        .crearUsuario(payload)
-        .pipe(finalize(() => (this.saving = false)))
-        .subscribe({
-          next: () => {
-            // recargar la página actual
-            this.loadUsuarios();
-            this.closeModal();
-          },
-          error: (err: any) => {
-            console.error('Error creando usuario', err);
-            this.errorMessage = 'Error al crear el usuario.';
-            alert(this.errorMessage);
-          },
-        });
-    }
+    const id = this.editingUsuario.id;
+    this.usuarioService
+      .actualizarUsuario(id, payload)
+      .pipe(finalize(() => (this.saving = false)))
+      .subscribe({
+        next: () => {
+          this.loadUsuarios();
+          this.closeModal();
+        },
+        error: (err: any) => {
+          console.error('Error actualizando usuario', err);
+          this.errorMessage = 'Error al actualizar el usuario.';
+          alert(this.errorMessage);
+        },
+      });
+  } else {
+    this.usuarioService
+      .crearUsuario(payload)
+      .pipe(finalize(() => (this.saving = false)))
+      .subscribe({
+        next: () => {
+          this.loadUsuarios();
+          this.closeModal();
+        },
+        error: (err: any) => {
+          console.error('Error creando usuario', err);
+          this.errorMessage = 'Error al crear el usuario.';
+          alert(this.errorMessage);
+        },
+      });
+  }
+
   }
 
   deleteUsuario(usuario: Usuario) {
@@ -369,7 +383,6 @@ export class CrudUsuarioComponent implements OnInit {
       .pipe(finalize(() => (this.deleting = false)))
       .subscribe({
         next: () => {
-          // reload current page (safer with pagination)
           if (this.usuarios.length === 1 && this.page > 0) {
             this.page = Math.max(0, this.page - 1);
           }
@@ -389,7 +402,6 @@ export class CrudUsuarioComponent implements OnInit {
     this.usuarioData = {};
     this.limpiarImagen();
   }
-
 
   buscarUsuario() {
     const q = this.searchText?.trim().toLowerCase() ?? '';

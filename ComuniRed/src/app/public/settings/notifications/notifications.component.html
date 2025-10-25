@@ -1,0 +1,12 @@
+<h3>Notificaciones</h3>
+<p class="muted">Configura cómo quieres recibir notificaciones.</p>
+
+<div class="notif-list">
+  <label><input type="checkbox" [(ngModel)]="email" name="email" /> Email</label>
+  <label><input type="checkbox" [(ngModel)]="push" name="push" /> Push</label>
+  <label><input type="checkbox" [(ngModel)]="sms" name="sms" /> SMS</label>
+</div>
+
+<div class="actions">
+  <button class="btn primary" (click)="save()">Guardar</button>
+</div>

@@ -1,0 +1,11 @@
+<h3>Privacidad</h3>
+<p class="muted">Controla quién puede ver tu información.</p>
+
+<div class="privacy-list">
+  <label><input type="checkbox" [(ngModel)]="showProfile" name="showProfile" /> Mostrar perfil públicamente</label>
+  <label><input type="checkbox" [(ngModel)]="showActivity" name="showActivity" /> Mostrar actividad</label>
+</div>
+
+<div class="actions">
+  <button class="btn primary" (click)="save()">Guardar</button>
+</div>

@@ -1,1 +1,19 @@
-<p>Obtuviste 100 reacciones</p>
+<div class="settings-container">
+  <h2 class="settings-title">Configuración</h2>
+
+  <nav class="settings-tabs">
+    <button 
+      *ngFor="let tab of tabs" 
+      [routerLink]="tab.route" 
+      routerLinkActive="active"
+      [class.active]="isActive(tab.route)">
+      <span class="material-icons">{{ tab.icon }}</span>
+      {{ tab.label }}
+    </button>
+  </nav>
+
+    <div class="settings-content">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>
