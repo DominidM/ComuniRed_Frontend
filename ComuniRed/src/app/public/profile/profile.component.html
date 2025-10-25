@@ -1,1 +1,147 @@
-<p>profile works!</p>
+<div class="settings-container">
+  <div class="profile-header">
+    <div class="header-background"></div>
+    <div class="profile-info">
+      <div class="avatar">JP</div>
+      <div class="user-details">
+        <h1 class="user-name">Juan Pérez</h1>
+        <div class="user-meta">
+          <span class="member-date">📅 Miembro desde Oct 2025</span>
+          <span class="role">Usuario</span>
+        </div>
+      </div>
+      <button class="edit-profile-btn">✏️ Editar Perfil</button>
+    </div>
+  </div>
+
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-number">2</div>
+      <div class="stat-label">Reportes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Resueltos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">249</div>
+      <div class="stat-label">Reacciones</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">39</div>
+      <div class="stat-label">Comentarios</div>
+    </div>
+  </div>
+
+  <div class="tabs-section">
+    <div class="tabs-header">
+      <button 
+        class="tab-btn" 
+        [class.active]="currentTab === 'actividad'"
+        (click)="changeTab('actividad')">
+        Actividad
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="currentTab === 'logros'"
+        (click)="changeTab('logros')">
+        Logros
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="currentTab === 'estadisticas'"
+        (click)="changeTab('estadisticas')">
+        Estadísticas
+      </button>
+    </div>
+
+    <div class="tab-content">
+      <div *ngIf="currentTab === 'actividad'" class="activity-content">
+        <div class="empty-state">
+          <div class="empty-icon">📈</div>
+          <p>Tu actividad reciente aparecerá aquí</p>
+        </div>
+      </div>
+
+      <div *ngIf="currentTab === 'logros'" class="logros-content">
+        <div class="logros-grid">
+          <div class="logro-card" [class.unlocked]="true">
+            <div class="logro-icon" style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);">🎯</div>
+            <div class="logro-info">
+              <h3>Primer Reporte</h3>
+              <p>Creaate tu primer reporte</p>
+            </div>
+            <div class="logro-badge">✓</div>
+          </div>
+
+          <div class="logro-card" [class.unlocked]="true">
+            <div class="logro-icon" style="background: linear-gradient(135deg, #ffd93d 0%, #ffed4e 100%);">⭐</div>
+            <div class="logro-info">
+              <h3>Ciudadano Activo</h3>
+              <p>Creaate 5 reportes</p>
+            </div>
+            <div class="logro-badge">✓</div>
+          </div>
+
+          <div class="logro-card" [class.unlocked]="true">
+            <div class="logro-icon" style="background: linear-gradient(135deg, #ff9f43 0%, #ffb366 100%);">🏆</div>
+            <div class="logro-info">
+              <h3>Influencer Cívico</h3>
+              <p>Obtuviste 100 reacciones</p>
+            </div>
+            <div class="logro-badge">✓</div>
+          </div>
+
+          <div class="logro-card" [class.unlocked]="false">
+            <div class="logro-icon" style="background: linear-gradient(135deg, #d0d0d0 0%, #e0e0e0 100%);">📋</div>
+            <div class="logro-info">
+              <h3>Problema Resuelto</h3>
+              <p>Un reporte tuyo fue resuelto</p>
+            </div>
+            <div class="logro-badge">🔒</div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="currentTab === 'estadisticas'" class="estadisticas-content">
+        <div class="estadisticas-grid">
+          <div class="estadistica-section">
+            <h3>Impacto de tus Reportes</h3>
+            <div class="estadistica-items">
+              <div class="estadistica-item">
+                <span class="estadistica-label">Total de reacciones</span>
+                <span class="estadistica-value">249</span>
+              </div>
+              <div class="estadistica-item">
+                <span class="estadistica-label">Total de comentarios</span>
+                <span class="estadistica-value">39</span>
+              </div>
+              <div class="estadistica-item">
+                <span class="estadistica-label">Tasa de resolución</span>
+                <span class="estadistica-value" style="color: #10b981;">0%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="estadistica-section">
+            <h3>Participación</h3>
+            <div class="estadistica-items">
+              <div class="estadistica-item">
+                <span class="estadistica-label">Reportes este mes</span>
+                <span class="estadistica-value">3</span>
+              </div>
+              <div class="estadistica-item">
+                <span class="estadistica-label">Promedio semanal</span>
+                <span class="estadistica-value">1.2</span>
+              </div>
+              <div class="estadistica-item">
+                <span class="estadistica-label">Racha actual</span>
+                <span class="estadistica-value" style="color: #f97316;">5 días 🔥</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
