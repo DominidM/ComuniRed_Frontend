@@ -108,16 +108,29 @@
           />
         </div>
 
+        <!-- ✅ NUEVA SECCIÓN: Fecha de nacimiento y edad calculada -->
         <div class="form-group">
-          <label for="edad">Edad</label>
+          <label for="fecha_nacimiento">Fecha de Nacimiento</label>
           <input
-            id="edad"
-            type="number"
-            [(ngModel)]="usuario.edad"
-            name="edad"
-            min="0"
-            max="150"
+            id="fecha_nacimiento"
+            type="date"
+            [(ngModel)]="usuario.fecha_nacimiento"
+            name="fecha_nacimiento"
+            [max]="hoy"
           />
+          <small style="color: #6b7280; font-size: 0.875rem;">La edad se calcula automáticamente</small>
+        </div>
+
+        <!-- ✅ EDAD CALCULADA (solo lectura) -->
+        <div class="form-group" *ngIf="usuario.fecha_nacimiento">
+          <label>Edad</label>
+          <input
+            type="text"
+            [value]="calcularEdad(usuario.fecha_nacimiento) + ' años'"
+            readonly
+            style="background-color: #f3f4f6; cursor: not-allowed;"
+          />
+          <small style="color: #6b7280; font-size: 0.875rem;">Calculada desde la fecha de nacimiento</small>
         </div>
 
         <div class="form-group">
@@ -165,6 +178,19 @@
             rows="3"
             placeholder="Av. Principal 123"
           ></textarea>
+        </div>
+
+        <!-- ✅ Mostrar fecha de registro (solo lectura) -->
+        <div class="form-group" style="grid-column: 1 / -1;" *ngIf="usuario.fecha_registro">
+          <label for="fecha_registro">Fecha de Registro</label>
+          <input
+            id="fecha_registro"
+            type="text"
+            [value]="usuario.fecha_registro | date:'dd/MM/yyyy HH:mm'"
+            readonly
+            style="background-color: #f3f4f6; cursor: not-allowed;"
+          />
+          <small style="color: #6b7280; font-size: 0.875rem;">Este campo no se puede modificar</small>
         </div>
 
         <div class="acciones">

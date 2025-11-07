@@ -22,8 +22,10 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
   
   avatarPreview: string | null = null;
   
+  // ✅ NUEVO: Para el max del input date
+  hoy: string = new Date().toISOString().substring(0, 10);
+  
   private destroy$ = new Subject<void>();
-
   private rutaVolver: string = '/dashboard';
 
   constructor(
@@ -32,8 +34,7 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
     private usuarioService: UsuarioService
   ) {}
 
-  ngOnInit(): void 
-  {
+  ngOnInit(): void {
     let id = this.route.snapshot.paramMap.get('id');
     
     if (!id) {
@@ -69,7 +70,6 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
             this.usuario = { ...usuario };
             this.original = { ...usuario };
             
-            // Cargar foto de perfil si existe
             if (usuario.foto_perfil) {
               this.avatarPreview = usuario.foto_perfil;
             }
@@ -88,19 +88,23 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
       });
   }
 
+  // ✅ NUEVO: Calcular edad desde fecha de nacimiento
+  calcularEdad(fechaNacimiento: string): number | null {
+    if (!fechaNacimiento) return null;
+    return this.usuarioService.calcularEdad(fechaNacimiento);
+  }
+
   cambiarAvatar(event: Event): void {
     const input = event.target as HTMLInputElement;
 
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       
-      // Validar tamaño (máx 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('La imagen es muy grande. Máximo 5MB.');
         return;
       }
 
-      // Validar tipo
       if (!file.type.startsWith('image/')) {
         alert('Por favor selecciona una imagen válida.');
         return;
@@ -136,19 +140,20 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
     this.guardando = true;
     this.error = null;
 
+    // ✅ PAYLOAD ACTUALIZADO: sin edad
     const usuarioInput = {
       foto_perfil: this.usuario.foto_perfil || '',
       nombre: this.usuario.nombre,
       apellido: this.usuario.apellido,
       dni: this.usuario.dni,
       numero_telefono: this.usuario.numero_telefono || '',
-      edad: this.usuario.edad || 0,
       sexo: this.usuario.sexo || '',
       distrito: this.usuario.distrito || '',
       codigo_postal: this.usuario.codigo_postal || '',
       direccion: this.usuario.direccion || '',
       email: this.usuario.email,
       rol_id: this.usuario.rol_id,
+      fecha_nacimiento: this.usuario.fecha_nacimiento || ''
     };
 
     this.usuarioService
@@ -160,7 +165,6 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
           this.usuario = { ...usuarioActualizado };
           this.original = { ...usuarioActualizado };
           
-          // Actualizar preview de avatar
           if (usuarioActualizado.foto_perfil) {
             this.avatarPreview = usuarioActualizado.foto_perfil;
           }
@@ -168,7 +172,6 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
           this.guardando = false;
           alert('Perfil actualizado con éxito');
           
-          // Actualizar localStorage si es el usuario actual
           const currentUser = this.usuarioService.getUser();
           if (currentUser && currentUser.id === usuarioActualizado.id) {
             this.usuarioService.saveUser(usuarioActualizado);
@@ -186,7 +189,6 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
   private validarUsuario(): boolean {
     if (!this.usuario) return false;
 
-    // Validaciones básicas
     if (!this.usuario.nombre?.trim()) {
       alert('El nombre es obligatorio');
       return false;
@@ -202,23 +204,24 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    // Validar formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.usuario.email)) {
       alert('El formato del email no es válido');
       return false;
     }
 
-    // Validar DNI (8 dígitos para Perú)
     if (this.usuario.dni && !/^\d{8}$/.test(this.usuario.dni)) {
       alert('El DNI debe tener 8 dígitos');
       return false;
     }
 
-    // Validar edad si está presente
-    if (this.usuario.edad && (this.usuario.edad < 0 || this.usuario.edad > 150)) {
-      alert('La edad no es válida');
-      return false;
+    // ✅ ACTUALIZADO: Validar edad desde fecha_nacimiento
+    if (this.usuario.fecha_nacimiento) {
+      const edad = this.calcularEdad(this.usuario.fecha_nacimiento);
+      if (edad !== null && (edad < 7 || edad > 100)) {
+        alert('Debes tener entre 7 y 120 años para usar la plataforma');
+        return false;
+      }
     }
 
     return true;
@@ -232,7 +235,6 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
     
     if (this.original) {
       this.usuario = { ...this.original };
-      // Restaurar foto de perfil original
       this.avatarPreview = this.original.foto_perfil || null;
     }
   }
@@ -243,10 +245,6 @@ export class EditarPerfilComponent implements OnInit, OnDestroy {
       if (!confirmar) return;
     }
     
-    // Intentar volver a la página anterior usando el historial del navegador
     window.history.back();
-    
-    // Alternativa: navegar a una ruta específica
-    // this.router.navigate([this.rutaVolver]);
   }
 }

@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { gql } from 'apollo-angular';
 
+
 export interface Usuario {
   id: string;
   foto_perfil?: string;
@@ -11,7 +12,6 @@ export interface Usuario {
   apellido: string;
   dni: string;
   numero_telefono: string;
-  edad: number;
   sexo: string;
   distrito: string;
   codigo_postal: string;
@@ -19,7 +19,7 @@ export interface Usuario {
   email: string;
   password?: string;
   rol_id: string;
-
+  
   fecha_nacimiento?: string;
   fecha_registro?: string;
 }
@@ -30,7 +30,6 @@ export interface UsuarioInput {
   apellido: string;
   dni?: string;
   numero_telefono?: string;
-  edad?: number;
   sexo?: string;
   distrito?: string;
   codigo_postal?: string;
@@ -38,9 +37,7 @@ export interface UsuarioInput {
   email: string;
   password?: string;
   rol_id: string;
-
   fecha_nacimiento?: string;
-
 }
 
 export interface UsuarioPage {
@@ -51,7 +48,8 @@ export interface UsuarioPage {
   size: number;
 }
 
-/* Queries / Mutations */
+
+
 const OBTENER_USUARIOS = gql`
   query ObtenerUsuarios($page: Int!, $size: Int!) {
     obtenerUsuarios(page: $page, size: $size) {
@@ -62,7 +60,6 @@ const OBTENER_USUARIOS = gql`
         apellido
         dni
         numero_telefono
-        edad
         sexo
         distrito
         codigo_postal
@@ -80,6 +77,7 @@ const OBTENER_USUARIOS = gql`
   }
 `;
 
+// ✅ Query actualizada (sin edad)
 const OBTENER_TODOS_LOS_USUARIOS = gql`
   query ObtenerTodosLosUsuarios {
     obtenerTodosLosUsuarios {
@@ -89,7 +87,6 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
       apellido
       dni
       numero_telefono
-      edad
       sexo
       distrito
       codigo_postal
@@ -102,6 +99,7 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
   }
 `;
 
+// ✅ Query actualizada (sin edad)
 const OBTENER_USUARIO_POR_ID = gql`
   query ObtenerUsuarioPorId($id: ID!) {
     obtenerUsuarioPorId(id: $id) {
@@ -111,7 +109,6 @@ const OBTENER_USUARIO_POR_ID = gql`
       apellido
       dni
       numero_telefono
-      edad
       sexo
       distrito
       codigo_postal
@@ -130,6 +127,7 @@ const CONTAR_USUARIOS_POR_ROL = gql`
   }
 `;
 
+// ✅ Mutation actualizada (sin edad)
 const CREAR_USUARIO = gql`
   mutation CrearUsuario($usuario: UsuarioInput!) {
     crearUsuario(usuario: $usuario) {
@@ -139,7 +137,6 @@ const CREAR_USUARIO = gql`
       apellido
       dni
       numero_telefono
-      edad
       sexo
       distrito
       codigo_postal
@@ -152,6 +149,7 @@ const CREAR_USUARIO = gql`
   }
 `;
 
+// ✅ Mutation actualizada (sin edad)
 const ACTUALIZAR_USUARIO = gql`
   mutation ActualizarUsuario($id: ID!, $usuario: UsuarioInput!) {
     actualizarUsuario(id: $id, usuario: $usuario) {
@@ -161,7 +159,6 @@ const ACTUALIZAR_USUARIO = gql`
       apellido
       dni
       numero_telefono
-      edad
       sexo
       distrito
       codigo_postal
@@ -191,28 +188,29 @@ const LOGIN = gql`
         apellido
         email
         rol_id
+        fecha_registro
       }
     }
   }
-  `;
+`;
 
-  const SOLICITAR_CODIGO_RECUPERACION = gql`
-    mutation SolicitarCodigoRecuperacion($email: String!) {
-      solicitarCodigoRecuperacion(email: $email)
-    }
-  `;
+const SOLICITAR_CODIGO_RECUPERACION = gql`
+  mutation SolicitarCodigoRecuperacion($email: String!) {
+    solicitarCodigoRecuperacion(email: $email)
+  }
+`;
 
-  const VERIFICAR_CODIGO_RECUPERACION = gql`
-    mutation VerificarCodigoRecuperacion($email: String!, $codigo: String!) {
-      verificarCodigoRecuperacion(email: $email, codigo: $codigo)
-    }
-  `;
+const VERIFICAR_CODIGO_RECUPERACION = gql`
+  mutation VerificarCodigoRecuperacion($email: String!, $codigo: String!) {
+    verificarCodigoRecuperacion(email: $email, codigo: $codigo)
+  }
+`;
 
-  const CAMBIAR_PASSWORD_CON_CODIGO = gql`
-    mutation CambiarPasswordConCodigo($email: String!, $codigo: String!, $nuevaPassword: String!) {
-      cambiarPasswordConCodigo(email: $email, codigo: $codigo, nuevaPassword: $nuevaPassword)
-    }
-  `;
+const CAMBIAR_PASSWORD_CON_CODIGO = gql`
+  mutation CambiarPasswordConCodigo($email: String!, $codigo: String!, $nuevaPassword: String!) {
+    cambiarPasswordConCodigo(email: $email, codigo: $codigo, nuevaPassword: $nuevaPassword)
+  }
+`;
 
 export interface LoginResult {
   token?: string;
@@ -228,12 +226,10 @@ export const USER_KEY = 'comunired_user';
 export class UsuarioService {
   private apiBase = '/graphql';
 
-  // BehaviorSubject que mantiene el contador global de usuarios (inicial 0)
   private userCountSubject = new BehaviorSubject<number>(0);
-  
   private usuarioSubject = new BehaviorSubject<Usuario | null>(this.getUser());
+  
   public usuario$ = this.usuarioSubject.asObservable();
-
   public userCount$ = this.userCountSubject.asObservable();
 
   constructor(private apollo: Apollo) {
@@ -422,7 +418,6 @@ export class UsuarioService {
     }
   }
 
-
   isLoggedIn(): boolean {
     const t = this.getToken();
     return !!t && t.length > 0;
@@ -450,11 +445,6 @@ export class UsuarioService {
       });
   }
   
-  /**
-   * Solicita un código de recuperación que se envía al email del usuario
-   * @param email Email del usuario
-   * @returns Observable<boolean> true si se envió correctamente
-   */
   solicitarCodigoRecuperacion(email: string): Observable<boolean> {
     return this.apollo.mutate<{ solicitarCodigoRecuperacion: boolean }>({
       mutation: SOLICITAR_CODIGO_RECUPERACION,
@@ -465,12 +455,6 @@ export class UsuarioService {
     );
   }
 
-  /**
-   * Verifica si un código de recuperación es válido
-   * @param email Email del usuario
-   * @param codigo Código de 6 dígitos recibido por email
-   * @returns Observable<boolean> true si el código es válido
-   */
   verificarCodigoRecuperacion(email: string, codigo: string): Observable<boolean> {
     return this.apollo.mutate<{ verificarCodigoRecuperacion: boolean }>({
       mutation: VERIFICAR_CODIGO_RECUPERACION,
@@ -481,13 +465,6 @@ export class UsuarioService {
     );
   }
 
-  /**
-   * Cambia la contraseña del usuario usando el código de recuperación
-   * @param email Email del usuario
-   * @param codigo Código de 6 dígitos
-   * @param nuevaPassword Nueva contraseña
-   * @returns Observable<boolean> true si se cambió correctamente
-   */
   cambiarPasswordConCodigo(email: string, codigo: string, nuevaPassword: string): Observable<boolean> {
     return this.apollo.mutate<{ cambiarPasswordConCodigo: boolean }>({
       mutation: CAMBIAR_PASSWORD_CON_CODIGO,
@@ -497,5 +474,32 @@ export class UsuarioService {
       map(result => result.data?.cambiarPasswordConCodigo ?? false)
     );
   }
-  
+
+  calcularEdad(fechaNacimiento: string): number | null {
+    if (!fechaNacimiento) return null;
+    
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+    
+    return edad;
+  }
+
+  formatearFechaRegistro(fechaRegistro: string): string {
+    if (!fechaRegistro) return 'Sin fecha';
+    
+    const fecha = new Date(fechaRegistro);
+    return fecha.toLocaleDateString('es-PE', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
 }

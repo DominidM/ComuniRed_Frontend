@@ -68,22 +68,24 @@
         </div>
       </div>
       
+      <!-- ✅ REEMPLAZAR EDAD POR FECHA DE NACIMIENTO -->
       <div class="form-row">
         <div class="form-group">
-          <label>Edad</label>
+          <label>Fecha de Nacimiento</label>
           <input 
-            type="number" 
-            [(ngModel)]="usuarioData.edad" 
-            name="edad" 
+            type="date" 
+            [(ngModel)]="usuarioData.fecha_nacimiento" 
+            name="fecha_nacimiento" 
             autocomplete="off"
-            min="18"
-            max="120"
-            placeholder="18-120"
-            (blur)="validateEdad()"
-            (input)="validateEdad()"
-            [class.error]="errors['edad']"
+            [max]="hoy"
+            (blur)="validateFechaNacimiento()"
+            (change)="validateFechaNacimiento()"
+            [class.error]="errors['fecha_nacimiento']"
           />
-          <span class="error-message" *ngIf="errors['edad']">{{ errors['edad'] }}</span>
+          <span class="error-message" *ngIf="errors['fecha_nacimiento']">{{ errors['fecha_nacimiento'] }}</span>
+          <small style="display: block; color: #6b7280; font-size: 0.875rem; margin-top: 4px;">
+            Debes ser mayor de 18 años
+          </small>
         </div>
         
         <div class="form-group">
@@ -92,6 +94,7 @@
             <option value="">Sin especificar</option>
             <option value="M">Masculino</option>
             <option value="F">Femenino</option>
+            <option value="Otro">Otro</option>
           </select>
         </div>
       </div>
@@ -190,13 +193,11 @@
       </div>
     </form>
     
-    <!-- Flotante de éxito -->
     <div class="snackbar" *ngIf="showSuccess">
       <span class="snackbar-icon">✔️</span>
       ¡Usuario creado exitosamente!
     </div>
     
-    <!-- Flotante de error -->
     <div class="snackbar error" *ngIf="showError">
       <span class="snackbar-icon">❌</span>
       {{ showError }}

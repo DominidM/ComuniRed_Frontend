@@ -3,7 +3,7 @@
     <div class="crud-usuario-header">
       <h2>Gestión de Usuarios</h2>
       <button class="btn-primary" (click)="openAddModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
@@ -11,11 +11,9 @@
       </button>
     </div>
 
-    <!-- Controles superiores: Buscador + mostrar por página + total -->
     <div class="crud-usuario-controls-row">
       <div class="crud-usuario-search-box">
         <input type="text" [(ngModel)]="searchText" placeholder="Buscar por nombre, apellido, DNI..." />
-        <!-- BOTÓN DE BÚSQUEDA CON ICONO LUPA -->
         <button class="crud-usuario-search-btn" (click)="buscarUsuario()" aria-label="Buscar usuario">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"/>
@@ -41,9 +39,10 @@
             <th>Apellido</th>
             <th>Rol</th>
             <th>DNI</th>
+            <th>Edad</th>
             <th>Distrito</th>
             <th>Fecha Nacimiento</th>
-            <th>Fecha Registro</th> 
+            <th>Fecha Registro</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -54,12 +53,32 @@
             <td><div class="user-lastname">{{ usuario.apellido }}</div></td>
             <td><div class="user-role">{{ getRolNombre(usuario.rol_id) }}</div></td>
             <td><div class="user-dni">{{ usuario.dni }}</div></td>
+            <td>
+              <ng-container *ngIf="calcularEdad(usuario.fecha_nacimiento) as edad; else sinEdad">
+                <span style="color: #000;">{{ edad }} años</span>
+              </ng-container>
+              <ng-template #sinEdad>
+                <span style="color: #9ca3af;">—</span>
+              </ng-template>
+            </td>
             <td><div class="user-district">{{ usuario.distrito }}</div></td>
-            
-              <td>{{ usuario.fecha_nacimiento | date:'dd/MM/yyyy' }}</td>
-              <td>{{ usuario.fecha_registro | date:'dd/MM/yyyy HH:mm' }}</td>
-            
-              <td>
+            <td>
+              <ng-container *ngIf="usuario.fecha_nacimiento; else sinFechaNac">
+                {{ usuario.fecha_nacimiento | date:'dd/MM/yyyy' }}
+              </ng-container>
+              <ng-template #sinFechaNac>
+                <span style="color: #9ca3af;">—</span>
+              </ng-template>
+            </td>
+            <td>
+              <ng-container *ngIf="usuario.fecha_registro; else sinFechaReg">
+                {{ usuario.fecha_registro | date:'dd/MM/yyyy HH:mm' }}
+              </ng-container>
+              <ng-template #sinFechaReg>
+                <span style="color: #9ca3af;">—</span>
+              </ng-template>
+            </td>
+            <td>
               <div class="action-buttons">
                 <button class="btn-edit" (click)="openEditModal(usuario)" title="Editar usuario">Editar</button>
                 <button class="btn-delete" (click)="deleteUsuario(usuario)" title="Eliminar usuario">Eliminar</button>
@@ -81,7 +100,6 @@
       </div>
     </ng-template>
 
-    <!-- Paginación abajo centrada y contador -->
     <div class="crud-usuario-pagination-row" *ngIf="totalElements > 0">
       <div class="crud-usuario-pagination">
         <button class="crud-usuario-pagination-btn" (click)="prevPage()" [disabled]="page === 0"><b>&lt; Anterior</b></button>
@@ -97,38 +115,18 @@
     <div class="crud-usuario-modal" *ngIf="showModal" (click)="closeModal()">
       <div class="crud-usuario-modal-content" (click)="$event.stopPropagation()">
         <h3>{{ editingUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
-
         <form (ngSubmit)="saveUsuario(usuarioForm)" #usuarioForm="ngForm">
-
-        <div class="form-group imagen-perfil">
-          <label for="foto_perfil" class="form-label">Foto de Perfil</label>
-
-          <div class="imagen-preview">
-            <img
-              [src]="imagenPreview || usuarioData.foto_perfil || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'"
-              alt="Foto de perfil"
-              class="preview"
-            />
+          <div class="form-group imagen-perfil">
+            <label for="foto_perfil" class="form-label">Foto de Perfil</label>
+            <div class="imagen-preview">
+              <img [src]="imagenPreview || usuarioData.foto_perfil || defaultFoto" alt="Foto de perfil" class="preview" />
+            </div>
+            <input type="file" id="foto_perfil" accept="image/*" (change)="onFileSelected($event)" class="form-control archivo-input" />
+            <button *ngIf="imagenPreview || usuarioData.foto_perfil" type="button" class="btn-quitar-foto" (click)="quitarFoto()">
+              Quitar foto
+            </button>
           </div>
-
-          <input
-            type="file"
-            id="foto_perfil"
-            accept="image/*"
-            (change)="onFileSelected($event)"
-            class="form-control archivo-input"
-          />
-
-          <button
-            *ngIf="imagenPreview || usuarioData.foto_perfil"
-            type="button"
-            class="btn-quitar-foto"
-            (click)="quitarFoto()"
-          >
-            Quitar foto
-          </button>
-        </div>
-
+          
           <div class="form-row">
             <div class="form-group">
               <label for="nombre">Nombre *</label>
@@ -139,8 +137,7 @@
               <input id="apellido" name="apellido" type="text" [(ngModel)]="usuarioData.apellido" required placeholder="Apellido del usuario" autocomplete="off"/>
             </div>
           </div>
-
-          <!-- DNI / Teléfono -->
+          
           <div class="form-row">
             <div class="form-group">
               <label for="dni">DNI</label>
@@ -151,51 +148,43 @@
               <input id="numero_telefono" name="numero_telefono" type="text" [(ngModel)]="usuarioData.numero_telefono" placeholder="987654321" maxlength="15" (input)="onTelefonoInput($event)"/>
             </div>
           </div>
-
-          <!-- Edad / Sexo -->
+          
           <div class="form-row">
-            <div class="form-group">
-              <label for="edad">Edad</label>
-              <input id="edad" name="edad" type="number" [(ngModel)]="usuarioData.edad" min="0" max="120"/>
-            </div>
             <div class="form-group">
               <label for="sexo">Sexo</label>
               <select id="sexo" name="sexo" [(ngModel)]="usuarioData.sexo">
                 <option value="">Seleccionar...</option>
                 <option value="M">Masculino</option>
                 <option value="F">Femenino</option>
+                <option value="Otro">Otro</option>
               </select>
             </div>
-          </div>
-
-          <!-- Distrito / Código Postal -->
-          <div class="form-row">
             <div class="form-group">
               <label for="distrito">Distrito</label>
               <input id="distrito" name="distrito" type="text" [(ngModel)]="usuarioData.distrito" placeholder="Ej: Miraflores" autocomplete="off"/>
             </div>
+          </div>
+          
+          <div class="form-row">
             <div class="form-group">
               <label for="codigo_postal">Código Postal</label>
               <input id="codigo_postal" name="codigo_postal" type="text" [(ngModel)]="usuarioData.codigo_postal" placeholder="15074" maxlength="10" autocomplete="off"/>
             </div>
+            <div class="form-group">
+              <label for="direccion">Dirección</label>
+              <input id="direccion" name="direccion" type="text" [(ngModel)]="usuarioData.direccion" placeholder="Ingrese dirección completa" autocomplete="off"/>
+            </div>
           </div>
-
-          <!-- Dirección / Email -->
-          <div class="form-group">
-            <label for="direccion">Dirección</label>
-            <input id="direccion" name="direccion" type="text" [(ngModel)]="usuarioData.direccion"/>
-          </div>
-
+          
           <div class="form-group">
             <label for="email">Email *</label>
-            <input id="email" name="email" type="email" [(ngModel)]="usuarioData.email" required/>
+            <input id="email" name="email" type="email" [(ngModel)]="usuarioData.email" required placeholder="ejemplo@correo.com"/>
           </div>
-
-          <!-- Password / Rol -->
+          
           <div class="form-row">
             <div class="form-group">
               <label for="password">Contraseña {{ !editingUsuario ? '*' : '' }}</label>
-              <input id="password" name="password" type="password" [(ngModel)]="usuarioData.password" [required]="!editingUsuario"/>
+              <input id="password" name="password" type="password" [(ngModel)]="usuarioData.password" [required]="!editingUsuario" placeholder="Mínimo 6 caracteres"/>
             </div>
             <div class="form-group">
               <label for="rol_id">Rol *</label>
@@ -205,31 +194,24 @@
               </select>
             </div>
           </div>
-
+          
           <div class="form-group">
-            <label for="fecha_nacimiento">Fecha de nacimiento</label>
-            <input
-              id="fecha_nacimiento"
-              name="fecha_nacimiento"
-              type="date"
-              [(ngModel)]="usuarioData.fecha_nacimiento"
-            />
+            <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+            <input id="fecha_nacimiento" name="fecha_nacimiento" type="date" [(ngModel)]="usuarioData.fecha_nacimiento" [max]="hoy" />
+            <small style="color: #6b7280; font-size: 0.875rem;">La edad se calcula automáticamente</small>
           </div>
-
-          <div class="form-group">
-            <label for="fecha_registro">Fecha de registro</label>
-            <input
-              id="fecha_registro"
-              name="fecha_registro"
-              type="datetime-local"
-              [(ngModel)]="usuarioData.fecha_registro"
-              readonly
-            />
+          
+          <div class="form-group" *ngIf="editingUsuario && usuarioData.fecha_registro">
+            <label for="fecha_registro_display">Fecha de Registro</label>
+            <input id="fecha_registro_display" type="text" [value]="usuarioData.fecha_registro | date:'dd/MM/yyyy HH:mm'" readonly style="background-color: #f3f4f6; cursor: not-allowed;"/>
+            <small style="color: #6b7280; font-size: 0.875rem;">Este campo no se puede modificar</small>
           </div>
-
+          
           <div class="crud-usuario-modal-actions">
             <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
-            <button type="submit" class="btn-primary" [disabled]="!usuarioForm.form.valid || saving">{{ editingUsuario ? 'Actualizar' : 'Guardar' }}</button>
+            <button type="submit" class="btn-primary" [disabled]="!usuarioForm.form.valid || saving">
+              {{ saving ? 'Guardando...' : (editingUsuario ? 'Actualizar' : 'Guardar') }}
+            </button>
           </div>
         </form>
       </div>

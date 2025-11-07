@@ -31,13 +31,18 @@ export class CrudUsuarioComponent implements OnInit {
   pageSizes = [5, 10, 20, 50];
   searchText: string = '';
 
+  hoy: string = new Date().toISOString().substring(0, 10);
+
   // UI states
   loading = false;
   saving = false;
   deleting = false;
   errorMessage: string | null = null;
 
-  constructor(private usuarioService: UsuarioService, private rolService: RolService) {}
+  constructor(
+    private usuarioService: UsuarioService,
+    private rolService: RolService
+  ) {}
 
   ngOnInit() {
     this.loadRoles()
@@ -50,52 +55,57 @@ export class CrudUsuarioComponent implements OnInit {
   }
 
   // ---------- Usuarios ----------
-loadUsuarios() {
-  this.loading = true;
-  this.errorMessage = null;
+  loadUsuarios() {
+    this.loading = true;
+    this.errorMessage = null;
 
-  this.usuarioService
-    .obtenerUsuarios(this.page, this.size)
-    .pipe(finalize(() => (this.loading = false)))
-    .subscribe({
-      next: (pageData: UsuarioPage) => {
-        // Validamos que venga contenido
-        if (!pageData || !pageData.content) {
-          console.warn('⚠️ No se recibieron usuarios del backend.');
+    this.usuarioService
+      .obtenerUsuarios(this.page, this.size)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: (pageData: UsuarioPage) => {
+          if (!pageData || !pageData.content) {
+            console.warn('⚠️ No se recibieron usuarios del backend.');
+            this.usuarios = [];
+            this.allUsuarios = [];
+            return;
+          }
+
+          this.usuarios = [...pageData.content];
+          this.allUsuarios = [...this.usuarios];
+          
+          this.totalPages = pageData.totalPages ?? 1;
+          this.totalElements = pageData.totalElements ?? this.allUsuarios.length;
+
+          console.log('✅ [Usuarios] cargados correctamente:', this.usuarios.length, 'usuarios');
+          
+          if (this.usuarios.length > 0) {
+            console.log('📅 Ejemplo de usuario:', {
+              nombre: this.usuarios[0].nombre,
+              fecha_nacimiento: this.usuarios[0].fecha_nacimiento,
+              fecha_registro: this.usuarios[0].fecha_registro
+            });
+          }
+        },
+        error: (err: any) => {
+          console.error('❌ Error al cargar usuarios:', err);
+          
+          if (err.graphQLErrors) {
+            console.error('GraphQL Errors:', err.graphQLErrors);
+          }
+          if (err.networkError) {
+            console.error('Network Error:', err.networkError);
+          }
+          if (err.message) {
+            console.error('Error Message:', err.message);
+          }
+          
+          this.errorMessage = 'Error al cargar usuarios. Ver consola para detalles.';
           this.usuarios = [];
           this.allUsuarios = [];
-          return;
-        }
-
-        // Procesamos cada usuario y normalizamos la fecha
-        this.usuarios = pageData.content.map((u) => {
-          // Validamos si llega la fecha_nacimiento
-          if (!u.fecha_nacimiento) {
-            console.warn(`⚠️ Usuario sin fecha de nacimiento: ${u.nombre} ${u.apellido}`);
-          } else {
-            console.log(`📅 Fecha de nacimiento recibida (${u.nombre}):`, u.fecha_nacimiento);
-            // Convertir al formato YYYY-MM-DD si viene como ISO
-            if (u.fecha_nacimiento.includes('T')) {
-              u.fecha_nacimiento = u.fecha_nacimiento.substring(0, 10);
-            }
-          }
-          return u;
-        });
-
-        // Clonamos los datos para búsqueda/paginación
-        this.allUsuarios = [...this.usuarios];
-        this.totalPages = pageData.totalPages ?? 1;
-        this.totalElements = pageData.totalElements ?? this.allUsuarios.length;
-
-        console.log('[Usuarios] recibidos:', this.usuarios);
-      },
-      error: (err: any) => {
-        console.error('Error al cargar usuarios', err);
-        this.errorMessage = 'Error al cargar usuarios. Revisa la consola.';
-      },
-    });
-}
-
+        },
+      });
+  }
 
   onPageSizeChange(event: any) {
     const newSize = +event.target.value;
@@ -135,7 +145,6 @@ loadUsuarios() {
             if (r && r.id) this.rolesMap.set(String(r.id), r.nombre);
           });
           console.log('[Roles] cargados:', this.roles);
-          console.log('[RolesMap]:', Array.from(this.rolesMap.entries()));
           resolve();
         },
         error: (err: any) => {
@@ -187,64 +196,44 @@ loadUsuarios() {
     if (!rolId) return 'Sin rol';
     const key = String(rolId).trim();
 
-    console.log(`[getRolNombre] Buscando rol_id: "${key}"`);
-
     const direct = this.rolesMap.get(key);
-    if (direct) {
-      console.log(`[getRolNombre] Match directo encontrado: "${direct}"`);
-      return direct;
-    }
+    if (direct) return direct;
 
     const m = key.match(/ObjectId\("(.*)"\)/);
     const normalized = m ? m[1] : key;
     const direct2 = this.rolesMap.get(normalized);
-    if (direct2) {
-      console.log(`[getRolNombre] Match normalizado encontrado: "${direct2}"`);
-      return direct2;
-    }
+    if (direct2) return direct2;
 
     const suffix = normalized.slice(-12);
     for (const [k, v] of this.rolesMap) {
       if (k.endsWith(suffix) || k.includes(suffix)) {
-        console.log(`[getRolNombre] Match parcial encontrado: "${v}"`);
         return v;
       }
     }
 
-    console.warn(`[getRolNombre] No se encontró nombre para rol_id: "${key}"`);
     return key;
+  }
+
+  calcularEdad(fechaNacimiento?: string): number | null {
+    if (!fechaNacimiento) return null;
+    return this.usuarioService.calcularEdad(fechaNacimiento);
   }
 
   openAddModal() {
     this.editingUsuario = null;
     this.usuarioData = {};
 
-    const now = new Date();
-    const localISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 16);
-
-    this.usuarioData.fecha_registro = localISO;
     this.usuarioData.fecha_nacimiento = '';
 
     this.imagenPreview = null;
     this.showModal = true;
   }
 
-
   openEditModal(usuario: Usuario) {
     this.editingUsuario = usuario;
     this.usuarioData = { ...usuario } as any;
 
-    // Convertir fecha_registro para mostrar correctamente en el input datetime-local
-    if (usuario.fecha_registro) {
-      const fecha = new Date(usuario.fecha_registro);
-      const localISO = new Date(fecha.getTime() - fecha.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 16);
-      this.usuarioData.fecha_registro = localISO;
-    }
-
+    // Manejar foto de perfil
     if (usuario.foto_perfil && usuario.foto_perfil.trim() !== '') {
       this.imagenPreview = usuario.foto_perfil;
       this.usuarioData.foto_perfil = usuario.foto_perfil;
@@ -253,6 +242,7 @@ loadUsuarios() {
       this.usuarioData.foto_perfil = '';
     }
 
+    // Eliminar password del objeto (no debe editarse aquí)
     if ('password' in this.usuarioData) {
       delete (this.usuarioData as any).password;
     }
@@ -326,50 +316,50 @@ loadUsuarios() {
       direccion: this.usuarioData.direccion ?? '',
       rol_id: this.usuarioData.rol_id ?? '',
       foto_perfil: this.usuarioData.foto_perfil ?? '',
+      fecha_nacimiento: this.usuarioData.fecha_nacimiento ?? '',
     };
 
-
-    if (this.usuarioData.password && String(this.usuarioData.password).trim() !== '') {
-      (payload as any).password = this.usuarioData.password;
-    }
-
+    // Agregar password solo si existe y no está vacío
     if (this.usuarioData.password && String(this.usuarioData.password).trim() !== '') {
       (payload as any).password = this.usuarioData.password;
     }
 
     if (this.editingUsuario && this.editingUsuario.id) {
-    const id = this.editingUsuario.id;
-    this.usuarioService
-      .actualizarUsuario(id, payload)
-      .pipe(finalize(() => (this.saving = false)))
-      .subscribe({
-        next: () => {
-          this.loadUsuarios();
-          this.closeModal();
-        },
-        error: (err: any) => {
-          console.error('Error actualizando usuario', err);
-          this.errorMessage = 'Error al actualizar el usuario.';
-          alert(this.errorMessage);
-        },
-      });
-  } else {
-    this.usuarioService
-      .crearUsuario(payload)
-      .pipe(finalize(() => (this.saving = false)))
-      .subscribe({
-        next: () => {
-          this.loadUsuarios();
-          this.closeModal();
-        },
-        error: (err: any) => {
-          console.error('Error creando usuario', err);
-          this.errorMessage = 'Error al crear el usuario.';
-          alert(this.errorMessage);
-        },
-      });
-  }
-
+      // ACTUALIZAR
+      const id = this.editingUsuario.id;
+      this.usuarioService
+        .actualizarUsuario(id, payload)
+        .pipe(finalize(() => (this.saving = false)))
+        .subscribe({
+          next: (usuario) => {
+            console.log('✅ Usuario actualizado correctamente:', usuario);
+            this.loadUsuarios();
+            this.closeModal();
+          },
+          error: (err: any) => {
+            console.error('❌ Error actualizando usuario:', err);
+            this.errorMessage = 'Error al actualizar el usuario.';
+            alert(this.errorMessage);
+          },
+        });
+    } else {
+      // CREAR
+      this.usuarioService
+        .crearUsuario(payload)
+        .pipe(finalize(() => (this.saving = false)))
+        .subscribe({
+          next: (usuario) => {
+            console.log('✅ Usuario creado correctamente:', usuario);
+            this.loadUsuarios();
+            this.closeModal();
+          },
+          error: (err: any) => {
+            console.error('❌ Error creando usuario:', err);
+            this.errorMessage = 'Error al crear el usuario.';
+            alert(this.errorMessage);
+          },
+        });
+    }
   }
 
   deleteUsuario(usuario: Usuario) {
@@ -383,13 +373,14 @@ loadUsuarios() {
       .pipe(finalize(() => (this.deleting = false)))
       .subscribe({
         next: () => {
+          console.log('✅ Usuario eliminado correctamente');
           if (this.usuarios.length === 1 && this.page > 0) {
             this.page = Math.max(0, this.page - 1);
           }
           this.loadUsuarios();
         },
         error: (err: any) => {
-          console.error('Error eliminando usuario', err);
+          console.error('❌ Error eliminando usuario:', err);
           this.errorMessage = 'Error al eliminar el usuario.';
           alert(this.errorMessage);
         },

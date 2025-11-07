@@ -17,31 +17,34 @@ export class RegisterComponent {
     apellido: '',
     dni: '',
     numero_telefono: '',
-    edad: undefined,
     sexo: '',
     distrito: '',
     codigo_postal: '',
     direccion: '',
     email: '',
     password: '',
-    rol_id: ''
+    rol_id: '',
+    fecha_nacimiento: '' // ✅ NUEVO: en lugar de edad
   };
 
-  // Objeto para almacenar errores de validación
+  // ✅ NUEVO: Para el max del input date
+  hoy: string = new Date().toISOString().substring(0, 10);
+
   errors: { [key: string]: string } = {};
 
   showSuccess = false;
   showError: string | null = null;
   isLoading = false;
 
-  constructor(private usuarioService: UsuarioService, private router: Router) {}
+  constructor(
+    private usuarioService: UsuarioService,
+    private router: Router
+  ) {}
 
-  // Helper seguro para trim (evita error cuando value es undefined)
   private trim(value: unknown): string {
     return (value ?? '').toString().trim();
   }
 
-  // Validaciones en tiempo real (usando trim seguro y checks defensivos)
   validateNombre() {
     const value = this.trim(this.usuarioData.nombre);
     if (!value) {
@@ -77,9 +80,7 @@ export class RegisterComponent {
       delete this.errors['dni'];
       return;
     }
-    // Solo permitir números
     this.usuarioData.dni = (this.usuarioData.dni ?? '').toString().replace(/[^0-9]/g, '');
-    // Limitar a 8 dígitos
     if (this.usuarioData.dni.length > 8) {
       this.usuarioData.dni = this.usuarioData.dni.substring(0, 8);
     }
@@ -96,9 +97,7 @@ export class RegisterComponent {
       delete this.errors['numero_telefono'];
       return;
     }
-    // Solo permitir números y el símbolo +
     this.usuarioData.numero_telefono = (this.usuarioData.numero_telefono ?? '').toString().replace(/[^0-9+]/g, '');
-    // Limitar a 15 caracteres
     if (this.usuarioData.numero_telefono.length > 15) {
       this.usuarioData.numero_telefono = this.usuarioData.numero_telefono.substring(0, 15);
     }
@@ -110,20 +109,21 @@ export class RegisterComponent {
     }
   }
 
-  validateEdad() {
-    const edad = this.usuarioData.edad;
-    if (edad !== undefined && edad !== null) {
-      if (typeof edad !== 'number' || isNaN(edad)) {
-        this.errors['edad'] = 'Edad inválida';
-      } else if (edad < 18) {
-        this.errors['edad'] = 'Debes ser mayor de 18 años';
-      } else if (edad > 120) {
-        this.errors['edad'] = 'Edad inválida';
-      } else {
-        delete this.errors['edad'];
-      }
+  // ✅ NUEVO: Validar fecha de nacimiento
+  validateFechaNacimiento() {
+    if (!this.usuarioData.fecha_nacimiento) {
+      delete this.errors['fecha_nacimiento'];
+      return;
+    }
+
+    const edad = this.usuarioService.calcularEdad(this.usuarioData.fecha_nacimiento);
+    
+    if (edad !== null && edad < 18) {
+      this.errors['fecha_nacimiento'] = 'Debes ser mayor de 18 años';
+    } else if (edad !== null && edad > 120) {
+      this.errors['fecha_nacimiento'] = 'Fecha de nacimiento inválida';
     } else {
-      delete this.errors['edad'];
+      delete this.errors['fecha_nacimiento'];
     }
   }
 
@@ -132,9 +132,7 @@ export class RegisterComponent {
       delete this.errors['codigo_postal'];
       return;
     }
-    // Solo permitir números
     this.usuarioData.codigo_postal = (this.usuarioData.codigo_postal ?? '').toString().replace(/[^0-9]/g, '');
-    // Limitar a 5 dígitos
     if (this.usuarioData.codigo_postal.length > 5) {
       this.usuarioData.codigo_postal = this.usuarioData.codigo_postal.substring(0, 5);
     }
@@ -188,7 +186,6 @@ export class RegisterComponent {
     }
   }
 
-  // Verificar si el formulario es válido (usa trim seguro)
   isFormValid(): boolean {
     return Object.keys(this.errors).length === 0 &&
            this.trim(this.usuarioData.nombre) !== '' &&
@@ -200,12 +197,12 @@ export class RegisterComponent {
   register() {
     if (this.isLoading) return;
 
-    // Validar todos los campos antes de enviar
+    // Validar todos los campos
     this.validateNombre();
     this.validateApellido();
     this.validateDni();
     this.validateTelefono();
-    this.validateEdad();
+    this.validateFechaNacimiento(); // ✅ NUEVO
     this.validateCodigoPostal();
     this.validateEmail();
     this.validatePassword();
@@ -223,25 +220,24 @@ export class RegisterComponent {
     this.isLoading = true;
     this.showError = null;
 
-    // Asegurar rol por defecto si no se proporciona
     this.usuarioData.rol_id = this.usuarioData.rol_id && this.trim(this.usuarioData.rol_id) !== ''
       ? this.usuarioData.rol_id
       : '68ca68b40bc4d9ca3267b663';
 
-    // Construir payload explícito (defensivo)
+    // ✅ PAYLOAD ACTUALIZADO: sin edad
     const payload: UsuarioInput = {
       nombre: this.trim(this.usuarioData.nombre),
       apellido: this.trim(this.usuarioData.apellido),
       dni: this.usuarioData.dni ? this.usuarioData.dni.toString() : undefined,
       numero_telefono: this.usuarioData.numero_telefono ?? undefined,
-      edad: typeof this.usuarioData.edad === 'number' ? this.usuarioData.edad : undefined,
       sexo: this.usuarioData.sexo ?? undefined,
       distrito: this.usuarioData.distrito ?? undefined,
       codigo_postal: this.usuarioData.codigo_postal ?? undefined,
       direccion: this.usuarioData.direccion ?? undefined,
       email: this.trim(this.usuarioData.email),
       password: this.trim(this.usuarioData.password),
-      rol_id: this.usuarioData.rol_id
+      rol_id: this.usuarioData.rol_id,
+      fecha_nacimiento: this.usuarioData.fecha_nacimiento ?? undefined
     };
 
     this.usuarioService.crearUsuario(payload).subscribe({
@@ -254,7 +250,6 @@ export class RegisterComponent {
         }, 1200);
       },
       error: (err) => {
-        // Mensajes de error amigables
         if (err?.error?.message?.includes('email')) {
           this.showError = 'Este email ya está registrado.';
         } else if (err?.error?.message?.includes('dni')) {
