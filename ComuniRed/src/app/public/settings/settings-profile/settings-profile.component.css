@@ -75,6 +75,7 @@
   flex-wrap: wrap;
 }
 
+/* Avatar Section */
 .avatar-section {
   flex: 0 0 150px;
   text-align: center;
@@ -91,6 +92,20 @@
   object-fit: cover;
   border: 3px solid #000;
   background: #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.avatar-lg:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.username {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+  text-align: center;
 }
 
 .btn-change-photo {
@@ -103,11 +118,13 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-block;
 }
 
 .btn-change-photo:hover {
   background: #333;
   transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .photo-info {
@@ -116,6 +133,7 @@
   margin: 0;
 }
 
+/* Form */
 .profile-form {
   flex: 1;
   min-width: 300px;
@@ -145,6 +163,7 @@
 }
 
 .form-group input,
+.form-group select,
 .form-group textarea {
   padding: 10px 12px;
   border: 1px solid #ddd;
@@ -156,7 +175,12 @@
   transition: all 0.3s ease;
 }
 
+.form-group select {
+  cursor: pointer;
+}
+
 .form-group input:focus,
+.form-group select:focus,
 .form-group textarea:focus {
   outline: none;
   border-color: #000;
@@ -167,6 +191,17 @@
 .form-group textarea {
   min-height: 100px;
   resize: vertical;
+}
+
+.form-group .error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.form-group small {
+  color: #6b7280;
+  font-size: 0.85rem;
 }
 
 .actions {
@@ -190,8 +225,13 @@
   transition: all 0.3s ease;
 }
 
-.btn-cancel:hover {
+.btn-cancel:hover:not(:disabled) {
   background: #f0f0f0;
+}
+
+.btn-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-save {
@@ -204,14 +244,39 @@
   font-weight: 600;
   font-size: 0.95rem;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.btn-save:hover {
+.btn-save:hover:not(:disabled) {
   background: #333;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .tabs-section {
     padding: 0 16px;
@@ -232,6 +297,10 @@
     flex-direction: column;
     align-items: center;
     gap: 24px;
+  }
+
+  .avatar-section {
+    flex: none;
   }
 
   .form-row {

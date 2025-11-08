@@ -12,8 +12,8 @@ interface PrivacySetting {
 @Component({
   selector: "app-privacy",
   imports: [CommonModule, FormsModule],
-  templateUrl: "./privacy.component.html",
-  styleUrl: "./privacy.component.css",
+  templateUrl: "./settings-privacy.component.html",
+  styleUrl: "./settings-privacy.component.css",
 })
 export class SettingsPrivacyComponent {
   privacySettings: PrivacySetting[] = [

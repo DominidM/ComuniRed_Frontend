@@ -1,0 +1,158 @@
+<div class="config-container">
+  <div class="tab-content">
+    <div class="section-header">
+      <h2>Información Personal</h2>
+      <p>Actualiza tu información de perfil</p>
+    </div>
+
+    <div class="profile-main">
+      <div class="avatar-section">
+        <img [src]="foto_perfil_url" alt="Foto de perfil" class="avatar-lg" />
+        
+        <p class="username" *ngIf="usuario">{{ usuario.nombre }} {{ usuario.apellido }}</p>
+        
+        <label for="file-input" class="btn-change-photo">
+          Cambiar foto
+        </label>
+        <input 
+          id="file-input" 
+          type="file" 
+          accept="image/*" 
+          (change)="onFileSelected($event)"
+          style="display: none;"
+        />
+        
+        <p class="photo-info">JPG, PNG o GIF. Máx. 2MB</p>
+      </div>
+
+      <form [formGroup]="profileForm" (ngSubmit)="save()" class="profile-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input 
+              type="text" 
+              formControlName="nombre" 
+              placeholder="Ingresa tu nombre" 
+            />
+            <span class="error" *ngIf="profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched">
+              El nombre es obligatorio
+            </span>
+          </div>
+          
+          <div class="form-group">
+            <label>Apellido *</label>
+            <input 
+              type="text" 
+              formControlName="apellido" 
+              placeholder="Ingresa tu apellido" 
+            />
+            <span class="error" *ngIf="profileForm.get('apellido')?.invalid && profileForm.get('apellido')?.touched">
+              El apellido es obligatorio
+            </span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Correo electrónico *</label>
+            <input 
+              type="email" 
+              formControlName="email" 
+              placeholder="tu@email.com" 
+            />
+            <span class="error" *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+              Ingresa un email válido
+            </span>
+          </div>
+          
+          <div class="form-group">
+            <label>DNI</label>
+            <input 
+              type="text" 
+              formControlName="dni" 
+              placeholder="12345678" 
+              maxlength="8"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input 
+              type="text" 
+              formControlName="numero_telefono" 
+              placeholder="987654321" 
+            />
+          </div>
+          
+          <div class="form-group">
+            <label>Fecha de Nacimiento</label>
+            <input 
+              type="date" 
+              formControlName="fecha_nacimiento" 
+              [max]="hoy"
+            />
+            <small *ngIf="calcularEdad()" style="color: #6b7280; font-size: 12px;">
+              Edad: {{ calcularEdad() }} años
+            </small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Sexo</label>
+            <select formControlName="sexo">
+              <option value="">Seleccionar</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Distrito</label>
+            <input 
+              type="text" 
+              formControlName="distrito" 
+              placeholder="Ej: Miraflores" 
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Código Postal</label>
+            <input 
+              type="text" 
+              formControlName="codigo_postal" 
+              placeholder="15073" 
+              maxlength="5"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label>Dirección</label>
+            <input 
+              type="text" 
+              formControlName="direccion" 
+              placeholder="Av. Principal 123" 
+            />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="guardando">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-save" [disabled]="profileForm.invalid || guardando">
+            <span *ngIf="!guardando">Guardar Cambios</span>
+            <span *ngIf="guardando">
+              <span class="spinner-small"></span> Guardando...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

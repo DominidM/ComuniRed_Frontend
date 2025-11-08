@@ -54,67 +54,65 @@
   object-fit: cover;
 }
 
-.user-email {
-  font-size: 16px;
-  color: #555;
-  margin-top: -5px;
-  margin-bottom: 10px;
+/* ✅ NUEVO: Contenedor principal con flex */
+.profile-content {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding-top: 10px;
 }
 
+/* ✅ Izquierda: Nombre y Email */
 .user-details {
-  flex: 1;
-  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .user-name {
   font-size: 28px;
   font-weight: 700;
   color: #000000;
-  margin: 0 0 12px 0;
+  margin: 0;
 }
 
+.user-email {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ✅ Derecha: Fecha y Rol */
 .user-meta {
   display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  font-size: 14px;
-  color: #2d353f;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  text-align: right;
 }
 
-.user-meta span {
-  display: flex;
+.member-date {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-}
-
-.role {
-  background: #e0e7ff;
-  color: #05040e;
-  padding: 4px 12px;
-  border-radius: 20px;
+  font-size: 16px;
+  color: #475569;
   font-weight: 500;
 }
 
-.edit-profile-btn {
-  background: #000000;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
+.role {
+  display: inline-flex;
+  align-items: center;
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 6px 14px;
+  border-radius: 20px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  margin-top: 10px;
+  font-size: 16px;
 }
 
-.edit-profile-btn:hover {
-  background: #000000;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
-}
-
+/* Stats Container */
 .stats-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -154,6 +152,7 @@
   font-weight: 500;
 }
 
+/* Tabs Section */
 .tabs-section {
   background: white;
   border-radius: 12px;
@@ -204,6 +203,7 @@
   min-height: 300px;
 }
 
+/* Empty State */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -212,6 +212,7 @@
   gap: 16px;
   color: #94a3b8;
   text-align: center;
+  padding: 60px 20px;
 }
 
 .empty-icon {
@@ -224,6 +225,7 @@
   margin: 0;
 }
 
+/* Logros Grid */
 .logros-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -293,6 +295,7 @@
   color: #94a3b8;
 }
 
+/* Estadísticas */
 .estadisticas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -363,19 +366,16 @@
   }
 }
 
+/* Responsive */
 @media (max-width: 768px) {
-  .profile-info {
+  .profile-content {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    gap: 16px;
   }
 
   .user-meta {
-    justify-content: center;
-  }
-
-  .edit-profile-btn {
-    width: 100%;
+    align-items: flex-start;
+    text-align: left;
   }
 
   .stats-container {

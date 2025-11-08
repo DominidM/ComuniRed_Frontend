@@ -32,10 +32,10 @@ import { HelpComponent } from './public/help/help.component';
 
 import { SettingsComponent } from './public/settings/settings.component';
 
-import { SettingsNotificationsComponent } from './public/settings/notifications/notifications.component';
-import { SettingsPrivacyComponent } from './public/settings/privacy/privacy.component';
-import { SettingsSecurityComponent } from './public/settings/security/security.component';
-import { SettingsProfileComponent } from './public/settings/profile/profile.component';
+import { SettingsNotificationsComponent } from './public/settings/settings-notifications/settings-notifications.component';
+import { SettingsPrivacyComponent } from './public/settings/settings-privacy/settings-privacy.component';
+import { SettingsSecurityComponent } from './public/settings/settings-security/settings-security.component';
+import { SettingsProfileComponent } from './public/settings/settings-profile/settings-profile.component';
 
 
 // Reportes y exportaciones
@@ -118,9 +118,8 @@ export const routes: Routes = [
       { path: 'trending', component: TrendingComponent },
       { path: 'reels', component: ReelsComponent },
       { path: 'notifications', component: NotificationsComponent },
-      { path: 'profile/:id', component: ProfileComponent },
+      { path: 'profile/:id', component: ProfileComponent},
       { path: 'help', component: HelpComponent },
-
       {
         path: 'settings',
         component: SettingsComponent,

@@ -6,8 +6,8 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-settings-security',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './security.component.html',
-  styleUrls: ['./security.component.css']
+  templateUrl: './settings-security.component.html',
+  styleUrls: ['./settings-security.component.css']
 })
 export class SettingsSecurityComponent {
   twoFactor = false;

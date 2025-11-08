@@ -5,17 +5,24 @@
       <div class="avatar">
         <img [src]="user?.foto_perfil" alt="Foto de perfil" class="avatar-img" />
       </div>
-      <div class="user-details">
-        <h1 class="user-name">{{ user?.nombre }} {{ user?.apellido }}</h1>
-        <p class="user-email">{{ user?.email }}</p>
-      </div>
-
-        <div class="user-meta">
-          <span class="member-date">📅 Miembro desde Oct 2025</span>
-          <span class="role">Usuario</span>
+      
+      <!-- ✅ Contenedor principal con flex -->
+      <div class="profile-content">
+        <!-- ✅ Izquierda: Nombre y Email -->
+        <div class="user-details">
+          <h1 class="user-name">{{ user?.nombre }} {{ user?.apellido }}</h1>
+          <p class="user-email">{{ user?.email }}</p>
         </div>
         
-      <button class="edit-profile-btn">✏️ Editar Perfil</button>
+        <div class="user-meta">
+          <span class="member-date">
+            Miembro desde el {{ user?.fecha_registro | date: 'd' }} de 
+            {{ user?.fecha_registro | date: 'MMMM' }} de 
+            {{ user?.fecha_registro | date: 'yyyy' }}
+          </span>
+          <span class="role">Usuario</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -74,7 +81,7 @@
             <div class="logro-icon" style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);">🎯</div>
             <div class="logro-info">
               <h3>Primer Reporte</h3>
-              <p>Creaate tu primer reporte</p>
+              <p>Creaste tu primer reporte</p>
             </div>
             <div class="logro-badge">✓</div>
           </div>
@@ -83,7 +90,7 @@
             <div class="logro-icon" style="background: linear-gradient(135deg, #ffd93d 0%, #ffed4e 100%);">⭐</div>
             <div class="logro-info">
               <h3>Ciudadano Activo</h3>
-              <p>Creaate 5 reportes</p>
+              <p>Creaste 5 reportes</p>
             </div>
             <div class="logro-badge">✓</div>
           </div>
