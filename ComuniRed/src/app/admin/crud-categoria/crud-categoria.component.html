@@ -11,19 +11,9 @@
       </button>
     </div>
 
-
     <div class="crud-rol-controls-row">
-      <div class="crud-rol-search-box">
-        <input type="text" [(ngModel)]="nombreBuscado" placeholder="Buscar por nombre..." (keyup.enter)="buscarCategoria()" />
-
-
-        <button class="crud-rol-search-btn" (click)="buscarCategoria()" aria-label="Buscar categoría">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-        </button>
-      </div>
+      <!-- Si vas a implementar búsqueda paginada, aquí puedes agregar el filtro por nombre -->
+      <!-- Por ahora, solo frontend paginación 😃 -->
       <div class="crud-rol-show-select">
         <label for="pageSize">por página</label>
         <select id="pageSize" (change)="onPageSizeChange($event)" [value]="pageSize">
@@ -33,8 +23,7 @@
       </div>
     </div>
 
-
-    <div *ngIf="paginatedCategorias && paginatedCategorias.length > 0; else noCategorias">
+    <div *ngIf="categorias && categorias.length > 0; else noCategorias">
       <table class="crud-rol-table">
         <thead>
           <tr>
@@ -46,7 +35,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let cat of paginatedCategorias; trackBy: trackByCategoriaId">
+          <tr *ngFor="let cat of categorias; trackBy: trackByCategoriaId">
             <td style="display: none;">{{ cat.id }}</td>
             <td>
               <div class="role-name">{{ cat.nombre }}</div>
@@ -61,19 +50,14 @@
             </td>
             <td>
               <div class="action-buttons">
-                <button class="btn-edit" (click)="editarCategoria(cat)" title="Editar categoría">
-                  Editar
-                </button>
-                <button class="btn-delete" (click)="eliminarCategoria(cat.id)" title="Eliminar categoría">
-                  Eliminar
-                </button>
+                <button class="btn-edit" (click)="editarCategoria(cat)" title="Editar categoría">Editar</button>
+                <button class="btn-delete" (click)="eliminarCategoria(cat.id)" title="Eliminar categoría">Eliminar</button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-
 
     <ng-template #noCategorias>
       <div class="crud-rol-empty">
@@ -90,24 +74,22 @@
       </div>
     </ng-template>
 
-
-    <div class="crud-rol-pagination-row" *ngIf="allCategorias.length > 0">
+    <div class="crud-rol-pagination-row" *ngIf="categorias.length > 0">
       <div class="crud-rol-pagination">
         <button class="crud-rol-pagination-btn" (click)="cambiarPagina(currentPage - 1)" [disabled]="currentPage === 1">
-          <b>&lt; Anterior</b>
+          &lt; Anterior
         </button>
         <span class="crud-rol-pagination-info">
-          <b>Página {{ currentPage }} de {{ totalPages }}</b>
+          Página {{ currentPage }} de {{ totalPages }}
         </span>
         <button class="crud-rol-pagination-btn" (click)="cambiarPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
-          <b>Siguiente &gt;</b>
+          Siguiente &gt;
         </button>
       </div>
       <div class="crud-rol-pagination-count">
-        <span>Mostrando {{ paginatedCategorias.length }} de {{ categoriasFiltradas.length }} datos.</span>
+        <span>Mostrando {{ categorias.length }} de {{ totalCategorias }} datos.</span>
       </div>
     </div>
-
 
     <div class="crud-rol-modal" *ngIf="showModal" (click)="closeModal()">
       <div class="crud-rol-modal-content" (click)="$event.stopPropagation()">
@@ -120,7 +102,6 @@
           </svg>
           {{ editingCategoria ? 'Editar Categoría' : 'Nueva Categoría' }}
         </h3>
-        
         <form (ngSubmit)="guardarCategoria()" #categoriaForm="ngForm">
           <div class="form-group">
             <label for="nombre">Nombre de la Categoría</label>
@@ -134,7 +115,6 @@
               autocomplete="off"
             />
           </div>
-          
           <div class="form-group">
             <label for="descripcion">Descripción</label>
             <input 
@@ -146,7 +126,6 @@
               autocomplete="off"
             />
           </div>
-          
           <div class="form-group">
             <label class="checkbox-label">
               <input 
@@ -158,7 +137,6 @@
               <span class="checkbox-text">Categoría activa</span>
             </label>
           </div>
-          
           <div class="crud-rol-modal-actions">
             <button type="button" class="btn-cancel" (click)="closeModal()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

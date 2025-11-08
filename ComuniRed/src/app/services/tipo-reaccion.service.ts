@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, map } from 'rxjs';
 
 export interface TipoReaccion {
   id: string;
@@ -11,42 +10,46 @@ export interface TipoReaccion {
   orden: number;
 }
 
+export interface TiposReaccionPage {
+  content: TipoReaccion[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TipoReaccionService {
   constructor(private apollo: Apollo) {}
 
-  // Listar todos
-  getAll(): Observable<TipoReaccion[]> {
+  obtenerTipoReaccionPage(page: number, size: number): Observable<TiposReaccionPage> {
     return this.apollo
-      .watchQuery<{ listarTiposReaccion: TipoReaccion[] }>({
+      .watchQuery<{ obtenerTipo_reaccion: TiposReaccionPage }>({
         query: gql`
-          query {
-            listarTiposReaccion {
-              id
-              key
-              label
-              activo
-              orden
+          query ($page: Int!, $size: Int!) {
+            obtenerTipo_reaccion(page: $page, size: $size) {
+              content { id key label activo orden }
+              totalElements
+              totalPages
+              number
+              size
             }
           }
         `,
-        fetchPolicy: 'network-only'
+        variables: { page, size },
+        fetchPolicy: 'network-only'  // 👈 Agrega esta línea
       })
-      .valueChanges.pipe(map(result => result.data.listarTiposReaccion));
+      .valueChanges.pipe(map(result => result.data.obtenerTipo_reaccion));
   }
 
-  // Buscar por label
-  buscarPorNombre(label: string): Observable<TipoReaccion | null> {
+
+  buscarPorLabel(label: string): Observable<TipoReaccion | null> {
     return this.apollo
       .watchQuery<{ buscarTipoReaccionPorLabel: TipoReaccion | null }>({
         query: gql`
-          query BuscarTipoReaccionPorLabel($label: String!) {
+          query ($label: String!) {
             buscarTipoReaccionPorLabel(label: $label) {
-              id
-              key
-              label
-              activo
-              orden
+              id key label activo orden
             }
           }
         `,
@@ -56,18 +59,13 @@ export class TipoReaccionService {
       .valueChanges.pipe(map(result => result.data.buscarTipoReaccionPorLabel));
   }
 
-  // Crear
-  create(tipo: Partial<TipoReaccion>): Observable<TipoReaccion> {
+  crearTipoReaccion(tipo: Partial<TipoReaccion>, page: number, size: number): Observable<TipoReaccion> {
     return this.apollo
       .mutate<{ crearTipoReaccion: TipoReaccion }>({
         mutation: gql`
           mutation($key: String!, $label: String!, $activo: Boolean!, $orden: Int!) {
             crearTipoReaccion(key: $key, label: $label, activo: $activo, orden: $orden) {
-              id
-              key
-              label
-              activo
-              orden
+              id key label activo orden
             }
           }
         `,
@@ -76,23 +74,34 @@ export class TipoReaccionService {
           label: tipo.label!,
           activo: tipo.activo ?? true,
           orden: tipo.orden ?? 1
-        }
+        },
+        refetchQueries: [
+          {
+            query: gql`
+              query ($page: Int!, $size: Int!) {
+                obtenerTipo_reaccion(page: $page, size: $size) {
+                  content { id key label activo orden }
+                  totalElements
+                  totalPages
+                  number
+                  size
+                }
+              }
+            `,
+            variables: { page, size }
+          }
+        ]
       })
       .pipe(map(result => result.data!.crearTipoReaccion));
   }
 
-  // Actualizar - CAMBIO AQUÍ: String! → ID!
-  update(id: string, tipo: Partial<TipoReaccion>): Observable<TipoReaccion> {
+  actualizarTipoReaccion(id: string, tipo: Partial<TipoReaccion>, page: number, size: number): Observable<TipoReaccion> {
     return this.apollo
       .mutate<{ actualizarTipoReaccion: TipoReaccion }>({
         mutation: gql`
           mutation($id: ID!, $key: String!, $label: String!, $activo: Boolean!, $orden: Int!) {
             actualizarTipoReaccion(id: $id, key: $key, label: $label, activo: $activo, orden: $orden) {
-              id
-              key
-              label
-              activo
-              orden
+              id key label activo orden
             }
           }
         `,
@@ -102,13 +111,28 @@ export class TipoReaccionService {
           label: tipo.label!,
           activo: tipo.activo ?? true,
           orden: tipo.orden ?? 1
-        }
+        },
+        refetchQueries: [
+          {
+            query: gql`
+              query ($page: Int!, $size: Int!) {
+                obtenerTipo_reaccion(page: $page, size: $size) {
+                  content { id key label activo orden }
+                  totalElements
+                  totalPages
+                  number
+                  size
+                }
+              }
+            `,
+            variables: { page, size }
+          }
+        ]
       })
       .pipe(map(result => result.data!.actualizarTipoReaccion));
   }
 
-  // Eliminar - CAMBIO AQUÍ: String! → ID!
-  delete(id: string): Observable<boolean> {
+  eliminarTipoReaccion(id: string, page: number, size: number): Observable<boolean> {
     return this.apollo
       .mutate<{ eliminarTipoReaccion: boolean }>({
         mutation: gql`
@@ -116,7 +140,23 @@ export class TipoReaccionService {
             eliminarTipoReaccion(id: $id)
           }
         `,
-        variables: { id }
+        variables: { id },
+        refetchQueries: [
+          {
+            query: gql`
+              query ($page: Int!, $size: Int!) {
+                obtenerTipo_reaccion(page: $page, size: $size) {
+                  content { id key label activo orden }
+                  totalElements
+                  totalPages
+                  number
+                  size
+                }
+              }
+            `,
+            variables: { page, size }
+          }
+        ]
       })
       .pipe(map(result => result.data?.eliminarTipoReaccion ?? false));
   }

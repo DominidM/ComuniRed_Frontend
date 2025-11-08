@@ -1,10 +1,10 @@
 <div class="crud-tipo-reaccion-root">
   <div class="crud-tipo-reaccion-card">
-    <!-- Header -->
+
     <div class="crud-tipo-reaccion-header">
       <h2>Gestión de Tipos de Reacción</h2>
       <button class="btn-primary" (click)="openAddModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
@@ -12,31 +12,17 @@
       </button>
     </div>
 
-    <!-- Controles superiores: Buscador + selector por página -->
     <div class="crud-tipo-reaccion-controls-row">
-      <div class="crud-tipo-reaccion-search-box">
-        <input type="text" [(ngModel)]="busqueda" placeholder="Buscar por nombre..." (keyup.enter)="buscarPorNombre()" />
-
-        <button class="crud-tipo-reaccion-search-btn" (click)="buscarPorNombre()" aria-label="Buscar tipo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-        </button>
-      </div>
       <div class="crud-tipo-reaccion-show-select">
         <label for="pageSize">por página</label>
-        <select id="pageSize" (change)="cambiarCantidad($event)" [value]="itemsPerPage">
-          <option [value]="5">5</option>
-          <option [value]="10">10</option>
-          <option [value]="20">20</option>
-          <option [value]="50">50</option>
+        <select id="pageSize" (change)="onPageSizeChange($event)" [value]="pageSize">
+          <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
         </select>
-        <span>Total: {{ tipos.length }}</span>
+        <span>Total: {{ totalTipos }}</span>
       </div>
     </div>
 
-    <div *ngIf="paginatedTipos && paginatedTipos.length > 0; else noTipos">
+    <div *ngIf="tipos.length > 0; else noTipos">
       <table class="crud-tipo-reaccion-table">
         <thead>
           <tr>
@@ -49,32 +35,20 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let tipo of paginatedTipos; trackBy: trackByTipoId">
+          <tr *ngFor="let tipo of tipos; trackBy: trackByTipoId">
             <td style="display: none;">{{ tipo.id }}</td>
-            <td>
-              <div class="tipo-key">
-                <span class="badge-key">{{ tipo.key }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="tipo-nombre">{{ tipo.label }}</div>
-            </td>
+            <td><div class="tipo-key"><span class="badge-key">{{ tipo.key }}</span></div></td>
+            <td><div class="tipo-nombre">{{ tipo.label }}</div></td>
             <td>
               <span class="status-badge" [class.status-active]="tipo.activo" [class.status-inactive]="!tipo.activo">
                 {{ tipo.activo ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
-            <td>
-              <span class="orden-badge">{{ tipo.orden }}</span>
-            </td>
+            <td><span class="orden-badge">{{ tipo.orden }}</span></td>
             <td>
               <div class="action-buttons">
-                <button class="btn-edit" (click)="openEditModal(tipo)" title="Editar tipo">
-                  Editar
-                </button>
-                <button class="btn-delete" (click)="deleteTipo(tipo)" title="Eliminar tipo">
-                  Eliminar
-                </button>
+                <button class="btn-edit" (click)="openEditModal(tipo)" title="Editar tipo">Editar</button>
+                <button class="btn-delete" (click)="deleteTipo(tipo)" title="Eliminar tipo">Eliminar</button>
               </div>
             </td>
           </tr>
@@ -82,10 +56,9 @@
       </table>
     </div>
 
-
     <ng-template #noTipos>
       <div class="crud-tipo-reaccion-empty">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #000000;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
           <circle cx="12" cy="12" r="10"></circle>
           <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
           <line x1="9" y1="9" x2="9.01" y2="9"></line>
@@ -98,29 +71,27 @@
       </div>
     </ng-template>
 
-
-    <div class="crud-tipo-reaccion-pagination-row" *ngIf="tipos.length > 0">
+    <div class="crud-tipo-reaccion-pagination-row" *ngIf="totalTipos > 0">
       <div class="crud-tipo-reaccion-pagination">
         <button class="crud-tipo-reaccion-pagination-btn" (click)="cambiarPagina(currentPage - 1)" [disabled]="currentPage === 1">
-          <b>&lt; Anterior</b>
+          &lt; Anterior
         </button>
         <span class="crud-tipo-reaccion-pagination-info">
-          <b>Página {{ currentPage }} de {{ totalPages }}</b>
+          Página {{ currentPage }} de {{ totalPages }}
         </span>
         <button class="crud-tipo-reaccion-pagination-btn" (click)="cambiarPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
-          <b>Siguiente &gt;</b>
+          Siguiente &gt;
         </button>
       </div>
       <div class="crud-tipo-reaccion-pagination-count">
-        <span>Mostrando {{ paginatedTipos.length }} de {{ tipos.length }} datos.</span>
+        <span>Mostrando {{ tipos.length }} de {{ totalTipos }} datos.</span>
       </div>
     </div>
-
 
     <div class="crud-tipo-reaccion-modal" *ngIf="showModal" (click)="closeModal()">
       <div class="crud-tipo-reaccion-modal-content" (click)="$event.stopPropagation()">
         <h3>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
             <line x1="9" y1="9" x2="9.01" y2="9"></line>
@@ -128,7 +99,6 @@
           </svg>
           {{ editingTipo ? 'Editar Tipo de Reacción' : 'Nuevo Tipo de Reacción' }}
         </h3>
-        
         <form (ngSubmit)="saveTipo()" #tipoForm="ngForm">
           <div class="form-group">
             <label for="key">Clave (Key)</label>
@@ -139,12 +109,10 @@
               [(ngModel)]="tipoData.key" 
               required 
               maxlength="50"
-              placeholder="Ej: like, love, laugh..."
               autocomplete="off"
             />
             <small class="form-help">Identificador único del tipo de reacción</small>
           </div>
-          
           <div class="form-group">
             <label for="label">Nombre (Label)</label>
             <input 
@@ -154,12 +122,10 @@
               [(ngModel)]="tipoData.label" 
               required 
               maxlength="100"
-              placeholder="Ej: Me gusta, Me encanta, Me divierte..."
               autocomplete="off"
             />
             <small class="form-help">Nombre visible del tipo de reacción</small>
           </div>
-          
           <div class="form-group">
             <label for="orden">Orden</label>
             <input 
@@ -169,11 +135,9 @@
               [(ngModel)]="tipoData.orden" 
               required 
               min="1"
-              placeholder="Ej: 1, 2, 3..."
               autocomplete="off"
             />
           </div>
-          
           <div class="form-group">
             <label class="checkbox-label">
               <input 
@@ -185,17 +149,16 @@
               <span class="checkbox-text">Tipo de reacción activo</span>
             </label>
           </div>
-          
           <div class="crud-tipo-reaccion-modal-actions">
             <button type="button" class="btn-cancel" (click)="closeModal()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
               Cancelar
             </button>
             <button type="submit" class="btn-primary" [disabled]="!tipoForm.valid">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="20,6 9,17 4,12"></polyline>
               </svg>
               {{ editingTipo ? 'Actualizar' : 'Guardar' }}

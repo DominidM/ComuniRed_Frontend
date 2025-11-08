@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TipoReaccionService, TipoReaccion } from '../../services/tipo-reaccion.service';
+import { finalize } from 'rxjs/operators';
+import { TipoReaccionService, TipoReaccion, TiposReaccionPage } from '../../services/tipo-reaccion.service';
 
 @Component({
   selector: 'app-crud-tipo-reaccion',
@@ -12,84 +13,80 @@ import { TipoReaccionService, TipoReaccion } from '../../services/tipo-reaccion.
 })
 export class CrudTipoReaccionComponent implements OnInit {
   tipos: TipoReaccion[] = [];
-  tiposFiltrados: TipoReaccion[] = [];
+  totalTipos: number = 0;
+  currentPage: number = 1;
+  totalPages: number = 1;
+  pageSize: number = 5;
+  pageSizes: number[] = [5, 10, 20, 50, 100];
+
+  loading = false;
+  saving = false;
+  deleting = false;
+
   showModal = false;
   editingTipo: TipoReaccion | null = null;
   tipoData: Partial<TipoReaccion> = {};
-  busqueda: string = '';
 
-  currentPage = 1;
-  itemsPerPage = 10;
-  totalPages = 1;
-
-  constructor(private tipoReaccionService: TipoReaccionService) {}
+  constructor(
+    private tipoReaccionService: TipoReaccionService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadTipos();
   }
 
-  trackByTipoId(index: number, tipo: TipoReaccion): any {
-    return tipo.id || index;
+  trackByTipoId(index: number, tipo: TipoReaccion): string {
+    return tipo.id || index.toString();
   }
 
   loadTipos() {
-    this.tipoReaccionService.getAll().subscribe({
-      next: (data) => {
-        this.tipos = data;
-        this.filtrar();
-      },
-      error: (err) => console.error('Error al cargar tipos:', err)
-    });
+    this.loading = true;
+    this.tipoReaccionService.obtenerTipoReaccionPage(this.currentPage - 1, this.pageSize)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: (data: TiposReaccionPage) => {
+          this.tipos = data.content;
+          this.totalTipos = data.totalElements;
+          this.totalPages = data.totalPages;
+          if (this.currentPage > this.totalPages && this.totalPages > 0) {
+            this.currentPage = this.totalPages;
+            this.loadTipos();
+          }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error al cargar tipos:', err);
+          alert('Error al cargar los tipos de reacción');
+        }
+      });
   }
 
-  buscarPorNombre() {
-    const label = this.busqueda.trim();
-    if (!label) {
+  onPageSizeChange(event: any): void {
+    const newSize = +event.target.value;
+    if (!isNaN(newSize) && newSize > 0) {
+      this.pageSize = newSize;
+      this.currentPage = 1;
       this.loadTipos();
-      return;
-    }
-
-    this.tipoReaccionService.buscarPorNombre(label).subscribe({
-      next: (result) => {
-        this.tipos = result ? [result] : [];
-        this.filtrar();
-      },
-      error: (err) => {
-        console.error('Error al buscar tipo:', err);
-        this.tipos = [];
-        this.filtrar();
-      }
-    });
-  }
-
-  filtrar() {
-    this.tiposFiltrados = this.tipos.slice();
-    this.totalPages = Math.ceil(this.tiposFiltrados.length / this.itemsPerPage);
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = this.totalPages > 0 ? this.totalPages : 1;
     }
   }
 
-  get paginatedTipos(): TipoReaccion[] {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    return this.tiposFiltrados.slice(start, end);
-  }
-
-  cambiarCantidad(event: any) {
-    this.itemsPerPage = +event.target.value;
-    this.filtrar();
-  }
-
-  cambiarPagina(pagina: number) {
+  cambiarPagina(pagina: number): void {
     if (pagina < 1 || pagina > this.totalPages) return;
     this.currentPage = pagina;
+    this.loadTipos();
   }
 
   openAddModal() {
     this.editingTipo = null;
     this.tipoData = { activo: true, orden: 1 };
     this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+    this.editingTipo = null;
+    this.tipoData = {};
   }
 
   openEditModal(tipo: TipoReaccion) {
@@ -104,11 +101,20 @@ export class CrudTipoReaccionComponent implements OnInit {
       return;
     }
 
+    this.saving = true;
+
     if (this.editingTipo) {
-      this.tipoReaccionService.update(this.editingTipo.id, this.tipoData).subscribe({
+      this.tipoReaccionService.actualizarTipoReaccion(
+        this.editingTipo.id,
+        this.tipoData,
+        this.currentPage - 1,
+        this.pageSize
+      )
+      .pipe(finalize(() => (this.saving = false)))
+      .subscribe({
         next: () => {
-          this.loadTipos();
           this.closeModal();
+          this.loadTipos();
         },
         error: (err) => {
           console.error('Error al actualizar:', err);
@@ -116,10 +122,16 @@ export class CrudTipoReaccionComponent implements OnInit {
         }
       });
     } else {
-      this.tipoReaccionService.create(this.tipoData).subscribe({
+      this.tipoReaccionService.crearTipoReaccion(
+        this.tipoData,
+        this.currentPage - 1,
+        this.pageSize
+      )
+      .pipe(finalize(() => (this.saving = false)))
+      .subscribe({
         next: () => {
-          this.loadTipos();
           this.closeModal();
+          this.loadTipos();
         },
         error: (err) => {
           console.error('Error al crear:', err);
@@ -130,29 +142,33 @@ export class CrudTipoReaccionComponent implements OnInit {
   }
 
   deleteTipo(tipo: TipoReaccion) {
-    if (confirm(`¿Seguro que deseas eliminar el tipo "${tipo.label}"?`)) {
-      const id = tipo.id;
+    if (!confirm(`¿Seguro que deseas eliminar el tipo "${tipo.label}"?`)) return;
 
-      if (!id) {
-        alert('Error: ID de tipo no válido');
-        return;
-      }
+    const id = tipo.id;
+    if (!id) {
+      alert('Error: ID de tipo no válido');
+      return;
+    }
 
-      this.tipoReaccionService.delete(id).subscribe({
-        next: () => {
-          this.loadTipos();
+    let paginaGuardada = this.currentPage;
+    if (this.tipos.length === 1 && this.currentPage > 1) {
+      paginaGuardada = this.currentPage - 1;
+    }
+
+    this.deleting = true;
+    this.tipoReaccionService.eliminarTipoReaccion(id, paginaGuardada - 1, this.pageSize)
+      .pipe(finalize(() => (this.deleting = false)))
+      .subscribe({
+        next: (ok) => {
+          if (ok) {
+            this.currentPage = paginaGuardada;
+            this.loadTipos();
+          }
         },
         error: (error) => {
           console.error('Error al eliminar:', error);
           alert(`Error al eliminar tipo: ${error.message || 'Error interno del servidor'}`);
         }
       });
-    }
-  }
-
-  closeModal() {
-    this.showModal = false;
-    this.editingTipo = null;
-    this.tipoData = {};
   }
 }

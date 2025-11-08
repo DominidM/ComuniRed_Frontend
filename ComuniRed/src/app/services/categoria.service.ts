@@ -10,6 +10,14 @@ export interface Categoria {
   activo: boolean;
 }
 
+export interface CategoriaPage {
+  content: Categoria[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,25 +25,30 @@ export class CategoriaService {
 
   constructor(private apollo: Apollo) {}
 
-  // 🔹 1. Listar todas las categorías
-  listarCategorias(): Observable<Categoria[]> {
-    return this.apollo.watchQuery<{ listarCategorias: Categoria[] }>({
+  obtenerCategorias(page: number, size: number): Observable<CategoriaPage> {
+    return this.apollo.watchQuery<{ obtenerCategorias: CategoriaPage }>({
       query: gql`
-        query {
-          listarCategorias {
-            id
-            nombre
-            descripcion
-            activo
+        query ($page: Int!, $size: Int!) {
+          obtenerCategorias(page: $page, size: $size) {
+            content {
+              id
+              nombre
+              descripcion
+              activo
+            }
+            totalElements
+            totalPages
+            number
+            size
           }
         }
-      `
+      `,
+      variables: { page, size }
     }).valueChanges.pipe(
-      map(result => result.data.listarCategorias)
+      map(result => result.data.obtenerCategorias)
     );
   }
 
-  // 🔹 2. Buscar categoría por nombre
   buscarCategoriaPorNombre(nombre: string): Observable<Categoria | null> {
     return this.apollo.watchQuery<{ buscarCategoriaPorNombre: Categoria }>({
       query: gql`
@@ -54,8 +67,7 @@ export class CategoriaService {
     );
   }
 
-  // 🔹 3. Crear una nueva categoría
-  crearCategoria(nombre: string, descripcion: string, activo: boolean): Observable<Categoria> {
+  crearCategoria(nombre: string, descripcion: string, activo: boolean, page: number, size: number): Observable<Categoria> {
     return this.apollo.mutate<{ crearCategoria: Categoria }>({
       mutation: gql`
         mutation ($nombre: String!, $descripcion: String!, $activo: Boolean!) {
@@ -67,14 +79,29 @@ export class CategoriaService {
           }
         }
       `,
-      variables: { nombre, descripcion, activo }
+      variables: { nombre, descripcion, activo },
+      refetchQueries: [
+        {
+          query: gql`
+            query ($page: Int!, $size: Int!) {
+              obtenerCategorias(page: $page, size: $size) {
+                content { id nombre descripcion activo }
+                totalElements
+                totalPages
+                number
+                size
+              }
+            }
+          `,
+          variables: { page, size }
+        }
+      ]
     }).pipe(
       map(result => result.data!.crearCategoria)
     );
   }
 
-  // 🔹 4. Actualizar categoría por ID
-  actualizarCategoria(id: string, nombre: string, descripcion: string, activo: boolean): Observable<Categoria | null> {
+  actualizarCategoria(id: string, nombre: string, descripcion: string, activo: boolean, page: number, size: number): Observable<Categoria | null> {
     return this.apollo.mutate<{ actualizarCategoria: Categoria }>({
       mutation: gql`
         mutation ($id: ID!, $nombre: String!, $descripcion: String!, $activo: Boolean!) {
@@ -86,21 +113,52 @@ export class CategoriaService {
           }
         }
       `,
-      variables: { id, nombre, descripcion, activo }
+      variables: { id, nombre, descripcion, activo },
+      refetchQueries: [
+        {
+          query: gql`
+            query ($page: Int!, $size: Int!) {
+              obtenerCategorias(page: $page, size: $size) {
+                content { id nombre descripcion activo }
+                totalElements
+                totalPages
+                number
+                size
+              }
+            }
+          `,
+          variables: { page, size }
+        }
+      ]
     }).pipe(
       map(result => result.data?.actualizarCategoria ?? null)
     );
   }
 
-  // 🔹 5. Eliminar categoría por ID
-  eliminarCategoria(id: string): Observable<boolean> {
+  eliminarCategoria(id: string, page: number, size: number): Observable<boolean> {
     return this.apollo.mutate<{ eliminarCategoria: boolean }>({
       mutation: gql`
         mutation ($id: ID!) {
           eliminarCategoria(id: $id)
         }
       `,
-      variables: { id }
+      variables: { id },
+      refetchQueries: [
+        {
+          query: gql`
+            query ($page: Int!, $size: Int!) {
+              obtenerCategorias(page: $page, size: $size) {
+                content { id nombre descripcion activo }
+                totalElements
+                totalPages
+                number
+                size
+              }
+            }
+          `,
+          variables: { page, size }
+        }
+      ]
     }).pipe(
       map(result => result.data!.eliminarCategoria)
     );

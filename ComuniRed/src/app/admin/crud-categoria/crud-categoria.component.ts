@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { CategoriaService, Categoria } from '../../services/categoria.service';
+import { CategoriaService, Categoria, CategoriaPage } from '../../services/categoria.service';
 
 @Component({
   selector: 'app-crud-categoria',
@@ -14,9 +14,7 @@ import { CategoriaService, Categoria } from '../../services/categoria.service';
 export class CrudCategoriaComponent implements OnInit {
 
   categorias: Categoria[] = [];
-  allCategorias: Categoria[] = [];
-  categoriasFiltradas: Categoria[] = [];
-  
+
   idSeleccionado: string | null = null;
   nombre: string = '';
   descripcion: string = '';
@@ -27,9 +25,9 @@ export class CrudCategoriaComponent implements OnInit {
   editingCategoria: boolean = false;
 
   pageSize: number = 5;
-  pageSizes: number[] = [5, 10, 20, 50];
+  pageSizes: number[] = [5, 10, 20, 50, 100];
   totalCategorias: number = 0;
-  currentPage: number = 1;
+  currentPage: number = 1;  // GraphQL backend: index 0
   totalPages: number = 1;
 
   loading = false;
@@ -45,27 +43,20 @@ export class CrudCategoriaComponent implements OnInit {
     this.obtenerCategorias();
   }
 
-  trackByCategoriaId(index: number, cat: Categoria): string {
-    return cat.id || index.toString();
-  }
-
   obtenerCategorias(): void {
     this.loading = true;
-    
-    this.categoriaService.listarCategorias()
+    this.categoriaService.obtenerCategorias(this.currentPage - 1, this.pageSize)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: (cats) => {
-          this.allCategorias = [...cats];
-          this.totalCategorias = cats.length;
-          
-          if (this.nombreBuscado.trim()) {
-            this.aplicarFiltro();
-          } else {
-            this.categoriasFiltradas = [...this.allCategorias];
+        next: (data: CategoriaPage) => {
+          this.categorias = data.content;
+          this.totalCategorias = data.totalElements;
+          this.totalPages = data.totalPages;
+          // Si eliminaste el único registro de la última página, retrocede de página
+          if (this.currentPage > this.totalPages && this.totalPages > 0) {
+            this.currentPage = this.totalPages;
+            this.obtenerCategorias();
           }
-          
-          this.calcularPaginacion();
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -75,51 +66,19 @@ export class CrudCategoriaComponent implements OnInit {
       });
   }
 
-  calcularPaginacion(): void {
-    this.totalPages = Math.ceil(this.categoriasFiltradas.length / this.pageSize);
-    
-    if (this.currentPage > this.totalPages && this.totalPages > 0) {
-      this.currentPage = this.totalPages;
-    }
-    
-    if (this.totalPages === 0) {
-      this.currentPage = 1;
-    }
-  }
-
-  aplicarFiltro(): void {
-    const busqueda = this.nombreBuscado.trim().toLowerCase();
-    
-    if (!busqueda) {
-      this.categoriasFiltradas = [...this.allCategorias];
-    } else {
-      this.categoriasFiltradas = this.allCategorias.filter(cat =>
-        (cat.nombre ?? '').toLowerCase().includes(busqueda) ||
-        (cat.descripcion ?? '').toLowerCase().includes(busqueda)
-      );
-    }
-  }
-
   onPageSizeChange(event: any): void {
     const newSize = +event.target.value;
     if (!isNaN(newSize) && newSize > 0) {
       this.pageSize = newSize;
       this.currentPage = 1;
-      this.calcularPaginacion();
+      this.obtenerCategorias();
     }
-  }
-
-  get paginatedCategorias(): Categoria[] {
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    const paginated = this.categoriasFiltradas.slice(start, end);
-    this.categorias = paginated;
-    return paginated;
   }
 
   cambiarPagina(pagina: number): void {
     if (pagina < 1 || pagina > this.totalPages) return;
     this.currentPage = pagina;
+    this.obtenerCategorias();
   }
 
   openAddModal(): void {
@@ -155,7 +114,6 @@ export class CrudCategoriaComponent implements OnInit {
       return;
     }
 
-    const paginaGuardada = this.currentPage;
     this.saving = true;
 
     if (this.idSeleccionado) {
@@ -163,13 +121,14 @@ export class CrudCategoriaComponent implements OnInit {
         this.idSeleccionado,
         this.nombre,
         this.descripcion,
-        this.activo
+        this.activo,
+        this.currentPage - 1,
+        this.pageSize
       )
       .pipe(finalize(() => (this.saving = false)))
       .subscribe({
         next: () => {
           this.limpiarCampos();
-          this.currentPage = paginaGuardada;
           this.obtenerCategorias();
         },
         error: (err) => {
@@ -181,13 +140,14 @@ export class CrudCategoriaComponent implements OnInit {
       this.categoriaService.crearCategoria(
         this.nombre,
         this.descripcion,
-        this.activo
+        this.activo,
+        this.currentPage - 1,
+        this.pageSize
       )
       .pipe(finalize(() => (this.saving = false)))
       .subscribe({
         next: () => {
           this.limpiarCampos();
-          this.currentPage = paginaGuardada;
           this.obtenerCategorias();
         },
         error: (err) => {
@@ -198,55 +158,16 @@ export class CrudCategoriaComponent implements OnInit {
     }
   }
 
-  buscarCategoria(): void {
-    const busqueda = this.nombreBuscado.trim();
-    
-    if (!busqueda) {
-      this.currentPage = 1;
-      this.obtenerCategorias();
-      return;
-    }
-
-    this.loading = true;
-    
-    this.categoriaService.buscarCategoriaPorNombre(busqueda)
-      .pipe(finalize(() => (this.loading = false)))
-      .subscribe({
-        next: (categoria) => {
-          this.allCategorias = categoria ? [categoria] : [];
-          this.categoriasFiltradas = [...this.allCategorias];
-          this.totalCategorias = this.allCategorias.length;
-          this.currentPage = 1;
-          this.calcularPaginacion();
-        },
-        error: (err) => {
-          console.error('Error al buscar categoría:', err);
-          this.allCategorias = [];
-          this.categoriasFiltradas = [];
-          this.totalCategorias = 0;
-          this.currentPage = 1;
-          this.calcularPaginacion();
-        }
-      });
-  }
-
   eliminarCategoria(id: string): void {
     if (!confirm('¿Deseas eliminar esta categoría?')) return;
 
-    if (!id || id === undefined || id === null || id === '') {
-      alert('Error: ID de categoría no válido');
-      return;
-    }
-
     let paginaGuardada = this.currentPage;
-    
-    if (this.paginatedCategorias.length === 1 && this.currentPage > 1) {
+    if (this.categorias.length === 1 && this.currentPage > 1) {
       paginaGuardada = this.currentPage - 1;
     }
 
     this.deleting = true;
-
-    this.categoriaService.eliminarCategoria(id)
+    this.categoriaService.eliminarCategoria(id, paginaGuardada - 1, this.pageSize)
       .pipe(finalize(() => (this.deleting = false)))
       .subscribe({
         next: (ok) => {
@@ -261,7 +182,9 @@ export class CrudCategoriaComponent implements OnInit {
         }
       });
   }
-
+  trackByCategoriaId(index: number, cat: Categoria): string {
+    return cat.id || index.toString();
+  }
   limpiarCampos(): void {
     this.idSeleccionado = null;
     this.nombre = '';

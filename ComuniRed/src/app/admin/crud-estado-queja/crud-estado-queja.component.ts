@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { EstadosQuejaService, EstadoQueja } from '../../services/estado-queja.service';
+import { EstadosQuejaService, EstadoQueja, EstadoQuejaPage } from '../../services/estado-queja.service';
 
 @Component({
   selector: 'app-crud-estado-queja',
@@ -14,22 +14,19 @@ import { EstadosQuejaService, EstadoQueja } from '../../services/estado-queja.se
 export class CrudEstadoQuejaComponent implements OnInit {
 
   estados: EstadoQueja[] = [];
-  allEstados: EstadoQueja[] = [];
-  estadosFiltrados: EstadoQueja[] = [];
-  modalVisible = false;
-  modoEdicion = false;
-  estadoActual: EstadoQueja = { id: '', clave: '', nombre: '', descripcion: '', orden: 1 };
-  nombreBuscado: string = '';
-
-  pageSize: number = 5;
-  pageSizes: number[] = [5, 10, 20, 50];
   totalEstados: number = 0;
-  currentPage = 1;
-  totalPages = 1;
+  currentPage: number = 1;
+  totalPages: number = 1;
+  pageSize: number = 5;
+  pageSizes: number[] = [5, 10, 20, 50, 100];
 
   loading = false;
   saving = false;
   deleting = false;
+
+  modalVisible = false;
+  modoEdicion = false;
+  estadoActual: EstadoQueja = { id: '', clave: '', nombre: '', descripcion: '', orden: 1 };
 
   constructor(
     private estadosService: EstadosQuejaService,
@@ -40,27 +37,23 @@ export class CrudEstadoQuejaComponent implements OnInit {
     this.obtenerEstados();
   }
 
-  trackByEstadoId(index: number, estado: EstadoQueja): any {
-    return estado.id || index;
+  trackByEstadoId(index: number, estado: EstadoQueja): string {
+    return estado.id || index.toString();
   }
 
   obtenerEstados() {
     this.loading = true;
-    
-    this.estadosService.listarEstadosQueja()
+    this.estadosService.obtenerEstadosQueja(this.currentPage - 1, this.pageSize)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: (data: EstadoQueja[]) => {
-          this.allEstados = [...data];
-          this.totalEstados = data.length;
-          
-          if (this.nombreBuscado.trim()) {
-            this.aplicarFiltro();
-          } else {
-            this.estadosFiltrados = [...this.allEstados];
+        next: (data: EstadoQuejaPage) => {
+          this.estados = data.content;
+          this.totalEstados = data.totalElements;
+          this.totalPages = data.totalPages;
+          if (this.currentPage > this.totalPages && this.totalPages > 0) {
+            this.currentPage = this.totalPages;
+            this.obtenerEstados();
           }
-          
-          this.calcularPaginacion();
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -70,50 +63,19 @@ export class CrudEstadoQuejaComponent implements OnInit {
       });
   }
 
-  calcularPaginacion() {
-    this.totalPages = Math.ceil(this.estadosFiltrados.length / this.pageSize);
-    
-    if (this.currentPage > this.totalPages && this.totalPages > 0) {
-      this.currentPage = this.totalPages;
-    }
-    
-    if (this.totalPages === 0) {
-      this.currentPage = 1;
-    }
-  }
-
-  aplicarFiltro() {
-    const busqueda = this.nombreBuscado.trim().toLowerCase();
-    
-    if (!busqueda) {
-      this.estadosFiltrados = [...this.allEstados];
-    } else {
-      this.estadosFiltrados = this.allEstados.filter(estado =>
-        (estado.nombre ?? '').toLowerCase().includes(busqueda) ||
-        (estado.clave ?? '').toLowerCase().includes(busqueda) ||
-        (estado.descripcion ?? '').toLowerCase().includes(busqueda)
-      );
-    }
-  }
-
   onPageSizeChange(event: any): void {
     const newSize = +event.target.value;
     if (!isNaN(newSize) && newSize > 0) {
       this.pageSize = newSize;
       this.currentPage = 1;
-      this.calcularPaginacion();
+      this.obtenerEstados();
     }
   }
 
-  get paginatedEstados(): EstadoQueja[] {
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    return this.estadosFiltrados.slice(start, end);
-  }
-
-  cambiarPagina(pagina: number) {
+  cambiarPagina(pagina: number): void {
     if (pagina < 1 || pagina > this.totalPages) return;
     this.currentPage = pagina;
+    this.obtenerEstados();
   }
 
   abrirModal() {
@@ -147,22 +109,21 @@ export class CrudEstadoQuejaComponent implements OnInit {
       return;
     }
 
-    const paginaGuardada = this.currentPage;
     this.saving = true;
-
     if (this.modoEdicion) {
       this.estadosService.actualizarEstadoQueja(
         this.estadoActual.id,
         this.estadoActual.clave,
         this.estadoActual.nombre,
         this.estadoActual.descripcion ?? '',
-        this.estadoActual.orden
+        this.estadoActual.orden,
+        this.currentPage - 1,
+        this.pageSize
       )
       .pipe(finalize(() => (this.saving = false)))
       .subscribe({
         next: () => {
           this.cerrarModal();
-          this.currentPage = paginaGuardada;
           this.obtenerEstados();
         },
         error: (err) => {
@@ -175,13 +136,14 @@ export class CrudEstadoQuejaComponent implements OnInit {
         this.estadoActual.clave,
         this.estadoActual.nombre,
         this.estadoActual.descripcion ?? '',
-        this.estadoActual.orden
+        this.estadoActual.orden,
+        this.currentPage - 1,
+        this.pageSize
       )
       .pipe(finalize(() => (this.saving = false)))
       .subscribe({
         next: () => {
           this.cerrarModal();
-          this.currentPage = paginaGuardada;
           this.obtenerEstados();
         },
         error: (err) => {
@@ -192,59 +154,18 @@ export class CrudEstadoQuejaComponent implements OnInit {
     }
   }
 
-  buscar() {
-    const busqueda = this.nombreBuscado.trim();
-    
-    if (!busqueda) {
-      this.currentPage = 1;
-      this.obtenerEstados();
-      return;
-    }
-
-    this.loading = true;
-    
-    this.estadosService.buscarEstadoPorNombre(busqueda)
-      .pipe(finalize(() => (this.loading = false)))
-      .subscribe({
-        next: (estado) => {
-          this.allEstados = estado ? [estado] : [];
-          this.estadosFiltrados = [...this.allEstados];
-          this.totalEstados = this.allEstados.length;
-          this.currentPage = 1;
-          this.calcularPaginacion();
-        },
-        error: (err) => {
-          console.error('Error al buscar estado:', err);
-          this.allEstados = [];
-          this.estadosFiltrados = [];
-          this.totalEstados = 0;
-          this.currentPage = 1;
-          this.calcularPaginacion();
-        }
-      });
-  }
-
   eliminarEstado(id: string) {
     if (!confirm('¿Deseas eliminar este estado de queja?')) return;
-
-    if (!id || id === undefined || id === null || id === '') {
-      alert('Error: ID de estado no válido');
-      return;
-    }
-
     let paginaGuardada = this.currentPage;
-    
-    if (this.paginatedEstados.length === 1 && this.currentPage > 1) {
+    if (this.estados.length === 1 && this.currentPage > 1) {
       paginaGuardada = this.currentPage - 1;
     }
-
     this.deleting = true;
-
-    this.estadosService.eliminarEstadoQueja(String(id))
+    this.estadosService.eliminarEstadoQueja(id, paginaGuardada - 1, this.pageSize)
       .pipe(finalize(() => (this.deleting = false)))
       .subscribe({
-        next: (result) => {
-          if (result) {
+        next: (ok) => {
+          if (ok) {
             this.currentPage = paginaGuardada;
             this.obtenerEstados();
           }
