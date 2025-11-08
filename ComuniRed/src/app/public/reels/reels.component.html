@@ -1,1 +1,170 @@
-<p>reels works!</p>
+<div class="reels-container">
+  <div class="reels-header">
+    <h1>Reels</h1>
+    <p>Videos cortos de la comunidad</p>
+  </div>
+
+  <div class="reels-content">
+    <!-- Sección de visualización principal de reels -->
+    <div class="reels-viewer">
+      <div class="reel-card">
+        <div class="reel-video">
+          <img [src]="currentReel.thumbnail" [alt]="currentReel.title" />
+          <div class="video-overlay">
+            <div class="play-button">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="reel-info">
+          <div class="reel-header-info">
+            <div class="author-info">
+              <div class="avatar">{{ currentReel.avatar }}</div>
+              <div class="author-details">
+                <h3>{{ currentReel.author }}</h3>
+                <span class="timestamp">{{ currentReel.timestamp }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="reel-description">
+            <h2>{{ currentReel.title }}</h2>
+            <p>{{ currentReel.description }}</p>
+          </div>
+
+          <div class="reel-stats">
+            <div class="stat">
+              <span class="stat-value">{{ currentReel.views }}</span>
+              <span class="stat-label">Vistas</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">{{ currentReel.likes }}</span>
+              <span class="stat-label">Me gusta</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">{{ currentReel.comments }}</span>
+              <span class="stat-label">Comentarios</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">{{ currentReel.shares }}</span>
+              <span class="stat-label">Compartidos</span>
+            </div>
+          </div>
+
+          <div class="reel-actions">
+            <button 
+              class="action-btn"
+              [class.liked]="currentReel.liked"
+              (click)="toggleLike(currentReel)">
+              <svg width="20" height="20" viewBox="0 0 24 24" [attr.fill]="currentReel.liked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              Me gusta
+            </button>
+            <button class="action-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              Comentar
+            </button>
+            <button class="action-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+              Compartir
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controles de navegación -->
+      <div class="reel-controls">
+        <button 
+          class="control-btn prev"
+          (click)="prevReel()"
+          [disabled]="currentReelIndex === 0">
+          ←
+        </button>
+        <div class="progress-indicator">
+          <span>{{ currentReelIndex + 1 }} / {{ reels.length }}</span>
+        </div>
+        <button 
+          class="control-btn next"
+          (click)="nextReel()"
+          [disabled]="currentReelIndex === reels.length - 1">
+          →
+        </button>
+      </div>
+    </div>
+
+    <!-- Sección de subida de reels -->
+    <div class="reels-upload">
+      <div class="upload-card">
+        <h3>Compartir tu Reel</h3>
+        <p>Sube un video corto sobre tu comunidad</p>
+
+        <div class="upload-form">
+          <div class="form-group">
+            <label for="reel-title">Título del Reel</label>
+            <input 
+              id="reel-title"
+              type="text" 
+              [(ngModel)]="newReelTitle"
+              placeholder="Describe tu reportaje o proyecto"
+              [disabled]="isUploading">
+          </div>
+
+          <div class="form-group">
+            <label for="reel-description">Descripción (Opcional)</label>
+            <textarea 
+              id="reel-description"
+              [(ngModel)]="newReelDescription"
+              placeholder="Agrega detalles sobre tu video"
+              rows="3"
+              [disabled]="isUploading"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="video-input" class="file-upload-label">
+              <span class="upload-icon">📹</span>
+              <span>Selecciona tu video</span>
+              <span class="file-hint">MP4, WebM o Ogg. Máximo 500MB</span>
+            </label>
+            <input 
+              id="video-input"
+              type="file" 
+              accept="video/*"
+              (change)="onFileSelected($event)"
+              [disabled]="isUploading"
+              hidden>
+            <span class="selected-file" *ngIf="selectedFile">
+              ✓ {{ selectedFile.name }}
+            </span>
+          </div>
+
+          <!-- Barra de progreso de carga -->
+          <div class="upload-progress" *ngIf="isUploading">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+            </div>
+            <span class="progress-text">{{ uploadProgress | number: '1.0-0' }}%</span>
+          </div>
+
+          <button 
+            class="upload-btn"
+            (click)="uploadReel()"
+            [disabled]="isUploading">
+            {{ isUploading ? 'Subiendo...' : 'Subir Reel' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

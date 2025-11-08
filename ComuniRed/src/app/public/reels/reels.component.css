@@ -1,0 +1,522 @@
+.reels-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.reels-header {
+  margin-bottom: 32px;
+}
+
+.reels-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.reels-header p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Main Content */
+.reels-content {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reels Viewer */
+.reels-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reel-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.reel-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.reel-video {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  background: #f5f5f5;
+  overflow: hidden;
+}
+
+.reel-video img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.reel-card:hover .reel-video img {
+  transform: scale(1.02);
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.reel-card:hover .video-overlay {
+  opacity: 1;
+}
+
+.play-button {
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Reel Info */
+.reel-info {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reel-header-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.author-details h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.author-details .timestamp {
+  display: block;
+  color: #999;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.reel-description h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.reel-description p {
+  margin: 8px 0 0 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Stats */
+.reel-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.stat {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-value {
+  font-weight: 600;
+  font-size: 16px;
+  color: #1a1a1a;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #999;
+}
+
+/* Actions */
+.reel-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 12px;
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #efefef;
+  border-color: #d5d5d5;
+}
+
+.action-btn.liked {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+.action-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Navigation Controls */
+.reel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.control-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #1a1a1a;
+}
+
+.control-btn:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #d5d5d5;
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.progress-indicator {
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Upload Section */
+.reels-upload {
+  position: sticky;
+  top: 24px;
+  height: fit-content;
+}
+
+.upload-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 20px;
+  animation: slideInRight 0.6s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.upload-card h3 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.upload-card > p {
+  margin: 0 0 20px 0;
+  color: #666;
+  font-size: 13px;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  padding: 10px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  color: #1a1a1a;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #1a1a1a;
+  box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+}
+
+.form-group input[type="text"]:disabled,
+.form-group textarea:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  background: #f9f9f9;
+  border: 2px dashed #d5d5d5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.file-upload-label:hover {
+  border-color: #1a1a1a;
+  background: #fafafa;
+}
+
+.upload-icon {
+  font-size: 32px;
+}
+
+.file-upload-label span:nth-child(2) {
+  font-weight: 500;
+  color: #1a1a1a;
+  font-size: 13px;
+}
+
+.file-hint {
+  font-size: 12px;
+  color: #999;
+}
+
+.selected-file {
+  display: block;
+  padding: 8px 12px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #2d7f2d;
+  margin-top: 4px;
+}
+
+/* Upload Progress */
+.upload-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #e5e5e5;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #1a1a1a;
+  transition: width 0.2s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+}
+
+/* Upload Button */
+.upload-btn {
+  padding: 12px 16px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-btn:hover:not(:disabled) {
+  background: #333;
+}
+
+.upload-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reels-content {
+    grid-template-columns: 1fr;
+  }
+
+  .reels-upload {
+    position: static;
+  }
+
+  .reel-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .action-btn {
+    min-width: 90px;
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .reels-container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reels-header h1 {
+    font-size: 24px;
+  }
+
+  .reel-video {
+    aspect-ratio: 4 / 5;
+  }
+
+  .reel-actions {
+    flex-direction: column;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+}
