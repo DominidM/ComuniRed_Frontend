@@ -10,6 +10,7 @@ interface Reel {
   comments: number;
   shares: number;
   description: string;
+  avatarUrl?: string; // <- nuevo
 }
 
 @Component({
@@ -30,14 +31,14 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   private userInteracted = false;
 
   reels: Reel[] = [
-    { id: 1, videoUrl: 'assets/videos/reel1.mp4', title: 'ByPass las torres', author: 'Municipalidad de Lima', likes: 1234, comments: 89, shares: 45, description: 'Obras en construcción para mejorar el tráfico' },
-    { id: 2, videoUrl: 'assets/videos/reel2.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de SJL', likes: 856, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico' },
-    { id: 3, videoUrl: 'assets/videos/reel3.mp4', title: 'bailecito', author: 'Jose Jeri', likes: 46, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico' },
-    { id: 4, videoUrl: 'assets/videos/reel4.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de SJL', likes: 86, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico' },
-    { id: 5, videoUrl: 'assets/videos/reel5.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de Lima', likes: 836, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico' },
-    { id: 6, videoUrl: 'assets/videos/reel6.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de Lima', likes: 53, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico' },
-    { id: 7, videoUrl: 'assets/videos/reel7.mp4', title: 'Via rapida Wiesse', author: 'Municipalidad de SJL', likes: 1, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico' },
-    { id: 8, videoUrl: 'assets/videos/reel8.mp4', title: 'Parque las Flores', author: 'Municipalidad de SJL', likes: 32, comments: 12, shares: 8, description: 'Manteniendo nuestros espacios verdes limpios y seguros' }
+    { id: 1, videoUrl: 'assets/videos/reel1.mp4', title: 'ByPass las torres', author: 'Municipalidad de Lima', likes: 1234, comments: 89, shares: 45, description: 'Obras en construcción para mejorar el tráfico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png' },
+    { id: 2, videoUrl: 'assets/videos/reel2.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de SJL', likes: 856, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png' },
+    { id: 3, videoUrl: 'assets/videos/reel3.mp4', title: 'bailecito', author: 'Jose Jeri', likes: 46, comments: 34, shares: 21, description: 'Baile popular', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745297/imagen_2025-11-09_222811177_easpfs.png' },
+    { id: 4, videoUrl: 'assets/videos/reel4.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de SJL', likes: 86, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png' },
+    { id: 5, videoUrl: 'assets/videos/reel5.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de Lima', likes: 836, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png' },
+    { id: 6, videoUrl: 'assets/videos/reel6.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de Lima', likes: 53, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png' },
+    { id: 7, videoUrl: 'assets/videos/reel7.mp4', title: 'Via rapida Wiesse', author: 'Municipalidad de SJL', likes: 1, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png' },
+    { id: 8, videoUrl: 'assets/videos/reel8.mp4', title: 'Parque las Flores', author: 'Municipalidad de SJL', likes: 32, comments: 12, shares: 8, description: 'Manteniendo nuestros espacios verdes limpios y seguros', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png' }
   ];
 
   private onWindowResizeBound = () => {
@@ -253,4 +254,14 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   }
 
   likeReel() { this.reels[this.currentIndex].likes++; }
+
+  // avatar fallback handler
+  onAvatarError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    const fallback = 'assets/images/default-avatar.png';
+    if (!img) return;
+    if (img.dataset['fallbackApplied'] === '1') return;
+    img.dataset['fallbackApplied'] = '1';
+    img.src = fallback;
+  }
 }
