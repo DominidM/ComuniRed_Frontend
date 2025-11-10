@@ -16,6 +16,7 @@ export class SettingsProfileComponent implements OnInit {
   foto_perfil_url = 'assets/img/avatar-placeholder.png';
   usuario: Usuario | null = null;
   guardando = false;
+  cargando = true; // 👈 Nuevo estado de carga
   avatarPreview: string | null = null;
   hoy: string = new Date().toISOString().substring(0, 10);
 
@@ -23,22 +24,27 @@ export class SettingsProfileComponent implements OnInit {
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
     private router: Router
-  ) {}
+  ) {
+    // 👈 Inicializa el formulario vacío primero
+    this.inicializarFormularioVacio();
+  }
 
   ngOnInit(): void {
-     
     const currentUser = this.usuarioService.getUser();
     
     if (currentUser && currentUser.id) {
-
+      this.cargando = true;
+      
       this.usuarioService.obtenerUsuarioPorId(currentUser.id).subscribe({
         next: (usuario) => {
           this.usuario = usuario;
           this.cargarDatosUsuario(usuario);
+          this.cargando = false; // 👈 Datos cargados
         },
         error: (err) => {
           console.error('Error al cargar usuario:', err);
           alert('Error al cargar los datos del usuario');
+          this.cargando = false;
         }
       });
     } else {
@@ -47,24 +53,41 @@ export class SettingsProfileComponent implements OnInit {
     }
   }
 
-  private cargarDatosUsuario(usuario: Usuario): void {
+  // 👈 Nuevo método: inicializa el formulario vacío
+  private inicializarFormularioVacio(): void {
+    this.profileForm = this.fb.group({
+      nombre: ['', Validators.required],
+      apellido: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      dni: [''],
+      numero_telefono: [''],
+      fecha_nacimiento: [''],
+      sexo: [''],
+      distrito: [''],
+      codigo_postal: [''],
+      direccion: [''],
+    });
+  }
 
+  // 👈 Actualizado: usa patchValue para actualizar el formulario
+  private cargarDatosUsuario(usuario: Usuario): void {
     if (usuario.foto_perfil) {
       this.foto_perfil_url = usuario.foto_perfil;
       this.avatarPreview = usuario.foto_perfil;
     }
 
-    this.profileForm = this.fb.group({
-      nombre: [usuario.nombre || '', Validators.required],
-      apellido: [usuario.apellido || '', Validators.required],
-      email: [usuario.email || '', [Validators.required, Validators.email]],
-      dni: [usuario.dni || ''],
-      numero_telefono: [usuario.numero_telefono || ''],
-      fecha_nacimiento: [usuario.fecha_nacimiento || ''],
-      sexo: [usuario.sexo || ''],
-      distrito: [usuario.distrito || ''],
-      codigo_postal: [usuario.codigo_postal || ''],
-      direccion: [usuario.direccion || ''],
+    // 👈 Usa patchValue en vez de recrear el formulario
+    this.profileForm.patchValue({
+      nombre: usuario.nombre || '',
+      apellido: usuario.apellido || '',
+      email: usuario.email || '',
+      dni: usuario.dni || '',
+      numero_telefono: usuario.numero_telefono || '',
+      fecha_nacimiento: usuario.fecha_nacimiento || '',
+      sexo: usuario.sexo || '',
+      distrito: usuario.distrito || '',
+      codigo_postal: usuario.codigo_postal || '',
+      direccion: usuario.direccion || '',
     });
   }
 
