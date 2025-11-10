@@ -1,0 +1,189 @@
+/* Paleta de colores ComuniRed */
+:root{
+  --primary-red: #d32f2f;
+  --dark-bg: #1a1a1a;
+  --light-gray: #f5f5f5;
+  --text-dark: #333333;
+  --white: #ffffff;
+}
+
+/* Layout general: centrar una columna tipo TikTok */
+.reels-container{
+  position: relative;
+  width: 100%;
+  height: 89vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--dark-bg);
+  overflow: hidden;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Column video: limitar ancho en desktop para evitar barras negras grandes */
+.video-wrapper{
+  position: relative;
+  width: 100%;
+  max-width: 480px;            /* <<--- ancho tipo TikTok en desktop */
+  height: calc(89vh - 32px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  margin: 0 auto;
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+}
+
+/* vídeo: contain en desktop (ver todo), cover en móvil (llenar) */
+.video-player{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;          /* muestra todo el cuadro en desktop */
+  object-position: center center;
+  background-color: #000;
+  z-index: 1;
+  transition: opacity 0.18s ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* On narrow screens (mobile) behave like reels: fill & crop */
+@media (max-width: 1024px){
+  .video-wrapper{
+    max-width: none;
+    width: 100%;
+    height: 85vh;
+    border-radius: 0;
+  }
+  .video-player{
+    object-fit: cover;
+  }
+}
+
+/* Remove native controls visual */
+video::-webkit-media-controls { display: none !important; }
+video::-webkit-media-controls-panel { display: none !important; }
+
+/* Play overlay */
+.play-pause-overlay{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  z-index:30;
+}
+.play-icon{
+  width:80px; height:80px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(0,0,0,0.5);
+}
+
+/* Actions overlay (TikTok style): inside video, right center */
+.actions-overlay{
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 40;
+  align-items: center;
+  pointer-events: auto;
+}
+
+/* Circular buttons */
+.action-circle{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  border: none;
+  background: rgba(0,0,0,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+  position: relative;
+}
+.action-circle:hover{ transform: translateY(-3px); }
+
+/* small badge for likes */
+.action-badge{
+  position:absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size:12px;
+  color: #fff;
+  font-weight:700;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+/* subtle frame overlay to improve contrast on text */
+.video-frame-shadow{
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  box-shadow: inset 0 -90px 100px -30px rgba(0,0,0,0.6);
+  z-index: 3;
+}
+
+/* Info overlay bottom: higher contrast and readable text */
+.info-overlay{
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  right: 12px;
+  padding: 12px 14px;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0.05));
+  border-radius: 8px;
+  pointer-events: none;
+}
+.author-info{ display:flex; gap:10px; align-items:center; }
+.author-avatar{ width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--primary-red),#ff6b6b); display:flex; align-items:center; justify-content:center; border:2px solid rgba(255,255,255,0.06); }
+.author-name{ color:#fff; font-weight:700; margin:0; font-size:14px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+.video-title{ color: #e8e8e8; margin:0; font-size:13px; text-shadow:0 1px 2px rgba(0,0,0,0.6); }
+.video-description{ color: #ddd; font-size:12px; margin:0; opacity:0.95; }
+
+/* Progress dots (TikTok style) */
+.progress-dots{
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display:flex;
+  gap:10px;
+  z-index: 50;
+  pointer-events: auto;
+}
+.progress-dots .dot{
+  width:8px; height:8px; border-radius:50%;
+  background: rgba(255,255,255,0.45);
+  transition: all .18s ease;
+}
+.progress-dots .dot.active{
+  width:10px; height:10px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+/* Responsive tweaks */
+@media (max-width: 420px){
+  .action-circle{ width:48px; height:48px; }
+  .action-badge{ font-size:11px; }
+  .reels-container{ padding:0; height:100vh; }
+}
+
+/* Accessibility & niceties */
+*{ -webkit-tap-highlight-color: transparent; }
+button{ outline:none; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }

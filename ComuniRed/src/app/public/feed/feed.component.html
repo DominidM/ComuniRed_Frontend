@@ -1,13 +1,12 @@
 <!-- Feed main container -->
 <div class="feed-container">
-
   <!-- Create / report card (top) -->
   <div class="create-card card">
     <div class="create-top">
       <div class="create-avatar">
-        <img [src]="user?.avatarUrl" alt="{{ user?.name }}" class="user-avatar" />
+        <img [src]="user?.avatarUrl" [alt]="user?.name" class="user-avatar" />
       </div>
-      <button class="create-input" aria-label="Crear reporte">
+      <button class="create-input" (click)="openCreateReport()" aria-label="Crear reporte">
         ¿Qué problema de infraestructura quieres reportar?
       </button>
     </div>
@@ -15,35 +14,164 @@
     <div class="create-sep"></div>
 
     <div class="create-actions">
-      <button class="create-action" type="button">
+      <button class="create-action" type="button" (click)="openCreateReportWithMedia()">
         <span class="create-icon">🖼️</span>
         <span>Foto/Video</span>
       </button>
-      <button class="create-action" type="button">
+      <button class="create-action" type="button" (click)="openCreateReportWithLocation()">
         <span class="create-icon">📍</span>
         <span>Ubicación</span>
       </button>
     </div>
   </div>
 
+  <!-- Modal para crear queja -->
+  <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <!-- Header del modal -->
+      <div class="modal-header">
+        <h2 class="modal-title">Crear Reporte</h2>
+        <button class="modal-close" (click)="closeCreateModal()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <!-- Contenido del modal -->
+      <div class="modal-body">
+        <!-- Usuario -->
+        <div class="modal-user">
+          <img [src]="user?.avatarUrl" [alt]="user?.name" class="modal-avatar" />
+          <span class="modal-username">{{ user?.name }}</span>
+        </div>
+
+        <!-- Formulario -->
+        <form class="create-form">
+          <!-- Título -->
+          <div class="form-group">
+            <label for="titulo" class="form-label">Título del problema</label>
+            <input 
+              type="text" 
+              id="titulo" 
+              class="form-input"
+              [(ngModel)]="newQueja.titulo"
+              name="titulo"
+              placeholder="Ej: Bache peligroso en la avenida principal"
+              maxlength="100"
+            />
+          </div>
+
+          <!-- Descripción -->
+          <div class="form-group">
+            <label for="descripcion" class="form-label">Descripción detallada</label>
+            <textarea 
+              id="descripcion" 
+              class="form-textarea"
+              [(ngModel)]="newQueja.descripcion"
+              name="descripcion"
+              placeholder="Describe el problema de infraestructura que quieres reportar..."
+              rows="4"
+            ></textarea>
+          </div>
+
+          <!-- Categoría -->
+          <div class="form-group">
+            <label for="categoria" class="form-label">Categoría</label>
+            <select 
+              id="categoria" 
+              class="form-select"
+              [(ngModel)]="newQueja.categoria"
+              name="categoria"
+            >
+              <option value="">Selecciona una categoría</option>
+              <option value="vias">🛣️ Vías y Calles</option>
+              <option value="alumbrado">💡 Alumbrado Público</option>
+              <option value="agua">💧 Agua y Saneamiento</option>
+              <option value="parques">🌳 Parques y Jardines</option>
+              <option value="seguridad">🚨 Seguridad</option>
+              <option value="otros">📋 Otros</option>
+            </select>
+          </div>
+
+          <!-- Ubicación -->
+          <div class="form-group">
+            <label for="ubicacion" class="form-label">📍 Ubicación</label>
+            <input 
+              type="text" 
+              id="ubicacion" 
+              class="form-input"
+              [(ngModel)]="newQueja.ubicacion"
+              name="ubicacion"
+              placeholder="Ej: Av. Principal 123, San Isidro"
+            />
+          </div>
+
+          <!-- Upload de imagen -->
+          <div class="form-group">
+            <label class="form-label">🖼️ Foto del problema (opcional)</label>
+            <div class="upload-area" (click)="fileInput.click()">
+              <input 
+                #fileInput
+                type="file" 
+                accept="image/*" 
+                (change)="onFileSelected($event)"
+                style="display: none;"
+              />
+              <div *ngIf="!newQueja.imagenPreview" class="upload-placeholder">
+                <span class="upload-icon">📷</span>
+                <span class="upload-text">Click para subir una foto</span>
+              </div>
+              <div *ngIf="newQueja.imagenPreview" class="image-preview">
+                <img [src]="newQueja.imagenPreview" alt="Preview" />
+                <button 
+                  type="button" 
+                  class="remove-image" 
+                  (click)="removeImage($event)"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Footer del modal -->
+      <div class="modal-footer">
+        <button 
+          type="button" 
+          class="btn btn-cancel" 
+          (click)="closeCreateModal()"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          (click)="submitQueja()"
+          [disabled]="!isFormValid()"
+        >
+          Publicar Reporte
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Posts -->
-  <ng-container *ngIf="filteredPosts().length > 0; else emptyState">
-    <div *ngFor="let post of filteredPosts(); trackBy: trackByPostId" class="post-card">
+  <ng-container *ngIf="posts.length > 0; else emptyState">
+    <div *ngFor="let post of posts; trackBy: trackByPostId" class="post-card">
       <!-- Header -->
       <div class="post-header">
         <div class="avatar-container">
-          <img [src]="post.avatar" [alt]="post.author" class="avatar" />
+          <img [src]="getAvatarUrl(post)" [alt]="getAuthorName(post)" class="avatar" />
         </div>
 
         <div class="post-info">
           <div class="post-title-row">
             <div>
-              <div class="post-author">{{ post.author }}</div>
+              <div class="post-author">{{ getAuthorName(post) }}</div>
               <div class="post-meta">
-                <span class="post-date">{{ post.date }}</span>
-                <ng-container *ngIf="post.location">
+                <span class="post-date">{{ getPostDate(post) }}</span>
+                <ng-container *ngIf="hasLocation(post)">
                   <span class="dot-sep">•</span>
-                  <span class="post-location">📍 {{ post.location }}</span>
+                  <span class="post-location">📍 {{ getLocation(post) }}</span>
                 </ng-container>
               </div>
             </div>
@@ -51,25 +179,25 @@
             <button class="post-menu" aria-label="Más opciones">⋯</button>
           </div>
 
-          <h3 class="post-heading">{{ post.title }}</h3>
-          <p class="post-text">{{ post.content }}</p>
+          <h3 class="post-heading">{{ getTitle(post) }}</h3>
+          <p class="post-text">{{ getDescription(post) }}</p>
 
           <div class="post-tags">
-            <span class="tag category-tag">{{ post.category }}</span>
-            <span *ngIf="post.status" class="tag status-tag">{{ post.status }}</span>
+            <span class="tag category-tag">{{ getCategoryName(post) }}</span>
+            <span *ngIf="post.estado?.nombre" class="tag status-tag">{{ post.estado?.nombre }}</span>
           </div>
 
-          <div *ngIf="post.location" class="post-location-line">
+          <div *ngIf="hasLocation(post)" class="post-location-line">
             <span class="location-icon">📍</span>
-            <span class="location-text">{{ post.location }}</span>
+            <span class="location-text">{{ getLocation(post) }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Image / placeholder -->
+      <!-- Image / evidence carousel: show first evidence image -->
       <div class="post-image-wrapper">
-        <ng-container *ngIf="post.imageUrl; else imagePlaceholder">
-          <img [src]="post.imageUrl" [alt]="post.title" class="post-image" />
+        <ng-container *ngIf="hasEvidence(post); else imagePlaceholder">
+          <img [src]="getFirstEvidenceUrl(post)" [alt]="getTitle(post)" class="post-image" />
         </ng-container>
 
         <ng-template #imagePlaceholder>
@@ -79,51 +207,51 @@
         </ng-template>
       </div>
 
-      <!-- Vote section (if image exists) -->
-      <div *ngIf="post.imageUrl" class="vote-section">
+      <!-- Vote section -->
+      <div *ngIf="hasVotes(post)" class="vote-section">
         <div class="vote-question">
           ¿Estás de acuerdo con este reporte?
-          <span class="vote-count">{{ post.acceptVotes + post.rejectVotes }} votos</span>
+          <span class="vote-count">{{ getTotalVotes(post) }} votos</span>
         </div>
 
         <div class="vote-buttons">
           <button
             class="vote-btn accept"
-            [class.voted]="post.userVote === 'accept'"
-            [disabled]="post.userVote !== null"
+            [class.voted]="post.userVote === 'YES'"
+            [disabled]="!canVote(post)"
             (click)="vote(post, 'accept')"
           >
-            ✅ Sí ({{ post.acceptVotes }})
+            ✅ Sí ({{ getYesVotes(post) }})
           </button>
 
           <button
             class="vote-btn reject"
-            [class.voted]="post.userVote === 'reject'"
-            [disabled]="post.userVote !== null"
+            [class.voted]="post.userVote === 'NO'"
+            [disabled]="!canVote(post)"
             (click)="vote(post, 'reject')"
           >
-            ❌ No ({{ post.rejectVotes }})
+            ❌ No ({{ getNoVotes(post) }})
           </button>
         </div>
       </div>
 
-      <!-- Actions row -->
+      <!-- Actions row (reactions & comments) -->
       <div class="post-actions">
         <div class="left-actions">
-          <button class="action-btn" [class.liked]="post.liked" (click)="toggleLike(post)">
-            <span class="action-emoji">{{ post.liked ? '❤️' : '🤍' }}</span>
-            <span class="action-text">{{ post.likes }}</span>
+          <button class="action-btn" (click)="toggleReaction(post, 'like')">
+            <span class="action-emoji">{{ getLikeEmoji(post) }}</span>
+            <span class="action-text">{{ getReactionCount(post, 'like') }}</span>
           </button>
 
           <button class="action-btn" (click)="toggleComments(post)">
             <span class="action-emoji">💬</span>
-            <span class="action-text">{{ post.comments.length }}</span>
+            <span class="action-text">{{ post.commentsCount || (post.comments?.length || 0) }}</span>
           </button>
         </div>
 
         <div class="right-actions">
-          <button class="action-btn" (click)="toggleBookmark(post)" [class.bookmarked]="post.bookmarked">
-            <span class="action-emoji">{{ post.bookmarked ? '🔖' : '📑' }}</span>
+          <button class="action-btn" (click)="toggleBookmark(post)">
+            <span class="action-emoji">{{ getBookmarkEmoji(post) }}</span>
             <span class="action-text">Guardar</span>
           </button>
 
@@ -131,13 +259,19 @@
             <span class="action-emoji">📤</span>
             <span class="action-text">Compartir</span>
           </button>
+
+          <button class="action-btn" (click)="downloadPostJson(post)">
+            <span class="action-emoji">⬇️</span>
+            <span class="action-text">JSON</span>
+          </button>
         </div>
       </div>
 
       <!-- Comments -->
-      <div *ngIf="post.showComments" class="comments-section">
-        <div *ngFor="let comment of post.comments; trackBy: trackByComment" class="comment">
-          <strong>{{ comment.author }}:</strong> {{ comment.content }}
+      <div *ngIf="getShowComments(post)" class="comments-section">
+        <div *ngFor="let comment of post.comments || []; trackBy: trackByComment" class="comment">
+          <strong>{{ getCommentAuthor(comment) }}:</strong>
+          {{ getCommentText(comment) }}
         </div>
 
         <div class="comment-input-container">

@@ -24,9 +24,10 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets"
             ],
-            "styles": 
+            "styles":
             [
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
