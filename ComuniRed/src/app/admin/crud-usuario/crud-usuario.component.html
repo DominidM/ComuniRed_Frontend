@@ -115,6 +115,7 @@
     <div class="crud-usuario-modal" *ngIf="showModal" (click)="closeModal()">
       <div class="crud-usuario-modal-content" (click)="$event.stopPropagation()">
         <h3>{{ editingUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
+
         <form (ngSubmit)="saveUsuario(usuarioForm)" #usuarioForm="ngForm">
           <div class="form-group imagen-perfil">
             <label for="foto_perfil" class="form-label">Foto de Perfil</label>
@@ -209,8 +210,8 @@
           
           <div class="crud-usuario-modal-actions">
             <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
-            <button type="submit" class="btn-primary" [disabled]="!usuarioForm.form.valid || saving">
-              {{ saving ? 'Guardando...' : (editingUsuario ? 'Actualizar' : 'Guardar') }}
+            <button type="submit" class="btn-primary" [disabled]="!usuarioForm.form.valid || saving || subiendoImagen">
+              {{ subiendoImagen ? 'Subiendo imagen...' : (saving ? 'Guardando...' : (editingUsuario ? 'Actualizar' : 'Guardar')) }}
             </button>
           </div>
         </form>

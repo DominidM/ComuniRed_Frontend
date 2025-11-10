@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { UsuarioService } from '../../services/usuario.service';
 
+
+
 interface PieSegment {
   label: string;
   value: number;
@@ -22,7 +24,7 @@ interface PieSegment {
 export class DashboardComponent implements OnInit, OnDestroy {
   metrics = {
     totalComplaints: 5,
-    activeUsers: 3,
+    activeUsers: 0,
     assignments: 3,
     resolutionRate: 20
   };

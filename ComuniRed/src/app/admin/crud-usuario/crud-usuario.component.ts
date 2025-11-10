@@ -16,7 +16,10 @@ export class CrudUsuarioComponent implements OnInit {
   usuarios: Usuario[] = [];
   allUsuarios: Usuario[] = [];
   roles: Rol[] = [];
+  
+  // 🆕 Cloudinary: File en lugar de Base64
   imagenPreview: string | null = null;
+  archivoSeleccionado: File | null = null;  // ← NUEVO
   defaultFoto = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
   private rolesMap = new Map<string, string>();
@@ -38,6 +41,7 @@ export class CrudUsuarioComponent implements OnInit {
   saving = false;
   deleting = false;
   errorMessage: string | null = null;
+  subiendoImagen = false;  // ← NUEVO
 
   constructor(
     private usuarioService: UsuarioService,
@@ -54,7 +58,6 @@ export class CrudUsuarioComponent implements OnInit {
     return usuario.id;
   }
 
-  // ---------- Usuarios ----------
   loadUsuarios() {
     this.loading = true;
     this.errorMessage = null;
@@ -78,28 +81,9 @@ export class CrudUsuarioComponent implements OnInit {
           this.totalElements = pageData.totalElements ?? this.allUsuarios.length;
 
           console.log('✅ [Usuarios] cargados correctamente:', this.usuarios.length, 'usuarios');
-          
-          if (this.usuarios.length > 0) {
-            console.log('📅 Ejemplo de usuario:', {
-              nombre: this.usuarios[0].nombre,
-              fecha_nacimiento: this.usuarios[0].fecha_nacimiento,
-              fecha_registro: this.usuarios[0].fecha_registro
-            });
-          }
         },
         error: (err: any) => {
           console.error('❌ Error al cargar usuarios:', err);
-          
-          if (err.graphQLErrors) {
-            console.error('GraphQL Errors:', err.graphQLErrors);
-          }
-          if (err.networkError) {
-            console.error('Network Error:', err.networkError);
-          }
-          if (err.message) {
-            console.error('Error Message:', err.message);
-          }
-          
           this.errorMessage = 'Error al cargar usuarios. Ver consola para detalles.';
           this.usuarios = [];
           this.allUsuarios = [];
@@ -130,7 +114,6 @@ export class CrudUsuarioComponent implements OnInit {
     }
   }
 
-  // ---------- Roles ----------
   async loadRoles(): Promise<void> {
     return new Promise((resolve) => {
       this.rolService.obtenerTodosLosRoles().subscribe({
@@ -155,43 +138,51 @@ export class CrudUsuarioComponent implements OnInit {
     });
   }
 
-  // ---------- Manejo de Imágenes ----------
+  // 🆕 CLOUDINARY: Manejo de imágenes optimizado
   onFileSelected(event: any): void {
     const file = event.target.files[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        alert('Por favor selecciona un archivo de imagen válido');
-        return;
-      }
+    if (!file) return;
 
-      if (file.size > 5 * 1024 * 1024) {
-        alert('La imagen no debe superar los 5MB');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64String = reader.result as string;
-        this.imagenPreview = base64String;
-        this.usuarioData.foto_perfil = base64String;
-      };
-      reader.readAsDataURL(file);
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona un archivo de imagen válido');
+      return;
     }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen no debe superar los 5MB');
+      return;
+    }
+
+    // Guardar archivo para subir después
+    this.archivoSeleccionado = file;
+
+    // Mostrar preview local
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagenPreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 
   quitarFoto() {
     this.imagenPreview = null;
+    this.archivoSeleccionado = null;
     this.usuarioData.foto_perfil = '';
   }
 
   private limpiarImagen() {
     this.imagenPreview = null;
+    this.archivoSeleccionado = null;
     if (this.usuarioData) {
       this.usuarioData.foto_perfil = '';
     }
   }
 
-  // ---------- Roles ----------
+  // 🆕 CLOUDINARY: Obtener foto optimizada
+  obtenerFotoUsuario(foto_perfil?: string): string {
+    return this.usuarioService.obtenerFotoMiniatura(foto_perfil, 50);
+  }
+
   getRolNombre(rolId?: string | null): string {
     if (!rolId) return 'Sin rol';
     const key = String(rolId).trim();
@@ -222,10 +213,9 @@ export class CrudUsuarioComponent implements OnInit {
   openAddModal() {
     this.editingUsuario = null;
     this.usuarioData = {};
-
     this.usuarioData.fecha_nacimiento = '';
-
     this.imagenPreview = null;
+    this.archivoSeleccionado = null;
     this.showModal = true;
   }
 
@@ -242,7 +232,9 @@ export class CrudUsuarioComponent implements OnInit {
       this.usuarioData.foto_perfil = '';
     }
 
-    // Eliminar password del objeto (no debe editarse aquí)
+    this.archivoSeleccionado = null;
+
+    // Eliminar password del objeto
     if ('password' in this.usuarioData) {
       delete (this.usuarioData as any).password;
     }
@@ -250,7 +242,6 @@ export class CrudUsuarioComponent implements OnInit {
     this.showModal = true;
   }
 
-  // ---------- Inputs helpers / validations ----------
   onNumericInput(event: Event, field: keyof Usuario, maxLen: number) {
     const input = event.target as HTMLInputElement;
     let value = input.value ?? '';
@@ -294,7 +285,8 @@ export class CrudUsuarioComponent implements OnInit {
     return null;
   }
 
-  saveUsuario(form?: NgForm) {
+  // 🆕 CLOUDINARY: Guardar usuario con imagen
+  async saveUsuario(form?: NgForm) {
     const validationError = this.validarAntesDeGuardar();
     if (validationError) {
       alert(validationError);
@@ -304,61 +296,89 @@ export class CrudUsuarioComponent implements OnInit {
     this.saving = true;
     this.errorMessage = null;
 
-    const payload: UsuarioInput = {
-      nombre: this.usuarioData.nombre!,
-      apellido: this.usuarioData.apellido!,
-      email: this.usuarioData.email!,
-      dni: this.usuarioData.dni ?? '',
-      numero_telefono: this.usuarioData.numero_telefono ?? '',
-      sexo: this.usuarioData.sexo ?? '',
-      distrito: this.usuarioData.distrito ?? '',
-      codigo_postal: (this.usuarioData as any).codigo_postal ?? '',
-      direccion: this.usuarioData.direccion ?? '',
-      rol_id: this.usuarioData.rol_id ?? '',
-      foto_perfil: this.usuarioData.foto_perfil ?? '',
-      fecha_nacimiento: this.usuarioData.fecha_nacimiento ?? '',
-    };
+    try {
+      // 1. Si hay archivo nuevo, subir a Cloudinary primero
+      let fotoUrl = this.usuarioData.foto_perfil || '';
+      
+      if (this.archivoSeleccionado) {
+        this.subiendoImagen = true;
+        console.log('📤 Subiendo imagen a Cloudinary...');
+        
+        try {
+          fotoUrl = await this.usuarioService.subirFotoCloudinary(this.archivoSeleccionado);
+          console.log('✅ Imagen subida:', fotoUrl);
+        } catch (error) {
+          console.error('❌ Error subiendo imagen:', error);
+          alert('Error al subir la imagen. Intenta de nuevo.');
+          this.saving = false;
+          this.subiendoImagen = false;
+          return;
+        } finally {
+          this.subiendoImagen = false;
+        }
+      }
 
-    // Agregar password solo si existe y no está vacío
-    if (this.usuarioData.password && String(this.usuarioData.password).trim() !== '') {
-      (payload as any).password = this.usuarioData.password;
-    }
+      // 2. Preparar payload
+      const payload: UsuarioInput = {
+        nombre: this.usuarioData.nombre!,
+        apellido: this.usuarioData.apellido!,
+        email: this.usuarioData.email!,
+        dni: this.usuarioData.dni ?? '',
+        numero_telefono: this.usuarioData.numero_telefono ?? '',
+        sexo: this.usuarioData.sexo ?? '',
+        distrito: this.usuarioData.distrito ?? '',
+        codigo_postal: (this.usuarioData as any).codigo_postal ?? '',
+        direccion: this.usuarioData.direccion ?? '',
+        rol_id: this.usuarioData.rol_id ?? '',
+        foto_perfil: fotoUrl,  // ← URL de Cloudinary
+        fecha_nacimiento: this.usuarioData.fecha_nacimiento ?? '',
+      };
 
-    if (this.editingUsuario && this.editingUsuario.id) {
-      // ACTUALIZAR
-      const id = this.editingUsuario.id;
-      this.usuarioService
-        .actualizarUsuario(id, payload)
-        .pipe(finalize(() => (this.saving = false)))
-        .subscribe({
-          next: (usuario) => {
-            console.log('✅ Usuario actualizado correctamente:', usuario);
-            this.loadUsuarios();
-            this.closeModal();
-          },
-          error: (err: any) => {
-            console.error('❌ Error actualizando usuario:', err);
-            this.errorMessage = 'Error al actualizar el usuario.';
-            alert(this.errorMessage);
-          },
-        });
-    } else {
-      // CREAR
-      this.usuarioService
-        .crearUsuario(payload)
-        .pipe(finalize(() => (this.saving = false)))
-        .subscribe({
-          next: (usuario) => {
-            console.log('✅ Usuario creado correctamente:', usuario);
-            this.loadUsuarios();
-            this.closeModal();
-          },
-          error: (err: any) => {
-            console.error('❌ Error creando usuario:', err);
-            this.errorMessage = 'Error al crear el usuario.';
-            alert(this.errorMessage);
-          },
-        });
+      if (this.usuarioData.password && String(this.usuarioData.password).trim() !== '') {
+        (payload as any).password = this.usuarioData.password;
+      }
+
+      // 3. Guardar usuario
+      if (this.editingUsuario && this.editingUsuario.id) {
+        // ACTUALIZAR
+        const id = this.editingUsuario.id;
+        this.usuarioService
+          .actualizarUsuario(id, payload)
+          .pipe(finalize(() => (this.saving = false)))
+          .subscribe({
+            next: (usuario) => {
+              console.log('✅ Usuario actualizado correctamente:', usuario);
+              this.loadUsuarios();
+              this.closeModal();
+            },
+            error: (err: any) => {
+              console.error('❌ Error actualizando usuario:', err);
+              this.errorMessage = 'Error al actualizar el usuario.';
+              alert(this.errorMessage);
+            },
+          });
+      } else {
+        // CREAR
+        this.usuarioService
+          .crearUsuario(payload)
+          .pipe(finalize(() => (this.saving = false)))
+          .subscribe({
+            next: (usuario) => {
+              console.log('✅ Usuario creado correctamente:', usuario);
+              this.loadUsuarios();
+              this.closeModal();
+            },
+            error: (err: any) => {
+              console.error('❌ Error creando usuario:', err);
+              this.errorMessage = 'Error al crear el usuario.';
+              alert(this.errorMessage);
+            },
+          });
+      }
+    } catch (error) {
+      console.error('❌ Error general:', error);
+      this.saving = false;
+      alert('Error al guardar el usuario');
     }
   }
 

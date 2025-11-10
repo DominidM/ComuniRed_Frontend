@@ -4,10 +4,9 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { gql } from 'apollo-angular';
 
-
 export interface Usuario {
   id: string;
-  foto_perfil?: string;
+  foto_perfil?: string;  // URL de Cloudinary
   nombre: string;
   apellido: string;
   dni: string;
@@ -19,7 +18,6 @@ export interface Usuario {
   email: string;
   password?: string;
   rol_id: string;
-  
   fecha_nacimiento?: string;
   fecha_registro?: string;
 }
@@ -48,8 +46,7 @@ export interface UsuarioPage {
   size: number;
 }
 
-
-
+// Mantén tus queries y mutations existentes
 const OBTENER_USUARIOS = gql`
   query ObtenerUsuarios($page: Int!, $size: Int!) {
     obtenerUsuarios(page: $page, size: $size) {
@@ -77,7 +74,6 @@ const OBTENER_USUARIOS = gql`
   }
 `;
 
-// ✅ Query actualizada (sin edad)
 const OBTENER_TODOS_LOS_USUARIOS = gql`
   query ObtenerTodosLosUsuarios {
     obtenerTodosLosUsuarios {
@@ -99,7 +95,6 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
   }
 `;
 
-// ✅ Query actualizada (sin edad)
 const OBTENER_USUARIO_POR_ID = gql`
   query ObtenerUsuarioPorId($id: ID!) {
     obtenerUsuarioPorId(id: $id) {
@@ -127,7 +122,6 @@ const CONTAR_USUARIOS_POR_ROL = gql`
   }
 `;
 
-// ✅ Mutation actualizada (sin edad)
 const CREAR_USUARIO = gql`
   mutation CrearUsuario($usuario: UsuarioInput!) {
     crearUsuario(usuario: $usuario) {
@@ -149,7 +143,6 @@ const CREAR_USUARIO = gql`
   }
 `;
 
-// ✅ Mutation actualizada (sin edad)
 const ACTUALIZAR_USUARIO = gql`
   mutation ActualizarUsuario($id: ID!, $usuario: UsuarioInput!) {
     actualizarUsuario(id: $id, usuario: $usuario) {
@@ -168,6 +161,12 @@ const ACTUALIZAR_USUARIO = gql`
       fecha_nacimiento
       fecha_registro
     }
+  }
+`;
+
+const ELIMINAR_FOTO_PERFIL = gql`
+  mutation EliminarFotoPerfil($usuarioId: ID!) {
+    eliminarFotoPerfil(usuarioId: $usuarioId)
   }
 `;
 
@@ -225,7 +224,6 @@ export const USER_KEY = 'comunired_user';
 })
 export class UsuarioService {
   private apiBase = '/graphql';
-
   private userCountSubject = new BehaviorSubject<number>(0);
   private usuarioSubject = new BehaviorSubject<Usuario | null>(this.getUser());
   
@@ -474,6 +472,116 @@ export class UsuarioService {
       map(result => result.data?.cambiarPasswordConCodigo ?? false)
     );
   }
+
+  // 🆕 MÉTODOS CLOUDINARY
+
+  /**
+   * Eliminar foto de perfil (de Cloudinary y MongoDB)
+   */
+  eliminarFotoPerfil(usuarioId: string): Observable<boolean> {
+    return this.apollo.mutate<{ eliminarFotoPerfil: boolean }>({
+      mutation: ELIMINAR_FOTO_PERFIL,
+      variables: { usuarioId },
+      refetchQueries: [
+        { query: OBTENER_USUARIO_POR_ID, variables: { id: usuarioId } }
+      ]
+    }).pipe(
+      tap(raw => console.debug('[UsuarioService] eliminarFotoPerfil raw:', raw)),
+      map(result => result.data?.eliminarFotoPerfil ?? false)
+    );
+  }
+
+  /**
+   * Subir foto directamente a Cloudinary desde el frontend
+   */
+  async subirFotoCloudinary(archivo: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', archivo);
+    formData.append('upload_preset', 'ml_default');  // ← CAMBIAR: era 'usuarios'
+    formData.append('folder', 'usuarios');
+
+    try {
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/da4wxtjwu/image/upload',
+        {
+          method: 'POST',
+          body: formData
+        }
+      );
+
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+      
+      return data.secure_url;
+    } catch (error) {
+      console.error('Error subiendo imagen a Cloudinary:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Actualizar foto de perfil (subir y guardar en un solo paso)
+   */
+  async actualizarFotoPerfil(usuarioId: string, archivo: File): Promise<Usuario | undefined> {
+    try {
+      // 1. Subir imagen a Cloudinary
+      const url = await this.subirFotoCloudinary(archivo);
+
+      // 2. Obtener datos actuales del usuario
+      const usuario = await this.obtenerUsuarioPorId(usuarioId).toPromise();
+
+      if (!usuario) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      // 3. Actualizar usuario con la nueva URL
+      return this.actualizarUsuario(usuarioId, {
+        ...usuario,
+        foto_perfil: url
+      }).toPromise();
+    } catch (error) {
+      console.error('Error actualizando foto de perfil:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verificar si la foto es URL de Cloudinary
+   */
+  esFotoCloudinary(foto_perfil?: string): boolean {
+    return foto_perfil?.includes('cloudinary.com') ?? false;
+  }
+
+  /**
+   * Obtener URL optimizada para miniatura
+   */
+  obtenerFotoMiniatura(foto_perfil?: string, width: number = 150): string {
+    if (!foto_perfil) {
+      return '/assets/img/default-avatar.png';
+    }
+
+    if (!this.esFotoCloudinary(foto_perfil)) {
+      return foto_perfil;
+    }
+
+    // Transformar URL de Cloudinary para miniatura optimizada
+    return foto_perfil.replace(
+      '/upload/',
+      `/upload/w_${width},h_${width},c_fill,g_face,q_auto,f_auto/`
+    );
+  }
+
+  /**
+   * Obtener placeholder mientras carga la imagen
+   */
+  obtenerPlaceholderFoto(): string {
+    return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23e0e0e0" width="150" height="150"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="48" dy="0.35em" x="50%" y="50%" text-anchor="middle"%3E👤%3C/text%3E%3C/svg%3E';
+  }
+
+  // MÉTODOS AUXILIARES
 
   calcularEdad(fechaNacimiento: string): number | null {
     if (!fechaNacimiento) return null;
