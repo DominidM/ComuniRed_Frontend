@@ -211,6 +211,7 @@ const CAMBIAR_PASSWORD_CON_CODIGO = gql`
   }
 `;
 
+
 export interface LoginResult {
   token?: string;
   usuario?: Usuario | null;
@@ -261,6 +262,7 @@ export class UsuarioService {
       })
     );
   }
+
 
   obtenerTodosLosUsuarios(): Observable<Usuario[]> {
     return this.apollo.watchQuery<{ obtenerTodosLosUsuarios: Usuario[] }>({
@@ -610,4 +612,5 @@ export class UsuarioService {
       minute: '2-digit'
     });
   }
+
 }

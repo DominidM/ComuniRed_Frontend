@@ -12,20 +12,37 @@
 
     <div class="profile-main" *ngIf="!cargando">
       <div class="avatar-section">
-        <img [src]="foto_perfil_url" alt="Foto de perfil" class="avatar-lg" />
-        
-        <p class="username" *ngIf="usuario">{{ usuario.nombre }} {{ usuario.apellido }}</p>
-        
-        <label for="file-input" class="btn-change-photo">
-          Cambiar foto
-        </label>
-        <input 
-          id="file-input" 
-          type="file" 
-          accept="image/*" 
-          (change)="onFileSelected($event)"
-          style="display: none;"
-        />
+        <img [src]="avatarPreview || foto_perfil_url" alt="Foto de perfil" class="avatar-lg" />
+                
+        <div class="avatar-actions">
+          <label for="file-input" class="btn-change-photo" [class.disabled]="subiendoImagen || eliminandoFoto">
+            <span *ngIf="!subiendoImagen">Cambiar foto</span>
+            <span *ngIf="subiendoImagen" class="loading-text">
+              <span class="spinner-tiny"></span> Subiendo...
+            </span>
+          </label>
+          <input 
+            id="file-input" 
+            type="file" 
+            accept="image/*" 
+            (change)="onFileSelected($event)"
+            [disabled]="subiendoImagen || eliminandoFoto"
+            style="display: none;"
+          />
+          
+          <button 
+            type="button" 
+            class="btn-remove-photo" 
+            (click)="eliminarFoto()"
+            [disabled]="subiendoImagen || eliminandoFoto || !usuario?.foto_perfil"
+            *ngIf="usuario?.foto_perfil"
+          >
+            <span *ngIf="!eliminandoFoto">Eliminar foto</span>
+            <span *ngIf="eliminandoFoto" class="loading-text">
+              <span class="spinner-tiny"></span> Eliminando...
+            </span>
+          </button>
+        </div>
         
         <p class="photo-info">JPG, PNG o GIF. Máx. 2MB</p>
       </div>
@@ -98,9 +115,6 @@
               formControlName="fecha_nacimiento" 
               [max]="hoy"
             />
-            <small *ngIf="calcularEdad()" style="color: #6b7280; font-size: 12px;">
-              Edad: {{ calcularEdad() }} años
-            </small>
           </div>
         </div>
 
@@ -147,12 +161,15 @@
         </div>
 
         <div class="actions">
-          <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="guardando">
+          <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="guardando || subiendoImagen">
             Cancelar
           </button>
-          <button type="submit" class="btn-save" [disabled]="profileForm.invalid || guardando">
-            <span *ngIf="!guardando">Guardar Cambios</span>
-            <span *ngIf="guardando">
+          <button type="submit" class="btn-save" [disabled]="profileForm.invalid || guardando || subiendoImagen">
+            <span *ngIf="!guardando && !subiendoImagen">Guardar Cambios</span>
+            <span *ngIf="subiendoImagen">
+              <span class="spinner-small"></span> Subiendo imagen...
+            </span>
+            <span *ngIf="guardando && !subiendoImagen">
               <span class="spinner-small"></span> Guardando...
             </span>
           </button>

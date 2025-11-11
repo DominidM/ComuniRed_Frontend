@@ -1,14 +1,12 @@
 <div class="sidebar-container" role="navigation" aria-label="Sidebar">
-  <!-- Menú principal -->
   <nav class="sidebar-menu" aria-label="Main menu">
     <a
       class="sidebar-link"
-      *ngFor="let item of menuItems; let i = index"
+      *ngFor="let item of menuItems"
       [routerLink]="item.route"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
+      [routerLinkActiveOptions]="{ exact: false }"
       [class.soft]="item.soft"
-      [attr.aria-current]="i === 0 ? 'true' : null"
       title="{{ item.label }}"
     >
       <span class="icon-wrap" aria-hidden="true">
@@ -18,7 +16,6 @@
     </a>
   </nav>
 
-  <!-- Footer / perfil -->
   <div class="sidebar-footer" role="region" aria-label="User">
     <div class="user-card" *ngIf="user">
       <div class="user-left">

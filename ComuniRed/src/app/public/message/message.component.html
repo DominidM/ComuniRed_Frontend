@@ -1,0 +1,147 @@
+<div class="messages-container-wrapper">
+  <div class="conversations-sidebar">
+    <div class="sidebar-header">
+      <h2>Mensajes</h2>
+    </div>
+
+    <div *ngIf="loadingConversaciones" class="loading-conversations">
+      <div class="spinner"></div>
+      <p>Cargando conversaciones...</p>
+    </div>
+
+    <div *ngIf="!loadingConversaciones" class="conversations-list">
+      <div 
+        *ngFor="let conversacion of conversaciones" 
+        class="conversation-item"
+        [class.active]="conversacionSeleccionada?.id === conversacion.id"
+        (click)="seleccionarConversacion(conversacion)">
+        
+        <div class="conversation-avatar-container">
+          <img 
+            [src]="obtenerFoto(conversacion.otroUsuario?.foto_perfil)" 
+            alt="Avatar"
+            class="conversation-avatar"
+          />
+          <span *ngIf="conversacion.mensajesNoLeidos && conversacion.mensajesNoLeidos > 0" 
+                class="badge-no-leidos">
+            {{ conversacion.mensajesNoLeidos }}
+          </span>
+        </div>
+        
+        <div class="conversation-info">
+          <div class="conversation-header">
+            <h4 class="conversation-name">{{ obtenerNombreUsuario(conversacion) }}</h4>
+            <span class="conversation-time">{{ formatearHora(conversacion.fechaUltimaActividad) }}</span>
+          </div>
+          
+          <p class="conversation-preview">
+            <span *ngIf="conversacion.ultimoMensaje?.emisorId === usuarioActual?.id">Tú: </span>
+            {{ conversacion.ultimoMensaje?.contenido || 'Sin mensajes' }}
+          </p>
+        </div>
+      </div>
+
+      <div *ngIf="conversaciones.length === 0" class="empty-conversations">
+        <i class="bi bi-chat-dots"></i>
+        <p>No tienes conversaciones aún</p>
+        <small>Empieza a seguir usuarios para chatear</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-main">
+    <div *ngIf="!conversacionSeleccionada" class="chat-empty">
+      <i class="bi bi-chat-heart"></i>
+      <h3>Selecciona una conversación</h3>
+      <p>Elige una conversación de la izquierda para empezar a chatear</p>
+    </div>
+
+    <div *ngIf="conversacionSeleccionada" class="chat-active">
+      <div class="chat-header">
+        <div class="chat-header-user" (click)="verPerfilUsuario()">
+          <img 
+            [src]="obtenerFoto(usuarioChat?.foto_perfil)" 
+            alt="Avatar"
+            class="chat-avatar"
+          />
+          <div class="chat-user-info">
+            <h3>{{ usuarioChat?.nombre }} {{ usuarioChat?.apellido }}</h3>
+            <span class="chat-user-status">
+              <i class="bi bi-circle-fill"></i> En línea
+            </span>
+          </div>
+        </div>
+        
+        <div class="chat-header-actions">
+          <button class="btn-chat-action" (click)="verPerfilUsuario()">
+            <i class="bi bi-person"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="messages-container" #messagesContainer>
+        <div *ngIf="loadingMensajes" class="loading-messages">
+          <div class="spinner"></div>
+          <p>Cargando mensajes...</p>
+        </div>
+
+        <div *ngIf="!loadingMensajes" class="messages-list">
+          <div *ngIf="mensajes.length > 0" class="chat-date-divider">
+            {{ formatearHora(mensajes[0].fechaEnvio) }}
+          </div>
+
+          <div 
+            *ngFor="let mensaje of mensajes; let i = index" 
+            class="message-wrapper"
+            [class.message-mine]="esMiMensaje(mensaje)"
+            [class.message-other]="!esMiMensaje(mensaje)">
+            
+            <div class="message-bubble">
+              <p class="message-content">{{ mensaje.contenido }}</p>
+              <span class="message-time">
+                {{ formatearHora(mensaje.fechaEnvio) }}
+                <i *ngIf="esMiMensaje(mensaje) && mensaje.leido" 
+                   class="bi bi-check-all message-read" 
+                   title="Leído"></i>
+                <i *ngIf="esMiMensaje(mensaje) && !mensaje.leido" 
+                   class="bi bi-check message-sent"
+                   title="Enviado"></i>
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="mensajes.length === 0" class="empty-messages">
+            <p>No hay mensajes aún. ¡Envía el primero! 👋</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-container">
+        <div *ngIf="!seSiguenMutuamente" class="chat-blocked-warning">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>Ya no pueden chatear porque no se siguen mutuamente</span>
+        </div>
+
+        <ng-container *ngIf="seSiguenMutuamente">
+          <input 
+            type="text"
+            class="chat-input"
+            placeholder="Escribe un mensaje..."
+            [(ngModel)]="nuevoMensaje"
+            (keypress)="handleKeyPress($event)"
+            [disabled]="enviandoMensaje"
+            autofocus
+          />
+          
+          <button 
+            class="btn-send"
+            (click)="enviarMensaje()"
+            [disabled]="!nuevoMensaje.trim() || enviandoMensaje">
+            <i *ngIf="!enviandoMensaje" class="bi bi-send-fill"></i>
+            <div *ngIf="enviandoMensaje" class="spinner-small"></div>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

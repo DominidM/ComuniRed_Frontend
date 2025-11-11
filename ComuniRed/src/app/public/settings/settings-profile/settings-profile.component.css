@@ -1,9 +1,12 @@
 .config-container {
   max-width: 1000px;
   margin: 0 auto;
+  padding: 2rem 2rem;
   background: #fff;
   color: #000;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .tabs-section {
@@ -75,7 +78,7 @@
   flex-wrap: wrap;
 }
 
-/* Avatar Section */
+/* ===== AVATAR SECTION ===== */
 .avatar-section {
   flex: 0 0 150px;
   text-align: center;
@@ -108,32 +111,103 @@
   text-align: center;
 }
 
+/* ✅ AVATAR ACTIONS CONTAINER */
+.avatar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* ✅ BOTÓN CAMBIAR FOTO */
 .btn-change-photo {
   background: #000;
   color: #fff;
   border: none;
   border-radius: 6px;
-  padding: 8px 16px;
+  padding: 4px 16px;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
 }
 
-.btn-change-photo:hover {
+.btn-change-photo:hover:not(.disabled) {
   background: #333;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-change-photo.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none !important;
+}
+
+/* ✅ BOTÓN ELIMINAR FOTO */
+.btn-remove-photo {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+}
+
+.btn-remove-photo:hover:not(:disabled) {
+  background: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+}
+
+.btn-remove-photo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  background: #dc2626;
+}
+
+/* ✅ LOADING TEXT */
+.loading-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* ✅ SPINNER PEQUEÑO (para botones) */
+.spinner-tiny {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
 }
 
 .photo-info {
   font-size: 0.8rem;
   color: #999;
   margin: 0;
+  text-align: center;
 }
 
-/* Form */
+/* ===== FORM ===== */
 .profile-form {
   flex: 1;
   min-width: 300px;
@@ -204,6 +278,7 @@
   font-size: 0.85rem;
 }
 
+/* ===== ACTIONS ===== */
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -247,6 +322,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  justify-content: center;
 }
 
 .btn-save:hover:not(:disabled) {
@@ -261,6 +337,7 @@
   transform: none !important;
 }
 
+/* ✅ SPINNER MEDIANO (para botón guardar) */
 .spinner-small {
   width: 16px;
   height: 16px;
@@ -271,13 +348,22 @@
   display: inline-block;
 }
 
+/* ===== ANIMATIONS ===== */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* Responsive */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+  .config-container {
+    padding: 1.5rem 1rem;
+  }
+
   .tabs-section {
     padding: 0 16px;
     overflow-x: auto;
@@ -301,6 +387,24 @@
 
   .avatar-section {
     flex: none;
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .avatar-lg {
+    width: 120px;
+    height: 120px;
+  }
+
+  .avatar-actions {
+    width: 100%;
+  }
+
+  .btn-change-photo,
+  .btn-remove-photo {
+    width: 100%;
+    font-size: 0.85rem;
+    padding: 10px 16px;
   }
 
   .form-row {
@@ -322,12 +426,25 @@
   }
 }
 
+/* ===== EXTRA: Estados de carga en pantalla completa ===== */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.loading-spinner-large {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }

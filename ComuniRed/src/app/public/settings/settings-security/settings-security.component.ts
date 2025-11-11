@@ -11,8 +11,18 @@ import { FormsModule } from '@angular/forms';
 })
 export class SettingsSecurityComponent {
   twoFactor = false;
+  guardando = false;
+
+  cancel() {
+    this.twoFactor = false;
+  }
 
   save() {
-    alert('Configuración de seguridad guardada (demo)');
+    this.guardando = true;
+
+    setTimeout(() => {
+      this.guardando = false;
+      alert('Configuración de seguridad guardada exitosamente');
+    }, 1500);
   }
 }

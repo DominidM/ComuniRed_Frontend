@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { UsuarioService } from '../../services/usuario.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,11 +20,11 @@ import { UsuarioService } from '../../services/usuario.service';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   showModal = false;
   mostrarMenu = false;
+  private readonly DEFAULT_AVATAR = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
 
-  // Modal Form State
   title = '';
   description = '';
   category = '';
@@ -32,18 +33,20 @@ export class SidebarComponent implements OnInit {
   imagePreview: string | null = null;
   categories = ['Vías', 'Alumbrado', 'Grafitis', 'Semáforos', 'Otros'];
 
-  // menu: changed "Notificaciones" to "Reels" as requested
   menuItems = [
     { label: 'Inicio', icon: 'home', route: '/public/home' },
     { label: 'Tendencias', icon: 'trending_up', route: '/public/trending' },
     { label: 'Reels', icon: 'video_library', route: '/public/reels' },
     { label: 'Perfil', icon: 'person', route: '/public/profile/1', soft: true },
+    { label: 'Sugerencias', icon: 'post_add', route: '/public/suggestions', soft: true},
+    { label: 'Mensajes', icon: 'message', route: '/public/messages' },
     { label: 'Configuración', icon: 'settings', route: '/public/settings' },
     { label: 'Ayuda', icon: 'help_outline', route: '/public/help' },
   ];
 
-  // user mostrado en el sidebar (shape simple para la UI)
   user: { name: string; handle: string; avatarUrl: string } | null = null;
+  
+  private userSubscription?: Subscription;
 
   constructor(
     private router: Router,
@@ -51,27 +54,58 @@ export class SidebarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Obtén el usuario desde el service (token & user gestionados allí)
+    this.cargarUsuario();
+
+    this.userSubscription = this.usuarioService.usuario$.subscribe({
+      next: (usuario) => {
+        console.log('Usuario actualizado en sidebar:', usuario);
+        if (usuario) {
+          this.actualizarVistaUsuario(usuario);
+        } else {
+          this.user = null;
+        }
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.userSubscription?.unsubscribe();
+  }
+
+  private cargarUsuario(): void {
     const u = this.usuarioService.getUser();
     if (u) {
-      // adapta los campos según tu objeto Usuario
-      const nombre = (u as any).nombre ?? '';
-      const apellido = (u as any).apellido ?? '';
-      const email = (u as any).email ?? '';
-      const avatar = (u as any).foto_perfil ?? '';
-      this.user = {
-        name: `${nombre} ${apellido}`.trim() || email,
-        handle: email ? `@${email.split('@')[0]}` : '',
-        avatarUrl: avatar
-      };
+      this.actualizarVistaUsuario(u);
     } else {
-      // fallback (tu comportamiento actual)
       this.user = {
         name: 'Tu Usuario',
         handle: '@tuusuario',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/1.jpg'
+        avatarUrl: this.DEFAULT_AVATAR
       };
     }
+  }
+
+  private actualizarVistaUsuario(u: any): void {
+    const nombre = u.nombre ?? '';
+    const apellido = u.apellido ?? '';
+    const email = u.email ?? '';
+    let avatar = u.foto_perfil ?? '';
+
+    if (avatar && avatar.trim() !== '') {
+      if (this.usuarioService.esFotoCloudinary(avatar)) {
+        avatar = this.usuarioService.obtenerFotoMiniatura(avatar, 40);
+      }
+    } else {
+      avatar = this.DEFAULT_AVATAR;
+    }
+
+    this.user = {
+      name: `${nombre} ${apellido}`.trim() || email,
+      handle: email ? `@${email.split('@')[0]}` : '',
+      avatarUrl: avatar
+    };
+
+    console.log('Vista de usuario actualizada:', this.user);
   }
 
   openModal() {
@@ -124,7 +158,6 @@ export class SidebarComponent implements OnInit {
     this.removeImage();
   }
 
-  // ==================== Menú usuario ====================
   toggleMenu() {
     this.mostrarMenu = !this.mostrarMenu;
   }
@@ -132,21 +165,16 @@ export class SidebarComponent implements OnInit {
   onModificar() {
     console.log('Modificar perfil');
     this.mostrarMenu = false;
-    // si quieres navegar a editar perfil:
-    // this.router.navigate(['/public/profile/edit']);
+    this.router.navigate(['/public/settings']);
   }
 
   onSalir() {
-    // Cierra sesión con el UsuarioService (limpia token y user) y navega al login
     this.usuarioService.logout();
     this.mostrarMenu = false;
     this.router.navigate(['/login']);
   }
 
-  // helper si necesitas marcar ícono activo con lógica propia
   isActive(item: any) {
-    // si usas routerLinkActive, no es necesario; esta función puede
-    // comprobar la ruta actual y devolver true si coincide.
     return false;
   }
 }

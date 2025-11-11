@@ -1,26 +1,39 @@
 <div class="settings-container">
   <div class="profile-header">
-    <div class="header-background"></div>
+    <div class="header-background">
+      <div class="header-meta">
+        <span class="header-date">
+          Miembro desde el {{ user?.fecha_registro | date: 'd' }} de 
+          {{ user?.fecha_registro | date: 'MMMM' }} de 
+          {{ user?.fecha_registro | date: 'yyyy' }}
+        </span>
+        <span class="header-role">Usuario</span>
+      </div>
+    </div>
+    
     <div class="profile-info">
       <div class="avatar">
         <img [src]="user?.foto_perfil" alt="Foto de perfil" class="avatar-img" />
       </div>
-      
-      <!-- ✅ Contenedor principal con flex -->
+    
       <div class="profile-content">
-        <!-- ✅ Izquierda: Nombre y Email -->
-        <div class="user-details">
+        <div class="user-info-section">
           <h1 class="user-name">{{ user?.nombre }} {{ user?.apellido }}</h1>
           <p class="user-email">{{ user?.email }}</p>
         </div>
         
-        <div class="user-meta">
-          <span class="member-date">
-            Miembro desde el {{ user?.fecha_registro | date: 'd' }} de 
-            {{ user?.fecha_registro | date: 'MMMM' }} de 
-            {{ user?.fecha_registro | date: 'yyyy' }}
-          </span>
-          <span class="role">Usuario</span>
+        <div class="stats-row">
+          <button class="stat-item stat-clickable" (click)="verSeguidores()">
+            <span class="stat-number">{{ seguidoresCount }}</span>
+            <span class="stat-label">seguidores</span>
+          </button>
+          
+          <div class="stat-divider"></div>
+          
+          <button class="stat-item stat-clickable" (click)="verSeguidos()">
+            <span class="stat-number">{{ seguidosCount }}</span>
+            <span class="stat-label">seguidos</span>
+          </button>
         </div>
       </div>
     </div>
@@ -151,6 +164,92 @@
                 <span class="estadistica-value" style="color: #f97316;">5 días 🔥</span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="mostrarModalSeguidores" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Seguidores ({{ seguidoresCount }})</h2>
+        <button class="modal-close" (click)="cerrarModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="loadingModal" class="modal-loading">
+          <p>⏳ Cargando...</p>
+        </div>
+
+        <div *ngIf="!loadingModal && listaSeguidores.length === 0" class="modal-empty">
+          <p>No tienes seguidores aún</p>
+        </div>
+
+        <div *ngIf="!loadingModal && listaSeguidores.length > 0" class="users-list">
+          <div *ngFor="let usuario of listaSeguidores" class="user-item">
+            <img 
+              [src]="obtenerFoto(usuario.foto_perfil)" 
+              [alt]="usuario.nombre"
+              class="user-avatar-small"
+              (click)="verPerfil(usuario)"
+            />
+            
+            <div class="user-info-modal">
+              <h4>{{ usuario.nombre }} {{ usuario.apellido }}</h4>
+              <p *ngIf="usuario.distrito">📍 {{ usuario.distrito }}</p>
+            </div>
+
+            <button class="btn-view-modal" (click)="verPerfil(usuario)">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="mostrarModalSeguidos" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Siguiendo ({{ seguidosCount }})</h2>
+        <button class="modal-close" (click)="cerrarModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="loadingModal" class="modal-loading">
+          <p>⏳ Cargando...</p>
+        </div>
+
+        <div *ngIf="!loadingModal && listaSeguidos.length === 0" class="modal-empty">
+          <p>No sigues a nadie aún</p>
+        </div>
+
+        <div *ngIf="!loadingModal && listaSeguidos.length > 0" class="users-list">
+          <div *ngFor="let usuario of listaSeguidos" class="user-item">
+            <img 
+              [src]="obtenerFoto(usuario.foto_perfil)" 
+              [alt]="usuario.nombre"
+              class="user-avatar-small"
+              (click)="verPerfil(usuario)"
+            />
+            
+            <div class="user-info-modal">
+              <h4>{{ usuario.nombre }} {{ usuario.apellido }}</h4>
+              <p *ngIf="usuario.distrito">📍 {{ usuario.distrito }}</p>
+            </div>
+
+            <button class="btn-unfollow" (click)="dejarDeSeguir(usuario)">
+              Dejar de seguir
+            </button>
+
+            <button class="btn-view-modal" (click)="verPerfil(usuario)">
+              <i class="bi bi-eye"></i>
+            </button>
           </div>
         </div>
       </div>

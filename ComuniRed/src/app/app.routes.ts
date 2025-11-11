@@ -58,6 +58,8 @@ import { CrudEvidenciaComponent } from './admin/crud-evidencia/crud-evidencia.co
 
 import { AuthGuard } from './guards/auth.guard';
 import { ReelsComponent } from './public/reels/reels.component';
+import { SuggestionsComponent } from './public/suggestions/suggestions.component';
+import { MessageComponent } from './public/message/message.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -118,6 +120,8 @@ export const routes: Routes = [
       { path: 'trending', component: TrendingComponent },
       { path: 'reels', component: ReelsComponent },
       { path: 'notifications', component: NotificationsComponent },
+      { path: 'suggestions', component: SuggestionsComponent },
+      { path: 'messages', component: MessageComponent },
       { path: 'profile/:id', component: ProfileComponent},
       { path: 'help', component: HelpComponent },
       {

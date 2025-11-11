@@ -1,0 +1,171 @@
+<div class="suggestions-container">
+  <!-- Header con tabs -->
+  <div class="suggestions-header">
+    <div class="tabs">
+      <button 
+        class="tab"
+        [class.active]="tabActual === 'sugerencias'"
+        (click)="cambiarTab('sugerencias')">
+        Sugerencias
+      </button>
+      
+      <button 
+        class="tab"
+        [class.active]="tabActual === 'solicitudes'"
+        (click)="cambiarTab('solicitudes')">
+        Solicitudes
+        <span class="badge" *ngIf="totalSolicitudes > 0">{{ totalSolicitudes }}</span>
+      </button>
+    </div>
+    
+    <!-- Buscador solo en sugerencias -->
+    <div class="search-box" *ngIf="tabActual === 'sugerencias'">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        placeholder="Buscar..."
+        (keyup.enter)="buscar()"
+      />
+      <button (click)="buscar()" class="search-btn">
+        <i class="bi bi-search"></i>
+      </button>    
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <p>⏳ Cargando...</p>
+  </div>
+
+  <!-- Empty states -->
+  <div *ngIf="!loading && tabActual === 'sugerencias' && sugerencias.length === 0" class="no-results">
+    <p>❌ No hay sugerencias</p>
+  </div>
+
+  <div *ngIf="!loading && tabActual === 'solicitudes' && solicitudes.length === 0" class="no-results">
+    <p>📭 No tienes solicitudes pendientes</p>
+  </div>
+
+  <!-- TAB: SUGERENCIAS -->
+  <div class="suggestions-grid" *ngIf="!loading && tabActual === 'sugerencias' && sugerencias.length > 0">
+    <div *ngFor="let usuario of sugerencias" class="user-card">
+      <img 
+        [src]="obtenerFoto(usuario.foto_perfil)" 
+        [alt]="usuario.nombre"
+        class="user-avatar"
+        onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'"
+      />
+      
+      <div class="user-info">
+        <h3>{{ usuario.nombre }} {{ usuario.apellido }}</h3>
+        
+        <p class="user-details" *ngIf="usuario.distrito">
+          📍 {{ usuario.distrito }}
+        </p>
+        
+        <p class="user-details" *ngIf="calcularEdad(usuario.fecha_nacimiento) as edad">
+          🎂 {{ edad }} años
+        </p>
+      </div>
+      
+      <div class="user-actions">
+        <button 
+          class="btn-primary"
+          [class.btn-siguiendo]="obtenerEstado(usuario)?.estaSiguiendo"
+          [class.btn-pendiente]="obtenerEstado(usuario)?.solicitudEnviada"
+          [disabled]="estaCargando(usuario)"
+          (click)="toggleSeguir(usuario)">
+          
+          <span *ngIf="estaCargando(usuario)">⏳</span>
+          
+          <span *ngIf="!estaCargando(usuario)">
+            <ng-container *ngIf="obtenerEstado(usuario)?.estaSiguiendo">
+              Siguiendo
+            </ng-container>
+            <ng-container *ngIf="obtenerEstado(usuario)?.solicitudEnviada">
+              Pendiente
+            </ng-container>
+            <ng-container *ngIf="!obtenerEstado(usuario)?.estaSiguiendo && !obtenerEstado(usuario)?.solicitudEnviada">
+              Seguir
+            </ng-container>
+          </span>
+        </button>
+        
+        <button class="btn-secondary" (click)="verPerfil(usuario)">
+          Ver perfil
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: SOLICITUDES -->
+  <div class="solicitudes-list" *ngIf="!loading && tabActual === 'solicitudes' && solicitudes.length > 0">
+    <div *ngFor="let solicitud of solicitudes" class="solicitud-item">
+      <img 
+        [src]="obtenerFoto(obtenerUsuarioSolicitud(solicitud.seguidorId)?.foto_perfil)" 
+        [alt]="obtenerUsuarioSolicitud(solicitud.seguidorId)?.nombre"
+        class="user-avatar"
+        (click)="verPerfil(obtenerUsuarioSolicitud(solicitud.seguidorId)!)"
+        onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'"
+      />
+      
+      <div class="user-info">
+        <h3>
+          {{ obtenerUsuarioSolicitud(solicitud.seguidorId)?.nombre }} 
+          {{ obtenerUsuarioSolicitud(solicitud.seguidorId)?.apellido }}
+        </h3>
+        
+        <!-- ✅ Agregar más información -->
+        <p class="user-details" *ngIf="obtenerUsuarioSolicitud(solicitud.seguidorId)?.distrito">
+          📍 {{ obtenerUsuarioSolicitud(solicitud.seguidorId)?.distrito }}
+        </p>
+        
+        <p class="user-details" *ngIf="obtenerUsuarioSolicitud(solicitud.seguidorId)?.email">
+          ✉️ {{ obtenerUsuarioSolicitud(solicitud.seguidorId)?.email }}
+        </p>
+        
+        <p class="user-details" *ngIf="calcularEdad(obtenerUsuarioSolicitud(solicitud.seguidorId)?.fecha_nacimiento) as edad">
+          🎂 {{ edad }} años
+        </p>
+      </div>
+      
+      <div class="solicitud-actions">
+        <button 
+          class="btn-accept"
+          [disabled]="estaProcesandoSolicitud(solicitud)"
+          (click)="aceptarSolicitud(solicitud)"
+          title="Aceptar">
+          <span *ngIf="!estaProcesandoSolicitud(solicitud)">✓</span>
+          <span *ngIf="estaProcesandoSolicitud(solicitud)">⏳</span>
+        </button>
+        
+        <button 
+        class="btn-view"
+        (click)="verPerfil(obtenerUsuarioSolicitud(solicitud.seguidorId)!)"
+        title="Ver perfil">
+        <i class="bi bi-eye"></i>
+        </button>
+
+        <button 
+          class="btn-reject"
+          [disabled]="estaProcesandoSolicitud(solicitud)"
+          (click)="rechazarSolicitud(solicitud)"
+          title="Rechazar">
+          <span *ngIf="!estaProcesandoSolicitud(solicitud)">✕</span>
+          <span *ngIf="estaProcesandoSolicitud(solicitud)">⏳</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paginación -->
+  <div class="pagination" *ngIf="totalElements > 0 && !loading">
+    <button (click)="prevPage()" [disabled]="page === 0">
+      &lt; Anterior
+    </button>
+    <span>Página {{ page + 1 }} de {{ totalPages }}</span>
+    <button (click)="nextPage()" [disabled]="page >= totalPages - 1">
+      Siguiente &gt;
+    </button>
+  </div>
+</div>

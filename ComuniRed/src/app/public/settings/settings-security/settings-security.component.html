@@ -1,10 +1,43 @@
-<h3>Seguridad</h3>
-<p class="muted">Mejora la seguridad de tu cuenta.</p>
+<div class="config-container">
+  <div class="tab-content">
+    <div class="section-header">
+      <h2>Seguridad</h2>
+      <p>Mejora la seguridad de tu cuenta</p>
+    </div>
 
-<div class="security-item">
-  <label><input type="checkbox" [(ngModel)]="twoFactor" name="twoFactor" /> Activar autenticación en dos pasos</label>
-</div>
+    <div class="security-section">
+      <div class="security-item">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="twoFactor" 
+            name="twoFactor" 
+          />
+          Activar autenticación en dos pasos
+        </label>
+        <p class="muted small">Agrega una capa adicional de seguridad al iniciar sesión.</p>
+      </div>
+    </div>
 
-<div class="actions">
-  <button class="btn primary" (click)="save()">Guardar</button>
+    <div class="actions">
+      <button 
+        type="button" 
+        class="btn-cancel"
+        (click)="cancel()" 
+        [disabled]="guardando">
+        Cancelar
+      </button>
+
+      <button 
+        type="button" 
+        class="btn-save"
+        (click)="save()" 
+        [disabled]="guardando">
+        <span *ngIf="!guardando">Guardar Cambios</span>
+        <span *ngIf="guardando">
+          <span class="spinner-small"></span> Guardando...
+        </span>
+      </button>
+    </div>
+  </div>
 </div>

@@ -13,11 +13,14 @@ import { UsuarioService, Usuario } from '../../../services/usuario.service';
 })
 export class SettingsProfileComponent implements OnInit {
   profileForm!: FormGroup;
-  foto_perfil_url = 'assets/img/avatar-placeholder.png';
+  foto_perfil_url = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
   usuario: Usuario | null = null;
   guardando = false;
-  cargando = true; // 👈 Nuevo estado de carga
+  cargando = true;
+  subiendoImagen = false;
+  eliminandoFoto = false;
   avatarPreview: string | null = null;
+  selectedFile: File | null = null;
   hoy: string = new Date().toISOString().substring(0, 10);
 
   constructor(
@@ -25,7 +28,6 @@ export class SettingsProfileComponent implements OnInit {
     private usuarioService: UsuarioService,
     private router: Router
   ) {
-    // 👈 Inicializa el formulario vacío primero
     this.inicializarFormularioVacio();
   }
 
@@ -39,7 +41,7 @@ export class SettingsProfileComponent implements OnInit {
         next: (usuario) => {
           this.usuario = usuario;
           this.cargarDatosUsuario(usuario);
-          this.cargando = false; // 👈 Datos cargados
+          this.cargando = false;
         },
         error: (err) => {
           console.error('Error al cargar usuario:', err);
@@ -53,7 +55,6 @@ export class SettingsProfileComponent implements OnInit {
     }
   }
 
-  // 👈 Nuevo método: inicializa el formulario vacío
   private inicializarFormularioVacio(): void {
     this.profileForm = this.fb.group({
       nombre: ['', Validators.required],
@@ -69,14 +70,15 @@ export class SettingsProfileComponent implements OnInit {
     });
   }
 
-  // 👈 Actualizado: usa patchValue para actualizar el formulario
   private cargarDatosUsuario(usuario: Usuario): void {
     if (usuario.foto_perfil) {
-      this.foto_perfil_url = usuario.foto_perfil;
+      this.foto_perfil_url = this.usuarioService.obtenerFotoMiniatura(usuario.foto_perfil, 130);
       this.avatarPreview = usuario.foto_perfil;
+    } else {
+      this.foto_perfil_url = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
+      this.avatarPreview = null;
     }
 
-    // 👈 Usa patchValue en vez de recrear el formulario
     this.profileForm.patchValue({
       nombre: usuario.nombre || '',
       apellido: usuario.apellido || '',
@@ -89,12 +91,6 @@ export class SettingsProfileComponent implements OnInit {
       codigo_postal: usuario.codigo_postal || '',
       direccion: usuario.direccion || '',
     });
-  }
-
-  calcularEdad(): number | null {
-    const fechaNac = this.profileForm.get('fecha_nacimiento')?.value;
-    if (!fechaNac) return null;
-    return this.usuarioService.calcularEdad(fechaNac);
   }
 
   onFileSelected(event: Event): void {
@@ -113,17 +109,63 @@ export class SettingsProfileComponent implements OnInit {
         return;
       }
 
+      this.selectedFile = file;
+
       const reader = new FileReader();
       reader.onload = () => {
-        const base64 = reader.result as string;
-        this.avatarPreview = base64;
-        this.foto_perfil_url = base64;
+        this.avatarPreview = reader.result as string;
       };
       reader.readAsDataURL(file);
     }
   }
 
-  save(): void {
+  eliminarFoto(): void {
+    if (!this.usuario || !this.usuario.id) {
+      alert('Error: No se pudo identificar al usuario');
+      return;
+    }
+
+    const confirmar = confirm('¿Estás seguro de que deseas eliminar tu foto de perfil?');
+    if (!confirmar) return;
+
+    this.eliminandoFoto = true;
+
+    this.usuarioService.eliminarFotoPerfil(this.usuario.id).subscribe({
+      next: (exito) => {
+        if (exito) {
+          console.log('Foto eliminada correctamente');
+          
+          this.usuarioService.obtenerUsuarioPorId(this.usuario!.id).subscribe({
+            next: (usuarioActualizado) => {
+              this.usuarioService.saveUser(usuarioActualizado);
+              this.usuario = usuarioActualizado;
+              
+              this.foto_perfil_url = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
+              this.avatarPreview = null;
+              this.selectedFile = null;
+              
+              this.eliminandoFoto = false;
+              alert('Foto de perfil eliminada correctamente');
+            },
+            error: (err) => {
+              console.error('Error recargando usuario:', err);
+              this.eliminandoFoto = false;
+            }
+          });
+        } else {
+          this.eliminandoFoto = false;
+          alert('No se pudo eliminar la foto');
+        }
+      },
+      error: (err) => {
+        console.error('Error al eliminar foto:', err);
+        this.eliminandoFoto = false;
+        alert('Error al eliminar la foto. Por favor, intenta de nuevo.');
+      }
+    });
+  }
+
+  async save(): Promise<void> {
     if (this.profileForm.invalid) {
       alert('Por favor, completa todos los campos requeridos correctamente.');
       return;
@@ -136,50 +178,71 @@ export class SettingsProfileComponent implements OnInit {
 
     this.guardando = true;
 
-    const usuarioActualizado = {
-      foto_perfil: this.avatarPreview || this.usuario.foto_perfil || '',
-      nombre: this.profileForm.value.nombre,
-      apellido: this.profileForm.value.apellido,
-      email: this.profileForm.value.email,
-      dni: this.profileForm.value.dni || '',
-      numero_telefono: this.profileForm.value.numero_telefono || '',
-      sexo: this.profileForm.value.sexo || '',
-      distrito: this.profileForm.value.distrito || '',
-      codigo_postal: this.profileForm.value.codigo_postal || '',
-      direccion: this.profileForm.value.direccion || '',
-      fecha_nacimiento: this.profileForm.value.fecha_nacimiento || '',
-      rol_id: this.usuario.rol_id,
-    };
+    try {
+      let fotoUrl = this.usuario.foto_perfil || '';
 
-    this.usuarioService.actualizarUsuario(this.usuario.id, usuarioActualizado).subscribe({
-      next: (usuarioActualizado) => {
-        console.log('Perfil actualizado:', usuarioActualizado);
+      if (this.selectedFile) {
+        this.subiendoImagen = true;
+        console.log('Subiendo imagen a Cloudinary...');
         
-        this.usuarioService.saveUser(usuarioActualizado);
+        try {
+          fotoUrl = await this.usuarioService.subirFotoCloudinary(this.selectedFile);
+          console.log('Imagen subida:', fotoUrl);
+        } catch (error) {
+          this.subiendoImagen = false;
+          this.guardando = false;
+          alert('Error al subir la imagen. Por favor, intenta de nuevo.');
+          return;
+        }
         
-        this.usuario = usuarioActualizado;
-        this.cargarDatosUsuario(usuarioActualizado);
-        
-        this.guardando = false;
-        alert('Perfil actualizado correctamente');
-      },
-      error: (err) => {
-        console.error('Error al actualizar perfil:', err);
-        this.guardando = false;
-        alert('Error al actualizar el perfil. Por favor, intenta de nuevo.');
-      },
-    });
+        this.subiendoImagen = false;
+      }
+
+      const usuarioActualizado = {
+        foto_perfil: fotoUrl,
+        nombre: this.profileForm.value.nombre,
+        apellido: this.profileForm.value.apellido,
+        email: this.profileForm.value.email,
+        dni: this.profileForm.value.dni || '',
+        numero_telefono: this.profileForm.value.numero_telefono || '',
+        sexo: this.profileForm.value.sexo || '',
+        distrito: this.profileForm.value.distrito || '',
+        codigo_postal: this.profileForm.value.codigo_postal || '',
+        direccion: this.profileForm.value.direccion || '',
+        fecha_nacimiento: this.profileForm.value.fecha_nacimiento || '',
+        rol_id: this.usuario.rol_id,
+      };
+
+      this.usuarioService.actualizarUsuario(this.usuario.id, usuarioActualizado).subscribe({
+        next: (usuarioActualizado) => {
+          console.log('Perfil actualizado:', usuarioActualizado);
+          
+          this.usuarioService.saveUser(usuarioActualizado);
+          this.usuario = usuarioActualizado;
+          this.cargarDatosUsuario(usuarioActualizado);
+          
+          this.selectedFile = null;
+          this.guardando = false;
+          alert('Perfil actualizado correctamente');
+        },
+        error: (err) => {
+          console.error('Error al actualizar perfil:', err);
+          this.guardando = false;
+          alert('Error al actualizar el perfil. Por favor, intenta de nuevo.');
+        }
+      });
+
+    } catch (error) {
+      console.error('Error general:', error);
+      this.guardando = false;
+      alert('Error al guardar el perfil');
+    }
   }
 
   cancel(): void {
     if (this.usuario) {
       this.cargarDatosUsuario(this.usuario);
-      
-      if (this.usuario.foto_perfil) {
-        this.foto_perfil_url = this.usuario.foto_perfil;
-        this.avatarPreview = this.usuario.foto_perfil;
-      }
-      
+      this.selectedFile = null;
       alert('Cambios cancelados');
     }
   }

@@ -1,10 +1,16 @@
 .config-container {
   max-width: 1000px;
   margin: 0 auto;
+  padding: 2rem 2rem;
   background: #fff;
   color: #000;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+
+
 
 .tabs-section {
   display: flex;
