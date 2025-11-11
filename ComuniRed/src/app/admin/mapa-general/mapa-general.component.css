@@ -1,20 +1,20 @@
 .mapa-container {
   padding: 0;
-  background: #f9fafb;
+  background: var(--cr-background-content);
   min-height: 100vh;
 }
 
 /* Header */
 .mapa-header {
   padding: 20px 32px;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--cr-background);
+  border-bottom: 1px solid var(--cr-border);
 }
 
 .mapa-title {
   font-size: 1.5em;
   font-weight: 800;
-  color: #111827;
+  color: var(--cr-titulo);
   margin: 0 0 4px 0;
 }
 
@@ -39,7 +39,7 @@
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--cr-border);
   height: fit-content;
   position: sticky;
   top: 24px;
@@ -51,7 +51,7 @@
   gap: 10px;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--cr-border);
 }
 
 .filtros-header svg {
@@ -61,7 +61,7 @@
 .filtros-header h3 {
   font-size: 1.1em;
   font-weight: 700;
-  color: #111827;
+  color: var(--cr-titulo);
   margin: 0;
 }
 
@@ -98,7 +98,6 @@
   font-weight: 600;
   color: #4b5563;
   cursor: pointer;
-  transition: all 0.2s ease;
   text-align: left;
 }
 
@@ -146,19 +145,19 @@
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--cr-border);
   overflow: hidden;
 }
 
 .mapa-card-header {
   padding: 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--cr-border);
 }
 
 .mapa-card-header h3 {
   font-size: 1.2em;
   font-weight: 700;
-  color: #111827;
+  color: var(--cr-titulo);
   margin: 0 0 6px 0;
 }
 
@@ -205,7 +204,6 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
   animation: pinPulse 2s infinite;
 }
 
@@ -370,11 +368,11 @@
   }
 }
 
-.mapa-container { padding: 18px; font-family: Inter, Roboto, Arial, sans-serif; }
+.mapa-container { padding: 18px; font-family: Inter, Roboto, Arial, sans-serif; color: var(--cr-text); background: var(--cr-background-content); min-height: 100vh; }
 .mapa-content { display: flex; gap: 18px; align-items: flex-start; }
-.filtros-sidebar { width: 260px; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.filtros-sidebar { width: 260px; background: var(--cr-background); padding: 16px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
 .mapa-principal { flex: 1; }
-.mapa-card { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.mapa-card { background: var(--cr-background); border-radius: 8px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04);  }
 .mapa-card-header { margin-bottom: 12px; }
 .mapa-canvas { background: linear-gradient(180deg,#f8fafc,#f1f5f9); border-radius: 8px; padding: 2px; min-height: 220px; display:flex; align-items:stretch; }
 .leaflet-map { width: 100%; height: 620px; border-radius: 6px; }
@@ -382,8 +380,8 @@
 /* filtros */
 .filtro-section { margin-bottom: 12px; }
 .filtro-label { font-size: 12px; color: #6b7280; display:block; margin-bottom:8px; text-transform:uppercase; }
-.filtro-option { display:flex; align-items:center; gap:8px; width:100%; padding:8px 10px; border-radius:8px; border: none; background: #f8fafc; margin-bottom:6px; cursor:pointer; text-align:left; }
-.filtro-option.active { outline: 2px solid #6366f1; background: #fff; }
+.filtro-option { display:flex; align-items:center; gap:8px; width:100%; padding:8px 10px; border-radius:8px; border: none; background: var(--cr-background); margin-bottom:6px; cursor:pointer; text-align:left; }
+.filtro-option.active { outline: 2px solid #6366f1; background: var(--cr-background-content); }
 .cat-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
-.filtro-counter { margin-top: 12px; text-align:center; padding:8px; background:#f1f5f9; border-radius:8px; }
+.filtro-counter { margin-top: 12px; text-align:center; padding:8px; background:var(--cr-background); border-radius:8px; border: 1px solid var(--cr-border);}
 .mapa-info { margin-top: 28px; display:flex; gap:1px; align-items:center; color:#6b7280; }

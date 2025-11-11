@@ -29,10 +29,10 @@
   padding: 0;
   max-width: none;
   margin: 0;
-  background: #f8fafc;
+  background: var(--cr-background-content);
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  color: var(--gray-900);
+  color: var(--cr-titulo);
 }
 
 .crud-reaccion-header {
@@ -95,7 +95,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: 0.15s, box-shadow 0.15s;
   border-radius: 4px;
   position: absolute;
   right: 0.5rem;
@@ -107,7 +106,6 @@
   stroke: rgb(0, 0, 0);
   width: 20px;
   height: 20px;
-  transition: stroke 0.15s;
 }
 
 .crud-reaccion-search-btn:hover {
@@ -145,15 +143,14 @@
 
 /* --- Resto de tu CSS original --- */
 .btn-primary {
-  background: white;
-  border: 1.5px solid var(--success-color);
+  background: var(--cr-background);
+  border: 1.5px solid var(--cr-background-content);
   color: var(--success-color);
   border-radius: var(--border-radius);
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
   box-shadow: 0 4px 8px rgba(5, 150, 105, 0.1);
   display: inline-flex;
   align-items: center;
@@ -213,7 +210,6 @@
   border-bottom: 1px solid var(--gray-100);
   border-right: 1px solid var(--gray-100);
   background: white;
-  transition: all 0.15s ease-in-out;
 }
 
 .crud-reaccion-table td:last-child {
@@ -258,7 +254,6 @@
   font-size: 0.75rem;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s ease-in-out;
   text-transform: none;
   letter-spacing: normal;
   display: inline-flex;
@@ -308,9 +303,9 @@
 .crud-reaccion-empty {
   padding: 3rem 2rem;
   text-align: center;
-  color: var(--gray-500);
+  color: var(--cr-text);
   font-size: 1rem;
-  background: white;
+  background: var(--cr-background-content);
   border-radius: var(--border-radius);
   margin: 0 2rem;
   border: 1px solid var(--gray-200);
@@ -394,7 +389,6 @@
   border: 1px solid var(--gray-300);
   font-size: 0.875rem;
   background: rgb(224, 224, 224);
-  transition: all 0.15s ease-in-out;
   color: var(--gray-900);
   font-weight: 400;
 }
@@ -436,7 +430,6 @@
   font-size: 0.875rem;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.15s ease-in-out;
   text-transform: none;
   letter-spacing: normal;
   display: inline-flex;
@@ -524,7 +517,6 @@
   font-weight: bold;
   cursor: pointer;
   padding: 0.5rem 1rem;
-  transition: color 0.15s;
 }
 
 .crud-reaccion-pagination-btn:disabled {

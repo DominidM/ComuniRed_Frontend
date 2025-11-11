@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { UsuarioService } from '../services/usuario.service';
+import { ThemeService } from '../services/theme.service';
 
 interface ChatMessage {
   content: string;
@@ -56,7 +57,8 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
     private router: Router,
     private usuarioService: UsuarioService,
     private renderer: Renderer2,
-    private host: ElementRef
+    private host: ElementRef,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -103,7 +105,7 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
   }
 
   // Toggle theme (dark/light mode)
-  toggleTheme() {
+  /*toggleTheme() {
     this.isDarkMode = !this.isDarkMode;
     
     if (this.isDarkMode) {
@@ -113,7 +115,12 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
       document.documentElement.classList.remove('dark-mode');
       localStorage.setItem('theme', 'light');
     }
+  }*/
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
+    this.isDarkMode = this.themeService.isDarkTheme();
   }
+
 
   // Mostrar el email o nombre del usuario guardado en localStorage por UsuarioService
   get userDisplay(): string {

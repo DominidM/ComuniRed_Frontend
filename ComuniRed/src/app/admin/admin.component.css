@@ -2,21 +2,23 @@
 .admin-root {
   display: flex;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, var(--cr-background) 0%, var(--cr-background) 100%);
   font-family: "DM Sans", "Inter", Arial, sans-serif;
+  color: var(--cr-text);
+  border: var(--cr-border);
 }
 
 /* ---------- SIDEBAR ---------- */
 .cr-sidebar {
   width: 220px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(180deg, var(--cr-background) 0%, var(--cr-background) 100%);
   color: #1f2937;
   padding: 0;
   display: flex;
   flex-direction: column;
   height: 100vh;
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid var(--cr-border);
   position: fixed;
   left: 0;
   top: 0;
@@ -32,8 +34,8 @@
   font-weight: 800;
   color: #5f5cf6;
   padding: 14px 16px;
-  border-bottom: 1px solid #e5e7eb;
-  background: linear-gradient(135deg, #fafbff 0%, #ffffff 100%);
+  border-bottom: 1px solid var(--cr-border);
+  background: linear-gradient(135deg, var(--cr-background) 0%, var(--cr-background) 100%);
   flex-shrink: 0;
 }
 
@@ -98,7 +100,6 @@
   font-weight: 600;
   text-decoration: none;
   border-radius: 10px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   cursor: pointer;
 }
@@ -111,7 +112,6 @@
   height: 20px;
   font-size: 1em;
   opacity: 0.85;
-  transition: all 0.25s ease;
   flex-shrink: 0;
   background: linear-gradient(135deg, #e0e7ff 0%, #f3f4ff 100%);
   border-radius: 6px;
@@ -142,7 +142,6 @@
 .menu-link .chev {
   font-size: 1.1em;
   opacity: 0;
-  transition: opacity 0.2s ease;
   margin-left: auto;
 }
 
@@ -204,8 +203,8 @@
 /* CTA Export Button */
 .cr-cta {
   padding: 10px 12px 12px 12px;
-  border-top: 1px solid #e5e7eb;
-  background: linear-gradient(180deg, #fafbff 0%, #ffffff 100%);
+  border-top: 1px solid var(--cr-border);
+  background: linear-gradient(180deg, var(--cr-background) 0%, var(--cr-background) 100%);
   flex-shrink: 0;
 }
 
@@ -219,7 +218,6 @@
   font-size: 0.78em;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 12px rgba(95, 92, 246, 0.25);
   display: flex;
   align-items: center;
@@ -243,19 +241,18 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 32px;
-  background: #ffffff;
+  background: var(--cr-background);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--cr-border);
 }
 
 .admin-search {
   width: 380px;
   padding: 12px 20px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--cr-border);
   font-size: 0.95em;
-  background: #f9fafb;
-  transition: all 0.3s ease;
+  background: var(--cr-search);
 }
 
 .admin-search::placeholder {
@@ -277,21 +274,20 @@
 
 .user-name {
   font-weight: 600;
-  color: #374151;
+  color: var(--cr-titulo);
   font-size: 0.95em;
 }
 
 /* Theme Toggle Button */
 .admin-theme-toggle {
   background: transparent;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--cr-border);
   border-radius: 8px;
   padding: 8px 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
 }
 
 .admin-theme-toggle:hover {
@@ -313,7 +309,6 @@
   font-size: 0.9em;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
 }
 
@@ -336,6 +331,7 @@
 .admin-content {
   padding: 32px;
   flex: 1;
+  background: var(--cr-background-content);
 }
 
 /* ---------- CHATBOT ---------- */
@@ -356,7 +352,6 @@
   height: 64px;
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(95, 92, 246, 0.3);
-  transition: all 0.3s ease;
 }
 
 .chatbot-toggle:hover {
@@ -414,7 +409,6 @@
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
-  transition: background 0.2s ease;
   line-height: 1;
 }
 
@@ -473,7 +467,6 @@
   font-size: 0.95em;
   margin-right: 12px;
   background: #f9fafb;
-  transition: all 0.3s ease;
 }
 
 .chatbot-input:focus {
@@ -491,7 +484,6 @@
   padding: 12px 20px;
   font-size: 1.1em;
   cursor: pointer;
-  transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(95, 92, 246, 0.2);
 }
 

@@ -29,10 +29,9 @@
   padding: 0;
   max-width: none;
   margin: 0;
-  background: #f8fafc;
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  color: var(--gray-900);
+  color: var(--cr-titulo);
 }
 
 .crud-rol-header {
@@ -41,7 +40,7 @@
   justify-content: space-between;
   margin-bottom: 2rem;
   padding: 2rem 2rem 1.5rem 2rem;
-  background: transparent;
+  background: var(--cr-background-content);
   border: none;
   box-shadow: none;
   border-radius: 0;
@@ -51,7 +50,7 @@
   margin: 0;
   font-size: 1.875rem;
   font-weight: 700;
-  color: var(--gray-900);
+  color: var(--cr-titulo);
   letter-spacing: -0.025em;
   line-height: 1.25;
 }
@@ -96,7 +95,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: 0.15s, box-shadow 0.15s;
   border-radius: 4px;
   position: absolute;
   right: 0.5rem;
@@ -108,7 +106,6 @@
   stroke: rgb(0, 0, 0);
   width: 20px;
   height: 20px;
-  transition: stroke 0.15s;
 }
 
 .crud-rol-search-btn:hover {
@@ -136,10 +133,10 @@
 .crud-rol-show-select select {
   padding: 0.35rem 1.2rem 0.35rem 0.5rem;
   border-radius: var(--border-radius);
-  border: 1px solid var(--gray-300);
-  background: #fff;
+  border: 1px solid var(--cr-border);
+  background: var(--cr-background);
   font-size: 1rem;
-  color: var(--gray-900);
+  color: var(--cr-titulo);
   font-weight: 500;
   cursor: pointer;
 }
@@ -150,15 +147,14 @@
 }
 
 .btn-primary {
-  background: white;
-  border: 1.5px solid var(--success-color);
-  color: var(--success-color);
+  background: var(--cr-background);
+  border: 1.5px solid var(--cr-border);
+  color: var(--cr-titulo);
   border-radius: var(--border-radius);
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
   box-shadow: 0 4px 8px rgba(5, 150, 105, 0.10);
   display: inline-flex;
   align-items: center;
@@ -190,7 +186,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background: white;
+  background: var(--cr-background);
   border: 1px solid var(--gray-200);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
@@ -224,7 +220,6 @@
   border-bottom: 1px solid var(--gray-100);
   border-right: 1px solid var(--gray-100);
   background: white;
-  transition: all 0.15s ease-in-out;
 }
 
 .crud-rol-table td:last-child {
@@ -293,7 +288,6 @@
   font-size: 0.75rem;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s ease-in-out;
   text-transform: none;
   letter-spacing: normal;
   display: inline-flex;
@@ -425,7 +419,6 @@
   border: 1px solid var(--gray-300);
   font-size: 0.875rem;
   background: rgb(224, 224, 224);
-  transition: all 0.15s ease-in-out;
   color: var(--gray-900);
   font-weight: 400;
 }
@@ -480,7 +473,6 @@
   font-size: 0.875rem;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.15s ease-in-out;
   text-transform: none;
   letter-spacing: normal;
   display: inline-flex;
@@ -531,7 +523,6 @@
   font-weight: bold;
   cursor: pointer;
   padding: 0.5rem 1rem;
-  transition: color 0.15s;
 }
 
 .crud-rol-pagination-btn:hover:not(:disabled) {

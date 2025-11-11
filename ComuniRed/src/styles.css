@@ -1,3 +1,27 @@
+/* Variables globales de tema */
+:root {
+  --cr-primary: #5f5cf6;
+  --cr-background: #ffffff;
+  --cr-text: #1f2937;
+  --cr-surface: #f8fafc;
+  --cr-background-content: #ffffff;
+  --cr-border: #e5e7eb;
+  --cr-search: #f9fafb;
+  --cr-titulo: #0f1724;
+}
+
+/* Tema oscuro aplicado al body */
+.dark-theme {
+  --cr-primary: #5f5cf6;
+  --cr-background:  #161717;
+  --cr-text: #6b7280;
+  --cr-surface: #0b1220;
+  --cr-background-content: #272829;
+  --cr-border: #080303;
+  --cr-search: #333334;
+  --cr-titulo: #e4e6eb;
+}
+
 /* Agregar a src/styles.css */
 html, body {
   height: 100vh !important;
