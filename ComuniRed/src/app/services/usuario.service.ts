@@ -6,7 +6,7 @@ import { gql } from 'apollo-angular';
 
 export interface Usuario {
   id: string;
-  foto_perfil?: string;  // URL de Cloudinary
+  foto_perfil?: string;
   nombre: string;
   apellido: string;
   dni: string;
@@ -46,30 +46,27 @@ export interface UsuarioPage {
   size: number;
 }
 
-// Mantén tus queries y mutations existentes
+export interface EstadoRelacion {
+  estaSiguiendo: boolean;
+  teSigue: boolean;
+  seguimientoMutuo: boolean;
+  solicitudPendiente: boolean;
+  solicitudEnviada: boolean;
+}
+
+// ========================================
+// QUERIES
+// ========================================
+
 const OBTENER_USUARIOS = gql`
   query ObtenerUsuarios($page: Int!, $size: Int!) {
     obtenerUsuarios(page: $page, size: $size) {
       content {
-        id
-        foto_perfil
-        nombre
-        apellido
-        dni
-        numero_telefono
-        sexo
-        distrito
-        codigo_postal
-        direccion
-        email
-        rol_id
-        fecha_nacimiento
-        fecha_registro
+        id foto_perfil nombre apellido dni numero_telefono
+        sexo distrito codigo_postal direccion email rol_id
+        fecha_nacimiento fecha_registro
       }
-      totalElements
-      totalPages
-      number
-      size
+      totalElements totalPages number size
     }
   }
 `;
@@ -77,20 +74,9 @@ const OBTENER_USUARIOS = gql`
 const OBTENER_TODOS_LOS_USUARIOS = gql`
   query ObtenerTodosLosUsuarios {
     obtenerTodosLosUsuarios {
-      id
-      foto_perfil
-      nombre
-      apellido
-      dni
-      numero_telefono
-      sexo
-      distrito
-      codigo_postal
-      direccion
-      email
-      rol_id
-      fecha_nacimiento
-      fecha_registro
+      id foto_perfil nombre apellido dni numero_telefono
+      sexo distrito codigo_postal direccion email rol_id
+      fecha_nacimiento fecha_registro
     }
   }
 `;
@@ -98,20 +84,18 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
 const OBTENER_USUARIO_POR_ID = gql`
   query ObtenerUsuarioPorId($id: ID!) {
     obtenerUsuarioPorId(id: $id) {
-      id
-      foto_perfil
-      nombre
-      apellido
-      dni
-      numero_telefono
-      sexo
-      distrito
-      codigo_postal
-      direccion
-      email
-      rol_id
-      fecha_nacimiento
-      fecha_registro
+      id foto_perfil nombre apellido dni numero_telefono
+      sexo distrito codigo_postal direccion email rol_id
+      fecha_nacimiento fecha_registro
+    }
+  }
+`;
+
+const OBTENER_PERFIL_PUBLICO = gql`
+  query ObtenerPerfilPublico($id: ID!) {
+    obtenerUsuarioPorId(id: $id) {
+      id foto_perfil nombre apellido distrito
+      fecha_registro fecha_nacimiento
     }
   }
 `;
@@ -122,23 +106,37 @@ const CONTAR_USUARIOS_POR_ROL = gql`
   }
 `;
 
+const ESTADO_SEGUIMIENTO = gql`
+  query EstadoSeguimiento($usuarioActualId: ID!, $otroUsuarioId: ID!) {
+    estadoSeguimiento(usuarioActualId: $usuarioActualId, otroUsuarioId: $otroUsuarioId) {
+      estaSiguiendo teSigue seguimientoMutuo
+      solicitudPendiente solicitudEnviada
+    }
+  }
+`;
+
+const CONTAR_SEGUIDORES = gql`
+  query ContarSeguidores($usuarioId: ID!) {
+    contarSeguidores(usuarioId: $usuarioId)
+  }
+`;
+
+const CONTAR_SEGUIDOS = gql`
+  query ContarSeguidos($usuarioId: ID!) {
+    contarSeguidos(usuarioId: $usuarioId)
+  }
+`;
+
+// ========================================
+// MUTATIONS
+// ========================================
+
 const CREAR_USUARIO = gql`
   mutation CrearUsuario($usuario: UsuarioInput!) {
     crearUsuario(usuario: $usuario) {
-      id
-      foto_perfil
-      nombre
-      apellido
-      dni
-      numero_telefono
-      sexo
-      distrito
-      codigo_postal
-      direccion
-      email
-      rol_id
-      fecha_nacimiento
-      fecha_registro
+      id foto_perfil nombre apellido dni numero_telefono
+      sexo distrito codigo_postal direccion email rol_id
+      fecha_nacimiento fecha_registro
     }
   }
 `;
@@ -146,27 +144,10 @@ const CREAR_USUARIO = gql`
 const ACTUALIZAR_USUARIO = gql`
   mutation ActualizarUsuario($id: ID!, $usuario: UsuarioInput!) {
     actualizarUsuario(id: $id, usuario: $usuario) {
-      id
-      foto_perfil
-      nombre
-      apellido
-      dni
-      numero_telefono
-      sexo
-      distrito
-      codigo_postal
-      direccion
-      email
-      rol_id
-      fecha_nacimiento
-      fecha_registro
+      id foto_perfil nombre apellido dni numero_telefono
+      sexo distrito codigo_postal direccion email rol_id
+      fecha_nacimiento fecha_registro
     }
-  }
-`;
-
-const ELIMINAR_FOTO_PERFIL = gql`
-  mutation EliminarFotoPerfil($usuarioId: ID!) {
-    eliminarFotoPerfil(usuarioId: $usuarioId)
   }
 `;
 
@@ -176,18 +157,18 @@ const ELIMINAR_USUARIO = gql`
   }
 `;
 
+const ELIMINAR_FOTO_PERFIL = gql`
+  mutation EliminarFotoPerfil($usuarioId: ID!) {
+    eliminarFotoPerfil(usuarioId: $usuarioId)
+  }
+`;
+
 const LOGIN = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       token
       usuario {
-        id
-        foto_perfil
-        nombre
-        apellido
-        email
-        rol_id
-        fecha_registro
+        id foto_perfil nombre apellido email rol_id fecha_registro
       }
     }
   }
@@ -211,7 +192,6 @@ const CAMBIAR_PASSWORD_CON_CODIGO = gql`
   }
 `;
 
-
 export interface LoginResult {
   token?: string;
   usuario?: Usuario | null;
@@ -224,7 +204,6 @@ export const USER_KEY = 'comunired_user';
   providedIn: 'root'
 })
 export class UsuarioService {
-  private apiBase = '/graphql';
   private userCountSubject = new BehaviorSubject<number>(0);
   private usuarioSubject = new BehaviorSubject<Usuario | null>(this.getUser());
   
@@ -235,6 +214,10 @@ export class UsuarioService {
     this.refreshUserCount();
   }
 
+  // ========================================
+  // QUERIES BÁSICAS
+  // ========================================
+
   obtenerUsuarios(page: number, size: number): Observable<UsuarioPage> {
     return this.apollo.watchQuery<{ obtenerUsuarios: UsuarioPage }>({
       query: OBTENER_USUARIOS,
@@ -242,34 +225,21 @@ export class UsuarioService {
       fetchPolicy: 'network-only',
       errorPolicy: 'all'
     }).valueChanges.pipe(
-      tap((rawResult) => {
-        console.debug('[UsuarioService] Apollo raw result:', rawResult);
-        if ((rawResult as any).errors && (rawResult as any).errors.length > 0) {
-          console.warn('[UsuarioService] GraphQL errors:', (rawResult as any).errors);
-        }
-      }),
-      map(result => {
-        if (result && result.data && result.data.obtenerUsuarios) {
-          return result.data.obtenerUsuarios;
-        }
-        return {
-          content: [],
-          totalElements: 0,
-          totalPages: 0,
-          number: page,
-          size: size
-        } as UsuarioPage;
-      })
+      map(result => result.data?.obtenerUsuarios || {
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        number: page,
+        size: size
+      } as UsuarioPage)
     );
   }
-
 
   obtenerTodosLosUsuarios(): Observable<Usuario[]> {
     return this.apollo.watchQuery<{ obtenerTodosLosUsuarios: Usuario[] }>({
       query: OBTENER_TODOS_LOS_USUARIOS,
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[UsuarioService] obtenerTodos raw:', raw)),
       map(result => result.data?.obtenerTodosLosUsuarios || [])
     );
   }
@@ -280,7 +250,16 @@ export class UsuarioService {
       variables: { id },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[UsuarioService] obtenerUsuarioPorId raw:', raw)),
+      map(result => result.data.obtenerUsuarioPorId)
+    );
+  }
+
+  obtenerPerfilPublico(usuarioId: string): Observable<Usuario> {
+    return this.apollo.query<{ obtenerUsuarioPorId: Usuario }>({
+      query: OBTENER_PERFIL_PUBLICO,
+      variables: { id: usuarioId },
+      fetchPolicy: 'network-only'
+    }).pipe(
       map(result => result.data.obtenerUsuarioPorId)
     );
   }
@@ -291,10 +270,53 @@ export class UsuarioService {
       variables: { rol_id: rolId },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[UsuarioService] contarUsuariosPorRol raw:', raw)),
       map(result => result.data.contarUsuariosPorRol)
     );
   }
+
+  // ========================================
+  // ESTADO DE SEGUIMIENTO
+  // ========================================
+
+  obtenerEstadoSeguimiento(usuarioActualId: string, otroUsuarioId: string): Observable<EstadoRelacion> {
+    return this.apollo.query<{ estadoSeguimiento: EstadoRelacion }>({
+      query: ESTADO_SEGUIMIENTO,
+      variables: { usuarioActualId, otroUsuarioId },
+      fetchPolicy: 'network-only'
+    }).pipe(
+      map(result => result.data?.estadoSeguimiento || {
+        estaSiguiendo: false,
+        teSigue: false,
+        seguimientoMutuo: false,
+        solicitudPendiente: false,
+        solicitudEnviada: false
+      })
+    );
+  }
+
+  contarSeguidores(usuarioId: string): Observable<number> {
+    return this.apollo.query<{ contarSeguidores: number }>({
+      query: CONTAR_SEGUIDORES,
+      variables: { usuarioId },
+      fetchPolicy: 'network-only'
+    }).pipe(
+      map(result => result.data?.contarSeguidores || 0)
+    );
+  }
+
+  contarSeguidos(usuarioId: string): Observable<number> {
+    return this.apollo.query<{ contarSeguidos: number }>({
+      query: CONTAR_SEGUIDOS,
+      variables: { usuarioId },
+      fetchPolicy: 'network-only'
+    }).pipe(
+      map(result => result.data?.contarSeguidos || 0)
+    );
+  }
+
+  // ========================================
+  // MUTATIONS CRUD
+  // ========================================
 
   crearUsuario(usuario: UsuarioInput): Observable<Usuario> {
     return this.apollo.mutate<{ crearUsuario: Usuario }>({
@@ -305,7 +327,6 @@ export class UsuarioService {
         { query: OBTENER_TODOS_LOS_USUARIOS }
       ]
     }).pipe(
-      tap(raw => console.debug('[UsuarioService] crearUsuario raw:', raw)),
       tap(() => this.refreshUserCount()),
       map(result => result.data!.crearUsuario)
     );
@@ -320,7 +341,6 @@ export class UsuarioService {
         { query: OBTENER_TODOS_LOS_USUARIOS }
       ]
     }).pipe(
-      tap(raw => console.debug('[UsuarioService] actualizarUsuario raw:', raw)),
       tap(() => this.refreshUserCount()),
       map(result => result.data!.actualizarUsuario)
     );
@@ -335,18 +355,20 @@ export class UsuarioService {
         { query: OBTENER_TODOS_LOS_USUARIOS }
       ]
     }).pipe(
-      tap(raw => console.debug('[UsuarioService] eliminarUsuario raw:', raw)),
       tap(() => this.refreshUserCount()),
       map(result => result.data!.eliminarUsuario)
     );
   }
+
+  // ========================================
+  // AUTENTICACIÓN
+  // ========================================
 
   login(email: string, password: string) {
     return this.apollo.mutate<{ login: { token?: string; usuario?: Usuario } }>({
       mutation: LOGIN,
       variables: { email, password }
     }).pipe(
-      tap(raw => console.debug('[UsuarioService] login raw:', raw)),
       map(result => {
         const payload = result.data?.login;
         return {
@@ -431,9 +453,7 @@ export class UsuarioService {
 
   refreshUserCount(): void {
     this.obtenerUsuarios(0, 1)
-      .pipe(
-        map(page => page?.totalElements ?? (page?.content?.length ?? 0))
-      )
+      .pipe(map(page => page?.totalElements ?? 0))
       .subscribe({
         next: (count: number) => {
           this.userCountSubject.next(count);
@@ -444,13 +464,16 @@ export class UsuarioService {
         }
       });
   }
-  
+
+  // ========================================
+  // RECUPERACIÓN DE CONTRASEÑA
+  // ========================================
+
   solicitarCodigoRecuperacion(email: string): Observable<boolean> {
     return this.apollo.mutate<{ solicitarCodigoRecuperacion: boolean }>({
       mutation: SOLICITAR_CODIGO_RECUPERACION,
       variables: { email }
     }).pipe(
-      tap(raw => console.debug('[UsuarioService] solicitarCodigoRecuperacion raw:', raw)),
       map(result => result.data?.solicitarCodigoRecuperacion ?? false)
     );
   }
@@ -460,7 +483,6 @@ export class UsuarioService {
       mutation: VERIFICAR_CODIGO_RECUPERACION,
       variables: { email, codigo }
     }).pipe(
-      tap(raw => console.debug('[UsuarioService] verificarCodigoRecuperacion raw:', raw)),
       map(result => result.data?.verificarCodigoRecuperacion ?? false)
     );
   }
@@ -470,16 +492,14 @@ export class UsuarioService {
       mutation: CAMBIAR_PASSWORD_CON_CODIGO,
       variables: { email, codigo, nuevaPassword }
     }).pipe(
-      tap(raw => console.debug('[UsuarioService] cambiarPasswordConCodigo raw:', raw)),
       map(result => result.data?.cambiarPasswordConCodigo ?? false)
     );
   }
 
-  // 🆕 MÉTODOS CLOUDINARY
+  // ========================================
+  // CLOUDINARY
+  // ========================================
 
-  /**
-   * Eliminar foto de perfil (de Cloudinary y MongoDB)
-   */
   eliminarFotoPerfil(usuarioId: string): Observable<boolean> {
     return this.apollo.mutate<{ eliminarFotoPerfil: boolean }>({
       mutation: ELIMINAR_FOTO_PERFIL,
@@ -488,18 +508,14 @@ export class UsuarioService {
         { query: OBTENER_USUARIO_POR_ID, variables: { id: usuarioId } }
       ]
     }).pipe(
-      tap(raw => console.debug('[UsuarioService] eliminarFotoPerfil raw:', raw)),
       map(result => result.data?.eliminarFotoPerfil ?? false)
     );
   }
 
-  /**
-   * Subir foto directamente a Cloudinary desde el frontend
-   */
   async subirFotoCloudinary(archivo: File): Promise<string> {
     const formData = new FormData();
     formData.append('file', archivo);
-    formData.append('upload_preset', 'ml_default');  // ← CAMBIAR: era 'usuarios'
+    formData.append('upload_preset', 'ml_default');
     formData.append('folder', 'usuarios');
 
     try {
@@ -524,22 +540,15 @@ export class UsuarioService {
     }
   }
 
-  /**
-   * Actualizar foto de perfil (subir y guardar en un solo paso)
-   */
   async actualizarFotoPerfil(usuarioId: string, archivo: File): Promise<Usuario | undefined> {
     try {
-      // 1. Subir imagen a Cloudinary
       const url = await this.subirFotoCloudinary(archivo);
-
-      // 2. Obtener datos actuales del usuario
       const usuario = await this.obtenerUsuarioPorId(usuarioId).toPromise();
 
       if (!usuario) {
         throw new Error('Usuario no encontrado');
       }
 
-      // 3. Actualizar usuario con la nueva URL
       return this.actualizarUsuario(usuarioId, {
         ...usuario,
         foto_perfil: url
@@ -550,16 +559,10 @@ export class UsuarioService {
     }
   }
 
-  /**
-   * Verificar si la foto es URL de Cloudinary
-   */
   esFotoCloudinary(foto_perfil?: string): boolean {
     return foto_perfil?.includes('cloudinary.com') ?? false;
   }
 
-  /**
-   * Obtener URL optimizada para miniatura
-   */
   obtenerFotoMiniatura(foto_perfil?: string, width: number = 150): string {
     if (!foto_perfil) {
       return '/assets/img/default-avatar.png';
@@ -569,21 +572,19 @@ export class UsuarioService {
       return foto_perfil;
     }
 
-    // Transformar URL de Cloudinary para miniatura optimizada
     return foto_perfil.replace(
       '/upload/',
       `/upload/w_${width},h_${width},c_fill,g_face,q_auto,f_auto/`
     );
   }
 
-  /**
-   * Obtener placeholder mientras carga la imagen
-   */
   obtenerPlaceholderFoto(): string {
     return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23e0e0e0" width="150" height="150"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="48" dy="0.35em" x="50%" y="50%" text-anchor="middle"%3E👤%3C/text%3E%3C/svg%3E';
   }
 
-  // MÉTODOS AUXILIARES
+  // ========================================
+  // UTILIDADES
+  // ========================================
 
   calcularEdad(fechaNacimiento: string): number | null {
     if (!fechaNacimiento) return null;
@@ -612,5 +613,4 @@ export class UsuarioService {
       minute: '2-digit'
     });
   }
-
 }

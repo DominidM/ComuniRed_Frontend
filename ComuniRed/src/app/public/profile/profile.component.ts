@@ -189,7 +189,7 @@ export class ProfileComponent implements OnInit {
   }
 
   verPerfil(usuario: Usuario) {
-    this.router.navigate(['/user-profile', usuario.id]);
+    this.router.navigate(['/public/user-profile', usuario.id]);
   }
 
   obtenerFoto(foto_perfil?: string): string {

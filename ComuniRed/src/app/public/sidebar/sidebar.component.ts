@@ -37,7 +37,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     { label: 'Inicio', icon: 'home', route: '/public/home' },
     { label: 'Tendencias', icon: 'trending_up', route: '/public/trending' },
     { label: 'Reels', icon: 'video_library', route: '/public/reels' },
-    { label: 'Perfil', icon: 'person', route: '/public/profile/1', soft: true },
+    { label: 'Perfil', icon: 'person', route: '/public/profile/', soft: true },
     { label: 'Sugerencias', icon: 'post_add', route: '/public/suggestions', soft: true},
     { label: 'Mensajes', icon: 'message', route: '/public/messages' },
     { label: 'Configuración', icon: 'settings', route: '/public/settings' },

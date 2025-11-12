@@ -60,12 +60,12 @@ import { AuthGuard } from './guards/auth.guard';
 import { ReelsComponent } from './public/reels/reels.component';
 import { SuggestionsComponent } from './public/suggestions/suggestions.component';
 import { MessageComponent } from './public/message/message.component';
+import { UserProfileComponent } from './public/user-profile/user-profile.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'olvide-clave', component: OlvideClaveComponent },
-  // Admin area: protected, only users with ADMIN role_id can access children
   {
     path: 'admin',
     component: AdminComponent,
@@ -122,7 +122,8 @@ export const routes: Routes = [
       { path: 'notifications', component: NotificationsComponent },
       { path: 'suggestions', component: SuggestionsComponent },
       { path: 'messages', component: MessageComponent },
-      { path: 'profile/:id', component: ProfileComponent},
+      { path: 'profile', component: ProfileComponent},
+      { path: 'user-profile/:id', component: UserProfileComponent},
       { path: 'help', component: HelpComponent },
       {
         path: 'settings',

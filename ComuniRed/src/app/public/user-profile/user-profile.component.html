@@ -1,0 +1,219 @@
+<div class="settings-container" *ngIf="!cargando && usuario">
+  <div class="profile-header">
+    <div class="header-background">
+      <div class="header-meta">
+        <span class="header-date">
+          Miembro desde el {{ usuario.fecha_registro | date: 'd' }} de 
+          {{ usuario.fecha_registro | date: 'MMMM' }} de 
+          {{ usuario.fecha_registro | date: 'yyyy' }}
+        </span>
+        <span class="header-role">Usuario</     span>
+      </div>
+    </div>
+    
+    <div class="profile-info">
+      <div class="avatar">
+        <img [src]="urlFotoPerfil" alt="Foto de perfil" class="avatar-img" />
+      </div>
+    
+      <div class="profile-content">
+        <div class="user-info-section">
+          <h1 class="user-name">{{ usuario.nombre }} {{ usuario.apellido }}</h1>
+          <p class="user-location" *ngIf="usuario.distrito">📍 {{ usuario.distrito }}</p>
+          <p class="user-age" *ngIf="calcularEdad() as edad">🎂 {{ edad }} años</p>
+        </div>
+        
+        <div class="actions-and-stats">
+          <!-- Botones de acción -->
+          <div class="action-buttons">
+            <button 
+              class="btn-action btn-primary"
+              [class.btn-siguiendo]="estadoRelacion?.estaSiguiendo"
+              [class.btn-pendiente]="estadoRelacion?.solicitudEnviada"
+              [disabled]="procesando"
+              (click)="estadoRelacion?.estaSiguiendo ? dejarDeSeguir() : seguir()">
+              <span *ngIf="!procesando">{{ botonSeguir }}</span>
+              <span *ngIf="procesando">⏳ Procesando...</span>
+            </button>
+            
+            <button class="btn-action btn-message" (click)="enviarMensaje()">
+              💬 Mensaje
+            </button>
+          </div>
+
+          <!-- Stats -->
+          <div class="stats-row">
+            <button class="stat-item stat-clickable" (click)="verSeguidores()">
+              <span class="stat-number">{{ seguidoresCount }}</span>
+              <span class="stat-label">seguidores</span>
+            </button>
+            
+            <div class="stat-divider"></div>
+            
+            <button class="stat-item stat-clickable" (click)="verSeguidos()">
+              <span class="stat-number">{{ seguidosCount }}</span>
+              <span class="stat-label">seguidos</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards (placeholder) -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Reportes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Resueltos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Reacciones</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Comentarios</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-section">
+    <div class="tabs-header">
+      <button 
+        class="tab-btn" 
+        [class.active]="currentTab === 'actividad'"
+        (click)="changeTab('actividad')">
+        Actividad
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="currentTab === 'logros'"
+        (click)="changeTab('logros')">
+        Logros
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="currentTab === 'estadisticas'"
+        (click)="changeTab('estadisticas')">
+        Estadísticas
+      </button>
+    </div>
+
+    <div class="tab-content">
+      <div *ngIf="currentTab === 'actividad'" class="activity-content">
+        <div class="empty-state">
+          <div class="empty-icon">📈</div>
+          <p>La actividad de este usuario aparecerá aquí</p>
+        </div>
+      </div>
+
+      <div *ngIf="currentTab === 'logros'" class="logros-content">
+        <div class="empty-state">
+          <div class="empty-icon">🏆</div>
+          <p>Los logros de este usuario aparecerán aquí</p>
+        </div>
+      </div>
+
+      <div *ngIf="currentTab === 'estadisticas'" class="estadisticas-content">
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <p>Las estadísticas de este usuario aparecerán aquí</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Seguidores -->
+  <div class="modal-overlay" *ngIf="mostrarModalSeguidores" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Seguidores ({{ seguidoresCount }})</h2>
+        <button class="modal-close" (click)="cerrarModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="loadingModal" class="modal-loading">
+          <p>⏳ Cargando...</p>
+        </div>
+
+        <div *ngIf="!loadingModal && listaSeguidores.length === 0" class="modal-empty">
+          <p>No tiene seguidores aún</p>
+        </div>
+
+        <div *ngIf="!loadingModal && listaSeguidores.length > 0" class="users-list">
+          <div *ngFor="let user of listaSeguidores" class="user-item">
+            <img 
+              [src]="obtenerFoto(user.foto_perfil)" 
+              [alt]="user.nombre"
+              class="user-avatar-small"
+              (click)="verPerfil(user)"
+            />
+            
+            <div class="user-info-modal">
+              <h4>{{ user.nombre }} {{ user.apellido }}</h4>
+              <p *ngIf="user.distrito">📍 {{ user.distrito }}</p>
+            </div>
+
+            <button class="btn-view-modal" (click)="verPerfil(user)">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Seguidos -->
+  <div class="modal-overlay" *ngIf="mostrarModalSeguidos" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Siguiendo ({{ seguidosCount }})</h2>
+        <button class="modal-close" (click)="cerrarModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="loadingModal" class="modal-loading">
+          <p>⏳ Cargando...</p>
+        </div>
+
+        <div *ngIf="!loadingModal && listaSeguidos.length === 0" class="modal-empty">
+          <p>No sigue a nadie aún</p>
+        </div>
+
+        <div *ngIf="!loadingModal && listaSeguidos.length > 0" class="users-list">
+          <div *ngFor="let user of listaSeguidos" class="user-item">
+            <img 
+              [src]="obtenerFoto(user.foto_perfil)" 
+              [alt]="user.nombre"
+              class="user-avatar-small"
+              (click)="verPerfil(user)"
+            />
+            
+            <div class="user-info-modal">
+              <h4>{{ user.nombre }} {{ user.apellido }}</h4>
+              <p *ngIf="user.distrito">📍 {{ user.distrito }}</p>
+            </div>
+
+            <button class="btn-view-modal" (click)="verPerfil(user)">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading -->
+<div *ngIf="cargando" class="loading-container">
+  <div class="loading-spinner"></div>
+  <p>Cargando perfil...</p>
+</div>

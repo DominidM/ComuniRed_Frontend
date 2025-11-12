@@ -5,7 +5,10 @@ import { map, tap } from 'rxjs/operators';
 import { gql } from 'apollo-angular';
 import { Usuario, UsuarioPage } from './usuario.service';
 
-// ✅ Interfaces
+// ========================================
+// INTERFACES
+// ========================================
+
 export interface EstadoSeguimiento {
   estaSiguiendo: boolean;
   teSigue: boolean;
@@ -32,21 +35,17 @@ export interface SeguimientoPage {
   size: number;
 }
 
-// ✅ QUERIES
+// ========================================
+// QUERIES
+// ========================================
+
 const USUARIOS_SUGERIDOS = gql`
   query UsuariosSugeridos($usuarioId: ID!, $page: Int!, $size: Int!) {
     usuariosSugeridos(usuarioId: $usuarioId, page: $page, size: $size) {
       content {
-        id
-        foto_perfil
-        nombre
-        apellido
-        email
-        distrito
-        fecha_nacimiento
+        id foto_perfil nombre apellido email distrito fecha_nacimiento
       }
-      totalElements
-      totalPages
+      totalElements totalPages number size
     }
   }
 `;
@@ -55,31 +54,18 @@ const BUSCAR_USUARIOS = gql`
   query BuscarUsuarios($termino: String!, $page: Int!, $size: Int!) {
     buscarUsuarios(termino: $termino, page: $page, size: $size) {
       content {
-        id
-        foto_perfil
-        nombre
-        apellido
-        email
-        distrito
-        fecha_nacimiento
+        id foto_perfil nombre apellido email distrito fecha_nacimiento
       }
-      totalElements
-      totalPages
+      totalElements totalPages number size
     }
   }
 `;
 
 const ESTADO_SEGUIMIENTO = gql`
   query EstadoSeguimiento($usuarioActualId: ID!, $otroUsuarioId: ID!) {
-    estadoSeguimiento(
-      usuarioActualId: $usuarioActualId, 
-      otroUsuarioId: $otroUsuarioId
-    ) {
-      estaSiguiendo
-      teSigue
-      seguimientoMutuo
-      solicitudPendiente
-      solicitudEnviada
+    estadoSeguimiento(usuarioActualId: $usuarioActualId, otroUsuarioId: $otroUsuarioId) {
+      estaSiguiendo teSigue seguimientoMutuo
+      solicitudPendiente solicitudEnviada
     }
   }
 `;
@@ -88,14 +74,9 @@ const SEGUIDORES_DE = gql`
   query SeguidoresDe($usuarioId: ID!, $page: Int!, $size: Int!) {
     seguidoresDe(usuarioId: $usuarioId, page: $page, size: $size) {
       content {
-        id
-        seguidorId
-        seguidoId
-        estado
-        fechaSeguimiento
+        id seguidorId seguidoId estado fechaSeguimiento
       }
-      totalElements
-      totalPages
+      totalElements totalPages number size
     }
   }
 `;
@@ -104,14 +85,9 @@ const SEGUIDOS_POR = gql`
   query SeguidosPor($usuarioId: ID!, $page: Int!, $size: Int!) {
     seguidosPor(usuarioId: $usuarioId, page: $page, size: $size) {
       content {
-        id
-        seguidorId
-        seguidoId
-        estado
-        fechaSeguimiento
+        id seguidorId seguidoId estado fechaSeguimiento
       }
-      totalElements
-      totalPages
+      totalElements totalPages number size
     }
   }
 `;
@@ -120,14 +96,9 @@ const SOLICITUDES_PENDIENTES = gql`
   query SolicitudesPendientes($usuarioId: ID!, $page: Int!, $size: Int!) {
     solicitudesPendientes(usuarioId: $usuarioId, page: $page, size: $size) {
       content {
-        id
-        seguidorId
-        seguidoId
-        estado
-        fechaSeguimiento
+        id seguidorId seguidoId estado fechaSeguimiento
       }
-      totalElements
-      totalPages
+      totalElements totalPages number size
     }
   }
 `;
@@ -136,14 +107,9 @@ const SOLICITUDES_ENVIADAS = gql`
   query SolicitudesEnviadas($usuarioId: ID!, $page: Int!, $size: Int!) {
     solicitudesEnviadas(usuarioId: $usuarioId, page: $page, size: $size) {
       content {
-        id
-        seguidorId
-        seguidoId
-        estado
-        fechaSeguimiento
+        id seguidorId seguidoId estado fechaSeguimiento
       }
-      totalElements
-      totalPages
+      totalElements totalPages number size
     }
   }
 `;
@@ -160,16 +126,14 @@ const CONTAR_SEGUIDOS = gql`
   }
 `;
 
-// ✅ MUTATIONS
+// ========================================
+// MUTATIONS
+// ========================================
+
 const ENVIAR_SOLICITUD = gql`
   mutation EnviarSolicitud($seguidorId: ID!, $seguidoId: ID!) {
     enviarSolicitudSeguimiento(seguidorId: $seguidorId, seguidoId: $seguidoId) {
-      id
-      seguidorId
-      seguidoId
-      estado
-      fechaSeguimiento
-      notificacionesActivas
+      id seguidorId seguidoId estado fechaSeguimiento notificacionesActivas
     }
   }
 `;
@@ -177,11 +141,7 @@ const ENVIAR_SOLICITUD = gql`
 const ACEPTAR_SOLICITUD = gql`
   mutation AceptarSolicitud($seguimientoId: ID!) {
     aceptarSolicitud(seguimientoId: $seguimientoId) {
-      id
-      seguidorId
-      seguidoId
-      estado
-      fechaRespuesta
+      id seguidorId seguidoId estado fechaRespuesta
     }
   }
 `;
@@ -221,7 +181,6 @@ export class SeguimientoService {
       variables: { usuarioId, page, size },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[SeguimientoService] usuariosSugeridos:', raw)),
       map(result => result.data?.usuariosSugeridos || {
         content: [],
         totalElements: 0,
@@ -238,7 +197,6 @@ export class SeguimientoService {
       variables: { termino, page, size },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[SeguimientoService] buscarUsuarios:', raw)),
       map(result => result.data?.buscarUsuarios || {
         content: [],
         totalElements: 0,
@@ -259,7 +217,6 @@ export class SeguimientoService {
       variables: { usuarioActualId, otroUsuarioId },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[SeguimientoService] estadoSeguimiento:', raw)),
       map(result => result.data?.estadoSeguimiento || {
         estaSiguiendo: false,
         teSigue: false,
@@ -280,7 +237,6 @@ export class SeguimientoService {
       variables: { usuarioId, page, size },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[SeguimientoService] seguidoresDe:', raw)),
       map(result => result.data?.seguidoresDe || {
         content: [],
         totalElements: 0,
@@ -297,7 +253,6 @@ export class SeguimientoService {
       variables: { usuarioId, page, size },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[SeguimientoService] seguidosPor:', raw)),
       map(result => result.data?.seguidosPor || {
         content: [],
         totalElements: 0,
@@ -314,7 +269,6 @@ export class SeguimientoService {
       variables: { usuarioId, page, size },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[SeguimientoService] solicitudesPendientes:', raw)),
       map(result => result.data?.solicitudesPendientes || {
         content: [],
         totalElements: 0,
@@ -331,7 +285,6 @@ export class SeguimientoService {
       variables: { usuarioId, page, size },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[SeguimientoService] solicitudesEnviadas:', raw)),
       map(result => result.data?.solicitudesEnviadas || {
         content: [],
         totalElements: 0,
@@ -348,7 +301,6 @@ export class SeguimientoService {
       variables: { usuarioId },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[SeguimientoService] contarSeguidores:', raw)),
       map(result => result.data?.contarSeguidores || 0)
     );
   }
@@ -359,7 +311,6 @@ export class SeguimientoService {
       variables: { usuarioId },
       fetchPolicy: 'network-only'
     }).valueChanges.pipe(
-      tap(raw => console.debug('[SeguimientoService] contarSeguidos:', raw)),
       map(result => result.data?.contarSeguidos || 0)
     );
   }
@@ -373,7 +324,6 @@ export class SeguimientoService {
       mutation: ENVIAR_SOLICITUD,
       variables: { seguidorId, seguidoId }
     }).pipe(
-      tap(raw => console.debug('[SeguimientoService] enviarSolicitud:', raw)),
       map(result => result.data!.enviarSolicitudSeguimiento)
     );
   }
@@ -383,7 +333,6 @@ export class SeguimientoService {
       mutation: ACEPTAR_SOLICITUD,
       variables: { seguimientoId }
     }).pipe(
-      tap(raw => console.debug('[SeguimientoService] aceptarSolicitud:', raw)),
       map(result => result.data!.aceptarSolicitud)
     );
   }
@@ -393,7 +342,6 @@ export class SeguimientoService {
       mutation: RECHAZAR_SOLICITUD,
       variables: { seguimientoId }
     }).pipe(
-      tap(raw => console.debug('[SeguimientoService] rechazarSolicitud:', raw)),
       map(result => result.data?.rechazarSolicitud ?? false)
     );
   }
@@ -403,7 +351,6 @@ export class SeguimientoService {
       mutation: CANCELAR_SOLICITUD,
       variables: { seguimientoId }
     }).pipe(
-      tap(raw => console.debug('[SeguimientoService] cancelarSolicitud:', raw)),
       map(result => result.data?.cancelarSolicitud ?? false)
     );
   }
@@ -413,7 +360,6 @@ export class SeguimientoService {
       mutation: DEJAR_DE_SEGUIR,
       variables: { seguidorId, seguidoId }
     }).pipe(
-      tap(raw => console.debug('[SeguimientoService] dejarDeSeguir:', raw)),
       map(result => result.data?.dejarDeSeguir ?? false)
     );
   }

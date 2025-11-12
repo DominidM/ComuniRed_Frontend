@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
 import { SeguimientoService, EstadoSeguimiento, Seguimiento } from '../../services/seguimiento.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-suggestions',
@@ -12,15 +13,13 @@ import { SeguimientoService, EstadoSeguimiento, Seguimiento } from '../../servic
   styleUrls: ['./suggestions.component.css']
 })
 export class SuggestionsComponent implements OnInit {
-  // 🆕 Control de tabs
+
   tabActual: 'sugerencias' | 'solicitudes' = 'sugerencias';
   
-  // Sugerencias
   sugerencias: Usuario[] = [];
   estadosSeguimiento: Map<string, EstadoSeguimiento> = new Map();
   cargandoSeguimiento: Set<string> = new Set();
   
-  // 🆕 Solicitudes pendientes
   solicitudes: Seguimiento[] = [];
   usuariosSolicitudes: Map<string, Usuario> = new Map();
   procesandoSolicitud: Set<string> = new Set();
@@ -36,7 +35,8 @@ export class SuggestionsComponent implements OnInit {
 
   constructor(
     private usuarioService: UsuarioService,
-    private seguimientoService: SeguimientoService
+    private seguimientoService: SeguimientoService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -340,6 +340,7 @@ export class SuggestionsComponent implements OnInit {
 
   verPerfil(usuario: Usuario) {
     console.log('👁️ Ver perfil de:', usuario.nombre);
+    this.router.navigate(['/public/user-profile', usuario.id]);  // 👈 Usa user-profile
   }
 
   nextPage() {
