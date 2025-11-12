@@ -68,6 +68,7 @@ export class MessageComponent implements OnInit, OnDestroy {
       if (this.conversacionSeleccionada) {
         this.actualizarMensajes();
         this.verificarEstadoSeguimiento();
+        this.actualizarEstadoUsuarioChat();
       }
       this.actualizarConversaciones();
     }, 3000);
@@ -77,6 +78,19 @@ export class MessageComponent implements OnInit, OnDestroy {
     if (this.pollingInterval) {
       clearInterval(this.pollingInterval);
     }
+  }
+
+  actualizarEstadoUsuarioChat(): void {
+    if (!this.usuarioChat) return;
+
+    this.usuarioService.obtenerUsuarioPorId(this.usuarioChat.id).subscribe({
+      next: (usuario) => {
+        this.usuarioChat = usuario;
+      },
+      error: (error) => {
+        console.error('Error actualizando estado:', error);
+      }
+    });
   }
 
   cargarConversaciones(): void {
@@ -171,6 +185,18 @@ export class MessageComponent implements OnInit, OnDestroy {
                   existente.mensajesNoLeidos = noLeidos;
                 } catch (error) {
                   console.error('Error contando mensajes:', error);
+                }
+              }
+
+              // 🆕 NUEVO: Actualizar estado del usuario
+              if (existente.otroUsuario) {
+                try {
+                  const usuarioActualizado = await this.usuarioService
+                    .obtenerUsuarioPorId(existente.otroUsuario.id)
+                    .toPromise();
+                  existente.otroUsuario = usuarioActualizado;
+                } catch (error) {
+                  console.error('Error actualizando usuario:', error);
                 }
               }
             } else {
@@ -342,6 +368,22 @@ export class MessageComponent implements OnInit, OnDestroy {
       ? `${conversacion.otroUsuario.nombre} ${conversacion.otroUsuario.apellido}`
       : 'Usuario';
   }
+
+  estaEnLinea(usuario: Usuario | null | undefined): boolean {
+    if (!usuario) return false;
+    return this.usuarioService.estaEnLinea(usuario);
+  }
+
+  obtenerTextoEstado(usuario: Usuario | null | undefined): string {
+    if (!usuario) return 'Desconectado';
+    return this.usuarioService.obtenerTextoEstado(usuario);
+  }
+
+  obtenerUltimaActividad(usuario: Usuario | null | undefined): string {
+    if (!usuario) return '';
+    return this.usuarioService.obtenerUltimaActividad(usuario);
+  }
+
 
   obtenerFoto(foto_perfil?: string): string {
     if (!foto_perfil || foto_perfil.trim() === '') {

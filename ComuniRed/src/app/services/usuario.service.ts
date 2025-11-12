@@ -20,6 +20,8 @@ export interface Usuario {
   rol_id: string;
   fecha_nacimiento?: string;
   fecha_registro?: string;
+  ultimaActividad?: string;  // 👈 NUEVO
+  estaEnLinea?: boolean;     // 👈 NUEVO
 }
 
 export interface UsuarioInput {
@@ -65,6 +67,7 @@ const OBTENER_USUARIOS = gql`
         id foto_perfil nombre apellido dni numero_telefono
         sexo distrito codigo_postal direccion email rol_id
         fecha_nacimiento fecha_registro
+        ultimaActividad estaEnLinea
       }
       totalElements totalPages number size
     }
@@ -77,6 +80,7 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
       id foto_perfil nombre apellido dni numero_telefono
       sexo distrito codigo_postal direccion email rol_id
       fecha_nacimiento fecha_registro
+      ultimaActividad estaEnLinea
     }
   }
 `;
@@ -87,6 +91,7 @@ const OBTENER_USUARIO_POR_ID = gql`
       id foto_perfil nombre apellido dni numero_telefono
       sexo distrito codigo_postal direccion email rol_id
       fecha_nacimiento fecha_registro
+      ultimaActividad estaEnLinea
     }
   }
 `;
@@ -96,6 +101,7 @@ const OBTENER_PERFIL_PUBLICO = gql`
     obtenerUsuarioPorId(id: $id) {
       id foto_perfil nombre apellido distrito
       fecha_registro fecha_nacimiento
+      ultimaActividad estaEnLinea
     }
   }
 `;
@@ -137,6 +143,7 @@ const CREAR_USUARIO = gql`
       id foto_perfil nombre apellido dni numero_telefono
       sexo distrito codigo_postal direccion email rol_id
       fecha_nacimiento fecha_registro
+      ultimaActividad estaEnLinea
     }
   }
 `;
@@ -147,6 +154,7 @@ const ACTUALIZAR_USUARIO = gql`
       id foto_perfil nombre apellido dni numero_telefono
       sexo distrito codigo_postal direccion email rol_id
       fecha_nacimiento fecha_registro
+      ultimaActividad estaEnLinea
     }
   }
 `;
@@ -169,6 +177,7 @@ const LOGIN = gql`
       token
       usuario {
         id foto_perfil nombre apellido email rol_id fecha_registro
+        ultimaActividad estaEnLinea
       }
     }
   }
@@ -272,6 +281,47 @@ export class UsuarioService {
     }).valueChanges.pipe(
       map(result => result.data.contarUsuariosPorRol)
     );
+  }
+
+  // ========================================
+  // 🆕 MÉTODOS DE ESTADO EN LÍNEA
+  // ========================================
+
+  /**
+   * Verifica si un usuario está en línea
+   */
+  estaEnLinea(usuario: Usuario): boolean {
+    return usuario?.estaEnLinea ?? false;
+  }
+
+  /**
+   * Obtiene el texto del estado
+   */
+  obtenerTextoEstado(usuario: Usuario): string {
+    return this.estaEnLinea(usuario) ? 'En línea' : 'Desconectado';
+  }
+
+  /**
+   * Obtiene la última actividad formateada
+   */
+  obtenerUltimaActividad(usuario: Usuario): string {
+    if (!usuario?.ultimaActividad) {
+      return 'Sin actividad reciente';
+    }
+
+    const fecha = new Date(usuario.ultimaActividad);
+    const ahora = new Date();
+    const diff = ahora.getTime() - fecha.getTime();
+    const minutos = Math.floor(diff / 60000);
+
+    if (minutos < 1) return 'Justo ahora';
+    if (minutos < 60) return `Hace ${minutos} min`;
+    
+    const horas = Math.floor(minutos / 60);
+    if (horas < 24) return `Hace ${horas}h`;
+    
+    const dias = Math.floor(horas / 24);
+    return `Hace ${dias}d`;
   }
 
   // ========================================
@@ -581,10 +631,6 @@ export class UsuarioService {
   obtenerPlaceholderFoto(): string {
     return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23e0e0e0" width="150" height="150"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="48" dy="0.35em" x="50%" y="50%" text-anchor="middle"%3E👤%3C/text%3E%3C/svg%3E';
   }
-
-  // ========================================
-  // UTILIDADES
-  // ========================================
 
   calcularEdad(fechaNacimiento: string): number | null {
     if (!fechaNacimiento) return null;

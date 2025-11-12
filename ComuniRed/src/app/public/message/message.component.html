@@ -14,6 +14,7 @@
         *ngFor="let conversacion of conversaciones" 
         class="conversation-item"
         [class.active]="conversacionSeleccionada?.id === conversacion.id"
+        [class.user-online]="estaEnLinea(conversacion.otroUsuario)"
         (click)="seleccionarConversacion(conversacion)">
         
         <div class="conversation-avatar-container">
@@ -22,6 +23,12 @@
             alt="Avatar"
             class="conversation-avatar"
           />
+          <!-- 👇 Punto de estado en el avatar -->
+          <span 
+            class="avatar-status-dot" 
+            [class.online]="estaEnLinea(conversacion.otroUsuario)">
+          </span>
+          
           <span *ngIf="conversacion.mensajesNoLeidos && conversacion.mensajesNoLeidos > 0" 
                 class="badge-no-leidos">
             {{ conversacion.mensajesNoLeidos }}
@@ -30,7 +37,14 @@
         
         <div class="conversation-info">
           <div class="conversation-header">
-            <h4 class="conversation-name">{{ obtenerNombreUsuario(conversacion) }}</h4>
+            <h4 class="conversation-name">
+              {{ obtenerNombreUsuario(conversacion) }}
+              <!-- 👇 Punto de estado junto al nombre -->
+              <span 
+                class="estado-punto" 
+                [class.online]="estaEnLinea(conversacion.otroUsuario)">
+              </span>
+            </h4>
             <span class="conversation-time">{{ formatearHora(conversacion.fechaUltimaActividad) }}</span>
           </div>
           
@@ -66,8 +80,13 @@
           />
           <div class="chat-user-info">
             <h3>{{ usuarioChat?.nombre }} {{ usuarioChat?.apellido }}</h3>
-            <span class="chat-user-status">
-              <i class="bi bi-circle-fill"></i> En línea
+            <!-- 👇 Estado dinámico -->
+            <span 
+              class="chat-user-status" 
+              [class.online]="estaEnLinea(usuarioChat)"
+              [class.offline]="!estaEnLinea(usuarioChat)">
+              <i class="bi bi-circle-fill"></i> 
+              {{ obtenerTextoEstado(usuarioChat) }}
             </span>
           </div>
         </div>
