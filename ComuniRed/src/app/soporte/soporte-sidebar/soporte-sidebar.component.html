@@ -1,0 +1,34 @@
+<div class="sidebar-container">
+  <nav class="sidebar-menu">
+    <a 
+      *ngFor="let item of menuItems" 
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      class="sidebar-link"
+    >
+      <span class="icon-wrap">
+        <mat-icon>{{ item.icon }}</mat-icon>
+      </span>
+      <span class="link-label">{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <div class="perfil-header">
+    <div class="perfil">
+      <img
+        [src]="getImagenUrl(usuario?.foto_perfil)"
+        alt="Foto de perfil"
+        class="avatar"
+      />
+      <div class="user-info">
+        <span class="nombre">{{ usuario?.nombre }} {{ usuario?.apellido }}</span>
+        <span class="estado">En linea</span>
+      </div>
+    </div>
+
+    <button class="logout-btn" (click)="onSalir()" aria-label="Cerrar sesion">
+      <mat-icon>logout</mat-icon>
+      <span>Cerrar Sesion</span>
+    </button>
+  </div>
+</div>

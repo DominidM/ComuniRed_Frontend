@@ -56,7 +56,7 @@ export interface Reporte {
   titulo: string;
   descripcion: string;
   tipo: string;
-  estado: 'pendiente' | 'en progreso' | 'resuelto';
+  estado: 'pendiente' | 'en progreso' | 'resuelto' | 'aprobado' | 'rechazado' | 'en revision';
   prioridad: 'Alta' | 'Media' | 'Baja';
   periodo: string;
   fecha: Date;
@@ -73,6 +73,8 @@ export interface Reporte {
   comentarios: Comentario[];
   
   historial?: Historial[];
+
+  validado?: boolean; 
 }
 
 export interface Cliente {

@@ -1,0 +1,321 @@
+<div class="container">
+  <div class="editar-perfil-container">
+
+    <div class="header" *ngIf="!cargando && !error">
+      <button class="btn-volver" (click)="volver()">
+        ← Volver
+      </button>
+      <h2>Editar Perfil</h2>
+    </div>
+
+    <div *ngIf="cargando" class="loading">
+      <div class="spinner"></div>
+      <p>Cargando perfil...</p>
+    </div>
+
+    <div *ngIf="error && !cargando" class="error-message">
+      <p>{{ error }}</p>
+      <button class="btn-secondary" (click)="volver()">Volver</button>
+    </div>
+
+    <div *ngIf="!cargando && !error && usuario" class="perfil-form">
+
+      <div class="avatar-section">
+        <div class="avatar-container">
+          <img 
+            [src]="avatarPreview || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" 
+            alt="Avatar" 
+            class="avatar"
+          />
+          <div class="avatar-overlay">
+            <label for="file-input" class="avatar-label">
+              📷
+            </label>
+            <input 
+              id="file-input" 
+              type="file" 
+              accept="image/*" 
+              (change)="cambiarAvatar($event)"
+              style="display: none;"
+            />
+          </div>
+        </div>
+        <p class="avatar-info">Tamaño máximo: 5MB</p>
+        <button 
+          *ngIf="avatarPreview" 
+          class="btn-quitar-foto" 
+          (click)="quitarFoto()"
+          type="button"
+        >
+          🗑️ Quitar foto
+        </button>
+      </div>
+
+      <form>
+        <div class="form-group">
+          <label for="nombre">Nombre *</label>
+          <input
+            id="nombre"
+            type="text"
+            [(ngModel)]="usuario.nombre"
+            name="nombre"
+            placeholder="Ingresa tu nombre"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="apellido">Apellido *</label>
+          <input
+            id="apellido"
+            type="text"
+            [(ngModel)]="usuario.apellido"
+            name="apellido"
+            placeholder="Ingresa tu apellido"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="dni">DNI *</label>
+          <input
+            id="dni"
+            type="text"
+            [(ngModel)]="usuario.dni"
+            name="dni"
+            placeholder="12345678"
+            maxlength="8"
+            pattern="[0-9]{8}"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input
+            id="email"
+            type="email"
+            [(ngModel)]="usuario.email"
+            name="email"
+            placeholder="tu@email.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="numero_telefono">Teléfono</label>
+          <input
+            id="numero_telefono"
+            type="tel"
+            [(ngModel)]="usuario.numero_telefono"
+            name="numero_telefono"
+            placeholder="987654321"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+          <input
+            id="fecha_nacimiento"
+            type="date"
+            [(ngModel)]="usuario.fecha_nacimiento"
+            name="fecha_nacimiento"
+            [max]="hoy"
+          />
+        </div>
+
+        <div class="form-group" *ngIf="usuario.fecha_nacimiento">
+          <label>Edad</label>
+          <input
+            type="text"
+            [value]="calcularEdad(usuario.fecha_nacimiento) + ' años'"
+            readonly
+            style="background-color: #f3f4f6; cursor: not-allowed;"
+          />
+          <small>Calculada desde la fecha de nacimiento</small>
+        </div>
+
+        <div class="form-group">
+          <label for="sexo">Sexo</label>
+          <select
+            id="sexo"
+            [(ngModel)]="usuario.sexo"
+            name="sexo"
+          >
+            <option value="">Seleccionar</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="distrito">Distrito</label>
+          <input
+            id="distrito"
+            type="text"
+            [(ngModel)]="usuario.distrito"
+            name="distrito"
+            placeholder="San Isidro"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="codigo_postal">Código Postal</label>
+          <input
+            id="codigo_postal"
+            type="text"
+            [(ngModel)]="usuario.codigo_postal"
+            name="codigo_postal"
+            placeholder="15073"
+          />
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label for="direccion">Dirección</label>
+          <textarea
+            id="direccion"
+            [(ngModel)]="usuario.direccion"
+            name="direccion"
+            rows="3"
+            placeholder="Av. Principal 123"
+          ></textarea>
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1;" *ngIf="usuario.fecha_registro">
+          <label for="fecha_registro">Fecha de Registro</label>
+          <input
+            id="fecha_registro"
+            type="text"
+            [value]="usuario.fecha_registro | date:'dd/MM/yyyy HH:mm'"
+            readonly
+            style="background-color: #f3f4f6; cursor: not-allowed;"
+          />
+          <small>Este campo no se puede modificar</small>
+        </div>
+
+        <!-- SECCIÓN DE CAMBIAR CONTRASEÑA -->
+        <div class="security-section">
+          <div class="security-header">
+            <div class="security-icon">🔐</div>
+            <div class="security-info">
+              <h3>Seguridad de la Cuenta</h3>
+              <p>Mantén tu cuenta segura actualizando tu contraseña regularmente</p>
+            </div>
+          </div>
+
+          <button 
+            type="button" 
+            class="btn-toggle-password"
+            (click)="toggleCambiarPassword()"
+          >
+            <span *ngIf="!mostrarCambiarPassword">
+              <span class="btn-icon">🔓</span>
+              Cambiar Contraseña
+            </span>
+            <span *ngIf="mostrarCambiarPassword">
+              <span class="btn-icon">✖</span>
+              Cancelar Cambio
+            </span>
+          </button>
+
+          <div *ngIf="mostrarCambiarPassword" class="password-form-container">
+            <div class="password-form">
+              <div class="password-alert">
+                <span class="alert-icon">⚠️</span>
+                <span class="alert-text">Tu contraseña debe tener al menos 6 caracteres</span>
+              </div>
+
+              <div class="form-group">
+                <label for="passwordActual">
+                  <span class="label-icon">🔒</span>
+                  Contraseña Actual *
+                </label>
+                <input
+                  id="passwordActual"
+                  type="password"
+                  [(ngModel)]="passwordActual"
+                  name="passwordActual"
+                  placeholder="••••••••"
+                  [disabled]="cambiandoPassword"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="passwordNueva">
+                  <span class="label-icon">🔑</span>
+                  Nueva Contraseña *
+                </label>
+                <input
+                  id="passwordNueva"
+                  type="password"
+                  [(ngModel)]="passwordNueva"
+                  name="passwordNueva"
+                  placeholder="Mínimo 6 caracteres"
+                  minlength="6"
+                  [disabled]="cambiandoPassword"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="passwordConfirmar">
+                  <span class="label-icon">✓</span>
+                  Confirmar Nueva Contraseña *
+                </label>
+                <input
+                  id="passwordConfirmar"
+                  type="password"
+                  [(ngModel)]="passwordConfirmar"
+                  name="passwordConfirmar"
+                  placeholder="Repite la nueva contraseña"
+                  minlength="6"
+                  [disabled]="cambiandoPassword"
+                />
+              </div>
+
+              <div class="password-actions">
+                <button
+                  type="button"
+                  class="btn-cambiar-password"
+                  (click)="cambiarPassword()"
+                  [disabled]="cambiandoPassword"
+                >
+                  <span *ngIf="!cambiandoPassword">
+                    <span class="btn-icon">✓</span>
+                    Actualizar Contraseña
+                  </span>
+                  <span *ngIf="cambiandoPassword">
+                    <span class="spinner-small"></span> Actualizando...
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="acciones">
+          <button
+            type="button"
+            class="btn-cancelar"
+            (click)="cancelar()"
+            [disabled]="guardando"
+          >
+            Cancelar
+          </button>
+          
+          <button
+            type="button"
+            class="btn-guardar"
+            (click)="guardarCambios()"
+            [disabled]="!hayCambios() || guardando"
+          >
+            <span *ngIf="!guardando">Guardar Cambios</span>
+            <span *ngIf="guardando">
+              <span class="spinner-small"></span> Guardando...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

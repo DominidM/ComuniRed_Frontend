@@ -1,0 +1,216 @@
+<div class="validacion-container">
+  <div class="header-section">
+    <h2>Validacion de Reportes</h2>
+    <p class="descripcion">Revisa y valida los reportes enviados por los usuarios</p>
+  </div>
+
+  <div class="stats-resumen">
+    <div class="stat-item pendiente">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <span class="stat-label">Pendientes</span>
+        <span class="stat-value">{{ totalPendientes }}</span>
+      </div>
+    </div>
+
+    <div class="stat-item aprobado">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <span class="stat-label">Aprobados</span>
+        <span class="stat-value">{{ totalAprobados }}</span>
+      </div>
+    </div>
+
+    <div class="stat-item revision">
+      <div class="stat-icon">✔️</div>
+      <div class="stat-content">
+        <span class="stat-label">Resueltos</span>
+        <span class="stat-value">{{ totalResueltos }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tasa-aprobacion">
+    <span class="tasa-label">Tasa de Aprobacion</span>
+    <div class="tasa-barra">
+      <div class="tasa-fill" [style.width.%]="tasaAprobacion"></div>
+    </div>
+    <span class="tasa-valor">{{ tasaAprobacion }}%</span>
+  </div>
+
+  <div class="filtros-section">
+    <div class="filtros-container">
+      <input 
+        type="text" 
+        placeholder="Buscar por titulo, descripcion o usuario..." 
+        [(ngModel)]="busqueda"
+        (input)="aplicarFiltros()"
+        class="input-busqueda"
+      />
+
+      <select 
+        [(ngModel)]="filtroEstado" 
+        (change)="aplicarFiltros()"
+        class="select-estado"
+      >
+        <option value="">Todos los estados</option>
+        <option *ngFor="let estado of estadosValidacion" [value]="estado.id">
+          {{ estado.icono }} {{ estado.nombre }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="reportes-lista">
+    <div *ngIf="reportesFiltrados.length === 0" class="sin-resultados">
+      <div class="sin-resultados-icono">📭</div>
+      <h3>No hay reportes pendientes</h3>
+      <p>Todos los reportes han sido validados</p>
+    </div>
+
+    <div 
+      *ngFor="let reporte of reportesFiltrados" 
+      class="reporte-card"
+      (click)="seleccionarReporte(reporte)"
+    >
+      <div class="reporte-header">
+        <div class="usuario-info">
+          <img 
+            [src]="reporte.cliente.avatar_cliente || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" 
+            alt="avatar" 
+            class="avatar"
+          />
+          <div>
+            <h4>{{ reporte.titulo }}</h4>
+            <span class="usuario-nombre">👤 {{ reporte.cliente.nombre }}</span>
+          </div>
+        </div>
+        <span 
+          class="estado-badge"
+          [style.background]="getEstadoColor(reporte.estado)"
+        >
+          {{ getEstadoNombre(reporte.estado) }}
+        </span>
+      </div>
+
+      <div class="reporte-body">
+        <p class="reporte-descripcion">{{ reporte.descripcion }}</p>
+        
+        <div class="reporte-detalles">
+          <span class="detalle-item">
+            <strong>📍 Ubicacion:</strong> {{ reporte.ubicacion }}
+          </span>
+          <span class="detalle-item">
+            <strong>📅 Fecha:</strong> {{ reporte.fecha | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+          <span class="detalle-item">
+            <strong>🏷️ Tipo:</strong> {{ reporte.tipo || 'Sin categoria' }}
+          </span>
+        </div>
+
+        <div class="reporte-imagenes" *ngIf="reporte.imagenes && reporte.imagenes.length > 0">
+          <img 
+            *ngFor="let img of reporte.imagenes.slice(0, 3)" 
+            [src]="img" 
+            alt="imagen"
+            class="imagen-preview"
+          />
+          <span *ngIf="reporte.imagenes.length > 3" class="mas-imagenes">
+            +{{ reporte.imagenes.length - 3 }}
+          </span>
+        </div>
+      </div>
+
+      <div class="reporte-footer">
+        <button class="btn-ver-detalle">Ver Detalles y Validar →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+  <div class="modal-validacion" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Validar Reporte</h3>
+      <button class="btn-cerrar" (click)="cerrarModal()">✖</button>
+    </div>
+
+    <div class="modal-body" *ngIf="reporteSeleccionado">
+      <div class="reporte-info-completa">
+        <h4>{{ reporteSeleccionado.titulo }}</h4>
+        
+        <div class="info-usuario">
+          <img 
+            [src]="reporteSeleccionado.cliente.avatar_cliente || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" 
+            alt="avatar"
+            class="avatar-modal"
+          />
+          <div>
+            <strong>{{ reporteSeleccionado.cliente.nombre }}</strong>
+            <span *ngIf="reporteSeleccionado.cliente.email">{{ reporteSeleccionado.cliente.email }}</span>
+            <span *ngIf="reporteSeleccionado.cliente.telefono">📞 {{ reporteSeleccionado.cliente.telefono }}</span>
+          </div>
+        </div>
+
+        <div class="seccion-info">
+          <label>Descripcion:</label>
+          <p>{{ reporteSeleccionado.descripcion }}</p>
+        </div>
+
+        <div class="seccion-info">
+          <label>Ubicacion:</label>
+          <p>{{ reporteSeleccionado.ubicacion }}</p>
+        </div>
+
+        <div class="seccion-info">
+          <label>Fecha del Reporte:</label>
+          <p>{{ reporteSeleccionado.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+
+        <div class="imagenes-completas" *ngIf="reporteSeleccionado.imagenes && reporteSeleccionado.imagenes.length > 0">
+          <label>Imagenes Adjuntas:</label>
+          <div class="imagenes-grid">
+            <img 
+              *ngFor="let img of reporteSeleccionado.imagenes" 
+              [src]="img" 
+              alt="imagen"
+              class="imagen-grande"
+            />
+          </div>
+        </div>
+
+        <div class="seccion-validacion">
+          <label>Comentario (opcional):</label>
+          <textarea 
+            [(ngModel)]="comentarioValidacion"
+            placeholder="Agrega observaciones o comentarios sobre este reporte..."
+            rows="3"
+            class="textarea-comentario"
+          ></textarea>
+        </div>
+
+        <div class="seccion-rechazo" *ngIf="motivoRechazo !== null">
+          <label>Motivo de Rechazo *:</label>
+          <textarea 
+            [(ngModel)]="motivoRechazo"
+            placeholder="Especifica el motivo del rechazo..."
+            rows="3"
+            class="textarea-rechazo"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-rechazar" (click)="rechazarReporte()">
+        ❌ Rechazar
+      </button>
+      <button class="btn-revision" (click)="solicitarRevision()">
+        🔍 Solicitar Revision
+      </button>
+      <button class="btn-aprobar" (click)="aprobarReporte()">
+        ✅ Aprobar
+      </button>
+    </div>
+  </div>
+</div>

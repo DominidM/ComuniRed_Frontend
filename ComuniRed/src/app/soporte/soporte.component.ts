@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UsuarioService } from '../services/usuario.service';
-import { HeaderComponent } from './layout/header/header.component';
+import { SoporteHeaderComponent } from './soporte-header/soporte-header.component';
+import { SoporteSidebarComponent } from './soporte-sidebar/soporte-sidebar.component';
 
 @Component({
   selector: 'app-soporte',
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent],
+  imports: [CommonModule, RouterModule, SoporteHeaderComponent, SoporteSidebarComponent],
   templateUrl: './soporte.component.html',
   styleUrls: ['./soporte.component.css']
 })

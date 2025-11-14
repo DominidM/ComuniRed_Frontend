@@ -1,0 +1,125 @@
+<div class="clasificacion-container">
+  <div class="header-section">
+    <h2>Clasificación de Reportes</h2>
+    <p class="descripcion">Organiza los reportes por categorías para una mejor gestión</p>
+  </div>
+
+  <div class="stats-resumen">
+    <div class="stat-item">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <span class="stat-label">Total de Reportes</span>
+        <span class="stat-value">{{ totalReportes }}</span>
+      </div>
+    </div>
+
+    <div class="stat-item">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <span class="stat-label">Categorizados</span>
+        <span class="stat-value">{{ totalReportes - reportesSinCategorizar }}</span>
+      </div>
+    </div>
+
+    <div class="stat-item">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-content">
+        <span class="stat-label">Sin Categorizar</span>
+        <span class="stat-value">{{ reportesSinCategorizar }}</span>
+      </div>
+    </div>
+
+    <div class="stat-item">
+      <div class="stat-icon">📈</div>
+      <div class="stat-content">
+        <span class="stat-label">Progreso</span>
+        <span class="stat-value">{{ porcentajeCategorizado }}%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="barra-progreso">
+    <div class="progreso-fill" [style.width.%]="porcentajeCategorizado"></div>
+  </div>
+
+  <div class="categorias-grid">
+    <div 
+      *ngFor="let categoria of categorias" 
+      class="categoria-card"
+      [class.selected]="categoriaSeleccionada === categoria.id"
+      (click)="seleccionarCategoria(categoria.id)"
+    >
+      <div class="categoria-header" [style.background]="categoria.color">
+        <span class="categoria-icono">{{ categoria.icono }}</span>
+        <span class="categoria-badge">{{ categoria.total }}</span>
+      </div>
+      <div class="categoria-body">
+        <h3>{{ categoria.nombre }}</h3>
+        <p>{{ categoria.descripcion }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="reportes-section">
+    <div class="reportes-header">
+      <h3>
+        <span *ngIf="!categoriaSeleccionada">Todos los Reportes</span>
+        <span *ngIf="categoriaSeleccionada">
+          {{ getNombreCategoriaSeleccionada() }}
+        </span>
+        ({{ reportesFiltrados.length }})
+      </h3>
+      
+      <div class="busqueda-container">
+        <input 
+          type="text" 
+          placeholder="Buscar reportes..." 
+          [(ngModel)]="busqueda"
+          (input)="aplicarBusqueda()"
+          class="input-busqueda"
+        />
+      </div>
+    </div>
+
+    <div class="reportes-lista" *ngIf="reportesFiltrados.length > 0">
+      <div *ngFor="let reporte of reportesFiltrados" class="reporte-item">
+        <div class="reporte-info">
+          <div class="reporte-encabezado">
+            <h4>{{ reporte.titulo }}</h4>
+            <span 
+              class="categoria-tag"
+              [style.background]="getCategoriaColor(reporte.tipo)"
+            >
+              {{ getCategoriaNombre(reporte.tipo) }}
+            </span>
+          </div>
+          <p class="reporte-descripcion">{{ reporte.descripcion }}</p>
+          <div class="reporte-meta">
+            <span>📍 {{ reporte.ubicacion }}</span>
+            <span>📅 {{ reporte.fecha | date:'dd/MM/yyyy' }}</span>
+            <span>👤 {{ reporte.cliente.nombre }}</span>
+          </div>
+        </div>
+        
+        <div class="reporte-acciones">
+          <select 
+            class="select-categoria"
+            [value]="reporte.tipo"
+            (change)="asignarCategoria(reporte, $any($event.target).value)"
+          >
+            <option value="">Sin categoría</option>
+            <option *ngFor="let cat of categorias" [value]="cat.id">
+              {{ cat.icono }} {{ cat.nombre }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="reportesFiltrados.length === 0" class="sin-resultados">
+      <div class="sin-resultados-icono">🔍</div>
+      <h3>No se encontraron reportes</h3>
+      <p>Intenta con otra búsqueda o selecciona una categoría diferente</p>
+    </div>
+  </div>
+</div>

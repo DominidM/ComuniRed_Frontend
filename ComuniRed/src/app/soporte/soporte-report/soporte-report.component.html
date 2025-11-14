@@ -1,0 +1,236 @@
+<div class="contenedor-soporte">
+  <!-- ESTADÍSTICAS -->
+  <div class="stats-container">
+    <div class="stats-card total">
+      <div class="stats-header">
+        <h4>Total de Reportes</h4>
+        <span class="icon blue">📍</span>
+      </div>
+      <p class="stats-number">{{ total }}</p>
+      <span class="stats-sub">Todos los reportes</span>
+    </div>
+
+    <div class="stats-card nuevos">
+      <div class="stats-header">
+        <h4>Reportes Nuevos</h4>
+        <span class="icon red">⚠️</span>
+      </div>
+      <p class="stats-number">{{ nuevos }}</p>
+      <span class="stats-sub">Requieren atención</span>
+    </div>
+
+    <div class="stats-card proceso">
+      <div class="stats-header">
+        <h4>En Proceso</h4>
+        <span class="icon orange">⏳</span>
+      </div>
+      <p class="stats-number">{{ enProceso }}</p>
+      <span class="stats-sub">En seguimiento</span>
+    </div>
+
+    <div class="stats-card resueltos">
+      <div class="stats-header">
+        <h4>Resueltos</h4>
+        <span class="icon green">✅</span>
+      </div>
+      <p class="stats-number">{{ resueltos }}</p>
+      <span class="stats-sub">
+        Tasa de resolución 
+        <span class="badge">{{ tasaResolucion }}%</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filtros">
+    <input type="text" placeholder="Buscar reportes..." [(ngModel)]="busqueda" (input)="aplicarFiltro()" />
+
+    <label for="tipo">Tipo:</label>
+    <select id="tipo" [(ngModel)]="tipoReporte" (change)="aplicarFiltro()">
+      <option value="">Todos</option>
+      <option *ngFor="let tipo of tiposReporte" [value]="tipo">{{ tipo }}</option>
+    </select>
+
+    <label for="estado">Estado:</label>
+    <select id="estado" [(ngModel)]="estadoSeleccionado" (change)="aplicarFiltro()">
+      <option value="">Todos</option>
+      <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+    </select>
+
+    <label for="prioridad">Prioridad:</label>
+    <select id="prioridad" [(ngModel)]="prioridadSeleccionada" (change)="aplicarFiltro()">
+      <option value="">Todas</option>
+      <option *ngFor="let prioridad of prioridades" [value]="prioridad">{{ prioridad }}</option>
+    </select>
+
+    <label for="periodo">Periodo:</label>
+    <select id="periodo" [(ngModel)]="periodoSeleccionado" (change)="aplicarFiltro()">
+      <option value="">Todos</option>
+      <option *ngFor="let periodo of periodos" [value]="periodo">{{ periodo }}</option>
+    </select>
+  </div>
+
+  <!-- TARJETAS DE REPORTES -->
+  <div class="container-report-card">
+    <div *ngFor="let rep of reportesFiltrados" class="reporte-card" [ngClass]="getEstadoClase(rep.estado)">
+      <div class="reporte-header">
+        <img [src]="rep.cliente.avatar_cliente" alt="avatar" class="avatar">
+        <div class="usuario-info">
+          <h4>{{ rep.titulo }}</h4>
+          <small>👤 {{ rep.cliente.nombre }}</small>
+        </div>
+      </div>
+
+      <img *ngIf="rep.imagenPrincipal"
+          [src]="rep.imagenPrincipal"
+          alt="imagen principal"
+          class="imagen-principal"
+          (click)="abrirImagenCompleta(rep.imagenPrincipal)">
+
+      <div class="imagenes" *ngIf="rep.imagenes.length">
+        <img *ngFor="let img of rep.imagenes"
+            [src]="img"
+            alt="imagen mini"
+            class="imagen-mini"
+            (click)="abrirImagenCompleta(img)">
+      </div>
+
+      <div class="reporte-body">
+        <p>
+          <strong><i class="bi bi-file-earmark-text"></i> :</strong> {{ rep.descripcion }}
+        </p>
+        <p>
+          <strong><i class="bi bi-geo-alt-fill"></i> :</strong> {{ rep.ubicacion }}
+        </p>
+        <p *ngIf="rep.cliente.telefono">
+          <strong><i class="bi bi-telephone-fill"></i> :</strong> {{ rep.cliente.telefono }}
+        </p>
+        <p>
+          <strong><i class="bi bi-calendar-event"></i> :</strong> {{ rep.fecha | date:'dd/MM/yyyy, h:mm a' }}
+        </p>
+      </div>
+
+      <div class="reporte-footer">
+        <div class="reacciones">
+          👍 {{ rep.reacciones.likes }}
+          👎 {{ rep.reacciones.dislikes }}
+          ❤️ {{ rep.reacciones.love }}
+          😮 {{ rep.reacciones.wow }}
+          😔 {{ rep.reacciones.sad }}
+          ⚠️ {{ rep.reacciones.reportes }}
+          ☑️ {{ rep.reacciones.helpful }}
+        </div>
+
+        <div class="botones">
+          <button class="btn btn-detalles" (click)="abrirDetalles(rep, $event)">👁 Ver Detalles</button>
+          <button class="btn btn-ubicacion" (click)="abrirUbicacion(rep, $event)">📍 Ver Ubicación</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL IMAGEN COMPLETA -->
+<div class="modal-imagen" *ngIf="imagenSeleccionada" (click)="cerrarImagenCompleta()">
+  <div class="modal-contenido-imagen" (click)="$event.stopPropagation()">
+    <img [src]="imagenSeleccionada" alt="Imagen completa" class="imagen-completa">
+    <button class="btn-cerrar" (click)="cerrarImagenCompleta()">✖</button>
+  </div>
+</div>
+
+<!-- MODAL DETALLES -->
+<div class="modal" *ngIf="mostrarDetalles && reporteSeleccionado" (click)="cerrarDesdeFondo($event)">
+  <div class="modal-contenido" (click)="$event.stopPropagation()">
+    <button class="btn-cerrar-x" (click)="cerrarDetalles()">✖</button>
+
+    <h3 class="modal-titulo">Detalles del Reporte</h3>
+
+    <div class="imagenes" *ngIf="reporteSeleccionado.imagenes.length">
+      <img *ngFor="let img of reporteSeleccionado.imagenes"
+           [src]="img"
+           alt="imagen mini"
+           class="imagen-mini">
+    </div>
+
+    <h2 class="reporte-titulo">{{ reporteSeleccionado.titulo }}</h2>
+
+    <div class="seccion">
+      <h4><i class="bi bi-chat-left-dots-fill"></i> Descripción</h4>
+      <p>{{ reporteSeleccionado.descripcion }}</p>
+    </div>
+
+    <div class="seccion">
+      <h4><i class="bi bi-person-fill"></i> Información del Cliente</h4>
+      <p><strong>Nombre:</strong> {{ reporteSeleccionado.cliente.nombre }}</p>
+      <p *ngIf="reporteSeleccionado?.cliente?.telefono"><strong>Teléfono:</strong> {{ reporteSeleccionado.cliente.telefono }}</p>
+      <p *ngIf="reporteSeleccionado?.cliente?.email"><strong>Email:</strong> {{ reporteSeleccionado.cliente.email }}</p>
+      <p *ngIf="reporteSeleccionado?.cliente?.direccion"><strong>Dirección:</strong> {{ reporteSeleccionado.cliente.direccion }}</p>
+    </div>
+
+    <div class="seccion">
+      <h4><i class="bi bi-geo-alt-fill"></i> Ubicación</h4>
+      <p>Dirección: {{ reporteSeleccionado.ubicacion }}</p>
+      <p *ngIf="reporteSeleccionado.lat && reporteSeleccionado.lng"> Coordenadas: {{ reporteSeleccionado.lat }}, {{ reporteSeleccionado.lng }} </p>
+    </div>
+
+    <div class="seccion">
+      <h4><i class="bi bi-person-fill"></i> Información del Soporte</h4>
+      <p class="responsable">Responsable: {{ soporte.nombre }}</p>
+      <p class="fecha-estimada" *ngIf="ultimoHistorial">
+        Fecha estimada de resolución: {{ ultimoHistorial.fecha | date:'dd/MM/yyyy, h:mm a' }}
+      </p>
+    </div>
+
+    <div class="seccion">
+      <h4>Reacciones</h4>
+      <p class="reacciones">
+        <span>👍 {{ reporteSeleccionado.reacciones.likes }}</span>
+        <span>👎 {{ reporteSeleccionado.reacciones.dislikes }}</span>
+        <span>❤️ {{ reporteSeleccionado.reacciones.love }}</span>
+        <span>😮 {{ reporteSeleccionado.reacciones.wow }}</span>
+        <span>😔 {{ reporteSeleccionado.reacciones.sad }}</span>
+        <span>⚠️ {{ reporteSeleccionado.reacciones.reportes }}</span>
+        <span>☑️ {{ reporteSeleccionado.reacciones.helpful }}</span>
+      </p>
+    </div>
+
+    <div class="seccion selector-estado">
+      <label>Estado del Reporte:</label>
+      <select [(ngModel)]="ultimoEstadoModal" (ngModelChange)="cambiarEstado($event)">
+        <option value="enviado">Pendiente</option>
+        <option value="observado">En Proceso</option>
+        <option value="en progreso">Resuelto</option>
+        <option value="resuelto">Cerrado</option>
+      </select>
+    </div>
+
+    <div class="seccion historial" *ngIf="reporteSeleccionado?.historial?.length">
+      <h4><i class="bi bi-clock-history"></i> Historial</h4>
+      <ul>
+        <li *ngFor="let h of reporteSeleccionado.historial">
+          {{ h.mensaje }} - <small>{{ h.fecha | date:'short' }}</small>
+          (<em>{{ h.estado }}</em>)
+        </li>
+      </ul>
+    </div>
+
+    <div class="seccion enviar-mensaje">
+      <button class="btn-enviar-mensaje" (click)="abrirEnvioMensaje()">✉️ Enviar Mensaje</button>
+    </div>
+
+    <!-- FORMULARIO ENVIAR MENSAJE -->
+    <div class="enviar-mensaje-contenedor" *ngIf="mostrarEnvioMensaje">
+      <textarea [(ngModel)]="mensaje" placeholder="Escribe tu mensaje aquí..."></textarea>
+      <div class="acciones">
+        <button class="btn-cancelar" (click)="cerrarEnvioMensaje()">Cancelar</button>
+        <button class="btn-enviar" (click)="enviarMensaje()">Enviar</button>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-avanzar" (click)="avanzarProgreso()">Avanzar Progreso</button>
+      <button class="btn-cerrar" (click)="cerrarDetalles()">Cerrar</button>
+      <button class="btn-cerrar">Rechazar Reporte</button>
+    </div>
+  </div>
+</div>

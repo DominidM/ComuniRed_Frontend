@@ -18,10 +18,7 @@ import { CrudComentarioComponent } from './admin/crud-comentario/crud-comentario
 import { PublicComponent } from './public/public.component';
 
 import { SoporteComponent } from './soporte/soporte.component';
-import { EditarPerfilComponent } from './soporte/edit-profile/editar-perfil.component';
-import { SoporteHomeComponent } from './soporte/home/soporte-home.component';
-import { ReportStatsComponent } from './soporte/home/report-stats/report-stats.component';
-
+import { SoporteProfileComponent } from './soporte/soporte-profile/soporte-profile.component';
 // Componentes públicos tipo red social
 import { FeedComponent } from './public/feed/feed.component';
 import { ProfileComponent } from './public/profile/profile.component';
@@ -61,6 +58,10 @@ import { ReelsComponent } from './public/reels/reels.component';
 import { SuggestionsComponent } from './public/suggestions/suggestions.component';
 import { MessageComponent } from './public/message/message.component';
 import { UserProfileComponent } from './public/user-profile/user-profile.component';
+import { SoporteReportComponent } from './soporte/soporte-report/soporte-report.component';
+import { SoporteClasificacionComponent } from './soporte/soporte-clasificacion/soporte-clasificacion.component';
+import { SoporteValidacionComponent } from './soporte/soporte-validacion/soporte-validacion.component';
+import { SoporteSeguimientoComponent } from './soporte/soporte-seguimiento/soporte-seguimiento.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -149,10 +150,12 @@ export const routes: Routes = [
     canActivateChild: [AuthGuard],
     data: { roles: ['68ca68bb0bc4d9ca3267b665'] },
     children: [
-      { path: 'home', component: SoporteHomeComponent },
-      { path: 'editar-perfil/:nombre', component: EditarPerfilComponent },
-      { path: 'report-stats', component: ReportStatsComponent },
-      { path: '', redirectTo: 'home', pathMatch: 'full' }
+      { path: 'reporte-editar', component: SoporteReportComponent},
+      { path: 'clasificacion', component: SoporteClasificacionComponent},
+      { path: 'validacion', component: SoporteValidacionComponent},
+      { path: 'seguimiento', component: SoporteSeguimientoComponent},
+      { path: 'perfil', component: SoporteProfileComponent},
+      { path: '', redirectTo: 'reporte-editar', pathMatch: 'full' }
     ]
   },
 

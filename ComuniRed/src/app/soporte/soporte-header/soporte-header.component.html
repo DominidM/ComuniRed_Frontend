@@ -1,0 +1,33 @@
+<div class="header">
+
+  <div class="logo-section">
+    <div class="logo">
+      <img src="https://res.cloudinary.com/dpnxbnqxu/image/upload/v1757789195/55942ac9-d62b-45fd-8a3e-54f4c47ef7b6_fbmio4.jpg" alt="Logo ComuniRed">
+    </div>
+
+    <div class="app-info">
+      <h1>ComuniRed - Panel de Soporte</h1>
+      <span class="subtitle">Gestión de reportes del barrio</span>
+    </div>
+  </div>
+
+  <div class="perfil-header">
+    <div class="perfil">
+      <img
+        [src]="getImagenUrl(usuario?.foto_perfil)"
+        alt="Foto de perfil"
+        class="avatar"
+      />
+      <div class="user-info">
+        <span class="nombre">{{ usuario?.nombre }} {{ usuario?.apellido }}</span>
+        <span class="estado">En línea</span>
+      </div>
+    </div>
+
+    <button class="logout-btn" (click)="onSalir()" aria-label="Cerrar sesión">
+      <mat-icon>logout</mat-icon>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
+
+</div>

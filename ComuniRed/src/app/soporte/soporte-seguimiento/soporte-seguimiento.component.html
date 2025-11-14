@@ -1,0 +1,215 @@
+<div class="seguimiento-container">
+  <div class="header-section">
+    <h2>Seguimiento de Reportes</h2>
+    <p class="descripcion">Monitorea el progreso y estado de todos los reportes</p>
+  </div>
+
+  <div class="stats-resumen">
+    <div class="stat-item total">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <span class="stat-label">Total</span>
+        <span class="stat-value">{{ totalReportes }}</span>
+      </div>
+    </div>
+
+    <div class="stat-item pendiente">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <span class="stat-label">Pendientes</span>
+        <span class="stat-value">{{ reportesPendientes }}</span>
+      </div>
+    </div>
+
+    <div class="stat-item proceso">
+      <div class="stat-icon">⚙️</div>
+      <div class="stat-content">
+        <span class="stat-label">En Proceso</span>
+        <span class="stat-value">{{ reportesEnProceso }}</span>
+      </div>
+    </div>
+
+    <div class="stat-item resuelto">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <span class="stat-label">Resueltos</span>
+        <span class="stat-value">{{ reportesResueltos }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="filtros-section">
+    <div class="filtros-container">
+      <input 
+        type="text" 
+        placeholder="Buscar reportes..." 
+        [(ngModel)]="filtros.busqueda"
+        (input)="aplicarFiltros()"
+        class="input-busqueda"
+      />
+
+      <select 
+        [(ngModel)]="filtros.estado" 
+        (change)="aplicarFiltros()"
+        class="select-filtro"
+      >
+        <option value="">Todos los estados</option>
+        <option value="pendiente">⏳ Pendiente</option>
+        <option value="en progreso">⚙️ En Proceso</option>
+        <option value="resuelto">✅ Resuelto</option>
+      </select>
+
+      <select 
+        [(ngModel)]="filtros.ordenPor" 
+        (change)="ordenarReportes()"
+        class="select-filtro"
+      >
+        <option value="fecha">Ordenar por Fecha</option>
+        <option value="prioridad">Ordenar por Prioridad</option>
+        <option value="estado">Ordenar por Estado</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="reportes-tabla">
+    <div *ngIf="reportesFiltrados.length === 0" class="sin-resultados">
+      <div class="sin-resultados-icono">📭</div>
+      <h3>No se encontraron reportes</h3>
+      <p>Intenta ajustar los filtros de busqueda</p>
+    </div>
+
+    <div class="tabla-wrapper" *ngIf="reportesFiltrados.length > 0">
+      <table class="tabla-seguimiento">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Titulo</th>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th>Prioridad</th>
+            <th>Progreso</th>
+            <th>Dias</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let reporte of reportesFiltrados" class="fila-reporte">
+            <td class="celda-id">#{{ reporte.id }}</td>
+            <td class="celda-titulo">
+              <div class="titulo-wrapper">
+                <strong>{{ reporte.titulo }}</strong>
+                <small>{{ reporte.tipo }}</small>
+              </div>
+            </td>
+            <td class="celda-cliente">
+              <div class="cliente-info">
+                <img 
+                  [src]="reporte.cliente.avatar_cliente || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" 
+                  alt="avatar"
+                  class="avatar-mini"
+                />
+                <span>{{ reporte.cliente.nombre }}</span>
+              </div>
+            </td>
+            <td class="celda-estado">
+              <span 
+                class="badge-estado"
+                [style.background]="getEstadoColor(reporte.estado)"
+              >
+                {{ reporte.estado }}
+              </span>
+            </td>
+            <td class="celda-prioridad">
+              <span 
+                class="badge-prioridad"
+                [style.background]="getPrioridadColor(reporte.prioridad)"
+              >
+                {{ reporte.prioridad }}
+              </span>
+            </td>
+            <td class="celda-progreso">
+              <div class="progreso-wrapper">
+                <div class="barra-progreso">
+                  <div 
+                    class="progreso-fill"
+                    [style.width.%]="getProgreso(reporte)"
+                  ></div>
+                </div>
+                <span class="progreso-texto">{{ getProgreso(reporte) }}%</span>
+              </div>
+            </td>
+            <td class="celda-dias">
+              <span class="dias-badge">{{ getDiasTranscurridos(reporte.fecha) }}d</span>
+            </td>
+            <td class="celda-acciones">
+              <button 
+                class="btn-timeline"
+                (click)="verTimeline(reporte)"
+              >
+                📅 Timeline
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarTimeline" (click)="cerrarTimeline()">
+  <div class="modal-timeline" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Timeline del Reporte</h3>
+      <button class="btn-cerrar" (click)="cerrarTimeline()">✖</button>
+    </div>
+
+    <div class="modal-body" *ngIf="reporteSeleccionado">
+      <div class="reporte-info-header">
+        <h4>{{ reporteSeleccionado.titulo }}</h4>
+        <div class="info-meta">
+          <span class="meta-item">
+            <strong>Cliente:</strong> {{ reporteSeleccionado.cliente.nombre }}
+          </span>
+          <span class="meta-item">
+            <strong>Fecha:</strong> {{ reporteSeleccionado.fecha | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+          <span class="meta-item">
+            <strong>Estado:</strong> 
+            <span 
+              class="badge-estado"
+              [style.background]="getEstadoColor(reporteSeleccionado.estado)"
+            >
+              {{ reporteSeleccionado.estado }}
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <div class="timeline-container">
+        <div 
+          *ngIf="!reporteSeleccionado.historial || reporteSeleccionado.historial.length === 0"
+          class="sin-historial"
+        >
+          <p>No hay historial disponible para este reporte</p>
+        </div>
+
+        <div 
+          *ngFor="let evento of reporteSeleccionado.historial; let last = last"
+          class="timeline-item"
+          [class.ultimo]="last"
+        >
+          <div class="timeline-marker">
+            <span class="marker-icono">{{ getEstadoIcono(evento.estado || '') }}</span>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <span class="timeline-estado">{{ evento.estado }}</span>
+              <span class="timeline-fecha">{{ evento.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <p class="timeline-mensaje">{{ evento.mensaje }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
