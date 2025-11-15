@@ -45,9 +45,6 @@ export class SuggestionsComponent implements OnInit {
     this.contarSolicitudesPendientes();
   }
 
-  // ========================================
-  // TABS
-  // ========================================
 
   cambiarTab(tab: 'sugerencias' | 'solicitudes') {
     this.tabActual = tab;
@@ -59,10 +56,6 @@ export class SuggestionsComponent implements OnInit {
       this.cargarSolicitudes();
     }
   }
-
-  // ========================================
-  // SUGERENCIAS
-  // ========================================
 
   cargarSugerencias() {
     if (!this.usuarioActual?.id) return;
@@ -202,9 +195,6 @@ export class SuggestionsComponent implements OnInit {
       });
   }
 
-  // ========================================
-  // SOLICITUDES PENDIENTES
-  // ========================================
 
   contarSolicitudesPendientes() {
     if (!this.usuarioActual?.id) return;
@@ -317,9 +307,6 @@ export class SuggestionsComponent implements OnInit {
     return this.procesandoSolicitud.has(solicitud.id);
   }
 
-  // ========================================
-  // UTILIDADES
-  // ========================================
 
   obtenerEstado(usuario: Usuario): EstadoSeguimiento | undefined {
     return this.estadosSeguimiento.get(usuario.id);
@@ -340,7 +327,7 @@ export class SuggestionsComponent implements OnInit {
 
   verPerfil(usuario: Usuario) {
     console.log('👁️ Ver perfil de:', usuario.nombre);
-    this.router.navigate(['/public/user-profile', usuario.id]);  // 👈 Usa user-profile
+    this.router.navigate(['/public/user-profile', usuario.id]);
   }
 
   nextPage() {
