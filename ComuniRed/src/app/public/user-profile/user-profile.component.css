@@ -21,7 +21,7 @@
 
 .header-background {
   height: 100px;
-  background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+  background: linear-gradient(135deg, #ff41c0 0%, #000000 100%);
   border-radius: 0;
   box-shadow: none;
   display: flex;
@@ -95,21 +95,26 @@
 }
 
 .profile-content {
-  flex: auto;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 700px;
+  display: flex;             
+  justify-content: flex-end; 
+  align-items: center;      
+  gap: 20px;                 
+  padding-right: 10px;      
+  flex: 1;  
+  box-sizing: border-box;    
 }
 
+
+
 /* ========================================
-   USER INFO
-   ======================================== */
+USER INFO
+======================================== */
 
 .user-info-section {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  align-items: flex-start;  
 }
 
 .user-name {
@@ -117,14 +122,30 @@
   font-weight: 700;
   color: #000000;
   margin: 0;
+  white-space: nowrap;  
+  overflow: hidden;
+  text-overflow: ellipsis;  
 }
 
-.user-email {
-  font-size: 15px;
-  color: #262626;
+.user-location,
+.user-age {
+  font-size: 14px;
+  color: #6b7280;
   margin: 0;
-  font-weight: 500;
+  font-weight: 400;
 }
+.stats-row {
+  display: flex;
+  gap: 0;
+  align-items: self-end;
+  background: white;
+  border-radius: 8px;
+  padding: 0px;
+  border: 1px solid #dbdbdb;
+  overflow: hidden;
+  translate: 0px 7px;
+}
+
 /* ========================================
    ACTIONS AND STATS
    ======================================== */
