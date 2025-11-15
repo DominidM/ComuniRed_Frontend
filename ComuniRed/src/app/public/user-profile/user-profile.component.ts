@@ -52,7 +52,6 @@ export class UserProfileComponent implements OnInit {
         this.esPropioUsuario = userId === this.usuarioActualId;
         
         if (this.esPropioUsuario) {
-          // Si es tu propio perfil, redirige a /public/profile
           this.router.navigate(['/public/profile']);
         } else {
           this.cargarPerfil(userId);

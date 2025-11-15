@@ -1,7 +1,3 @@
-/* ========================================
-   CONTENEDOR AJUSTADO AL LAYOUT
-   ======================================== */
-
 .settings-container {
   max-width: 100%;
   margin: 0;
@@ -10,9 +6,6 @@
   min-height: calc(100vh - 60px);
 }
 
-/* ========================================
-   PROFILE HEADER COMPACTO
-   ======================================== */
 
 .profile-header {
   position: relative;
