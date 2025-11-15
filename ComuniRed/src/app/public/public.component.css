@@ -1,6 +1,6 @@
 :root {
   --navbar-height: 69px; /* Ajustado a la altura real de tu navbar */
-  --sidebar-width: 320px;
+  --sidebar-width: 380px;
   --rightbar-width: 320px;
 }
 
@@ -100,9 +100,10 @@ mat-sidenav-content {
   background: rgba(15, 23, 42, 0.3);
 }
 
-/* Sidebar (izquierda) */
 mat-sidenav.app-sidebar {
-  width: var(--sidebar-width) !important;
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
   height: 100%;
   overflow: hidden !important;
   box-sizing: border-box;

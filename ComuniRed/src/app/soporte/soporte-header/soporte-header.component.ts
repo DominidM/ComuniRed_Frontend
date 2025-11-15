@@ -1,53 +1,32 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-import { UsuarioService, Usuario } from '../../services/usuario.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule],
+  imports: [CommonModule],
   templateUrl: './soporte-header.component.html',
   styleUrls: ['./soporte-header.component.css']
 })
 export class SoporteHeaderComponent implements OnInit {
 
-  @Output() principal = new EventEmitter<void>();
-  @Output() modificar = new EventEmitter<void>();
-  @Output() salir = new EventEmitter<void>();
-
-  usuario: Usuario | null = null;
-
-  constructor(private usuarioService: UsuarioService) {}
+  isDarkMode = false;
+  notificationCount = 3;
 
   ngOnInit(): void {
-    const userLocal = this.usuarioService.getUser();
-    if (userLocal?.id) {
-      this.usuarioService.obtenerUsuarioPorId(userLocal.id).subscribe({
-        next: (data) => (this.usuario = data),
-        error: (err) => console.error('Error al obtener usuario:', err)
-      });
-    } else {
-      this.usuario = userLocal;
-    }
+    const savedTheme = localStorage.getItem('theme');
+    this.isDarkMode = savedTheme === 'dark';
+    document.body.setAttribute('data-theme', savedTheme || 'light');
   }
 
-  onPrincipal() {
-    this.principal.emit();
+  toggleTheme(): void {
+    this.isDarkMode = !this.isDarkMode;
+    const theme = this.isDarkMode ? 'dark' : 'light';
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
   }
 
-  onModificar() {
-    this.modificar.emit();
-  }
-
-  onSalir() {
-    this.salir.emit();
-  }
-
-  getImagenUrl(foto?: string): string {
-    return foto
-      ? foto
-      : 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+  openNotifications(): void {
+    console.log('Abriendo notificaciones...');
   }
 }
