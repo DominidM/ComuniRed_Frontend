@@ -1,22 +1,10 @@
-:root {
-  --sidebar-width: 320px;
-  --bg: #fdfcfc;
-  --border: #e2e8f0;
-  --muted: #64748b;
-  --text: #0f172a;
-  --active-bg: #0f172a;
-  --soft-bg: #f8fafc;
-  --danger: #ef4444;
-  --hover-bg: #f1f5f9;
-}
-
 .sidebar-container {
   width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 10px 12px 10px 12px;
-  background: var(--bg);
+  padding: 10px 12px;
+  background: #fdfcfc;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -28,7 +16,7 @@
   padding-top: 2px;
   flex: 1;
   min-height: 0;
-  max-height: calc(98vh - 140px);
+  max-height: calc(98vh - 190px);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -60,7 +48,7 @@
   gap: 11px;
   padding: 8px 13px;
   border-radius: 10px;
-  color: var(--text);
+  color: #0f172a;
   text-decoration: none;
   transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
   min-height: 36px;
@@ -68,6 +56,7 @@
   font-size: 14px;
   font-weight: 500;
   flex-shrink: 0;
+  position: relative;
 }
 
 .icon-wrap {
@@ -76,7 +65,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--muted);
+  color: #64748b;
   flex-shrink: 0;
   transition: color 150ms ease;
 }
@@ -90,7 +79,7 @@
 }
 
 .sidebar-link:hover:not(.active) {
-  background: var(--hover-bg);
+  background: #f1f5f9;
 }
 
 .sidebar-link.active {
@@ -120,10 +109,9 @@
   gap: 6px;
   padding-top: 6px;
   padding-bottom: 8px;
-  border-top: 1px solid var(--border);
-  background: var(--bg);
+  border-top: 1px solid #e2e8f0;
+  background: #fdfcfc;
   z-index: 10;
-  margin-top: -50px;
 }
 
 .user-card {
@@ -133,7 +121,7 @@
   padding: 0 9px;
   border-radius: 10px;
   background: #ffffff;
-  border: 1px solid var(--border);
+  border: 1px solid #e2e8f0;
   overflow: hidden;
   box-sizing: border-box;
   transition: all 0.2s ease;
@@ -186,7 +174,7 @@
 .user-name { 
   font-size: 13px;
   font-weight: 700; 
-  color: var(--text); 
+  color: #0f172a;
   white-space: nowrap; 
   overflow: hidden; 
   text-overflow: ellipsis; 
@@ -196,7 +184,7 @@
 
 .user-email { 
   font-size: 11px;
-  color: var(--muted); 
+  color: #64748b;
   white-space: nowrap; 
   overflow: hidden; 
   text-overflow: ellipsis; 
@@ -213,7 +201,7 @@
   padding: 0 9px;
   border-radius: 10px;
   border: 1px solid rgba(239,68,68,0.2);
-  color: var(--danger);
+  color: #ef4444;
   background: transparent;
   font-size: 13px;
   font-weight: 600;
@@ -226,7 +214,7 @@
 
 .logout-btn:hover {
   background: rgba(239,68,68,0.05);
-  border-color: var(--danger);
+  border-color: #ef4444;
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(239,68,68,0.2);
 }
@@ -249,10 +237,14 @@
   outline-offset: 2px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .sidebar-container { 
     width: 72px; 
     padding: 12px 8px; 
+  }
+  
+  .sidebar-menu {
+    gap: 4px;
   }
   
   .link-label, 
@@ -263,7 +255,8 @@
   
   .sidebar-link { 
     justify-content: center; 
-    padding: 8px; 
+    padding: 8px;
+    gap: 0;
   }
   
   .user-card { 
@@ -281,5 +274,12 @@
     padding: 8px;
     justify-content: center;
     height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar-container { 
+    width: 60px; 
+    padding: 8px 4px; 
   }
 }

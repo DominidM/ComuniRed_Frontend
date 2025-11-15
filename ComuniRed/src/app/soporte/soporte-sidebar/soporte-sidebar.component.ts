@@ -25,11 +25,11 @@ export class SoporteSidebarComponent implements OnInit {
       icon: 'label',  
       route: '/soporte/clasificacion' 
     },
-    { 
+    /*{ 
       label: 'Validacion', 
       icon: 'description', 
       route: '/soporte/validacion' 
-    },
+    },*/
     { 
       label: 'Seguimiento',
       icon: 'schedule', 
