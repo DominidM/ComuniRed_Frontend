@@ -37,19 +37,19 @@
   border-radius: 24px 0 0 24px;
   z-index: 100;
   
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .rightbar-container:hover {
-  transform: translateX(-4px);
+  transform: translateX(-6px);
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.12),
     0 15px 40px rgba(0, 0, 0, 0.08),
     0 0 0 1px rgba(255, 255, 255, 0.6) inset;
 }
 
-/* Secciones flotantes */
+/* Secciones flotantes con animaciones */
 .rightbar-section {
   background: linear-gradient(
     135deg,
@@ -62,7 +62,6 @@
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 18px;
 
-  /* Sombra flotante suave */
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.06),
     0 2px 8px rgba(0, 0, 0, 0.04),
@@ -71,21 +70,48 @@
   padding: 20px;
   
   transition: 
-    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.3s ease;
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s ease,
+    border-color 0.3s ease;
+  
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de brillo animado al hover */
+.rightbar-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.rightbar-section:hover::before {
+  left: 100%;
 }
 
 .rightbar-section:hover {
-  transform: translateY(-6px) scale(1.01);
+  transform: translateY(-8px) scale(1.02);
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.98),
     rgba(255, 255, 255, 0.9)
   );
+  border-color: rgba(255, 255, 255, 0.9);
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.1),
-    0 8px 16px rgba(0, 0, 0, 0.06),
+    0 20px 60px rgba(0, 0, 0, 0.12),
+    0 10px 24px rgba(0, 0, 0, 0.08),
     0 0 0 1px rgba(255, 255, 255, 0.8) inset;
 }
 
@@ -98,15 +124,35 @@
   gap: 8px;
   margin-bottom: 16px;
   user-select: none;
-  
-  /* Sutil animación del icono */
-  mat-icon {
-    transition: transform 0.3s ease;
-  }
+  position: relative;
+}
+
+.rightbar-section-title mat-icon {
+  transition: 
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    color 0.3s ease;
 }
 
 .rightbar-section:hover .rightbar-section-title mat-icon {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.2) rotate(360deg);
+  color: #0066ff;
+}
+
+/* Animación de subrayado en título */
+.rightbar-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #0066ff, #00ccff);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 2px;
+}
+
+.rightbar-section:hover .rightbar-section-title::after {
+  width: 60%;
 }
 
 /* LISTAS */
@@ -116,7 +162,7 @@
   gap: 12px;
 }
 
-/* Items de tendencias */
+/* Items de tendencias con animaciones */
 .trend-item {
   display: flex;
   flex-direction: column;
@@ -124,29 +170,53 @@
   padding: 12px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
   transition: 
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    background 0.3s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease;
+}
+
+/* Borde animado inferior */
+.trend-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0066ff, #00ccff);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .trend-item:hover {
-  background: rgba(255, 255, 255, 0.8);
-  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateX(8px) scale(1.02);
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.06),
-    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+}
+
+.trend-item:hover::after {
+  width: 100%;
 }
 
 .trend-hashtag {
   font-weight: 600;
   color: #16181c;
   font-size: 1em;
-  transition: color 0.2s ease;
+  transition: 
+    color 0.3s ease,
+    transform 0.3s ease,
+    letter-spacing 0.3s ease;
+  display: inline-block;
 }
 
 .trend-item:hover .trend-hashtag {
   color: #0066ff;
+  transform: translateX(4px);
+  letter-spacing: 0.3px;
 }
 
 .trend-count {
@@ -161,21 +231,35 @@
   display: inline-block;
   width: fit-content;
   box-shadow: 0 2px 8px rgba(22, 24, 28, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: 
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease,
+    background 0.3s ease;
 }
 
 .trend-item:hover .trend-count {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(22, 24, 28, 0.3);
+  transform: scale(1.1) rotate(-2deg);
+  box-shadow: 0 6px 16px rgba(22, 24, 28, 0.35);
+  background: linear-gradient(135deg, #0066ff, #0052cc);
 }
 
 .trend-desc {
   font-size: 0.9em;
   color: #6d6d6d;
   line-height: 1.4;
+  transition: 
+    color 0.3s ease,
+    transform 0.3s ease;
+  opacity: 0.8;
 }
 
-/* Items de distritos */
+.trend-item:hover .trend-desc {
+  color: #333;
+  transform: translateX(4px);
+  opacity: 1;
+}
+
+/* Items de distritos con animaciones */
 .district-item {
   display: flex;
   align-items: center;
@@ -185,30 +269,71 @@
   padding: 10px 12px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
   transition: 
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    background 0.3s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease;
+}
+
+/* Efecto de onda al hover */
+.district-item::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(0, 102, 255, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s ease, height 0.5s ease;
+}
+
+.district-item:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .district-item:hover {
-  background: rgba(255, 255, 255, 0.8);
-  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateX(8px) scale(1.03);
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.06),
-    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
 }
 
 .district-name {
   font-weight: 600;
   color: #16181c;
   flex: 1;
+  position: relative;
+  z-index: 1;
+  transition: 
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.district-item:hover .district-name {
+  color: #0066ff;
+  transform: translateX(4px);
 }
 
 .district-distance {
   font-size: 0.88em;
   color: #999;
   font-weight: 500;
+  position: relative;
+  z-index: 1;
+  transition: 
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.district-item:hover .district-distance {
+  color: #666;
+  transform: scale(1.05);
 }
 
 .district-count {
@@ -219,15 +344,23 @@
   padding: 4px 10px;
   font-weight: 600;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  z-index: 1;
+  transition: 
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease,
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
 .district-item:hover .district-count {
-  transform: scale(1.08);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 6px 16px rgba(0, 102, 255, 0.2);
+  background: linear-gradient(135deg, #0066ff, #00ccff);
+  color: #fff;
 }
 
-/* Estadísticas */
+/* Estadísticas con animaciones */
 .rightbar-stats {
   display: flex;
   justify-content: center;
@@ -253,11 +386,16 @@
   color: #222;
   letter-spacing: -0.5px;
   grid-row: 1;
-  transition: transform 0.3s ease;
+  transition: 
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    color 0.3s ease,
+    text-shadow 0.3s ease;
+  cursor: default;
 }
 
-.rightbar-stats:hover .stats-value {
-  transform: scale(1.05);
+.stats-value:hover {
+  transform: scale(1.15) translateY(-4px);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .stats-green {
@@ -265,14 +403,27 @@
   text-shadow: 0 2px 8px rgba(24, 182, 82, 0.2);
 }
 
+.stats-green:hover {
+  color: #15a047;
+  text-shadow: 0 6px 20px rgba(24, 182, 82, 0.4);
+}
+
 .stats-label {
   font-size: 0.9em;
   color: #888;
   grid-row: 2;
   font-weight: 500;
+  transition: 
+    color 0.3s ease,
+    transform 0.3s ease;
 }
 
-/* Botón flotante de accesibilidad */
+.stats-row:hover .stats-label {
+  color: #555;
+  transform: translateY(-2px);
+}
+
+/* Botón flotante de accesibilidad con animaciones avanzadas */
 .rightbar-accessibility-btn {
   position: fixed;
   right: 40px;
@@ -285,7 +436,6 @@
   width: 56px;
   height: 56px;
 
-  /* Sombra flotante pronunciada */
   box-shadow: 
     0 12px 40px rgba(0, 0, 0, 0.25),
     0 6px 20px rgba(0, 0, 0, 0.15),
@@ -299,30 +449,123 @@
   z-index: 999;
 
   transition: 
-    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
     background 0.3s ease;
+  
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de pulso animado */
+.rightbar-accessibility-btn::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  opacity: 0;
+  transition: 
+    transform 0.6s ease,
+    opacity 0.6s ease;
+}
+
+.rightbar-accessibility-btn:hover::before {
+  transform: scale(1.5);
+  opacity: 0;
 }
 
 .rightbar-accessibility-btn:hover {
-  background: linear-gradient(135deg, #3a3c42, #222);
-  transform: translateY(-8px) scale(1.05);
+  background: linear-gradient(135deg, #0066ff, #0052cc);
+  transform: translateY(-12px) scale(1.1) rotate(5deg);
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.3),
-    0 10px 30px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+    0 24px 70px rgba(0, 102, 255, 0.4),
+    0 12px 35px rgba(0, 102, 255, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
 }
 
 .rightbar-accessibility-btn:active {
-  transform: translateY(-6px) scale(1.02);
+  transform: translateY(-10px) scale(1.05);
 }
 
 .rightbar-accessibility-btn mat-icon {
-  transition: transform 0.3s ease;
+  transition: 
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.3s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .rightbar-accessibility-btn:hover mat-icon {
-  transform: rotate(15deg) scale(1.1);
+  transform: rotate(360deg) scale(1.2);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Animación de entrada escalonada para items */
+.trend-item,
+.district-item {
+  animation: slideInFromRight 0.5s ease-out backwards;
+}
+
+.trend-item:nth-child(1),
+.district-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.trend-item:nth-child(2),
+.district-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.trend-item:nth-child(3),
+.district-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.trend-item:nth-child(4),
+.district-item:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animación suave de aparición para secciones */
+.rightbar-section {
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.rightbar-section:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.rightbar-section:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.rightbar-section:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* === RESPONSIVE === */
@@ -369,5 +612,16 @@
 @media (min-width: 1440px) {
   .rightbar-container {
     max-width: 420px;
+  }
+}
+
+/* Reducir animaciones para usuarios con preferencias de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
