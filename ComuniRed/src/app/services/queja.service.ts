@@ -2,10 +2,6 @@ import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable, map, switchMap } from 'rxjs';
 
-// ========================================
-// INTERFACES (sin cambios)
-// ========================================
-
 export interface Queja {
   id: string;
   titulo: string;
@@ -26,6 +22,7 @@ export interface Queja {
   userVote?: string;
   showComments?: boolean;
   showMenu?: boolean;
+  fue_editado?: boolean;
 }
 
 export interface Usuario {
@@ -68,7 +65,9 @@ export interface Comentario {
   queja_id: string;
   texto: string;
   fecha_creacion: string;
+  fecha_modificacion?: string;
   author: Usuario;
+  showMenu?: boolean;
 }
 
 export interface Evidencia {
@@ -78,10 +77,6 @@ export interface Evidencia {
   tipo: string;
   fecha_subida?: string;
 }
-
-// ========================================
-// QUERIES
-// ========================================
 
 const OBTENER_QUEJAS = gql`
   query ObtenerQuejas($usuarioActualId: ID!) {
@@ -129,6 +124,61 @@ const OBTENER_QUEJA_POR_ID = gql`
         author { id nombre apellido foto_perfil }
       }
       commentsCount canVote userVote
+    }
+  }
+`;
+
+// ✅ Nueva query para obtener quejas por usuario
+const QUEJAS_POR_USUARIO = gql`
+  query QuejasPorUsuario($usuarioId: ID!, $usuarioActualId: ID!) {
+    quejasPorUsuario(usuarioId: $usuarioId, usuarioActualId: $usuarioActualId) {
+      id
+      titulo
+      descripcion
+      ubicacion
+      imagen_url
+      fecha_creacion
+      fecha_actualizacion
+      usuario {
+        id
+        nombre
+        apellido
+        foto_perfil
+      }
+      categoria {
+        id
+        nombre
+        descripcion
+      }
+      estado {
+        id
+        nombre
+      }
+      evidence {
+        id
+        url
+        tipo
+      }
+      votes {
+        yes
+        no
+        total
+      }
+      reactions {
+        total
+        userReaction
+        counts {
+          like
+          love
+          wow
+          helpful
+          dislike
+          report
+        }
+      }
+      commentsCount
+      canVote
+      userVote
     }
   }
 `;
@@ -222,7 +272,22 @@ export class QuejaService {
       );
   }
 
-  // ✅ CLOUDINARY: Subir imagen (igual que usuario)
+  // ✅ Nuevo método: Obtener quejas por usuario
+  quejasPorUsuario(usuarioId: string, usuarioActualId: string): Observable<Queja[]> {
+    return this.apollo
+      .watchQuery<{ quejasPorUsuario: Queja[] }>({
+        query: QUEJAS_POR_USUARIO,
+        variables: { usuarioId, usuarioActualId },
+        fetchPolicy: 'network-only'
+      })
+      .valueChanges.pipe(
+        map(result => {
+          console.log('📥 Quejas del usuario recibidas:', result.data.quejasPorUsuario);
+          return result.data.quejasPorUsuario;
+        })
+      );
+  }
+
   async subirImagenCloudinary(archivo: File): Promise<string> {
     const formData = new FormData();
     formData.append('file', archivo);
@@ -252,7 +317,6 @@ export class QuejaService {
     }
   }
 
-  // ✅ CREAR QUEJA CON CLOUDINARY
   crearQueja(
     titulo: string,
     descripcion: string,
@@ -261,7 +325,6 @@ export class QuejaService {
     ubicacion?: string,
     imagen?: File
   ): Observable<Queja> {
-    // ✅ SI HAY IMAGEN, SUBIR A CLOUDINARY PRIMERO
     if (imagen) {
       return new Observable<Queja>(observer => {
         console.log('📤 Subiendo imagen a Cloudinary...');
@@ -271,7 +334,6 @@ export class QuejaService {
             console.log('✅ Imagen subida:', imagenUrl);
             console.log('📤 Creando queja con GraphQL...');
             
-            // 1. Crear queja sin imagen
             const variables: any = {
               titulo,
               descripcion,
@@ -295,7 +357,6 @@ export class QuejaService {
                 
                 console.log('✅ Queja creada, actualizando con URL de imagen...');
                 
-                // 2. Actualizar queja con URL de imagen
                 return this.apollo
                   .mutate<{ actualizarQueja: Queja }>({
                     mutation: ACTUALIZAR_QUEJA,
@@ -327,7 +388,6 @@ export class QuejaService {
       });
     }
 
-    // ✅ SI NO HAY IMAGEN, USAR GRAPHQL NORMAL
     const variables: any = {
       titulo,
       descripcion,

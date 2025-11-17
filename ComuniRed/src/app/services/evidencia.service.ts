@@ -2,9 +2,6 @@ import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable, map } from 'rxjs';
 
-// ========================================
-// INTERFACES
-// ========================================
 
 export interface Evidencia {
   id: string;
@@ -14,10 +11,6 @@ export interface Evidencia {
   fecha_subida?: string;
 }
 
-// ========================================
-// QUERIES
-// ========================================
-
 const EVIDENCIAS_POR_QUEJA = gql`
   query EvidenciasPorQueja($quejaId: ID!) {
     evidenciasPorQueja(quejaId: $quejaId) {
@@ -26,9 +19,6 @@ const EVIDENCIAS_POR_QUEJA = gql`
   }
 `;
 
-// ========================================
-// MUTATIONS
-// ========================================
 
 const SUBIR_EVIDENCIA = gql`
   mutation SubirEvidencia($quejaId: ID!, $archivo: Upload!, $tipo: String) {
@@ -48,9 +38,7 @@ const ELIMINAR_EVIDENCIA = gql`
 export class EvidenciaService {
   constructor(private apollo: Apollo) {}
 
-  // ========================================
-  // CONSULTAS
-  // ========================================
+
 
   evidenciasPorQueja(quejaId: string): Observable<Evidencia[]> {
     return this.apollo
@@ -62,9 +50,6 @@ export class EvidenciaService {
       .valueChanges.pipe(map(result => result.data.evidenciasPorQueja));
   }
 
-  // ========================================
-  // ACCIONES
-  // ========================================
 
   subirEvidencia(quejaId: string, archivo: File, tipo?: string): Observable<Evidencia> {
     return this.apollo

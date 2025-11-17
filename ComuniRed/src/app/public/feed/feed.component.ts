@@ -2,7 +2,7 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { Router } from '@angular/router';  // ✅ AGREGAR
+import { Router } from '@angular/router';
 import { QuejaService, Queja, Usuario } from '../../services/queja.service';
 import { ReaccionService } from '../../services/reaccion.service';
 import { ComentarioService } from '../../services/comentario.service';
@@ -17,12 +17,14 @@ import { UsuarioService } from '../../services/usuario.service';
   styleUrls: ['./feed.component.css']
 })
 export class FeedComponent implements OnInit {
+  Math = Math;
+  
   user: { id?: string; name: string; avatarUrl: string } | null = null;
   posts: Queja[] = [];
   filteredPosts: Queja[] = [];
   loading = false;
   categorias: Categoria[] = [];
-  
+  commentTexts: { [postId: string]: string } = {};
   searchTerm = '';
   selectedCategory = '';
   selectedStatus = '';
@@ -50,19 +52,31 @@ export class FeedComponent implements OnInit {
   page = 0;
   hasMore = true;
 
+  // ✅ PROPIEDADES PARA COMENTARIOS Y REACCIONES
+  showReactionMenu: { [postId: string]: boolean } = {};
+  showCommentsInline: { [postId: string]: boolean } = {};
+  showCommentMenuModal: { [commentId: string]: boolean } = {};
+  currentPage = 1;
+  reportsPerPage = 10;
+  totalReports = 0;
+
+  // ✅ PROPIEDADES PARA MODAL DE COMENTARIOS
+  showCommentsModal = false;
+  selectedReporteForComments: Queja | null = null;
+  newCommentText = '';
+
   constructor(
     private quejaService: QuejaService,
     private reaccionService: ReaccionService,
     private comentarioService: ComentarioService,
     private categoriaService: CategoriaService,
     private usuarioService: UsuarioService,
-    private router: Router  // ✅ AGREGAR
+    private router: Router
   ) {}
 
-  ngOnInit(): void {
-    this.loadUser();
-    this.loadCategorias();
-    this.loadPosts();
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    this.closeAllReactionMenus();
   }
 
   @HostListener('window:scroll', ['$event'])
@@ -73,6 +87,12 @@ export class FeedComponent implements OnInit {
     if (scrollPosition >= pageHeight - 100 && !this.loading && this.hasMore) {
       this.loadMorePosts();
     }
+  }
+
+  ngOnInit(): void {
+    this.loadUser();
+    this.loadCategorias();
+    this.loadPosts();
   }
 
   loadMorePosts(): void {
@@ -120,7 +140,7 @@ export class FeedComponent implements OnInit {
       next: (quejas) => {
         console.log('📦 Quejas cargadas del backend:', quejas);
         
-        this.posts = quejas.map(q => {
+        this.posts = JSON.parse(JSON.stringify(quejas)).map((q: any) => {
           const reactions = {
             total: q.reactions?.total || 0,
             userReaction: q.reactions?.userReaction || undefined,
@@ -155,7 +175,7 @@ export class FeedComponent implements OnInit {
         this.applyFilters();
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('❌ Error cargando quejas:', err);
         this.loading = false;
         this.showToastMessage('Error al cargar reportes');
@@ -165,6 +185,7 @@ export class FeedComponent implements OnInit {
 
   refreshPosts(): void {
     this.showToastMessage('Actualizando...');
+    this.currentPage = 1;
     this.loadPosts();
   }
 
@@ -191,6 +212,7 @@ export class FeedComponent implements OnInit {
     filtered = this.sortPosts(filtered);
 
     this.filteredPosts = filtered;
+    this.currentPage = 1;
   }
 
   sortPosts(posts: Queja[]): Queja[] {
@@ -232,40 +254,23 @@ export class FeedComponent implements OnInit {
     this.applyFilters();
   }
 
-  vote(post: Queja, choice: 'accept' | 'reject'): void {
-    if (!this.canVote(post) || !this.user?.id) return;
+  // ==================== REACCIONES ====================
+  closeAllReactionMenus(): void {
+    this.showReactionMenu = {};
+  }
 
-    const previousVotes = { ...post.votes };
-    const previousCanVote = post.canVote;
-    
-    if (choice === 'accept') {
-      post.votes.yes++;
-    } else {
-      post.votes.no++;
-    }
-    post.votes.total = post.votes.yes + post.votes.no;
-    post.canVote = false;
-
-    this.reaccionService.toggleReaccion(post.id, choice, this.user.id).subscribe({
-      next: () => {
-        this.quejaService.obtenerQuejaPorId(post.id, this.user!.id!).subscribe({
-          next: (updated) => {
-            const index = this.posts.findIndex(p => p.id === post.id);
-            if (index !== -1) {
-              this.posts[index] = { ...updated, showComments: post.showComments };
-              this.applyFilters();
-            }
-            this.showToastMessage('Voto registrado');
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Error al votar', err);
-        post.votes = previousVotes;
-        post.canVote = previousCanVote;
-        this.showToastMessage('Error al votar');
-      }
+  toggleReactionMenu(postId: string, event: Event): void {
+    event.stopPropagation();
+    Object.keys(this.showReactionMenu).forEach(key => {
+      if (key !== postId) this.showReactionMenu[key] = false;
     });
+    this.showReactionMenu[postId] = !this.showReactionMenu[postId];
+  }
+
+  selectReaction(post: Queja, type: string, event: Event): void {
+    event.stopPropagation();
+    this.toggleReaction(post, type);
+    this.showReactionMenu[post.id] = false;
   }
 
   toggleReaction(post: Queja, type: string): void {
@@ -304,34 +309,94 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  toggleComments(post: Queja): void {
-    post.showComments = !post.showComments;
+  getReactionIcon(type: string): string {
+    const icons: { [key: string]: string } = {
+      'like': '❤️',
+      'love': '😍',
+      'wow': '😮',
+      'helpful': '👍',
+      'dislike': '👎'
+    };
+    return icons[type] || '👍';
   }
 
-  // ✅ ACTUALIZADO: Refetch después de agregar comentario
-  addComment(post: Queja, text: string): void {
-    if (!text?.trim() || !this.user?.id) return;
+  getReactionCount(post: Queja, type: string): number {
+    return post.reactions?.counts?.[type] ?? 0;
+  }
 
-    this.comentarioService.agregarComentario(post.id, this.user.id, text.trim()).subscribe({
-      next: (newComment) => {
-        post.comments.push(newComment);
-        post.commentsCount = post.comments.length;
-        
-        // ✅ Refetch para actualizar todo el post
+  // ==================== VOTOS ====================
+  vote(post: Queja, choice: 'accept' | 'reject'): void {
+    if (!this.canVote(post) || !this.user?.id) return;
+
+    const previousVotes = { ...post.votes };
+    const previousCanVote = post.canVote;
+    
+    if (choice === 'accept') {
+      post.votes.yes++;
+    } else {
+      post.votes.no++;
+    }
+    post.votes.total = post.votes.yes + post.votes.no;
+    post.canVote = false;
+
+    this.reaccionService.toggleReaccion(post.id, choice, this.user.id).subscribe({
+      next: () => {
         this.quejaService.obtenerQuejaPorId(post.id, this.user!.id!).subscribe({
           next: (updated) => {
             const index = this.posts.findIndex(p => p.id === post.id);
             if (index !== -1) {
-              this.posts[index] = { ...updated, showComments: true };
+              this.posts[index] = { ...updated, showComments: post.showComments };
               this.applyFilters();
             }
+            this.showToastMessage('Voto registrado');
           }
         });
-        
-        this.showToastMessage('Comentario agregado');
       },
       error: (err) => {
+        console.error('Error al votar', err);
+        post.votes = previousVotes;
+        post.canVote = previousCanVote;
+        this.showToastMessage('Error al votar');
+      }
+    });
+  }
+
+  // ==================== COMENTARIOS INLINE ====================
+  toggleComments(post: Queja): void {
+    post.showComments = !post.showComments;
+  }
+
+  addComment(post: Queja, text: string): void {
+    if (!text?.trim() || !this.user?.id) return;
+
+    const tempComment = {
+      id: 'temp-' + Date.now(),
+      texto: text.trim(),
+      author: {
+        id: this.user.id,
+        nombre: this.user.name.split(' ')[0] || 'Usuario',
+        apellido: this.user.name.split(' ')[1] || '',
+        foto_perfil: this.user.avatarUrl
+      },
+      fecha_creacion: new Date().toISOString()
+    };
+
+    post.comments.push(tempComment as any);
+    post.commentsCount = post.comments.length;
+    this.commentTexts[post.id] = '';
+
+    this.comentarioService.agregarComentario(post.id, this.user.id, text.trim()).subscribe({
+      next: (newComment) => {
+        const commentIndex = post.comments.findIndex(c => c.id === tempComment.id);
+        if (commentIndex !== -1) {
+          post.comments[commentIndex] = newComment;
+        }
+        this.showToastMessage('Comentario agregado');
+      },
+      error: (err: any) => {
         console.error('Error al comentar', err);
+        post.comments = post.comments.filter(c => c.id !== tempComment.id);
+        post.commentsCount = post.comments.length;
         this.showToastMessage('Error al agregar comentario');
       }
     });
@@ -343,13 +408,36 @@ export class FeedComponent implements OnInit {
   }
 
   saveEditComment(post: Queja): void {
-    if (!this.editingCommentId || !this.editingCommentText.trim()) return;
+    if (!this.editingCommentId || !this.editingCommentText.trim() || !this.user?.id) return;
 
-    const comment = post.comments.find(c => c.id === this.editingCommentId);
-    if (comment) {
-      comment.texto = this.editingCommentText;
-      this.cancelEditComment();
-      this.showToastMessage('Comentario actualizado');
+    const commentIndex = post.comments.findIndex(c => c.id === this.editingCommentId);
+    if (commentIndex !== -1) {
+      const previousText = post.comments[commentIndex].texto;
+      
+      post.comments[commentIndex] = {
+        ...post.comments[commentIndex],
+        texto: this.editingCommentText.trim()
+      };
+      
+      this.comentarioService.actualizarComentario(
+        this.editingCommentId,
+        this.user.id,
+        this.editingCommentText.trim()
+      ).subscribe({
+        next: () => {
+          this.showToastMessage('Comentario actualizado');
+          this.cancelEditComment();
+        },
+        error: (err: any) => {
+          console.error('Error al actualizar comentario', err);
+          post.comments[commentIndex] = {
+            ...post.comments[commentIndex],
+            texto: previousText
+          };
+          this.showToastMessage('Error al actualizar comentario');
+          this.cancelEditComment();
+        }
+      });
     }
   }
 
@@ -361,13 +449,13 @@ export class FeedComponent implements OnInit {
   deleteComment(post: Queja, commentId: string): void {
     if (!this.user?.id || !confirm('¿Eliminar este comentario?')) return;
 
-    this.comentarioService.eliminarComentario(commentId, this.user.id, post.id).subscribe({
+    this.comentarioService.eliminarComentario(commentId, this.user.id).subscribe({
       next: () => {
         post.comments = post.comments.filter(c => c.id !== commentId);
         post.commentsCount = post.comments.length;
         this.showToastMessage('Comentario eliminado');
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error al eliminar comentario', err);
         this.showToastMessage('Error al eliminar comentario');
       }
@@ -378,6 +466,178 @@ export class FeedComponent implements OnInit {
     return comment.author?.id === this.user?.id;
   }
 
+  getCommentsCount(post: Queja): number {
+    return post.commentsCount || (post.comments || []).length;
+  }
+
+  getPreviewComments(post: Queja): any[] {
+    return (post.comments || []).slice(0, 3);
+  }
+
+  hasMoreComments(post: Queja): boolean {
+    return (post.comments || []).length > 3;
+  }
+
+  // ==================== MODAL DE COMENTARIOS ====================
+  openCommentsModal(reporte: Queja): void {
+    this.selectedReporteForComments = JSON.parse(JSON.stringify(reporte));
+    this.showCommentsModal = true;
+  }
+
+  closeCommentsModal(): void {
+    this.showCommentsModal = false;
+    this.selectedReporteForComments = null;
+    this.newCommentText = '';
+    this.editingCommentId = null;
+    this.editingCommentText = '';
+  }
+
+  addCommentModal(): void {
+    if (!this.newCommentText.trim() || !this.selectedReporteForComments || !this.user?.id) return;
+
+    const tempComment = {
+      id: 'temp-' + Date.now(),
+      texto: this.newCommentText.trim(),
+      author: {
+        id: this.user.id,
+        nombre: this.user.name.split(' ')[0] || 'Usuario',
+        apellido: this.user.name.split(' ')[1] || '',
+        foto_perfil: this.user.avatarUrl
+      },
+      fecha_creacion: new Date().toISOString()
+    };
+
+    if (!Array.isArray(this.selectedReporteForComments.comments)) {
+      this.selectedReporteForComments.comments = [];
+    }
+
+    this.selectedReporteForComments.comments = [...this.selectedReporteForComments.comments, tempComment as any];
+    this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
+
+    const quejaIndex = this.posts.findIndex(q => q.id === this.selectedReporteForComments!.id);
+    if (quejaIndex !== -1) {
+      this.posts[quejaIndex] = {
+        ...this.posts[quejaIndex],
+        comments: [...this.selectedReporteForComments.comments],
+        commentsCount: this.selectedReporteForComments.commentsCount
+      };
+      this.applyFilters();
+    }
+
+    const commentText = this.newCommentText.trim();
+    this.newCommentText = '';
+
+    this.comentarioService.agregarComentario(
+      this.selectedReporteForComments.id, 
+      this.user.id, 
+      commentText
+    ).subscribe({
+      next: (newComment) => {
+        if (this.selectedReporteForComments) {
+          const commentIndex = this.selectedReporteForComments.comments.findIndex(c => c.id === tempComment.id);
+          if (commentIndex !== -1) {
+            this.selectedReporteForComments.comments = [
+              ...this.selectedReporteForComments.comments.slice(0, commentIndex),
+              newComment,
+              ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
+            ];
+          }
+        }
+        this.showToastMessage('Comentario agregado');
+      },
+      error: (err: any) => {
+        console.error('Error al comentar', err);
+        if (this.selectedReporteForComments) {
+          this.selectedReporteForComments.comments = this.selectedReporteForComments.comments.filter(c => c.id !== tempComment.id);
+          this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
+        }
+        this.showToastMessage('Error al agregar comentario');
+      }
+    });
+  }
+
+  saveEditCommentModal(): void {
+    if (!this.editingCommentId || !this.editingCommentText.trim() || !this.selectedReporteForComments || !this.user?.id) return;
+
+    const commentIndex = this.selectedReporteForComments.comments.findIndex(c => c.id === this.editingCommentId);
+    if (commentIndex !== -1) {
+      const previousText = this.selectedReporteForComments.comments[commentIndex].texto;
+
+      this.selectedReporteForComments.comments = [
+        ...this.selectedReporteForComments.comments.slice(0, commentIndex),
+        {
+          ...this.selectedReporteForComments.comments[commentIndex],
+          texto: this.editingCommentText.trim(),
+          fecha_modificacion: new Date().toISOString()
+        } as any,
+        ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
+      ];
+
+      const postIndex = this.posts.findIndex(p => p.id === this.selectedReporteForComments!.id);
+      if (postIndex !== -1) {
+        this.posts[postIndex] = {
+          ...this.posts[postIndex],
+          comments: [...this.selectedReporteForComments.comments]
+        };
+        this.applyFilters();
+      }
+
+      this.comentarioService.actualizarComentario(
+        this.editingCommentId,
+        this.user.id,
+        this.editingCommentText.trim()
+      ).subscribe({
+        next: () => {
+          this.showToastMessage('Comentario actualizado');
+          this.cancelEditComment();
+        },
+        error: (err: any) => {
+          console.error('Error al actualizar comentario', err);
+          if (this.selectedReporteForComments) {
+            this.selectedReporteForComments.comments = [
+              ...this.selectedReporteForComments.comments.slice(0, commentIndex),
+              {
+                ...this.selectedReporteForComments.comments[commentIndex],
+                texto: previousText
+              },
+              ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
+            ];
+          }
+          this.showToastMessage('Error al actualizar comentario');
+        }
+      });
+    }
+  }
+
+  deleteCommentModal(comment: any): void {
+    if (!this.user?.id || !this.selectedReporteForComments || !confirm('¿Eliminar este comentario?')) return;
+
+    this.comentarioService.eliminarComentario(comment.id, this.user.id).subscribe({
+      next: () => {
+        if (this.selectedReporteForComments) {
+          this.selectedReporteForComments.comments = this.selectedReporteForComments.comments.filter(c => c.id !== comment.id);
+          this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
+
+          const postIndex = this.posts.findIndex(p => p.id === this.selectedReporteForComments!.id);
+          if (postIndex !== -1) {
+            this.posts[postIndex] = {
+              ...this.posts[postIndex],
+              comments: [...this.selectedReporteForComments.comments],
+              commentsCount: this.selectedReporteForComments.commentsCount
+            };
+            this.applyFilters();
+          }
+        }
+        this.showToastMessage('Comentario eliminado');
+      },
+      error: (err: any) => {
+        console.error('Error al eliminar comentario', err);
+        this.showToastMessage('Error al eliminar comentario');
+      }
+    });
+  }
+
+  // ==================== EDITAR/ELIMINAR REPORTE ====================
   canEditQueja(post: Queja): boolean {
     return post.usuario?.id === this.user?.id;
   }
@@ -444,41 +704,7 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  toggleBookmark(post: Queja): void {
-    (post as any).meta = (post as any).meta || {};
-    (post as any).meta.saved = !((post as any).meta.saved);
-    this.showToastMessage((post as any).meta.saved ? 'Guardado' : 'Eliminado de guardados');
-  }
-
-  sharePost(post: Queja): void {
-    const url = `${location.origin}/quejas/${post.id}`;
-    if (navigator.share) {
-      navigator.share({ 
-        title: post.titulo, 
-        text: post.descripcion, 
-        url 
-      }).catch(console.error);
-    } else {
-      navigator.clipboard.writeText(url).then(() => {
-        this.showToastMessage('Enlace copiado al portapapeles');
-      }).catch(() => this.showToastMessage('No se pudo compartir'));
-    }
-  }
-
-  downloadPostJson(post: Queja): void {
-    const data = JSON.stringify(post, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `queja-${post.id}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    this.showToastMessage('JSON descargado');
-  }
-
+  // ==================== CREAR REPORTE ====================
   openCreateReport(): void {
     this.showCreateModal = true;
     this.resetQuejaForm();
@@ -582,15 +808,106 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  showToastMessage(message: string): void {
-    this.toastMessage = message;
-    this.showToast = true;
-    setTimeout(() => {
-      this.showToast = false;
-    }, 3000);
+  // ==================== OTRAS ACCIONES ====================
+  toggleBookmark(post: Queja): void {
+    (post as any).meta = (post as any).meta || {};
+    (post as any).meta.saved = !((post as any).meta.saved);
+    this.showToastMessage((post as any).meta.saved ? 'Guardado' : 'Eliminado de guardados');
   }
 
-  // ✅ NUEVO: Ver perfil de usuario
+  sharePost(post: Queja): void {
+    const url = `${location.origin}/quejas/${post.id}`;
+    if (navigator.share) {
+      navigator.share({ 
+        title: post.titulo, 
+        text: post.descripcion, 
+        url 
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        this.showToastMessage('Enlace copiado al portapapeles');
+      }).catch(() => this.showToastMessage('No se pudo compartir'));
+    }
+  }
+
+  downloadPostJson(post: Queja): void {
+    const data = JSON.stringify(post, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `queja-${post.id}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    this.showToastMessage('JSON descargado');
+  }
+
+  // ==================== PAGINACIÓN ====================
+  getPaginatedPosts(): Queja[] {
+    const posts = this.displayedPosts;
+    this.totalReports = posts.length;
+    const startIndex = (this.currentPage - 1) * this.reportsPerPage;
+    const endIndex = startIndex + this.reportsPerPage;
+    return posts.slice(startIndex, endIndex);
+  }
+
+  getTotalPages(): number {
+    return Math.ceil(this.totalReports / this.reportsPerPage);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.getTotalPages()) {
+      this.currentPage = page;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.getTotalPages()) {
+      this.currentPage++;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const totalPages = this.getTotalPages();
+    const pages: number[] = [];
+    
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (this.currentPage <= 4) {
+        for (let i = 1; i <= 5; i++) pages.push(i);
+        pages.push(-1);
+        pages.push(totalPages);
+      } else if (this.currentPage >= totalPages - 3) {
+        pages.push(1);
+        pages.push(-1);
+        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push(-1);
+        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) pages.push(i);
+        pages.push(-1);
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  }
+
+  // ==================== UTILIDADES ====================
   verPerfilUsuario(usuario: Usuario): void {
     if (!usuario?.id) return;
     
@@ -669,10 +986,6 @@ export class FeedComponent implements OnInit {
     return (post as any).meta?.saved ? '🔖' : '📑';
   }
 
-  getReactionCount(post: Queja, type: string): number {
-    return post.reactions?.counts?.[type] ?? 0;
-  }
-
   getShowComments(post: Queja): boolean {
     return !!post.showComments;
   }
@@ -696,6 +1009,20 @@ export class FeedComponent implements OnInit {
     return `hace ${Math.floor(diffInHours / 24)} días`;
   }
 
+  formatCommentDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return 'justo ahora';
+    if (diffInSeconds < 3600) return `hace ${Math.floor(diffInSeconds / 60)} min`;
+    if (diffInSeconds < 86400) return `hace ${Math.floor(diffInSeconds / 3600)}h`;
+    if (diffInSeconds < 172800) return 'hace 1 día';
+    if (diffInSeconds < 604800) return `hace ${Math.floor(diffInSeconds / 86400)} días`;
+    
+    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  }
+
   trackByPostId(index: number, post: Queja): string {
     return post.id;
   }
@@ -712,5 +1039,13 @@ export class FeedComponent implements OnInit {
 
   getBookmarkText(post: Queja): string {
     return (post as any).meta?.saved ? 'Quitar de guardados' : 'Guardar';
+  }
+
+  showToastMessage(message: string): void {
+    this.toastMessage = message;
+    this.showToast = true;
+    setTimeout(() => {
+      this.showToast = false;
+    }, 3000);
   }
 }

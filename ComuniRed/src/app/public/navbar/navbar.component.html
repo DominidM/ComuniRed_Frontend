@@ -7,19 +7,76 @@
   </div>
 
   <div class="cr-navbar__center">
-    <label class="cr-search" aria-label="Buscar">
-      <svg class="cr-search__icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M21 21l-4.35-4.35" stroke="#6b6f76" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        <circle cx="11" cy="11" r="6" stroke="#6b6f76" stroke-width="1.6" fill="none"/>
-      </svg>
-      <input
-        type="search"
-        placeholder="Buscar reportes, personas..."
-        [(ngModel)]="query"
-        (ngModelChange)="onQueryChange($event)"
-        aria-label="Buscar reportes, personas"
-      />
-    </label>
+    <div class="cr-search-container">
+      <label class="cr-search" aria-label="Buscar">
+        <svg class="cr-search__icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 21l-4.35-4.35" stroke="#6b6f76" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="11" cy="11" r="6" stroke="#6b6f76" stroke-width="1.6" fill="none"/>
+        </svg>
+        <input
+          type="search"
+          placeholder="Buscar reportes, personas..."
+          [(ngModel)]="query"
+          (ngModelChange)="onQueryChange($event)"
+          (focus)="query && performSearch(query)"
+          aria-label="Buscar reportes, personas"
+        />
+        
+        <!-- Spinner de carga -->
+        <div *ngIf="searching" class="cr-search__spinner">
+          <div class="spinner-small"></div>
+        </div>
+      </label>
+
+      <!-- Dropdown de resultados -->
+      <div *ngIf="showSearchResults" class="search-dropdown">
+        <div *ngIf="searching" class="search-loading">
+          <div class="spinner-small"></div>
+          <span>Buscando...</span>
+        </div>
+
+        <div *ngIf="!searching && searchResults.length === 0" class="search-empty">
+          <div class="search-empty-icon">🔍</div>
+          <p>No se encontraron resultados para "{{ query }}"</p>
+        </div>
+
+        <div *ngIf="!searching && searchResults.length > 0" class="search-results">
+          <div 
+            *ngFor="let result of searchResults; trackBy: trackByResult" 
+            class="search-result-item"
+            (click)="selectResult(result)"
+          >
+            <div class="search-result-icon">
+              <ng-container *ngIf="result.type === 'reporte'">
+                📋
+              </ng-container>
+              <ng-container *ngIf="result.type === 'persona'">
+                <img 
+                  [src]="result.foto_perfil || 'assets/img/default-avatar.png'" 
+                  [alt]="getResultTitle(result)"
+                  class="search-result-avatar"
+                />
+              </ng-container>
+            </div>
+
+            <div class="search-result-content">
+              <div class="search-result-title">{{ getResultTitle(result) }}</div>
+              <div class="search-result-subtitle">
+                {{ getResultSubtitle(result) }}
+                <ng-container *ngIf="result.type === 'reporte' && result.fecha">
+                  • {{ formatDate(result.fecha) }}
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="search-result-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Backdrop para cerrar -->
+      <div *ngIf="showSearchResults" class="search-backdrop" (click)="closeSearch()"></div>
+    </div>
   </div>
 
   <div class="cr-navbar__right" role="toolbar" aria-label="Controles">

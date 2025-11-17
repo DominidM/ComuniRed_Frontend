@@ -1,88 +1,79 @@
 :root {
-  --navbar-height: 69px; /* Ajustado a la altura real de tu navbar */
-  --sidebar-width: 380px;
+  --navbar-height: 72px;
+  --sidebar-width: 260px;
   --rightbar-width: 320px;
 }
 
-/* Aseguramos que el app ocupe toda la ventana */
 html, body {
   height: 100%;
   margin: 0;
-  overflow: hidden; /* Evita scroll en body */
-}
-
-app-root {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
   overflow: hidden;
 }
 
-/* Navbar fijo en la parte superior */
+/* ==================== NAVBAR FIJO ==================== */
 app-navbar {
-  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   height: var(--navbar-height);
-  flex-shrink: 0;
-  box-sizing: border-box;
+  z-index: 1100;
+  background: white;
+  border-bottom: 1px solid rgba(15,23,42,0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* El mat-sidenav-container debe ocupar la altura restante */
-mat-sidenav-container {
-  flex: 1;
-  height: 100% !important;
-  min-height: 0;
-  box-sizing: border-box;
-  background-color: #ffffff !important;
-}
-
-/* Evitar scrollbar adicionales en mat-sidenav-content */
-mat-sidenav-content {
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100% !important;
-  min-height: 0;
+/* ==================== SIDENAV CONTAINER ==================== */
+mat-sidenav-container.sidenav-container {
+  margin-top: var(--navbar-height) !important;
+  height: calc(100vh - var(--navbar-height)) !important;
   overflow: hidden !important;
-  box-sizing: border-box;
-  background-color: #eae9eef5;
 }
 
-/* Estructura principal */
+/* ==================== SIDEBAR (SIN POSITION FIXED) ==================== */
+mat-sidenav.app-sidebar {
+  width: var(--sidebar-width) !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  background: #fdfcfc !important;
+  border-right: 1px solid #e2e8f0;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+  /* ✅ NO uses position: fixed aquí */
+}
+
+mat-sidenav.app-sidebar::ng-deep .mat-drawer-inner-container {
+  overflow: hidden !important;
+}
+
+/* ==================== CONTENIDO PRINCIPAL ==================== */
+mat-sidenav-content {
+  height: 100% !important;
+  overflow: hidden !important;
+  background-color: #eae9eef5;
+  /* ✅ Material ajusta automáticamente el margin-left en modo 'side' */
+}
+
 .public-layout {
-  display: flex;
-  flex-direction: column;
   height: 100%;
-  min-height: 0;
-  width: 100%;
-  box-sizing: border-box;
   overflow: hidden;
 }
 
 .feed-right-wrapper {
   display: flex;
-  flex: 1;
   height: 100%;
-  min-height: 0;
-  width: 100%;
-  box-sizing: border-box;
-  gap: 0;
   overflow: hidden;
 }
 
-/* Aquí va la barra de scroll: .feed-area será scrollable */
+/* ==================== FEED AREA (CON SCROLL INDEPENDIENTE) ==================== */
 .feed-area {
   flex: 1;
-  min-width: 0;
   height: 100%;
-  min-height: 0;
   overflow-y: auto !important;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   padding: 20px 16px;
-  box-sizing: border-box;
   background-color: #eae9eef5;
 }
 
-/* Scrollbar personalizado para feed-area */
 .feed-area::-webkit-scrollbar {
   width: 8px;
 }
@@ -96,31 +87,15 @@ mat-sidenav-content {
   border-radius: 10px;
 }
 
-.feed-area::-webkit-scrollbar-thumb:hover {
-  background: rgba(15, 23, 42, 0.3);
-}
-
-mat-sidenav.app-sidebar {
-  width: 200px !important;
-  min-width: 200px !important;
-  max-width: 200px !important;
-  height: 100%;
-  overflow: hidden !important;
-  box-sizing: border-box;
-}
-
-/* Rightbar (derecha) */
+/* ==================== RIGHTBAR ==================== */
 app-rightbar {
   flex: 0 0 var(--rightbar-width);
   width: var(--rightbar-width);
   height: 100%;
   overflow-y: auto;
-  overflow-x: hidden;
-  box-sizing: border-box;
   padding-left: 12px;
 }
 
-/* Scrollbar para rightbar */
 app-rightbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -130,23 +105,8 @@ app-rightbar::-webkit-scrollbar-thumb {
   border-radius: 10px;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  app-rightbar { 
-    flex: 0 0 200px; 
-    width: 200px;
-  }
-}
-
-@media (max-width: 600px) {
-  .public-layout { 
-    flex-direction: column; 
-  }
-  
-  .feed-right-wrapper { 
-    flex-direction: column; 
-  }
-  
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
   app-rightbar { 
     display: none; 
   }

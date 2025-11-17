@@ -23,7 +23,7 @@
             alt="Avatar"
             class="conversation-avatar"
           />
-          <!-- 👇 Punto de estado en el avatar -->
+
           <span 
             class="avatar-status-dot" 
             [class.online]="estaEnLinea(conversacion.otroUsuario)">
@@ -39,7 +39,7 @@
           <div class="conversation-header">
             <h4 class="conversation-name">
               {{ obtenerNombreUsuario(conversacion) }}
-              <!-- 👇 Punto de estado junto al nombre -->
+
               <span 
                 class="estado-punto" 
                 [class.online]="estaEnLinea(conversacion.otroUsuario)">
@@ -80,7 +80,7 @@
           />
           <div class="chat-user-info">
             <h3>{{ usuarioChat?.nombre }} {{ usuarioChat?.apellido }}</h3>
-            <!-- 👇 Estado dinámico -->
+
             <span 
               class="chat-user-status" 
               [class.online]="estaEnLinea(usuarioChat)"

@@ -20,8 +20,8 @@ export interface Usuario {
   rol_id: string;
   fecha_nacimiento?: string;
   fecha_registro?: string;
-  ultimaActividad?: string;  // 👈 NUEVO
-  estaEnLinea?: boolean;     // 👈 NUEVO
+  ultimaActividad?: string;
+  estaEnLinea?: boolean;
 }
 
 export interface UsuarioInput {
@@ -56,9 +56,7 @@ export interface EstadoRelacion {
   solicitudEnviada: boolean;
 }
 
-// ========================================
-// QUERIES
-// ========================================
+
 
 const OBTENER_USUARIOS = gql`
   query ObtenerUsuarios($page: Int!, $size: Int!) {
@@ -133,9 +131,6 @@ const CONTAR_SEGUIDOS = gql`
   }
 `;
 
-// ========================================
-// MUTATIONS
-// ========================================
 
 const CREAR_USUARIO = gql`
   mutation CrearUsuario($usuario: UsuarioInput!) {
@@ -223,9 +218,6 @@ export class UsuarioService {
     this.refreshUserCount();
   }
 
-  // ========================================
-  // QUERIES BÁSICAS
-  // ========================================
 
   obtenerUsuarios(page: number, size: number): Observable<UsuarioPage> {
     return this.apollo.watchQuery<{ obtenerUsuarios: UsuarioPage }>({
@@ -283,27 +275,17 @@ export class UsuarioService {
     );
   }
 
-  // ========================================
-  // 🆕 MÉTODOS DE ESTADO EN LÍNEA
-  // ========================================
 
-  /**
-   * Verifica si un usuario está en línea
-   */
   estaEnLinea(usuario: Usuario): boolean {
     return usuario?.estaEnLinea ?? false;
   }
 
-  /**
-   * Obtiene el texto del estado
-   */
+
   obtenerTextoEstado(usuario: Usuario): string {
     return this.estaEnLinea(usuario) ? 'En línea' : 'Desconectado';
   }
 
-  /**
-   * Obtiene la última actividad formateada
-   */
+
   obtenerUltimaActividad(usuario: Usuario): string {
     if (!usuario?.ultimaActividad) {
       return 'Sin actividad reciente';
@@ -324,9 +306,7 @@ export class UsuarioService {
     return `Hace ${dias}d`;
   }
 
-  // ========================================
-  // ESTADO DE SEGUIMIENTO
-  // ========================================
+
 
   obtenerEstadoSeguimiento(usuarioActualId: string, otroUsuarioId: string): Observable<EstadoRelacion> {
     return this.apollo.query<{ estadoSeguimiento: EstadoRelacion }>({
@@ -364,9 +344,7 @@ export class UsuarioService {
     );
   }
 
-  // ========================================
-  // MUTATIONS CRUD
-  // ========================================
+
 
   crearUsuario(usuario: UsuarioInput): Observable<Usuario> {
     return this.apollo.mutate<{ crearUsuario: Usuario }>({
@@ -410,9 +388,7 @@ export class UsuarioService {
     );
   }
 
-  // ========================================
-  // AUTENTICACIÓN
-  // ========================================
+
 
   login(email: string, password: string) {
     return this.apollo.mutate<{ login: { token?: string; usuario?: Usuario } }>({
@@ -515,9 +491,7 @@ export class UsuarioService {
       });
   }
 
-  // ========================================
-  // RECUPERACIÓN DE CONTRASEÑA
-  // ========================================
+
 
   solicitarCodigoRecuperacion(email: string): Observable<boolean> {
     return this.apollo.mutate<{ solicitarCodigoRecuperacion: boolean }>({
@@ -546,9 +520,7 @@ export class UsuarioService {
     );
   }
 
-  // ========================================
-  // CLOUDINARY
-  // ========================================
+
 
   eliminarFotoPerfil(usuarioId: string): Observable<boolean> {
     return this.apollo.mutate<{ eliminarFotoPerfil: boolean }>({

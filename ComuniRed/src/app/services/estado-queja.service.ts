@@ -23,16 +23,15 @@ export interface EstadoQuejaPage {
 })
 export class EstadosQuejaService {
   
-  // 🔥 Observable centralizado para el conteo total de estados
   private estadoCountSubject = new BehaviorSubject<number>(0);
   public estadoCount$ = this.estadoCountSubject.asObservable();
 
   constructor(private apollo: Apollo) {
-    // Inicializa el conteo al arrancar el servicio
+
     this.refreshEstadoCount();
   }
 
-  // 🔥 Método para refrescar el conteo total desde el backend
+
   refreshEstadoCount(): void {
     this.apollo.query<{ contarEstadosQueja: number }>({
       query: gql`
@@ -51,9 +50,6 @@ export class EstadosQuejaService {
     });
   }
 
-  // ============================================================
-  // Métodos de paginación y CRUD
-  // ============================================================
 
   obtenerEstadosQueja(page: number, size: number): Observable<EstadoQuejaPage> {
     return this.apollo.watchQuery<{ obtenerEstados_queja: EstadoQuejaPage }>({
@@ -97,7 +93,7 @@ export class EstadosQuejaService {
         }
       ]
     }).pipe(
-      tap(() => this.refreshEstadoCount()), // 🔥 Refresca el conteo tras crear
+      tap(() => this.refreshEstadoCount()),
       map(result => result.data!.crearEstado)
     );
   }
@@ -126,7 +122,7 @@ export class EstadosQuejaService {
         }
       ]
     }).pipe(
-      tap(() => this.refreshEstadoCount()), // 🔥 Refresca el conteo tras actualizar
+      tap(() => this.refreshEstadoCount()),
       map(result => result.data!.actualizarEstado)
     );
   }
@@ -153,7 +149,7 @@ export class EstadosQuejaService {
         }
       ]
     }).pipe(
-      tap(() => this.refreshEstadoCount()), // 🔥 Refresca el conteo tras eliminar
+      tap(() => this.refreshEstadoCount()),
       map(result => result.data!.eliminarEstado)
     );
   }

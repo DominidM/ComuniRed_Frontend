@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable, map } from 'rxjs';
+import { Observable, map, forkJoin, of } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 
 export interface Comentario {
   id: string;
   queja_id: string;
   texto: string;
   fecha_creacion: string;
+  fecha_modificacion?: string;
   author: Usuario;
+  showMenu?: boolean;
 }
 
 export interface Usuario {
@@ -23,6 +26,24 @@ const AGREGAR_COMENTARIO = gql`
       id
       texto
       fecha_creacion
+      fecha_modificacion
+      author {
+        id
+        nombre
+        apellido
+        foto_perfil
+      }
+    }
+  }
+`;
+
+const EDITAR_COMENTARIO = gql`
+  mutation EditarComentario($id: ID!, $usuarioId: ID!, $texto: String!) {
+    editarComentario(id: $id, usuarioId: $usuarioId, texto: $texto) {
+      id
+      texto
+      fecha_creacion
+      fecha_modificacion
       author {
         id
         nombre
@@ -36,6 +57,79 @@ const AGREGAR_COMENTARIO = gql`
 const ELIMINAR_COMENTARIO = gql`
   mutation EliminarComentario($id: ID!, $usuarioId: ID!) {
     eliminarComentario(id: $id, usuarioId: $usuarioId)
+  }
+`;
+
+const BUSCAR_COMENTARIO = gql`
+  query BuscarComentario($id: ID!) {
+    buscarComentario(id: $id) {
+      id
+      texto
+      fecha_creacion
+      fecha_modificacion
+      author {
+        id
+        nombre
+        apellido
+        foto_perfil
+      }
+    }
+  }
+`;
+
+const BUSCAR_COMENTARIOS_POR_TEXTO = gql`
+  query BuscarComentariosPorTexto($texto: String!, $usuarioId: ID!) {
+    buscarComentariosPorTexto(texto: $texto, usuarioId: $usuarioId) {
+      id
+      texto
+      fecha_creacion
+      fecha_modificacion
+      author {
+        id
+        nombre
+        apellido
+        foto_perfil
+      }
+    }
+  }
+`;
+
+// ✅ Query para obtener comentarios por usuario
+const BUSCAR_COMENTARIOS_POR_USUARIO = gql`
+  query BuscarComentariosPorUsuario($usuarioId: ID!) {
+    buscarComentariosPorUsuario(usuarioId: $usuarioId) {
+      id
+      queja_id
+      texto
+      fecha_creacion
+      fecha_modificacion
+      author {
+        id
+        nombre
+        apellido
+        foto_perfil
+      }
+    }
+  }
+`;
+
+// ✅ Query para obtener un reporte por ID
+const OBTENER_QUEJA_POR_ID = gql`
+  query ObtenerQuejaPorId($id: ID!, $usuarioActualId: ID!) {
+    obtenerQuejaPorId(id: $id, usuarioActualId: $usuarioActualId) {
+      id
+      titulo
+      descripcion
+      fecha_creacion
+      categoria {
+        id
+        nombre
+      }
+      estado {
+        id
+        nombre
+      }
+    }
   }
 `;
 
@@ -59,12 +153,119 @@ export class ComentarioService {
       );
   }
 
-  eliminarComentario(id: string, usuarioId: string, quejaId?: string): Observable<boolean> {
+  actualizarComentario(id: string, usuarioId: string, texto: string): Observable<Comentario> {
+    console.log('✏️ Editando comentario:', { id, usuarioId, texto });
+    
+    return this.apollo
+      .mutate<{ editarComentario: Comentario }>({
+        mutation: EDITAR_COMENTARIO,
+        variables: { id, usuarioId, texto }
+      })
+      .pipe(
+        map(result => {
+          console.log('✅ Comentario editado:', result.data!.editarComentario);
+          return result.data!.editarComentario;
+        })
+      );
+  }
+
+  eliminarComentario(id: string, usuarioId: string): Observable<boolean> {
+    console.log('🗑️ Eliminando comentario:', { id, usuarioId });
+    
     return this.apollo
       .mutate<{ eliminarComentario: boolean }>({
         mutation: ELIMINAR_COMENTARIO,
         variables: { id, usuarioId }
       })
-      .pipe(map(result => result.data?.eliminarComentario ?? false));
+      .pipe(
+        map(result => {
+          console.log('✅ Comentario eliminado:', result.data?.eliminarComentario);
+          return result.data?.eliminarComentario ?? false;
+        })
+      );
+  }
+
+  buscarComentario(id: string): Observable<Comentario | null> {
+    return this.apollo
+      .query<{ buscarComentario: Comentario }>({
+        query: BUSCAR_COMENTARIO,
+        variables: { id }
+      })
+      .pipe(map(result => result.data?.buscarComentario ?? null));
+  }
+
+  buscarComentariosPorTexto(texto: string, usuarioId: string): Observable<Comentario[]> {
+    return this.apollo
+      .query<{ buscarComentariosPorTexto: Comentario[] }>({
+        query: BUSCAR_COMENTARIOS_POR_TEXTO,
+        variables: { texto, usuarioId }
+      })
+      .pipe(map(result => result.data?.buscarComentariosPorTexto ?? []));
+  }
+
+  // ✅ Método para contar comentarios de un usuario
+  contarComentariosPorUsuario(usuarioId: string): Observable<number> {
+    return this.apollo
+      .query<{ buscarComentariosPorUsuario: Comentario[] }>({
+        query: BUSCAR_COMENTARIOS_POR_USUARIO,
+        variables: { usuarioId },
+        fetchPolicy: 'network-only' // ✅ Siempre traer datos frescos
+      })
+      .pipe(
+        map(result => {
+          const comentarios = result.data?.buscarComentariosPorUsuario ?? [];
+          return comentarios.length;
+        }),
+        catchError(error => {
+          console.error('Error contando comentarios:', error);
+          return of(0);
+        })
+      );
+  }
+
+  // ✅ Método para obtener reportes donde el usuario comentó (CON DATOS REALES)
+  obtenerReportesComentados(usuarioId: string, page: number = 0, size: number = 10): Observable<any[]> {
+    return this.apollo
+      .query<{ buscarComentariosPorUsuario: Comentario[] }>({
+        query: BUSCAR_COMENTARIOS_POR_USUARIO,
+        variables: { usuarioId },
+        fetchPolicy: 'network-only' // ✅ Siempre traer datos frescos
+      })
+      .pipe(
+        map(result => {
+          const comentarios = result.data?.buscarComentariosPorUsuario ?? [];
+          // Obtener IDs únicos de reportes (queja_id)
+          const reporteIds = [...new Set(comentarios.map(c => c.queja_id))];
+          return reporteIds.slice(page * size, (page + 1) * size);
+        }),
+        switchMap(reporteIds => {
+          if (reporteIds.length === 0) {
+            return of([]);
+          }
+          
+          // ✅ Obtener los reportes reales por sus IDs
+          const reporteQueries = reporteIds.map(id => 
+            this.apollo.query<{ obtenerQuejaPorId: any }>({
+              query: OBTENER_QUEJA_POR_ID,
+              variables: { id, usuarioActualId: usuarioId },
+              fetchPolicy: 'network-only'
+            }).pipe(
+              map(result => result.data?.obtenerQuejaPorId),
+              catchError(error => {
+                console.error(`Error obteniendo reporte ${id}:`, error);
+                return of(null);
+              })
+            )
+          );
+          
+          return forkJoin(reporteQueries).pipe(
+            map(reportes => reportes.filter(r => r !== null))
+          );
+        }),
+        catchError(error => {
+          console.error('Error obteniendo reportes comentados:', error);
+          return of([]);
+        })
+      );
   }
 }

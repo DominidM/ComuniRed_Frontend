@@ -11,7 +11,6 @@
   margin-bottom: 40px;
 }
 
-
 .header-background {
   height: 120px;
   background: linear-gradient(135deg, #000000 0%, #000000 50%, #000000 100%);
@@ -31,8 +30,8 @@
 }
 
 .header-date {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 400;
 }
 
@@ -95,7 +94,6 @@
   gap: 24px;
 }
 
-/* Sección izquierda - Info */
 .user-info-section {
   display: flex;
   flex-direction: column;
@@ -116,7 +114,6 @@
   font-weight: 500;
 }
 
-/* Sección derecha - Stats */
 .stats-row {
   display: flex;
   gap: 0;
@@ -266,6 +263,163 @@
 }
 
 /* ========================================
+   ACTIVIDAD TAB
+   ======================================== */
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.activity-content {
+  width: 100%;
+}
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.activity-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.activity-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.activity-section-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.activity-count {
+  background: #000;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.empty-activity {
+  text-align: center;
+  padding: 2rem;
+  color: #a0aec0;
+  font-size: 0.95rem;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.activity-item:hover {
+  background: #f1f5f9;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.activity-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-info h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a202c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-info p {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.activity-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.activity-date,
+.activity-category {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.activity-date {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.activity-category {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* ========================================
    EMPTY STATE
    ======================================== */
 
@@ -293,6 +447,10 @@
 /* ========================================
    LOGROS
    ======================================== */
+
+.logros-content {
+  width: 100%;
+}
 
 .logros-grid {
   display: grid;
@@ -366,6 +524,10 @@
 /* ========================================
    ESTADÍSTICAS
    ======================================== */
+
+.estadisticas-content {
+  width: 100%;
+}
 
 .estadisticas-grid {
   display: grid;
@@ -702,6 +864,11 @@
     flex: 1 1 33.33%;
   }
 
+  /* ✅ Actividad responsive */
+  .activity-grid {
+    grid-template-columns: 1fr;
+  }
+
   .modal-content {
     width: 95%;
     max-height: 90vh;
@@ -763,5 +930,9 @@
   .btn-view-modal {
     width: 28px;
     height: 28px;
+  }
+
+  .tab-content {
+    padding: 20px;
   }
 }

@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,          // <-- necesario para ngModel usado en Navbar (si Navbar no es standalone/importa FormsModule)
+    FormsModule,
     SidebarComponent,
     RightbarComponent,
     NavbarComponent,
@@ -39,11 +39,13 @@ export class PublicComponent {
   }
 
   checkScreenSize() {
-    this.isDesktop = window.innerWidth > 900;
+    this.isDesktop = window.innerWidth > 768; // ✅ Cambiado de 900 a 768
   }
+
   get sidenavMode(): 'side' | 'over' {
     return this.isDesktop ? 'side' : 'over';
   }
+
   get sidenavOpened(): boolean {
     return this.isDesktop;
   }

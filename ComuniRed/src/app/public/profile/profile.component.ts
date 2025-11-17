@@ -3,6 +3,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
 import { SeguimientoService, Seguimiento } from '../../services/seguimiento.service';
+import { QuejaService } from '../../services/queja.service'; // ✅ QuejaService
+import { ComentarioService } from '../../services/comentario.service';
 
 @Component({
   selector: 'app-profile',
@@ -29,6 +31,13 @@ export class ProfileComponent implements OnInit {
   seguidosCount: number = 0;
   loading: boolean = false;
 
+  // Actividad
+  misQuejas: any[] = []; // ✅ misQuejas
+  quejasComentadas: any[] = []; // ✅ quejasComentadas
+  cantidadQuejas: number = 0; // ✅ cantidadQuejas
+  cantidadComentarios: number = 0;
+  loadingActividad: boolean = false;
+
   mostrarModalSeguidores: boolean = false;
   mostrarModalSeguidos: boolean = false;
 
@@ -39,6 +48,8 @@ export class ProfileComponent implements OnInit {
   constructor(
     private usuarioService: UsuarioService,
     private seguimientoService: SeguimientoService,
+    private quejaService: QuejaService, // ✅ QuejaService
+    private comentarioService: ComentarioService,
     private router: Router
   ) {}
 
@@ -56,6 +67,7 @@ export class ProfileComponent implements OnInit {
       };
       
       this.cargarContadores();
+      this.cargarActividad();
     } else {
       this.user = {
         id: '',
@@ -94,6 +106,49 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  // ✅ Cargar quejas y comentarios del usuario
+  cargarActividad() {
+    if (!this.user?.id) return;
+
+    this.loadingActividad = true;
+
+    // ✅ Cargar quejas del usuario usando quejasPorUsuario
+    this.quejaService.quejasPorUsuario(this.user.id, this.user.id).subscribe({
+      next: (quejas: any[]) => {
+        this.misQuejas = quejas || [];
+        this.cantidadQuejas = quejas?.length || 0;
+      },
+      error: (error: any) => {
+        console.error('Error cargando quejas:', error);
+        this.misQuejas = [];
+      }
+    });
+
+
+    // ✅ Cargar quejas donde el usuario comentó
+    this.comentarioService.obtenerReportesComentados(this.user.id, 0, 10).subscribe({
+      next: (quejas: any[]) => {
+        this.quejasComentadas = quejas;
+        this.loadingActividad = false;
+      },
+      error: (error) => {
+        console.error('Error cargando quejas comentadas:', error);
+        this.quejasComentadas = [];
+        this.loadingActividad = false;
+      }
+    });
+
+    // ✅ Contar comentarios
+    this.comentarioService.contarComentariosPorUsuario(this.user.id).subscribe({
+      next: (count: number) => {
+        this.cantidadComentarios = count;
+      },
+      error: (error) => {
+        console.error('Error contando comentarios:', error);
+      }
+    });
+  }
+
   verSeguidores() {
     if (!this.user?.id) return;
 
@@ -104,7 +159,7 @@ export class ProfileComponent implements OnInit {
     this.seguimientoService
       .obtenerSeguidores(this.user.id, 0, 50)
       .subscribe({
-        next: (pageData) => {
+        next: (pageData: any) => {
           const seguimientosSeguidores = pageData.content;
           
           seguimientosSeguidores.forEach((seg: Seguimiento) => {
@@ -139,7 +194,7 @@ export class ProfileComponent implements OnInit {
     this.seguimientoService
       .obtenerSeguidos(this.user.id, 0, 50)
       .subscribe({
-        next: (pageData) => {
+        next: (pageData: any) => {
           const seguimientosSeguidos = pageData.content;
           
           seguimientosSeguidos.forEach((seg: Seguimiento) => {
@@ -190,6 +245,11 @@ export class ProfileComponent implements OnInit {
 
   verPerfil(usuario: Usuario) {
     this.router.navigate(['/public/user-profile', usuario.id]);
+  }
+
+  // ✅ Ver detalle de la queja
+  verQueja(queja: any) {
+    this.router.navigate(['/public/feed/queja', queja.id]);
   }
 
   obtenerFoto(foto_perfil?: string): string {

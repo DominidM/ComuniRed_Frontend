@@ -1,4 +1,5 @@
 <div class="settings-container">
+  <!-- ========== PROFILE HEADER ========== -->
   <div class="profile-header">
     <div class="header-background">
       <div class="header-meta">
@@ -39,9 +40,10 @@
     </div>
   </div>
 
+  <!-- ========== STATS CARDS ========== -->
   <div class="stats-container">
     <div class="stat-card">
-      <div class="stat-number">2</div>
+      <div class="stat-number">{{ cantidadQuejas }}</div>
       <div class="stat-label">Reportes</div>
     </div>
     <div class="stat-card">
@@ -49,15 +51,16 @@
       <div class="stat-label">Resueltos</div>
     </div>
     <div class="stat-card">
-      <div class="stat-number">249</div>
-      <div class="stat-label">Reacciones</div>
+      <div class="stat-number">{{ cantidadComentarios }}</div>
+      <div class="stat-label">Comentarios</div>
     </div>
     <div class="stat-card">
-      <div class="stat-number">39</div>
-      <div class="stat-label">Comentarios</div>
+      <div class="stat-number">0</div>
+      <div class="stat-label">Reacciones</div>
     </div>
   </div>
 
+  <!-- ========== TABS SECTION ========== -->
   <div class="tabs-section">
     <div class="tabs-header">
       <button 
@@ -81,13 +84,76 @@
     </div>
 
     <div class="tab-content">
+      <!-- ========== TAB ACTIVIDAD ========== -->
       <div *ngIf="currentTab === 'actividad'" class="activity-content">
-        <div class="empty-state">
-          <div class="empty-icon">📈</div>
-          <p>Tu actividad reciente aparecerá aquí</p>
+        <!-- Loading -->
+        <div *ngIf="loadingActividad" class="loading-state">
+          <div class="spinner"></div>
+          <p>Cargando actividad...</p>
+        </div>
+
+        <!-- Contenido -->
+        <div *ngIf="!loadingActividad" class="activity-grid">
+          <!-- Mis Reportes -->
+          <div class="activity-section">
+            <div class="activity-section-header">
+              <h3>📋 Mis Reportes</h3>
+              <span class="activity-count">{{ cantidadQuejas }}</span>
+            </div>
+
+            <div *ngIf="misQuejas.length === 0" class="empty-activity">
+              <p>No has creado reportes aún</p>
+            </div>
+
+            <div *ngIf="misQuejas.length > 0" class="activity-list">
+              <div 
+                *ngFor="let queja of misQuejas" 
+                class="activity-item"
+                (click)="verQueja(queja)">
+                <div class="activity-icon">📌</div>
+                <div class="activity-info">
+                  <h4>{{ queja.titulo }}</h4>
+                  <p>{{ queja.descripcion?.slice(0, 80) }}{{ queja.descripcion?.length > 80 ? '...' : '' }}</p>
+                  <div class="activity-meta">
+                    <span class="activity-date">{{ queja.fecha_creacion | date:'dd/MM/yyyy' }}</span>
+                    <span class="activity-category" *ngIf="queja.categoria">{{ queja.categoria.nombre }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reportes Comentados -->
+          <div class="activity-section">
+            <div class="activity-section-header">
+              <h3>💬 Reportes Comentados</h3>
+              <span class="activity-count">{{ cantidadComentarios }}</span>
+            </div>
+
+            <div *ngIf="quejasComentadas.length === 0" class="empty-activity">
+              <p>No has comentado en reportes aún</p>
+            </div>
+
+            <div *ngIf="quejasComentadas.length > 0" class="activity-list">
+              <div 
+                *ngFor="let queja of quejasComentadas" 
+                class="activity-item"
+                (click)="verQueja(queja)">
+                <div class="activity-icon">💬</div>
+                <div class="activity-info">
+                  <h4>{{ queja.titulo }}</h4>
+                  <p>{{ queja.descripcion?.slice(0, 80) }}{{ queja.descripcion?.length > 80 ? '...' : '' }}</p>
+                  <div class="activity-meta">
+                    <span class="activity-date">{{ queja.fecha_creacion | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- ========== TAB LOGROS ========== -->
       <div *ngIf="currentTab === 'logros'" class="logros-content">
         <div class="logros-grid">
           <div class="logro-card" [class.unlocked]="true">
@@ -128,6 +194,7 @@
         </div>
       </div>
 
+      <!-- ========== TAB ESTADÍSTICAS ========== -->
       <div *ngIf="currentTab === 'estadisticas'" class="estadisticas-content">
         <div class="estadisticas-grid">
           <div class="estadistica-section">
@@ -135,11 +202,11 @@
             <div class="estadistica-items">
               <div class="estadistica-item">
                 <span class="estadistica-label">Total de reacciones</span>
-                <span class="estadistica-value">249</span>
+                <span class="estadistica-value">0</span>
               </div>
               <div class="estadistica-item">
                 <span class="estadistica-label">Total de comentarios</span>
-                <span class="estadistica-value">39</span>
+                <span class="estadistica-value">{{ cantidadComentarios }}</span>
               </div>
               <div class="estadistica-item">
                 <span class="estadistica-label">Tasa de resolución</span>
@@ -152,16 +219,16 @@
             <h3>Participación</h3>
             <div class="estadistica-items">
               <div class="estadistica-item">
-                <span class="estadistica-label">Reportes este mes</span>
-                <span class="estadistica-value">3</span>
+                <span class="estadistica-label">Reportes totales</span>
+                <span class="estadistica-value">{{ cantidadQuejas }}</span>
               </div>
               <div class="estadistica-item">
-                <span class="estadistica-label">Promedio semanal</span>
-                <span class="estadistica-value">1.2</span>
+                <span class="estadistica-label">Comentarios totales</span>
+                <span class="estadistica-value">{{ cantidadComentarios }}</span>
               </div>
               <div class="estadistica-item">
                 <span class="estadistica-label">Racha actual</span>
-                <span class="estadistica-value" style="color: #f97316;">5 días 🔥</span>
+                <span class="estadistica-value" style="color: #f97316;">0 días</span>
               </div>
             </div>
           </div>
@@ -170,6 +237,7 @@
     </div>
   </div>
 
+  <!-- ========== MODAL SEGUIDORES ========== -->
   <div class="modal-overlay" *ngIf="mostrarModalSeguidores" (click)="cerrarModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -211,6 +279,7 @@
     </div>
   </div>
 
+  <!-- ========== MODAL SEGUIDOS ========== -->
   <div class="modal-overlay" *ngIf="mostrarModalSeguidos" (click)="cerrarModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">

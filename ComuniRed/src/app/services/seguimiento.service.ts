@@ -5,9 +5,6 @@ import { map, tap } from 'rxjs/operators';
 import { gql } from 'apollo-angular';
 import { Usuario, UsuarioPage } from './usuario.service';
 
-// ========================================
-// INTERFACES
-// ========================================
 
 export interface EstadoSeguimiento {
   estaSiguiendo: boolean;
@@ -34,10 +31,6 @@ export interface SeguimientoPage {
   number: number;
   size: number;
 }
-
-// ========================================
-// QUERIES
-// ========================================
 
 const USUARIOS_SUGERIDOS = gql`
   query UsuariosSugeridos($usuarioId: ID!, $page: Int!, $size: Int!) {
@@ -126,10 +119,6 @@ const CONTAR_SEGUIDOS = gql`
   }
 `;
 
-// ========================================
-// MUTATIONS
-// ========================================
-
 const ENVIAR_SOLICITUD = gql`
   mutation EnviarSolicitud($seguidorId: ID!, $seguidoId: ID!) {
     enviarSolicitudSeguimiento(seguidorId: $seguidorId, seguidoId: $seguidoId) {
@@ -171,10 +160,6 @@ export class SeguimientoService {
 
   constructor(private apollo: Apollo) {}
 
-  // ========================================
-  // BÚSQUEDA Y SUGERENCIAS
-  // ========================================
-
   obtenerUsuariosSugeridos(usuarioId: string, page: number, size: number): Observable<UsuarioPage> {
     return this.apollo.watchQuery<{ usuariosSugeridos: UsuarioPage }>({
       query: USUARIOS_SUGERIDOS,
@@ -207,9 +192,6 @@ export class SeguimientoService {
     );
   }
 
-  // ========================================
-  // ESTADO DE SEGUIMIENTO
-  // ========================================
 
   obtenerEstadoSeguimiento(usuarioActualId: string, otroUsuarioId: string): Observable<EstadoSeguimiento> {
     return this.apollo.watchQuery<{ estadoSeguimiento: EstadoSeguimiento }>({
@@ -227,9 +209,6 @@ export class SeguimientoService {
     );
   }
 
-  // ========================================
-  // LISTAS DE SEGUIMIENTO
-  // ========================================
 
   obtenerSeguidores(usuarioId: string, page: number, size: number): Observable<SeguimientoPage> {
     return this.apollo.watchQuery<{ seguidoresDe: SeguimientoPage }>({
@@ -315,9 +294,6 @@ export class SeguimientoService {
     );
   }
 
-  // ========================================
-  // ACCIONES DE SEGUIMIENTO
-  // ========================================
 
   enviarSolicitud(seguidorId: string, seguidoId: string): Observable<Seguimiento> {
     return this.apollo.mutate<{ enviarSolicitudSeguimiento: Seguimiento }>({

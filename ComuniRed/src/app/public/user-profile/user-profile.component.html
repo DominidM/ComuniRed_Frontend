@@ -12,19 +12,38 @@
     </div>
     
     <div class="profile-info">
+      <!-- ✅ AVATAR -->
       <div class="avatar">
         <img [src]="urlFotoPerfil" alt="Foto de perfil" class="avatar-img" />
       </div>
     
+      <!-- ✅ CONTENIDO: IZQUIERDA (INFO) + DERECHA (STATS + BOTONES) -->
       <div class="profile-content">
+        <!-- ✅ IZQUIERDA: INFO DEL USUARIO -->
         <div class="user-info-section">
           <h1 class="user-name">{{ usuario.nombre }} {{ usuario.apellido }}</h1>
           <p class="user-location" *ngIf="usuario.distrito">📍 {{ usuario.distrito }}</p>
           <p class="user-age" *ngIf="calcularEdad() as edad">🎂 {{ edad }} años</p>
         </div>
-        
-        <div class="actions-and-stats">
-          <!-- Botones de acción -->
+
+        <!-- ✅ DERECHA: STATS + BOTONES -->
+        <div class="right-section">
+          <!-- ✅ STATS ARRIBA -->
+          <div class="stats-row">
+            <button class="stat-item stat-clickable" (click)="verSeguidores()">
+              <span class="stat-number">{{ seguidoresCount }}</span>
+              <span class="stat-label">seguidores</span>
+            </button>
+            
+            <div class="stat-divider"></div>
+            
+            <button class="stat-item stat-clickable" (click)="verSeguidos()">
+              <span class="stat-number">{{ seguidosCount }}</span>
+              <span class="stat-label">seguidos</span>
+            </button>
+          </div>
+
+          <!-- ✅ BOTONES ABAJO -->
           <div class="action-buttons">
             <button 
               class="btn-action btn-primary"
@@ -40,27 +59,12 @@
               💬 Mensaje
             </button>
           </div>
-
-          <!-- Stats -->
-          <div class="stats-row">
-            <button class="stat-item stat-clickable" (click)="verSeguidores()">
-              <span class="stat-number">{{ seguidoresCount }}</span>
-              <span class="stat-label">seguidores</span>
-            </button>
-            
-            <div class="stat-divider"></div>
-            
-            <button class="stat-item stat-clickable" (click)="verSeguidos()">
-              <span class="stat-number">{{ seguidosCount }}</span>
-              <span class="stat-label">seguidos</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Stats Cards (placeholder) -->
+  <!-- Stats Cards -->
   <div class="stats-container">
     <div class="stat-card">
       <div class="stat-number">0</div>
@@ -127,7 +131,7 @@
     </div>
   </div>
 
-  <!-- Modal Seguidores -->
+  <!-- Modales (sin cambios) -->
   <div class="modal-overlay" *ngIf="mostrarModalSeguidores" (click)="cerrarModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -169,7 +173,6 @@
     </div>
   </div>
 
-  <!-- Modal Seguidos -->
   <div class="modal-overlay" *ngIf="mostrarModalSeguidos" (click)="cerrarModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -212,7 +215,6 @@
   </div>
 </div>
 
-<!-- Loading -->
 <div *ngIf="cargando" class="loading-container">
   <div class="loading-spinner"></div>
   <p>Cargando perfil...</p>

@@ -45,7 +45,6 @@ export class RolService {
     );
   }
 
-  // Helper: obtener todos los roles (sin paginar) — usado por el frontend para selects
   obtenerTodosLosRoles(): Observable<Rol[]> {
     console.log('[RolService] Ejecutando query obtenerTodosLosRoles...');
     return this.apollo.query<{ obtenerTodosLosRoles: Rol[] }>({

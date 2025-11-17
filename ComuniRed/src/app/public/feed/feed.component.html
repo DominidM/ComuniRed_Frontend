@@ -1,4 +1,3 @@
-<!-- Feed main container -->
 <div class="feed-container">
   
   <!-- Toast Notification -->
@@ -11,53 +10,7 @@
     <div class="spinner"></div>
   </div>
 
-  <!-- Barra de búsqueda y filtros -->
-  <div class="filters-bar card">
-    <div class="search-container">
-      <input 
-        type="text" 
-        class="search-input"
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearchChange()"
-        placeholder="🔍 Buscar reportes..."
-      />
-    </div>
-
-    <div class="filters-row">
-      <select 
-        class="filter-select"
-        [(ngModel)]="selectedCategory"
-        (ngModelChange)="onCategoryFilterChange()"
-      >
-        <option value="">Todas las categorías</option>
-        <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</option>
-      </select>
-
-      <select 
-        class="filter-select"
-        [(ngModel)]="sortBy"
-        (ngModelChange)="onSortChange()"
-      >
-        <option value="recent">Más recientes</option>
-        <option value="popular">Más populares</option>
-        <option value="votes">Más votados</option>
-      </select>
-
-      <button 
-        *ngIf="searchTerm || selectedCategory || sortBy !== 'recent'" 
-        class="btn-clear-filters"
-        (click)="clearFilters()"
-      >
-        ✕ Limpiar
-      </button>
-
-      <button class="btn-refresh" (click)="refreshPosts()" title="Actualizar">
-        🔄
-      </button>
-    </div>
-  </div>
-
-  <!-- Create / report card (top) -->
+  <!-- Crear Reporte -->
   <div class="create-card card">
     <div class="create-top">
       <div class="create-avatar">
@@ -72,17 +25,17 @@
 
     <div class="create-actions">
       <button class="create-action" type="button" (click)="openCreateReportWithMedia()">
-        <span class="create-icon">🖼️</span>
+        <i class="bi bi-image create-icon"></i>
         <span>Foto/Video</span>
       </button>
       <button class="create-action" type="button" (click)="openCreateReportWithLocation()">
-        <span class="create-icon">📍</span>
+        <i class="bi bi-geo-alt-fill create-icon"></i>
         <span>Ubicación</span>
       </button>
     </div>
   </div>
 
-  <!-- Modal para crear queja -->
+  <!-- Modal Crear Reporte -->
   <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
     <div class="modal-container" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -196,7 +149,7 @@
     </div>
   </div>
 
-  <!-- Modal para editar queja -->
+  <!-- Modal Editar Reporte -->
   <div *ngIf="showEditModal && editingQueja" class="modal-overlay" (click)="closeEditModal()">
     <div class="modal-container" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -253,10 +206,10 @@
 
   <!-- Posts -->
   <ng-container *ngIf="displayedPosts.length > 0; else emptyState">
-    <div *ngFor="let post of displayedPosts; trackBy: trackByPostId" class="post-card">
+    <div *ngFor="let post of getPaginatedPosts(); trackBy: trackByPostId" class="post-card">
       
+      <!-- Header del Post -->
       <div class="post-header">
-        <!-- ✅ FOTO CLICKEABLE -->
         <div class="avatar-container" (click)="verPerfilUsuario(post.usuario)">
           <img [src]="getAvatarUrl(post)" [alt]="getAuthorName(post)" class="avatar clickable" />
         </div>
@@ -264,7 +217,6 @@
         <div class="post-info">
           <div class="post-title-row">
             <div>
-              <!-- ✅ NOMBRE CLICKEABLE -->
               <div class="post-author clickable" (click)="verPerfilUsuario(post.usuario)">
                 {{ getAuthorName(post) }}
               </div>
@@ -277,7 +229,7 @@
               </div>
             </div>
 
-            <!-- Menú de opciones -->
+            <!-- Menú de 3 puntos -->
             <div class="post-menu-container">
               <button class="post-menu" aria-label="Más opciones" (click)="post.showMenu = !post.showMenu">⋯</button>
               
@@ -313,14 +265,10 @@
             <span class="tag category-tag">{{ getCategoryName(post) }}</span>
             <span *ngIf="post.estado?.nombre" class="tag status-tag">{{ post.estado?.nombre }}</span>
           </div>
-
-          <div *ngIf="hasLocation(post)" class="post-location-line">
-            <span class="location-icon">📍</span>
-            <span class="location-text">{{ getLocation(post) }}</span>
-          </div>
         </div>
       </div>
 
+      <!-- Imagen -->
       <div class="post-image-wrapper">
         <ng-container *ngIf="hasEvidence(post) || post.imagen_url; else imagePlaceholder">
           <img [src]="getFirstEvidenceUrl(post)" [alt]="getTitle(post)" class="post-image" />
@@ -333,7 +281,7 @@
         </ng-template>
       </div>
 
-      <!-- Vote section -->
+      <!-- Votos -->
       <div *ngIf="hasVotes(post)" class="vote-section">
         <div class="vote-question">
           ¿Estás de acuerdo con este reporte?
@@ -361,55 +309,75 @@
         </div>
       </div>
 
-      <!-- Reactions bar -->
+      <!-- Reacciones con menú estilo Facebook -->
       <div class="reactions-bar">
-        <button 
-          class="reaction-btn" 
-          [class.active]="post.reactions.userReaction === 'like'"
-          (click)="toggleReaction(post, 'like')"
-          title="Me gusta"
-        >
-          {{ post.reactions.userReaction === 'like' ? '❤️' : '🤍' }}
-          <span class="count">{{ getReactionCount(post, 'like') }}</span>
-        </button>
+        <div class="reaction-picker-container">
+          <button 
+            class="reaction-btn main-reaction" 
+            [class.active]="post.reactions.userReaction"
+            (click)="toggleReactionMenu(post.id, $event)"
+            title="Reaccionar"
+          >
+            <i [class]="post.reactions.userReaction === 'like' ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+            <span class="count">{{ post.reactions.total || 0 }}</span>
+          </button>
 
-        <button 
-          class="reaction-btn" 
-          [class.active]="post.reactions.userReaction === 'love'"
-          (click)="toggleReaction(post, 'love')"
-          title="Love"
-        >
-          {{ post.reactions.userReaction === 'love' ? '💖' : '🩶' }}
-          <span class="count">{{ getReactionCount(post, 'love') }}</span>
-        </button>
+          <!-- Menú de reacciones -->
+          <div *ngIf="showReactionMenu[post.id]" class="reactions-menu" (click)="$event.stopPropagation()">
+            <button class="reaction-option reaction-like" 
+                    (click)="selectReaction(post, 'like', $event)"
+                    [class.selected]="post.reactions.userReaction === 'like'">
+              <span class="emoji">❤️</span>
+              <span class="label">Me gusta</span>
+              <span class="count-small">{{ getReactionCount(post, 'like') }}</span>
+            </button>
+            
+            <button class="reaction-option reaction-love" 
+                    (click)="selectReaction(post, 'love', $event)"
+                    [class.selected]="post.reactions.userReaction === 'love'">
+              <span class="emoji">😍</span>
+              <span class="label">Me encanta</span>
+              <span class="count-small">{{ getReactionCount(post, 'love') }}</span>
+            </button>
+            
+            <button class="reaction-option reaction-wow" 
+                    (click)="selectReaction(post, 'wow', $event)"
+                    [class.selected]="post.reactions.userReaction === 'wow'">
+              <span class="emoji">😮</span>
+              <span class="label">Me asombra</span>
+              <span class="count-small">{{ getReactionCount(post, 'wow') }}</span>
+            </button>
+            
+            <button class="reaction-option reaction-helpful" 
+                    (click)="selectReaction(post, 'helpful', $event)"
+                    [class.selected]="post.reactions.userReaction === 'helpful'">
+              <span class="emoji">👍</span>
+              <span class="label">Útil</span>
+              <span class="count-small">{{ getReactionCount(post, 'helpful') }}</span>
+            </button>
+            
+            <button class="reaction-option reaction-dislike" 
+                    (click)="selectReaction(post, 'dislike', $event)"
+                    [class.selected]="post.reactions.userReaction === 'dislike'">
+              <span class="emoji">👎</span>
+              <span class="label">No me gusta</span>
+              <span class="count-small">{{ getReactionCount(post, 'dislike') }}</span>
+            </button>
+          </div>
+        </div>
 
-        <button 
-          class="reaction-btn" 
-          [class.active]="post.reactions.userReaction === 'wow'"
-          (click)="toggleReaction(post, 'wow')"
-          title="Wow"
-        >
-          {{ post.reactions.userReaction === 'wow' ? '😮' : '😐' }}
-          <span class="count">{{ getReactionCount(post, 'wow') }}</span>
-        </button>
-
-        <button 
-          class="reaction-btn" 
-          [class.active]="post.reactions.userReaction === 'helpful'"
-          (click)="toggleReaction(post, 'helpful')"
-          title="Útil"
-        >
-          {{ post.reactions.userReaction === 'helpful' ? '👍' : '👎' }}
-          <span class="count">{{ getReactionCount(post, 'helpful') }}</span>
+        <button class="reaction-btn" (click)="toggleComments(post)">
+          <i class="bi bi-chat-left-text"></i>
+          <span class="count">{{ getCommentsCount(post) }}</span>
         </button>
       </div>
 
-      <!-- Actions row -->
+      <!-- Acciones adicionales -->
       <div class="post-actions">
         <div class="left-actions">
           <button class="action-btn" (click)="toggleComments(post)">
             <span class="action-emoji">💬</span>
-            <span class="action-text">{{ post.commentsCount || (post.comments.length || 0) }}</span>          
+            <span class="action-text">Comentar</span>
           </button>
         </div>
 
@@ -423,79 +391,87 @@
             <span class="action-emoji">📤</span>
             <span class="action-text">Compartir</span>
           </button>
-
-          <button class="action-btn" (click)="downloadPostJson(post)">
-            <span class="action-emoji">⬇️</span>
-            <span class="action-text">JSON</span>
-          </button>
         </div>
       </div>
 
-      <!-- Comments -->
+      <!-- Sección de comentarios (solo 3 preview) -->
       <div *ngIf="getShowComments(post)" class="comments-section">
-        <div *ngFor="let comment of post.comments || []; trackBy: trackByComment" class="comment-wrapper">
-          <div *ngIf="editingCommentId !== comment.id" class="comment">
-            <!-- ✅ FOTO + NOMBRE CLICKEABLE -->
-            <div class="comment-header">
-              <img 
-                [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
-                [alt]="getCommentAuthor(comment)"
-                class="comment-avatar clickable"
-                (click)="verPerfilUsuario(comment.author)"
-              />
-              <strong 
-                class="comment-author clickable" 
-                (click)="verPerfilUsuario(comment.author)"
-              >
-                {{ getCommentAuthor(comment) }}
-              </strong>
-            </div>
+        <div class="comments-list-preview">
+          <div *ngFor="let comment of getPreviewComments(post); trackBy: trackByComment" 
+               class="comment-item-preview">
             
-            <div class="comment-text">
-              {{ getCommentText(comment) }}
-            </div>
+            <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
+                 [alt]="getCommentAuthor(comment)" 
+                 class="comment-avatar-preview clickable"
+                 (click)="verPerfilUsuario(comment.author)" />
             
-            <div *ngIf="canEditComment(comment)" class="comment-actions">
-              <button class="comment-action-btn" (click)="startEditComment(comment)">✏️</button>
-              <button class="comment-action-btn danger" (click)="deleteComment(post, comment.id)">🗑️</button>
+            <div class="comment-content-preview">
+              <div class="comment-header-preview">
+                <strong class="comment-author-preview clickable" 
+                        (click)="verPerfilUsuario(comment.author)">
+                  {{ getCommentAuthor(comment) }}
+                </strong>
+                <span class="comment-date-preview">{{ formatCommentDate(comment.fecha_creacion) }}</span>
+                <span *ngIf="comment.fecha_modificacion" class="edited-badge-tiny">
+                  <i class="bi bi-pencil-fill"></i>
+                </span>
+              </div>
+              <p class="comment-text-preview">{{ comment.texto }}</p>
+            </div>
+
+            <!-- Menú de 3 puntos -->
+            <div class="comment-menu-container" *ngIf="canEditComment(comment)">
+              <button class="comment-menu-btn" 
+                      (click)="$event.stopPropagation(); showCommentMenuModal[comment.id] = !showCommentMenuModal[comment.id]">
+                <i class="bi bi-three-dots"></i>
+              </button>
+              <div *ngIf="showCommentMenuModal[comment.id]" 
+                   class="comment-menu-dropdown" 
+                   (click)="$event.stopPropagation()">
+                <button class="comment-menu-item" 
+                        (click)="openCommentsModal(post); startEditComment(comment); showCommentMenuModal[comment.id] = false">
+                  <i class="bi bi-pencil"></i> Editar
+                </button>
+                <button class="comment-menu-item danger" 
+                        (click)="deleteComment(post, comment.id); showCommentMenuModal[comment.id] = false">
+                  <i class="bi bi-trash"></i> Eliminar
+                </button>
+              </div>
             </div>
           </div>
 
-          <div *ngIf="editingCommentId === comment.id" class="comment-edit">
-            <input 
-              type="text" 
-              class="comment-edit-input"
-              [(ngModel)]="editingCommentText"
-              (keyup.enter)="saveEditComment(post)"
-              (keyup.escape)="cancelEditComment()"
-            />
-            <div class="comment-edit-actions">
-              <button class="btn-comment-save" (click)="saveEditComment(post)">✓</button>
-              <button class="btn-comment-cancel" (click)="cancelEditComment()">✕</button>
-            </div>
-          </div>
+          <!-- Botón ver todos -->
+          <button *ngIf="hasMoreComments(post)" 
+                  class="view-all-modal-btn" 
+                  (click)="openCommentsModal(post)">
+            Ver todos los comentarios ({{ getCommentsCount(post) }})
+          </button>
         </div>
 
+        <!-- Input para agregar comentario -->
         <div class="comment-input-container">
-          <input
-            #commentInput
-            type="text"
-            class="comment-input"
+          <img [src]="user?.avatarUrl || 'assets/img/default-avatar.png'" class="comment-avatar-preview" />
+          <input 
+            type="text" 
+            [(ngModel)]="commentTexts[post.id]"
             placeholder="Escribe un comentario..."
-            (keyup.enter)="addComment(post, commentInput.value); commentInput.value = ''"
+            class="comment-input-preview"
+            (keyup.enter)="addComment(post, commentTexts[post.id] || '')"
           />
           <button 
-            class="btn-send-comment"
-            (click)="addComment(post, commentInput.value); commentInput.value = ''"
+            class="btn-send-preview"
+            (click)="addComment(post, commentTexts[post.id] || '')"
+            [disabled]="!(commentTexts[post.id] || '').trim()"
           >
-            ➤
+            <i class="bi bi-send-fill"></i>
           </button>
         </div>
       </div>
+
     </div>
   </ng-container>
 
-  <!-- Empty state -->
+  <!-- Estado vacío -->
   <ng-template #emptyState>
     <div class="no-posts">
       <div class="no-posts-inner">
@@ -509,4 +485,151 @@
       </div>
     </div>
   </ng-template>
+
+  <!-- MODAL DE COMENTARIOS -->
+  <div *ngIf="showCommentsModal" class="modal-overlay" (click)="closeCommentsModal()">
+    <div class="modal-comments" (click)="$event.stopPropagation()">
+      <div class="modal-header-comments">
+        <h3><i class="bi bi-chat-left-text"></i> Conversaciones</h3>
+        <button class="modal-close-btn" (click)="closeCommentsModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body-comments">
+        <div *ngIf="selectedReporteForComments">
+          <div class="report-summary">
+            <strong>{{ selectedReporteForComments.titulo }}</strong>
+            <span class="comments-count-modal">
+              {{ getCommentsCount(selectedReporteForComments) }} 
+              {{ getCommentsCount(selectedReporteForComments) === 1 ? 'comentario' : 'comentarios' }}
+            </span>
+          </div>
+
+          <div class="comments-list-modal">
+            <div *ngFor="let comment of selectedReporteForComments.comments || []; trackBy: trackByComment" 
+                 class="comment-item-modal">
+              
+              <div *ngIf="editingCommentId !== comment.id" class="comment-display-modal">
+                <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
+                     [alt]="getCommentAuthor(comment)" 
+                     class="comment-avatar-modal clickable"
+                     (click)="verPerfilUsuario(comment.author)" />
+                
+                <div class="comment-content-modal">
+                  <div class="comment-header-modal">
+                    <div class="comment-header-left">
+                      <strong class="comment-author-modal clickable" 
+                              (click)="verPerfilUsuario(comment.author)">
+                        {{ getCommentAuthor(comment) }}
+                      </strong>
+                      <span class="comment-date-modal">{{ formatCommentDate(comment.fecha_creacion) }}</span>
+                      <span *ngIf="comment.fecha_modificacion" class="edited-badge-small">
+                        <i class="bi bi-pencil-fill"></i>
+                      </span>
+                    </div>
+
+                    <!-- Menú de 3 puntos en modal -->
+                    <div class="comment-menu-modal-container" *ngIf="canEditComment(comment)">
+                      <button class="comment-menu-modal-btn" 
+                              (click)="$event.stopPropagation(); showCommentMenuModal[comment.id] = !showCommentMenuModal[comment.id]">
+                        <i class="bi bi-three-dots"></i>
+                      </button>
+                      <div *ngIf="showCommentMenuModal[comment.id]" 
+                           class="comment-menu-modal-dropdown" 
+                           (click)="$event.stopPropagation()">
+                        <button class="comment-menu-modal-item" 
+                                (click)="startEditComment(comment); showCommentMenuModal[comment.id] = false">
+                          <i class="bi bi-pencil"></i> Editar
+                        </button>
+                        <button class="comment-menu-modal-item danger" 
+                                (click)="deleteCommentModal(comment); showCommentMenuModal[comment.id] = false">
+                          <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <p class="comment-text-modal">{{ comment.texto }}</p>
+                </div>
+              </div>
+
+              <div *ngIf="editingCommentId === comment.id" class="comment-edit-modal-full">
+                <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
+                     class="comment-avatar-modal" />
+                <div class="comment-edit-wrapper-modal">
+                  <input type="text" 
+                         class="comment-edit-input-modal"
+                         [(ngModel)]="editingCommentText"
+                         (keyup.enter)="saveEditCommentModal()"
+                         (keyup.escape)="cancelEditComment()" />
+                  <div class="comment-edit-actions-modal">
+                    <button class="btn-save-modal" (click)="saveEditCommentModal()">
+                      <i class="bi bi-check-lg"></i>
+                    </button>
+                    <button class="btn-cancel-modal" (click)="cancelEditComment()">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="!selectedReporteForComments.comments || selectedReporteForComments.comments.length === 0" 
+                 class="no-comments">
+              <i class="bi bi-chat-left"></i>
+              <p>Sé el primero en comentar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer-comments">
+        <img [src]="user?.avatarUrl || 'assets/img/default-avatar.png'" class="comment-avatar-modal" />
+        <input type="text" 
+               [(ngModel)]="newCommentText" 
+               placeholder="Escribe un comentario..." 
+               class="comment-input-modal"
+               (keyup.enter)="addCommentModal()" />
+        <button class="btn-send-modal" (click)="addCommentModal()" [disabled]="!newCommentText.trim()">
+          <i class="bi bi-send-fill"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paginación -->
+  <div *ngIf="getTotalPages() > 1" class="pagination-container">
+    <button class="pagination-btn" 
+            [disabled]="currentPage === 1" 
+            (click)="prevPage()">
+      <i class="bi bi-chevron-left"></i>
+      Anterior
+    </button>
+
+    <div class="pagination-numbers">
+      <button *ngFor="let page of getPageNumbers()" 
+              class="pagination-number" 
+              [class.active]="page === currentPage"
+              [class.ellipsis]="page === -1"
+              [disabled]="page === -1"
+              (click)="page !== -1 && goToPage(page)">
+        {{ page === -1 ? '...' : page }}
+      </button>
+    </div>
+
+    <button class="pagination-btn" 
+            [disabled]="currentPage === getTotalPages()" 
+            (click)="nextPage()">
+      Siguiente
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+
+  <div *ngIf="getTotalPages() > 1" class="pagination-info">
+    Mostrando {{ (currentPage - 1) * reportsPerPage + 1 }} - 
+    {{ Math.min(currentPage * reportsPerPage, totalReports) }} 
+    de {{ totalReports }} reportes
+  </div>
+
 </div>
