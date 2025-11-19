@@ -40,7 +40,6 @@
     </div>
   </div>
 
-  <!-- ========== STATS CARDS ========== -->
   <div class="stats-container">
     <div class="stat-card">
       <div class="stat-number">{{ cantidadQuejas }}</div>
@@ -55,7 +54,7 @@
       <div class="stat-label">Comentarios</div>
     </div>
     <div class="stat-card">
-      <div class="stat-number">0</div>
+      <div class="stat-number">{{ cantidadReacciones }}</div>
       <div class="stat-label">Reacciones</div>
     </div>
   </div>
@@ -200,9 +199,10 @@
           <div class="estadistica-section">
             <h3>Impacto de tus Reportes</h3>
             <div class="estadistica-items">
+
               <div class="estadistica-item">
                 <span class="estadistica-label">Total de reacciones</span>
-                <span class="estadistica-value">0</span>
+                <span class="estadistica-value">{{ cantidadReacciones }}</span>
               </div>
               <div class="estadistica-item">
                 <span class="estadistica-label">Total de comentarios</span>

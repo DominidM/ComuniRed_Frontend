@@ -27,6 +27,13 @@ const TOGGLE_REACCION = gql`
   }
 `;
 
+
+const CONTAR_REACCIONES_POR_USUARIO = gql`
+  query ContarReaccionesPorUsuario($usuarioId: ID!) {
+    contarReaccionesPorUsuario(usuarioId: $usuarioId)
+  }
+`;
+
 @Injectable({ providedIn: 'root' })
 export class ReaccionService {
   constructor(private apollo: Apollo) {}
@@ -47,6 +54,24 @@ export class ReaccionService {
         map(result => {
           console.log('✅ Reacción actualizada:', result.data!.toggleReaccion);
           return result.data!.toggleReaccion;
+        })
+      );
+  }
+
+
+  contarReaccionesPorUsuario(usuarioId: string): Observable<number> {
+    console.log('🔄 Contando reacciones del usuario:', usuarioId);
+    
+    return this.apollo
+      .query<{ contarReaccionesPorUsuario: number }>({
+        query: CONTAR_REACCIONES_POR_USUARIO,
+        variables: { usuarioId },
+        fetchPolicy: 'network-only'
+      })
+      .pipe(
+        map(result => {
+          console.log('✅ Total de reacciones:', result.data.contarReaccionesPorUsuario);
+          return result.data.contarReaccionesPorUsuario;
         })
       );
   }

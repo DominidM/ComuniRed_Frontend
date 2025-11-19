@@ -25,7 +25,7 @@ import { ProfileComponent } from './public/profile/profile.component';
 import { TrendingComponent } from './public/trending/trending.component';
 import { NotificationsComponent } from './public/notifications/notifications.component';
 import { HelpComponent } from './public/help/help.component';
-
+import { FeedReporteComponent } from './public/feed-reporte/feed-reporte.component';
 
 import { SettingsComponent } from './public/settings/settings.component';
 
@@ -125,6 +125,7 @@ export const routes: Routes = [
       { path: 'messages', component: MessageComponent },
       { path: 'profile', component: ProfileComponent},
       { path: 'user-profile/:id', component: UserProfileComponent},
+      { path: 'feed/queja/:id', component: FeedReporteComponent },
       { path: 'help', component: HelpComponent },
       {
         path: 'settings',

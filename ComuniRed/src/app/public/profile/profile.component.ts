@@ -3,8 +3,9 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
 import { SeguimientoService, Seguimiento } from '../../services/seguimiento.service';
-import { QuejaService } from '../../services/queja.service'; // ✅ QuejaService
+import { QuejaService } from '../../services/queja.service';
 import { ComentarioService } from '../../services/comentario.service';
+import { ReaccionService } from '../../services/reaccion.service'; // ✅
 
 @Component({
   selector: 'app-profile',
@@ -32,10 +33,11 @@ export class ProfileComponent implements OnInit {
   loading: boolean = false;
 
   // Actividad
-  misQuejas: any[] = []; // ✅ misQuejas
-  quejasComentadas: any[] = []; // ✅ quejasComentadas
-  cantidadQuejas: number = 0; // ✅ cantidadQuejas
+  misQuejas: any[] = [];
+  quejasComentadas: any[] = [];
+  cantidadQuejas: number = 0;
   cantidadComentarios: number = 0;
+  cantidadReacciones: number = 0; // ✅
   loadingActividad: boolean = false;
 
   mostrarModalSeguidores: boolean = false;
@@ -48,8 +50,9 @@ export class ProfileComponent implements OnInit {
   constructor(
     private usuarioService: UsuarioService,
     private seguimientoService: SeguimientoService,
-    private quejaService: QuejaService, // ✅ QuejaService
+    private quejaService: QuejaService,
     private comentarioService: ComentarioService,
+    private reaccionService: ReaccionService, // ✅
     private router: Router
   ) {}
 
@@ -89,7 +92,7 @@ export class ProfileComponent implements OnInit {
       next: (count) => {
         this.seguidoresCount = count;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error contando seguidores:', error);
       }
     });
@@ -99,20 +102,19 @@ export class ProfileComponent implements OnInit {
         this.seguidosCount = count;
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error contando seguidos:', error);
         this.loading = false;
       }
     });
   }
 
-  // ✅ Cargar quejas y comentarios del usuario
   cargarActividad() {
     if (!this.user?.id) return;
 
     this.loadingActividad = true;
 
-    // ✅ Cargar quejas del usuario usando quejasPorUsuario
+    // Cargar quejas del usuario
     this.quejaService.quejasPorUsuario(this.user.id, this.user.id).subscribe({
       next: (quejas: any[]) => {
         this.misQuejas = quejas || [];
@@ -124,27 +126,38 @@ export class ProfileComponent implements OnInit {
       }
     });
 
-
-    // ✅ Cargar quejas donde el usuario comentó
+    // Cargar quejas donde el usuario comentó
     this.comentarioService.obtenerReportesComentados(this.user.id, 0, 10).subscribe({
       next: (quejas: any[]) => {
         this.quejasComentadas = quejas;
         this.loadingActividad = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error cargando quejas comentadas:', error);
         this.quejasComentadas = [];
         this.loadingActividad = false;
       }
     });
 
-    // ✅ Contar comentarios
+    // Contar comentarios
     this.comentarioService.contarComentariosPorUsuario(this.user.id).subscribe({
       next: (count: number) => {
         this.cantidadComentarios = count;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error contando comentarios:', error);
+      }
+    });
+
+    // ✅ Contar reacciones del usuario
+    this.reaccionService.contarReaccionesPorUsuario(this.user.id).subscribe({
+      next: (count: number) => {
+        this.cantidadReacciones = count;
+        console.log('✅ Reacciones cargadas:', count);
+      },
+      error: (error: any) => {
+        console.error('❌ Error contando reacciones:', error);
+        this.cantidadReacciones = 0;
       }
     });
   }
@@ -169,7 +182,7 @@ export class ProfileComponent implements OnInit {
                 next: (usuario) => {
                   this.listaSeguidores.push(usuario);
                 },
-                error: (error) => {
+                error: (error: any) => {
                   console.error('Error cargando seguidor:', error);
                 }
               });
@@ -177,7 +190,7 @@ export class ProfileComponent implements OnInit {
           
           this.loadingModal = false;
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error cargando seguidores:', error);
           this.loadingModal = false;
         }
@@ -204,7 +217,7 @@ export class ProfileComponent implements OnInit {
                 next: (usuario) => {
                   this.listaSeguidos.push(usuario);
                 },
-                error: (error) => {
+                error: (error: any) => {
                   console.error('Error cargando seguido:', error);
                 }
               });
@@ -212,7 +225,7 @@ export class ProfileComponent implements OnInit {
           
           this.loadingModal = false;
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error cargando seguidos:', error);
           this.loadingModal = false;
         }
@@ -236,7 +249,7 @@ export class ProfileComponent implements OnInit {
           this.listaSeguidos = this.listaSeguidos.filter(u => u.id !== usuario.id);
           this.seguidosCount--;
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error dejando de seguir:', error);
           alert('Error al dejar de seguir');
         }
@@ -247,7 +260,6 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['/public/user-profile', usuario.id]);
   }
 
-  // ✅ Ver detalle de la queja
   verQueja(queja: any) {
     this.router.navigate(['/public/feed/queja', queja.id]);
   }
