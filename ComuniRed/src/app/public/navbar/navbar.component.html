@@ -1,4 +1,4 @@
-<nav class="cr-navbar" role="navigation" aria-label="ComuniRed top navigation">
+<nav class="cr-navbar" [class.hidden]="isNavbarHidden" role="navigation" aria-label="ComuniRed top navigation">
   <div class="cr-navbar__left">
     <button class="cr-logo" (click)="goHome()" aria-label="Inicio">
       <img class="cr-logo__icon" [src]="logoUrl" alt="ComuniRed logo" loading="lazy" width="28" height="28" />
@@ -63,7 +63,8 @@
               <div class="search-result-title">{{ getResultTitle(result) }}</div>
               <div class="search-result-subtitle">
                 {{ getResultSubtitle(result) }}
-                <ng-container *ngIf="result.type === 'reporte' && result.fecha">
+                <!-- Make fecha check more explicit for TypeScript -->
+                <ng-container *ngIf="result.type === 'reporte' && result.fecha !== undefined">
                   • {{ formatDate(result.fecha) }}
                 </ng-container>
               </div>
