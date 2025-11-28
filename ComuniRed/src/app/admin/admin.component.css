@@ -276,6 +276,7 @@
   font-weight: 600;
   color: var(--cr-titulo);
   font-size: 0.95em;
+  margin: 10px;
 }
 
 /* Theme Toggle Button */

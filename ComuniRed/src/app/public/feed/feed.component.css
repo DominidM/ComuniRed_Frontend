@@ -5,6 +5,30 @@
   padding: 2rem 1rem;
   background: #fff;
   min-height: 100vh;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+
+.feed-area {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  padding: 25px 24px; /* <- changed from 25px 233px to avoid huge empty gap */
+  background-color: #eae9eef5;
+}
+
+/* Keep scroll functionality but hide the visual track/thumb if you prefer a cleaner look */
+.feed-area::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Firefox */
+.feed-area {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15,23,42,0.12) transparent;
 }
 
 /* ==================== TOAST NOTIFICATION ==================== */

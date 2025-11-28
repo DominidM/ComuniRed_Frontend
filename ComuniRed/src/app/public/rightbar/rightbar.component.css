@@ -1,627 +1,830 @@
+/* Rightbar CSS — compatible light/dark, contraste corregido para stats y botón */
+
+/* Variables */
+:root {
+  --rb-max-width: 400px;
+  --rb-min-width: 260px;
+  --rb-gap: 18px;
+  --rb-radius: 14px;
+
+  --rb-bg: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,255,255,0.9));
+  --rb-section-bg: rgba(255,255,255,0.96);
+  --rb-border: rgba(255,255,255,0.72);
+  --rb-inset: rgba(255,255,255,0.45);
+  --rb-ink: #111111;
+  --rb-muted: #6e7075;
+  --rb-accent: #0066ff;
+  --rb-shadow-1: 0 12px 36px rgba(0,0,0,0.06);
+  --rb-shadow-2: 0 6px 18px rgba(0,0,0,0.04);
+  --rb-button-bg: linear-gradient(135deg,#222,#161616);
+  --rb-button-hover: linear-gradient(135deg,#0077ff,#005bb5);
+  --rb-button-shadow: 0 8px 24px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* Dark mode overrides */
+html.dark {
+  --rb-bg: linear-gradient(135deg, rgba(20,22,24,0.94), rgba(22,24,26,0.9));
+  --rb-section-bg: linear-gradient(135deg, rgba(18,20,22,0.9), rgba(22,24,26,0.86));
+  --rb-border: rgba(255,255,255,0.04);
+  --rb-inset: rgba(255,255,255,0.02);
+  --rb-ink: #e8e8ea;
+  --rb-muted: #9aa4ad;
+  --rb-accent: #57a6ff;
+  --rb-shadow-1: 0 12px 36px rgba(0,0,0,0.36);
+  --rb-shadow-2: 0 6px 18px rgba(0,0,0,0.28);
+  --rb-button-bg: linear-gradient(135deg,#333438,#1b1b1d);
+  --rb-button-hover: linear-gradient(135deg,#57a6ff,#2f7fe4);
+  --rb-button-shadow: 0 8px 28px rgba(0,0,0,0.6), 0 6px 18px rgba(0,0,0,0.45);
+}
+
+/* -------------------- Container -------------------- */
 .rightbar-container {
-  width: 100%;
-  max-width: 400px;
-  min-width: 360px;
-  
-  /* Glassmorphism mejorado */
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.7),
-    rgba(255, 255, 255, 0.5)
-  );
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-
-  /* Bordes luminosos para efecto flotante */
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-left: 1px solid rgba(255, 255, 255, 0.8);
-
-  height: 100vh;
-  padding: 24px 16px 0 16px;
+  max-width: var(--rb-max-width);
+  min-width: var(--rb-min-width);
+  background: var(--rb-bg);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border: 1px solid var(--rb-border);
+  padding: 116px 14px 0 14px;
   box-sizing: border-box;
-
   display: flex;
   flex-direction: column;
-  gap: 20px;
-
+  gap: var(--rb-gap);
   position: sticky;
   top: 20px;
   margin-right: 20px;
-
-  /* Sombra flotante multicapa */
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.08),
-    0 10px 30px rgba(0, 0, 0, 0.05),
-    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
-  
-  border-radius: 24px 0 0 24px;
+  box-shadow: var(--rb-shadow-1), var(--rb-shadow-2), 0 0 0 1px var(--rb-inset) inset;
+  border-radius: 18px 0 0 18px;
   z-index: 100;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+  overflow-y: auto;
+  overflow-x: hidden;
   
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.rightbar-container:hover {
-  transform: translateX(-6px);
-  box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.12),
-    0 15px 40px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+/* Slight hover effect only on big screens */
+@media (min-width: 1025px) {
+  .rightbar-container:hover { transform: translateX(-2px); }
 }
 
-/* Secciones flotantes con animaciones */
+/* -------------------- Section -------------------- */
 .rightbar-section {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95),
-    rgba(255, 255, 255, 0.85)
-  );
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 18px;
-
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.06),
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
-  
-  padding: 20px;
-  
-  transition: 
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.3s ease,
-    border-color 0.3s ease;
-  
+  background: var(--rb-section-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--rb-border);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+  padding: 14px;
+  margin-bottom: 14px;
+  transition: transform 220ms cubic-bezier(0.2,0.8,0.2,1), box-shadow 220ms ease, background 200ms ease, border-color 200ms ease;
   position: relative;
   overflow: hidden;
+   border: 1px solid #e2e8f0;
+    border-radius: 8px;
 }
+.rightbar-section:last-child { margin-bottom: 0; }
 
-/* Efecto de brillo animado al hover */
+/* subtle shine */
 .rightbar-section::before {
   content: '';
   position: absolute;
   top: 0;
-  left: -100%;
-  width: 100%;
+  left: -70%;
+  width: 60%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
-  transition: left 0.6s ease;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transition: left 0.9s ease;
   pointer-events: none;
 }
+.rightbar-section:hover::before { left: 100%; }
 
-.rightbar-section:hover::before {
-  left: 100%;
-}
+/* Hover reduced */
+.rightbar-section:hover { transform: translateY(-3px) scale(1.005); box-shadow: 0 12px 36px rgba(0,0,0,0.06); }
 
-.rightbar-section:hover {
-  transform: translateY(-8px) scale(1.02);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.98),
-    rgba(255, 255, 255, 0.9)
-  );
-  border-color: rgba(255, 255, 255, 0.9);
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.12),
-    0 10px 24px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
-}
-
+/* -------------------- Titles -------------------- */
 .rightbar-section-title {
-  font-size: 1.1em;
+  font-size: 1.02em;
   font-weight: 600;
-  color: #1a1a1a;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  user-select: none;
-  position: relative;
+  color: var(--rb-ink);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:10px;
+  position:relative;
 }
+.rightbar-section-title mat-icon { color: var(--rb-muted); transition: transform 260ms ease, color 200ms ease; }
+.rightbar-section:hover .rightbar-section-title mat-icon { transform: scale(1.06); color: var(--rb-accent); }
 
-.rightbar-section-title mat-icon {
-  transition: 
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    color 0.3s ease;
-}
-
-.rightbar-section:hover .rightbar-section-title mat-icon {
-  transform: scale(1.2) rotate(360deg);
-  color: #0066ff;
-}
-
-/* Animación de subrayado en título */
+/* underline */
 .rightbar-section-title::after {
   content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #0066ff, #00ccff);
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 2px;
+  position:absolute;
+  bottom:-4px;
+  left:0;
+  width:0;
+  height:2px;
+  background: linear-gradient(90deg, var(--rb-accent), #00ccff);
+  transition: width 260ms ease;
+  border-radius:2px;
 }
+.rightbar-section:hover .rightbar-section-title::after { width:36%; }
 
-.rightbar-section:hover .rightbar-section-title::after {
-  width: 60%;
-}
+/* -------------------- Lists -------------------- */
+.trend-list, .district-list { display:flex; flex-direction:column; gap:10px; }
 
-/* LISTAS */
-.trend-list, .district-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Items de tendencias con animaciones */
+/* Trend item */
 .trend-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.4);
-  position: relative;
-  overflow: hidden;
-  transition: 
-    background 0.3s ease,
-    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.3s ease;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:10px;
+  border-radius:10px;
+  background: rgba(255,255,255,0.92);
+  transition: background 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+  position:relative;
+  overflow:hidden;
+  color: var(--rb-ink);
 }
 
-/* Borde animado inferior */
-.trend-item::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #0066ff, #00ccff);
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* Dark-specific item background for readability */
+html.dark .trend-item { background: rgba(30,32,34,0.76); color: var(--rb-ink); }
 
-.trend-item:hover {
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateX(8px) scale(1.02);
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
-}
+/* Hover mild */
+.trend-item:hover { transform: translateX(4px) scale(1.01); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
 
-.trend-item:hover::after {
-  width: 100%;
-}
+/* Hashtag color */
+.trend-hashtag { font-weight:600; color: var(--rb-ink); }
 
-.trend-hashtag {
-  font-weight: 600;
-  color: #16181c;
-  font-size: 1em;
-  transition: 
-    color 0.3s ease,
-    transform 0.3s ease,
-    letter-spacing 0.3s ease;
-  display: inline-block;
-}
-
-.trend-item:hover .trend-hashtag {
-  color: #0066ff;
-  transform: translateX(4px);
-  letter-spacing: 0.3px;
-}
-
+/* Counter badge */
 .trend-count {
-  background: linear-gradient(135deg, #16181c, #2c2e33);
+  display:inline-block;
+  background: linear-gradient(135deg, #1c1c1c, #2c2e33);
   color: #fff;
-  border-radius: 12px;
-  font-size: 0.85em;
-  padding: 4px 12px;
-  margin-left: 0;
-  margin-top: 4px;
-  font-weight: 500;
-  display: inline-block;
-  width: fit-content;
-  box-shadow: 0 2px 8px rgba(22, 24, 28, 0.2);
-  transition: 
-    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.3s ease,
-    background 0.3s ease;
+  border-radius:10px;
+  font-size:0.82em;
+  padding:6px 10px;
+  font-weight:700;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
-.trend-item:hover .trend-count {
-  transform: scale(1.1) rotate(-2deg);
-  box-shadow: 0 6px 16px rgba(22, 24, 28, 0.35);
-  background: linear-gradient(135deg, #0066ff, #0052cc);
+/* In dark mode make count more visible (light border & clear background) */
+html.dark .trend-count {
+  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  color: var(--rb-ink);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: none;
+  font-weight:600;
 }
 
-.trend-desc {
-  font-size: 0.9em;
-  color: #6d6d6d;
-  line-height: 1.4;
-  transition: 
-    color 0.3s ease,
-    transform 0.3s ease;
-  opacity: 0.8;
-}
-
-.trend-item:hover .trend-desc {
-  color: #333;
-  transform: translateX(4px);
-  opacity: 1;
-}
-
-/* Items de distritos con animaciones */
+/* -------------------- District items -------------------- */
 .district-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 0.98em;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.4);
-  position: relative;
-  overflow: hidden;
-  transition: 
-    background 0.3s ease,
-    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.3s ease;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  font-size:0.95em;
+  padding:10px;
+  border-radius:10px;
+  background: rgba(255,255,255,0.92);
+  transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+  color: var(--rb-ink);
 }
+html.dark .district-item { background: rgba(30,32,34,0.72); color: var(--rb-ink); }
 
-/* Efecto de onda al hover */
-.district-item::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(0, 102, 255, 0.1);
-  transform: translate(-50%, -50%);
-  transition: width 0.5s ease, height 0.5s ease;
-}
+.district-item:hover { transform: translateX(4px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
 
-.district-item:hover::before {
-  width: 300px;
-  height: 300px;
-}
+.district-name { font-weight:600; color: var(--rb-ink); }
+.district-distance { font-size:0.86em; color: var(--rb-muted); }
 
-.district-item:hover {
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateX(8px) scale(1.03);
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
-}
-
-.district-name {
-  font-weight: 600;
-  color: #16181c;
-  flex: 1;
-  position: relative;
-  z-index: 1;
-  transition: 
-    color 0.3s ease,
-    transform 0.3s ease;
-}
-
-.district-item:hover .district-name {
-  color: #0066ff;
-  transform: translateX(4px);
-}
-
-.district-distance {
-  font-size: 0.88em;
-  color: #999;
-  font-weight: 500;
-  position: relative;
-  z-index: 1;
-  transition: 
-    color 0.3s ease,
-    transform 0.3s ease;
-}
-
-.district-item:hover .district-distance {
-  color: #666;
-  transform: scale(1.05);
-}
-
+/* district count badge */
 .district-count {
-  background: linear-gradient(135deg, #f8f9fa, #f1f2f6);
+  background: rgba(255,255,255,0.95);
   color: #222;
-  border-radius: 10px;
-  font-size: 0.9em;
-  padding: 4px 10px;
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  position: relative;
-  z-index: 1;
-  transition: 
-    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.3s ease,
-    background 0.3s ease,
-    color 0.3s ease;
+  border-radius:8px;
+  padding:6px 8px;
+  font-weight:700;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+html.dark .district-count {
+  background: rgba(255,255,255,0.06);
+  color: var(--rb-ink);
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: none;
 }
 
-.district-item:hover .district-count {
-  transform: scale(1.15) rotate(5deg);
-  box-shadow: 0 6px 16px rgba(0, 102, 255, 0.2);
-  background: linear-gradient(135deg, #0066ff, #00ccff);
-  color: #fff;
-}
-
-/* Estadísticas con animaciones */
+/* -------------------- Stats -------------------- */
+/* Forzar contraste alto en stats (tanto en light como en dark) */
 .rightbar-stats {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 24px 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.98),
-    rgba(250, 251, 252, 0.9)
-  );
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:14px 12px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(250,251,252,0.95));
+  border-radius:12px;
+  color: var(--rb-ink);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+html.dark .rightbar-stats {
+  background: linear-gradient(135deg, rgba(20,22,24,0.84), rgba(22,24,26,0.78));
+  border: 1px solid rgba(255,255,255,0.03);
 }
 
-.stats-row {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 28px 20px;
-  align-items: center;
-}
-
+/* Asegurar que los valores se muestren con opacidad completa y contraste */
+.stats-row { display:grid; grid-template-columns:auto auto; gap:12px 10px; align-items:center; width:100%; }
 .stats-value {
-  font-size: 2em;
-  font-weight: 700;
-  color: #222;
-  letter-spacing: -0.5px;
-  grid-row: 1;
-  transition: 
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    color 0.3s ease,
-    text-shadow 0.3s ease;
-  cursor: default;
+  font-size:1.6em;
+  font-weight:800;
+  color: #121223 !important;
+  opacity: 1 !important;
+  text-align:center;
+  line-height: 1;
 }
-
-.stats-value:hover {
-  transform: scale(1.15) translateY(-4px);
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.stats-green {
-  color: #18b652;
-  text-shadow: 0 2px 8px rgba(24, 182, 82, 0.2);
-}
-
-.stats-green:hover {
-  color: #15a047;
-  text-shadow: 0 6px 20px rgba(24, 182, 82, 0.4);
-}
-
 .stats-label {
-  font-size: 0.9em;
-  color: #888;
-  grid-row: 2;
-  font-weight: 500;
-  transition: 
-    color 0.3s ease,
-    transform 0.3s ease;
+  color: #121223 !important;
+  opacity: 1 !important;
+  font-weight: 600;
+  font-size: 0.95em;
+  text-align: center;
 }
+.stats-green { color:#18b652; }
 
-.stats-row:hover .stats-label {
-  color: #555;
-  transform: translateY(-2px);
-}
+/* -------------------- Spacer -------------------- */
+.rightbar-spacer { height: 72px; flex-shrink:0; pointer-events:none; }
 
-/* Botón flotante de accesibilidad con animaciones avanzadas */
+/* -------------------- Accessibility button -------------------- */
+/* Forzar visibilidad del botón en ambos temas */
 .rightbar-accessibility-btn {
   position: fixed;
-  right: 40px;
+  right: 32px;
   bottom: 120px;
-
-  background: linear-gradient(135deg, #2c2e33, #16181c);
+  background: var(--rb-button-bg);
   color: #fff;
-  border: none;
+  border: 1px solid rgba(255,255,255,0.06);
   border-radius: 50%;
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
+  box-shadow: var(--rb-button-shadow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  z-index: 999;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+  overflow: hidden;
+}
+/* Hover leve */
+.rightbar-accessibility-btn:hover {
+  background: var(--rb-button-hover);
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 18px 48px rgba(0,0,0,0.18);
+}
+/* Asegurar contraste del icono */
+.rightbar-accessibility-btn mat-icon {
+  color: #ffffff !important;
+  font-size: 20px;
+  transition: transform 260ms ease, filter 200ms ease;
+}
+/* En caso de tema claro forzamos fondo oscuro para que blanco del icono resalte */
+@media (prefers-color-scheme: light) {
+  .rightbar-accessibility-btn {
+    background: linear-gradient(135deg,#222,#161616);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+}
+/* En dark reforzar fondo y borde sutil */
+html.dark .rightbar-accessibility-btn {
+  background: linear-gradient(135deg,#2b2d30,#17171a);
+  border: 1px solid rgba(255,255,255,0.04);
+}
 
-  box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.25),
-    0 6px 20px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  
+/* -------------------- Animations toned down -------------------- */
+.trend-item, .district-item { animation: slideIn 360ms ease-out both; }
+@keyframes slideIn { from { opacity:0; transform: translateX(8px);} to { opacity:1; transform: translateX(0);} }
+.rightbar-section { animation: fadeUp 380ms ease-out both; }
+@keyframes fadeUp { from { opacity:0; transform: translateY(6px);} to { opacity:1; transform: translateY(0);} }
+
+/* -------------------- Responsive -------------------- */
+@media (max-width: 600px) {
+  app-rightbar { display:none; }
+  .rightbar-accessibility-btn { right:16px; bottom:80px; width:48px; height:48px; }
+}
+@media (min-width:601px) and (max-width:1024px) {
+  app-rightbar { flex:0 0 280px; max-width:280px; }
+  .rightbar-container { max-width:280px; min-width:240px; padding:14px 12px 28px 12px; gap:14px; }
+  .rightbar-section { padding:12px; margin-bottom:12px; }
+  .rightbar-section-title { font-size:1em; margin-bottom:8px; }
+}
+
+/* Respect user reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+/* ==== PARCHE: override muy específico para rightbar stats y badges ==== */
+
+/* selector deliberadamente muy específico para ganar sobre "html.dark *" */
+html.dark body app-root app-feed app-rightbar .rightbar-container .rightbar-section.rightbar-stats,
+html.dark body app-root app-feed app-rightbar .rightbar-container .rightbar-section.rightbar-stats * {
+  background: linear-gradient(180deg, rgba(18,20,22,0.98), rgba(14,16,18,0.98)) !important;
+  border: 1px solid rgba(255,255,255,0.04) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.6) !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  background-clip: padding-box !important;
+}
+
+/* forzar los valores (números) y etiquetas dentro del panel */
+html.dark body app-root app-feed app-rightbar .rightbar-container .rightbar-section.rightbar-stats .stats-value,
+html.dark body app-root app-feed app-rightbar .rightbar-container .rightbar-section.rightbar-stats .stats-label {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+}
+
+/* badges a la derecha (34,28,19,15) */
+html.dark body app-root app-feed app-rightbar .rightbar-container .district-count,
+html.dark body app-root app-feed app-rightbar .rightbar-container .trend-count {
+  background: rgba(255,255,255,0.10) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+/* Forzar que el contenedor entero del rightbar no pierda su background por reglas globales */
+html.dark body app-root app-feed app-rightbar .rightbar-container,
+html.dark body app-root app-feed app-rightbar .rightbar-container * {
+  background-color: unset !important;
+  background-image: unset !important;
+  color: inherit !important;
+  opacity: 1 !important;
+}
+/* ===== FIX: Botón de accesibilidad visible en AMBOS modos ===== */
+
+.rightbar-accessibility-btn {
+  position: fixed;
+  right: 32px;
+  bottom: 120px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
-  z-index: 999;
-
-  transition: 
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.3s ease;
-  
-  position: relative;
+  z-index: 1500 !important;
+  pointer-events: auto !important;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
   overflow: hidden;
+  border: none;
+  outline: none;
 }
 
-/* Efecto de pulso animado */
-.rightbar-accessibility-btn::before {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(0);
-  opacity: 0;
-  transition: 
-    transform 0.6s ease,
-    opacity 0.6s ease;
-}
-
-.rightbar-accessibility-btn:hover::before {
-  transform: scale(1.5);
-  opacity: 0;
+/* ===== MODO CLARO (default) ===== */
+.rightbar-accessibility-btn {
+  background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
 .rightbar-accessibility-btn:hover {
-  background: linear-gradient(135deg, #0066ff, #0052cc);
-  transform: translateY(-12px) scale(1.1) rotate(5deg);
+  background: linear-gradient(135deg, #0077ff, #005bb5);
+  transform: translateY(-6px) scale(1.05);
   box-shadow: 
-    0 24px 70px rgba(0, 102, 255, 0.4),
-    0 12px 35px rgba(0, 102, 255, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+    0 12px 32px rgba(0, 119, 255, 0.4),
+    0 6px 16px rgba(0, 91, 181, 0.3);
 }
 
-.rightbar-accessibility-btn:active {
-  transform: translateY(-10px) scale(1.05);
-}
-
+/* Icono siempre blanco y visible */
 .rightbar-accessibility-btn mat-icon {
-  transition: 
-    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    filter 0.3s ease;
-  position: relative;
-  z-index: 1;
+  color: #ffffff !important;
+  font-size: 22px !important;
+  width: 22px !important;
+  height: 22px !important;
+  transition: transform 260ms ease, filter 200ms ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .rightbar-accessibility-btn:hover mat-icon {
-  transform: rotate(360deg) scale(1.2);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transform: scale(1.1) rotate(8deg);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
 }
 
-/* Animación de entrada escalonada para items */
-.trend-item,
-.district-item {
-  animation: slideInFromRight 0.5s ease-out backwards;
+/* ===== MODO OSCURO ===== */
+html.dark .rightbar-accessibility-btn {
+  background: linear-gradient(135deg, #2b2d30, #1a1b1d);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    0 8px 28px rgba(0, 0, 0, 0.6),
+    0 6px 18px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
 }
 
-.trend-item:nth-child(1),
-.district-item:nth-child(1) {
-  animation-delay: 0.1s;
+html.dark .rightbar-accessibility-btn:hover {
+  background: linear-gradient(135deg, #57a6ff, #2f7fe4);
+  box-shadow: 
+    0 12px 36px rgba(87, 166, 255, 0.35),
+    0 6px 18px rgba(47, 127, 228, 0.25);
 }
 
-.trend-item:nth-child(2),
-.district-item:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.trend-item:nth-child(3),
-.district-item:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-.trend-item:nth-child(4),
-.district-item:nth-child(4) {
-  animation-delay: 0.4s;
-}
-
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Animación suave de aparición para secciones */
-.rightbar-section {
-  animation: fadeInUp 0.6s ease-out backwards;
-}
-
-.rightbar-section:nth-child(1) {
-  animation-delay: 0.1s;
-}
-
-.rightbar-section:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.rightbar-section:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* === RESPONSIVE === */
-
-/* Móviles */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 600px) {
-  app-rightbar {
-    display: none;
-  }
-  
   .rightbar-accessibility-btn {
-    right: 20px;
+    right: 16px;
     bottom: 80px;
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .rightbar-accessibility-btn mat-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
   }
 }
 
-/* Tablets */
+/* ===== ACCESIBILIDAD: Focus visible ===== */
+.rightbar-accessibility-btn:focus-visible {
+  outline: 3px solid #0077ff;
+  outline-offset: 4px;
+}
+
+html.dark .rightbar-accessibility-btn:focus-visible {
+  outline-color: #57a6ff;
+}
+
+/* ===== ANIMACIÓN DE PULSO (opcional) ===== */
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 119, 255, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(0, 119, 255, 0); }
+}
+
+.rightbar-accessibility-btn.pulse {
+  animation: pulse 2s infinite;
+}
+
+/* ===== ESTADO ACTIVO (cuando el panel está abierto) ===== */
+.rightbar-accessibility-btn[aria-expanded="true"] {
+  background: linear-gradient(135deg, #0077ff, #005bb5);
+  transform: scale(1.05);
+}
+
+html.dark .rightbar-accessibility-btn[aria-expanded="true"] {
+  background: linear-gradient(135deg, #57a6ff, #2f7fe4);
+}
+
+/* ===== OVERRIDE: Forzar visibilidad sobre cualquier regla global ===== */
+.rightbar-accessibility-btn,
+.rightbar-accessibility-btn * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ===== FIX: Botón de accesibilidad visible en AMBOS modos ===== */
+
+.rightbar-accessibility-btn {
+  position: fixed;
+  right: 32px;
+  bottom: 120px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1500 !important;
+  pointer-events: auto !important;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+  overflow: hidden;
+  border: none;
+  outline: none;
+}
+
+/* ===== MODO CLARO (default) ===== */
+.rightbar-accessibility-btn {
+  background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.rightbar-accessibility-btn:hover {
+  background: linear-gradient(135deg, #0077ff, #005bb5);
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 
+    0 12px 32px rgba(0, 119, 255, 0.4),
+    0 6px 16px rgba(0, 91, 181, 0.3);
+}
+
+/* Icono siempre blanco y visible */
+.rightbar-accessibility-btn mat-icon {
+  color: #ffffff !important;
+  font-size: 22px !important;
+  width: 22px !important;
+  height: 22px !important;
+  transition: transform 260ms ease, filter 200ms ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.rightbar-accessibility-btn:hover mat-icon {
+  transform: scale(1.1) rotate(8deg);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* ===== MODO OSCURO ===== */
+html.dark .rightbar-accessibility-btn {
+  background: linear-gradient(135deg, #2b2d30, #1a1b1d);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    0 8px 28px rgba(0, 0, 0, 0.6),
+    0 6px 18px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+html.dark .rightbar-accessibility-btn:hover {
+  background: linear-gradient(135deg, #57a6ff, #2f7fe4);
+  box-shadow: 
+    0 12px 36px rgba(87, 166, 255, 0.35),
+    0 6px 18px rgba(47, 127, 228, 0.25);
+}
+
+/* ===== ESTADO ACTIVO (cuando el panel está abierto) ===== */
+.rightbar-accessibility-btn[aria-expanded="true"] {
+  background: linear-gradient(135deg, #0077ff, #005bb5);
+  transform: scale(1.05);
+}
+
+html.dark .rightbar-accessibility-btn[aria-expanded="true"] {
+  background: linear-gradient(135deg, #57a6ff, #2f7fe4);
+}
+
+/* ===== PANEL DE ACCESIBILIDAD ===== */
+.accessibility-panel {
+  position: fixed !important;
+  right: 100px !important;
+  bottom: 120px !important;
+  width: 280px !important;
+  max-width: calc(100vw - 40px) !important;
+  padding: 16px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,251,252,0.96)) !important;
+  color: #111111 !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  box-shadow: 
+    0 12px 36px rgba(0,0,0,0.15), 
+    0 4px 12px rgba(0,0,0,0.08),
+    0 0 0 1px rgba(255,255,255,0.5) inset !important;
+  z-index: 1400 !important;
+  font-size: 0.95rem !important;
+  backdrop-filter: blur(12px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(120%) !important;
+
+  /* hide/show */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px) scale(0.96);
+  transition: opacity 200ms ease, transform 200ms ease, visibility 0ms linear 200ms;
+  pointer-events: none;
+}
+
+/* Modo oscuro del panel */
+html.dark .accessibility-panel {
+  background: linear-gradient(180deg, rgba(20,22,24,0.98), rgba(24,26,28,0.96)) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  box-shadow: 
+    0 12px 36px rgba(0,0,0,0.55), 
+    0 4px 12px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(255,255,255,0.04) inset !important;
+}
+
+/* Flecha triangular apuntando hacia el botón */
+.accessibility-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  right: 26px;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid rgba(255,255,255,0.98);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+  pointer-events: none;
+}
+
+html.dark .accessibility-panel::after {
+  border-top-color: rgba(20,22,24,0.98);
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+
+/* Estado visible */
+.accessibility-panel.open {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) scale(1) !important;
+  transition: opacity 200ms ease, transform 200ms ease !important;
+  pointer-events: auto !important;
+}
+
+/* Panel header */
+.accessibility-panel h3 {
+  margin: 0 0 12px 0 !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: #111111 !important;
+  letter-spacing: -0.02em !important;
+}
+
+html.dark .accessibility-panel h3 {
+  color: #ffffff !important;
+}
+
+/* Filas del panel */
+.accessibility-panel .acc-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 10px 0 !important;
+}
+
+/* Labels */
+.accessibility-panel label {
+  font-size: 0.92rem !important;
+  color: #333333 !important;
+  font-weight: 600 !important;
+  flex: 1 !important;
+}
+
+html.dark .accessibility-panel label {
+  color: rgba(255,255,255,0.92) !important;
+}
+
+/* Acciones: botones */
+.accessibility-panel .acc-actions {
+  display: inline-flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+/* Estilo base para botones del panel */
+.accessibility-panel .acc-actions button,
+.accessibility-panel .acc-close {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 44px !important;
+  height: 36px !important;
+  padding: 0 12px !important;
+  border-radius: 9px !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  background: rgba(0,0,0,0.04) !important;
+  color: #111111 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+  transition: all 150ms ease !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+}
+
+html.dark .accessibility-panel .acc-actions button,
+html.dark .accessibility-panel .acc-close {
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  background: rgba(255,255,255,0.06) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35) inset !important;
+}
+
+/* Botones A-, A, A+ más pequeños */
+.accessibility-panel .acc-actions button[type="button"] {
+  min-width: 38px !important;
+  padding: 0 8px !important;
+  font-weight: 700 !important;
+}
+
+/* Hover states */
+.accessibility-panel .acc-actions button:hover,
+.accessibility-panel .acc-close:hover {
+  background: rgba(0,0,0,0.08) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12) !important;
+}
+
+html.dark .accessibility-panel .acc-actions button:hover,
+html.dark .accessibility-panel .acc-close:hover {
+  background: rgba(255,255,255,0.10) !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4) inset !important;
+}
+
+/* Focus states */
+.accessibility-panel .acc-actions button:focus-visible,
+.accessibility-panel .acc-close:focus-visible {
+  outline: 3px solid rgba(0,119,255,0.3) !important;
+  outline-offset: 2px !important;
+}
+
+html.dark .accessibility-panel .acc-actions button:focus-visible,
+html.dark .accessibility-panel .acc-close:focus-visible {
+  outline-color: rgba(87,166,255,0.4) !important;
+}
+
+/* Estado activo (aria-pressed) */
+.accessibility-panel .acc-actions button[aria-pressed="true"] {
+  background: linear-gradient(135deg, rgba(0,119,255,0.15), rgba(0,91,181,0.1)) !important;
+  border-color: rgba(0,119,255,0.3) !important;
+  color: #0077ff !important;
+  font-weight: 700 !important;
+}
+
+html.dark .accessibility-panel .acc-actions button[aria-pressed="true"] {
+  background: linear-gradient(135deg, rgba(87,166,255,0.18), rgba(47,127,228,0.12)) !important;
+  border-color: rgba(87,166,255,0.28) !important;
+  color: #57a6ff !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .rightbar-accessibility-btn {
+    right: 16px;
+    bottom: 80px;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .rightbar-accessibility-btn mat-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .accessibility-panel {
+    right: 16px !important;
+    bottom: 140px !important;
+    width: calc(100vw - 32px) !important;
+    max-width: 340px !important;
+  }
+  
+  .accessibility-panel::after {
+    right: 20px !important;
+  }
+  
+  .accessibility-panel .acc-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  
+  .accessibility-panel .acc-actions {
+    justify-content: stretch !important;
+  }
+  
+  .accessibility-panel .acc-actions button {
+    flex: 1 !important;
+  }
+}
+
 @media (min-width: 601px) and (max-width: 1024px) {
-  app-rightbar {
-    flex: 0 0 280px;
-    max-width: 280px;
-  }
-  
-  .rightbar-container {
-    max-width: 280px;
-    min-width: 260px;
-    padding: 20px 12px 0 12px;
-    gap: 16px;
-  }
-  
-  .rightbar-section {
-    padding: 16px;
-  }
-  
-  .rightbar-section-title {
-    font-size: 1em;
-    margin-bottom: 12px;
+  .accessibility-panel {
+    right: 80px !important;
+    width: 260px !important;
   }
 }
 
-/* Desktops grandes */
-@media (min-width: 1440px) {
-  .rightbar-container {
-    max-width: 420px;
-  }
+/* ===== ACCESIBILIDAD: Focus visible ===== */
+.rightbar-accessibility-btn:focus-visible {
+  outline: 3px solid #0077ff !important;
+  outline-offset: 4px !important;
 }
 
-/* Reducir animaciones para usuarios con preferencias de accesibilidad */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+html.dark .rightbar-accessibility-btn:focus-visible {
+  outline-color: #57a6ff !important;
+}
+
+/* ===== OVERRIDE: Forzar visibilidad sobre cualquier regla global ===== */
+.rightbar-accessibility-btn,
+.rightbar-accessibility-btn *,
+.accessibility-panel,
+.accessibility-panel * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.accessibility-panel:not(.open) {
+  opacity: 0 !important;
+  visibility: hidden !important;
 }

@@ -1,20 +1,24 @@
 :host {
   display: block;
-  height: 100%;
+  height: calc(100vh - 67px); /* ✅ Resta la altura del navbar */
   overflow: hidden;
-  position: relative;
+  position: fixed;
+  top: 72px ; /* ✅ Empieza debajo del navbar */
+  left: 0;
+  width: 240px;
+  z-index: 50; /* ✅ Menor que el navbar (que debería ser 100) */
 }
 
 .sidebar-container {
   width: 100%;
   height: 100%;
-  padding-top: 0; /* ✅ Sin padding extra */
   display: flex;
   flex-direction: column;
   background: #fdfcfc;
   box-sizing: border-box;
   overflow: hidden;
   position: relative;
+  border-right: 1px solid #e2e8f0;
 }
 
 /* ✅ MENÚ CON SCROLL */
@@ -26,7 +30,6 @@
   padding: 16px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: 160px; /* ✅ Espacio para el footer */
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   min-height: 0;
@@ -63,6 +66,8 @@
   font-size: 15px;
   font-weight: 500;
   flex-shrink: 0;
+  border: none;
+  outline: none;
 }
 
 .icon-wrap {
@@ -110,10 +115,7 @@
 
 /* ✅ FOOTER FIJO AL FONDO */
 .sidebar-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -211,6 +213,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 150ms ease;
+  outline: none;
 }
 
 .logout-btn:hover {
@@ -227,9 +230,14 @@
   color: inherit;
 }
 
+/* ✅ MOBILE - Sidebar colapsado */
 @media (max-width: 768px) {
+  :host {
+    width: 60px;
+  }
+  
   .sidebar-menu {
-    padding: 12px 8px 140px 8px;
+    padding: 12px 8px;
   }
   
   .link-label, 
@@ -241,5 +249,21 @@
   .sidebar-link { 
     justify-content: center; 
     padding: 8px;
+  }
+  
+  .user-card {
+    justify-content: center;
+    padding: 0;
+    width: 44px;
+    height: 44px;
+  }
+  
+  .user-left {
+    justify-content: center;
+  }
+  
+  .logout-btn {
+    justify-content: center;
+    padding: 0;
   }
 }

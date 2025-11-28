@@ -8,6 +8,7 @@
       [routerLinkActiveOptions]="{ exact: false }"
       [class.soft]="item.soft"
       title="{{ item.label }}"
+      type="button"
     >
       <span class="icon-wrap" aria-hidden="true">
         <mat-icon>{{ item.icon }}</mat-icon>
@@ -29,7 +30,7 @@
       </div>
     </div>
 
-    <button class="logout-btn" (click)="onSalir()" aria-label="Cerrar sesión">
+    <button class="logout-btn" (click)="onSalir()" aria-label="Cerrar sesión" type="button">
       <mat-icon>logout</mat-icon>
       <span>Cerrar Sesión</span>
     </button>

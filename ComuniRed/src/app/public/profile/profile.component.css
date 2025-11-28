@@ -1,7 +1,7 @@
 .settings-container {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  margin: 44px auto;
+  padding: 38px;
   background: var(--bg-primary);
   min-height: 100vh;
   color: var(--text-primary);

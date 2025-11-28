@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, type OnInit, type OnDestroy, HostListener } from "@angular/core"
+import { Component, EventEmitter, Output, HostListener, OnInit, OnDestroy } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
 import { Router } from "@angular/router"
@@ -30,7 +30,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   logoUrl = "https://res.cloudinary.com/dxuk9bogw/image/upload/v1761270927/fcd83bdf-0f03-44bf-9f55-7cfdc8244e99.png"
   userAvatarUrl = "https://ui-avatars.com/api/?name=ComuniRed&background=0B3B36&color=fff"
 
-  // ✅ NUEVAS PROPIEDADES PARA BÚSQUEDA
   showSearchResults = false
   searchResults: SearchResult[] = []
   searching = false
@@ -38,9 +37,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   isNavbarHidden = false
   private lastScrollY = 0
-  private scrollThreshold = 10 // Mínimo scroll antes de ocultar
+  private scrollThreshold = 10
 
   @Output() search = new EventEmitter<string>()
+  @Output() hiddenChange = new EventEmitter<boolean>()
 
   private debounceTimer?: any
   private debounceMs = 350
@@ -56,7 +56,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.isDark = saved === "dark"
     document.documentElement.classList.toggle("dark", this.isDark)
 
-    // Obtener usuario actual
     const user = this.usuarioService.getUser()
     if (user) {
       this.currentUserId = (user as any).id
@@ -68,20 +67,23 @@ export class NavbarComponent implements OnInit, OnDestroy {
     const currentScrollY = window.scrollY
     const scrollDelta = currentScrollY - this.lastScrollY
 
-    // Si scrollea hacia abajo más de 10px, ocultar navbar
+    const previous = this.isNavbarHidden
+
     if (scrollDelta > this.scrollThreshold && currentScrollY > 100) {
       this.isNavbarHidden = true
-    }
-    // Si scrollea hacia arriba, mostrar navbar
-    else if (scrollDelta < -this.scrollThreshold || currentScrollY < 100) {
+    } else if (scrollDelta < -this.scrollThreshold || currentScrollY < 100) {
       this.isNavbarHidden = false
+    }
+
+    if (this.isNavbarHidden !== previous) {
+      this.hiddenChange.emit(this.isNavbarHidden)
     }
 
     this.lastScrollY = currentScrollY
   }
 
   ngOnDestroy(): void {
-    // Angular maneja automáticamente los listeners de @HostListener
+    // cleanup si necesario
   }
 
   onQueryChange(value: any): void {
@@ -114,12 +116,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.searching = true
     this.showSearchResults = true
 
-    // Buscar reportes
     this.quejaService.obtenerQuejas(this.currentUserId).subscribe({
       next: (quejas) => {
         const termLower = term.toLowerCase()
 
-        // Filtrar reportes que coincidan
         const reportesResults: SearchResult[] = quejas
           .filter(
             (q) =>
@@ -136,7 +136,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
             fecha: q.fecha_creacion,
           }))
 
-        // Filtrar personas que coincidan (de los autores de reportes)
         const usuariosMap = new Map<string, SearchResult>()
         quejas.forEach((q) => {
           if (q.usuario) {
@@ -171,12 +170,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.query = ""
 
     if (result.type === "reporte") {
-      // Navegar al detalle del reporte (puedes ajustar la ruta)
       this.router.navigate(["/public/feed"], {
         queryParams: { reporte: result.id },
       })
     } else {
-      // Navegar al perfil del usuario
       if (result.id === this.currentUserId) {
         this.router.navigate(["/public/profile"])
       } else {
@@ -187,10 +184,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   closeSearch(): void {
     this.showSearchResults = false
-  }
-
-  getResultIcon(result: SearchResult): string {
-    return result.type === "reporte" ? "📋" : "👤"
   }
 
   getResultTitle(result: SearchResult): string {
@@ -221,7 +214,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   openNotifications(): void {
-    console.log("Abrir notificaciones")
     this.router.navigate(["/public/notifications"])
     this.notificationCount = 0
   }
