@@ -13,9 +13,10 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js version
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
@@ -58,4 +59,4 @@ jobs:
         with:
           app-name: 'ComuniRed'
           slot-name: 'Production'
-          package: .
+          package: ./  # Aquí está la raíz del artifact descargado
