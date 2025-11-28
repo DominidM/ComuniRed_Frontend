@@ -36,13 +36,22 @@ jobs:
         working-directory: ./ComuniRed
         run: npm run build -- --configuration production
 
+      - name: List build output (for debugging)
+        run: |
+          echo "Contents of dist/comuni-red:"
+          ls -la ./ComuniRed/dist/comuni-red/
+          if [ -d "./ComuniRed/dist/comuni-red/browser" ]; then
+            echo "Contents of dist/comuni-red/browser:"
+            ls -la ./ComuniRed/dist/comuni-red/browser/
+          fi
+
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_PROUD_BEACH_0E393570F }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "./ComuniRed/dist/comuni-red"
+          app_location: "./ComuniRed/dist/comuni-red/browser"
           output_location: ""
           api_location: ""
           skip_app_build: true
