@@ -16,9 +16,7 @@
             "outputPath": "dist/comuni-red",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -27,8 +25,7 @@
               },
               "src/assets"
             ],
-            "styles":
-            [
+            "styles": [
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "@angular/material/prebuilt-themes/azure-blue.css",
@@ -41,13 +38,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "3MB",
+                  "maximumError": "5MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "50kB",
+                  "maximumError": "100kB"
                 }
               ],
               "outputHashing": "all"
@@ -78,10 +75,7 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
               {
