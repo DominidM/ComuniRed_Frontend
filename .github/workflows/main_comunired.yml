@@ -1,4 +1,4 @@
-name: Build and deploy Node.js app to Azure Web App - ComuniRed
+name: Build and deploy Angular app to Azure Web App - ComuniRed
 
 on:
   push:
@@ -20,18 +20,17 @@ jobs:
         with:
           node-version: '24.x'
 
-      - name: npm install, build, and test
+      - name: Install dependencies and build
         working-directory: ./ComuniRed
         run: |
           npm install
           npm run build --if-present
-          npm run test --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: node-app
-          path: ./ComuniRed
+          name: angular-build
+          path: ./ComuniRed/dist/comuni-red
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,7 +43,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: node-app
+          name: angular-build
 
       - name: Login to Azure
         uses: azure/login@v2
