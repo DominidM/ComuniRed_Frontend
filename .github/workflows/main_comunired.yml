@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,7 +29,7 @@ jobs:
           npm install
           npm run build --if-present
 
-      - name: Upload Angular dist
+      - name: Upload Angular dist (browser folder)
         uses: actions/upload-artifact@v4
         with:
           name: angular-build
@@ -42,7 +46,7 @@ jobs:
           name: angular-build
           path: ./app
 
-      - name: Login to Azure
+      - name: Login to Azure using OIDC
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A8ABDAD3B15148DB93670B5019488CF7 }}
