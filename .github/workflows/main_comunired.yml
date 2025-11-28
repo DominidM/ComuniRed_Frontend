@@ -18,19 +18,19 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '24.x'
+          node-version: '18.x'
 
-      - name: Install dependencies and build
+      - name: Install & Build Angular
         working-directory: ./ComuniRed
         run: |
           npm install
           npm run build --if-present
 
-      - name: Upload artifact for deployment job
+      - name: Upload Angular dist
         uses: actions/upload-artifact@v4
         with:
           name: angular-build
-          path: ./ComuniRed/dist/comuni-red
+          path: ComuniRed/dist/comuni-red
 
   deploy:
     runs-on: ubuntu-latest
@@ -40,10 +40,11 @@ jobs:
       contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: angular-build
+          path: .
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -52,7 +53,7 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_18ACD77EC0644D9BA9F7819FC0381C58 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C55B9A7A83B94803AC01C4926BC10171 }}
 
-      - name: Deploy to Azure Web App
+      - name: Deploy Angular to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'ComuniRed'
