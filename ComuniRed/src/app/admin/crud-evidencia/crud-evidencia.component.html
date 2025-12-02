@@ -1,1 +1,206 @@
-<p>crud-evidencia works!</p>
+<div class="admin-content">
+  <div class="evidencias-header">
+    <div>
+      <h1 class="evidencias-titulo">Gestión de Evidencias</h1>
+      <p class="evidencias-subtitulo">Administra las imágenes y pruebas de problemas en la comunidad</p>
+    </div>
+    <button class="btn-nueva-evidencia" (click)="abrirFormulario()">
+      <span>➕</span> Nueva Evidencia
+    </button>
+  </div>
+
+  <!-- Filtros y Búsqueda -->
+  <div class="evidencias-filtros">
+    <input
+      type="text"
+      class="evidencias-busqueda"
+      placeholder="Buscar por usuario o título..."
+      [(ngModel)]="busqueda"
+    />
+
+    <div class="filtros-grupo">
+      <select class="filtro-select" [(ngModel)]="filtroEstado">
+        <option>Todos</option>
+        <option *ngFor="let estado of estados">{{ estado }}</option>
+      </select>
+
+      <select class="filtro-select" [(ngModel)]="filtroCategoria">
+        <option>Todos</option>
+        <option *ngFor="let categoria of categorias">{{ categoria }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Galería de Evidencias -->
+  <div class="evidencias-galeria">
+    <div *ngIf="evidenciasFiltradas.length === 0" class="evidencias-vacio">
+      <p>No hay evidencias que coincidan con los filtros</p>
+    </div>
+
+    <div *ngFor="let evidencia of evidenciasFiltradas" class="evidencia-card">
+      <div class="evidencia-imagen-contenedor">
+        <img [src]="evidencia.imagen" [alt]="evidencia.titulo" class="evidencia-imagen" />
+        <span [class]="'estado-badge-imagen estado-' + evidencia.estado.toLowerCase()">
+          {{ evidencia.estado }}
+        </span>
+      </div>
+
+      <div class="evidencia-contenido">
+        <div class="evidencia-header-card">
+          <h3 class="evidencia-titulo-card">{{ evidencia.titulo }}</h3>
+          <button class="btn-mas-opciones" (click)="verDetalles(evidencia)">⋮</button>
+        </div>
+
+        <p class="evidencia-descripcion-card">{{ evidencia.descripcion }}</p>
+
+        <div class="evidencia-info">
+          <span class="info-item">📍 {{ evidencia.ubicacion }}</span>
+          <span class="info-item">{{ evidencia.categoria }}</span>
+        </div>
+
+        <div class="evidencia-usuario-card">
+          <span class="avatar-mini">{{ evidencia.avatar }}</span>
+          <span class="usuario-nombre">{{ evidencia.usuario }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Formulario -->
+  <div *ngIf="mostrarFormulario" class="modal-overlay" (click)="cerrarFormulario()">
+    <div class="modal-contenido" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Nueva Evidencia</h2>
+        <button class="btn-cerrar" (click)="cerrarFormulario()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Título</label>
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="formularioEvidencia.titulo"
+            placeholder="Título de la evidencia"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea
+            class="form-textarea"
+            [(ngModel)]="formularioEvidencia.descripcion"
+            placeholder="Describe la situación en detalle"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Ubicación</label>
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="formularioEvidencia.ubicacion"
+            placeholder="Dirección o ubicación exacta"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Categoría</label>
+          <select class="form-select" [(ngModel)]="formularioEvidencia.categoria">
+            <option *ngFor="let categoria of categorias">{{ categoria }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Usuario</label>
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="formularioEvidencia.usuario"
+            placeholder="Nombre del usuario"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Avatar (emoji)</label>
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="formularioEvidencia.avatar"
+            placeholder="👤"
+            maxlength="2"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Imagen</label>
+          <input
+            type="file"
+            class="form-file"
+            accept="image/*"
+            (change)="onImagenSeleccionada($event)"
+          />
+          <div *ngIf="formularioEvidencia.imagen" class="imagen-preview">
+            <img [src]="formularioEvidencia.imagen" alt="Preview" />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancelar" (click)="cerrarFormulario()">Cancelar</button>
+        <button class="btn-guardar" (click)="guardarEvidencia()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalles -->
+  <div *ngIf="mostrarDetalles && evidenciaSeleccionada" class="modal-overlay" (click)="cerrarDetalles()">
+    <div class="modal-contenido modal-detalles-evidencia" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Detalles de Evidencia</h2>
+        <button class="btn-cerrar" (click)="cerrarDetalles()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <img [src]="evidenciaSeleccionada.imagen" [alt]="evidenciaSeleccionada.titulo" class="modal-imagen-grande" />
+
+        <div class="detalles-info">
+          <h3>{{ evidenciaSeleccionada.titulo }}</h3>
+          <p class="detalles-descripcion">{{ evidenciaSeleccionada.descripcion }}</p>
+
+          <div class="detalles-grid">
+            <div class="detalle-item">
+              <strong>Ubicación:</strong>
+              <p>{{ evidenciaSeleccionada.ubicacion }}</p>
+            </div>
+            <div class="detalle-item">
+              <strong>Categoría:</strong>
+              <p>{{ evidenciaSeleccionada.categoria }}</p>
+            </div>
+            <div class="detalle-item">
+              <strong>Usuario:</strong>
+              <p>{{ evidenciaSeleccionada.usuario }}</p>
+            </div>
+            <div class="detalle-item">
+              <strong>Fecha:</strong>
+              <p>{{ evidenciaSeleccionada.fecha | date:'short' }}</p>
+            </div>
+          </div>
+
+          <div class="detalles-estado">
+            <label>Estado:</label>
+            <select class="estado-select" [(ngModel)]="evidenciaSeleccionada.estado" (change)="cambiarEstado(evidenciaSeleccionada!.estado)">
+              <option *ngFor="let estado of estados">{{ estado }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancelar" (click)="cerrarDetalles()">Cerrar</button>
+        <button class="btn-eliminar-modal" (click)="eliminarEvidencia(evidenciaSeleccionada!.id)">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
