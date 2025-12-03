@@ -1,1 +1,65 @@
-<p>report-export works!</p>
+<div class="report-container">
+  <div class="report-card">
+    <div class="report-header">
+      <div>
+        <h2>Exportar Reportes</h2>
+        <p>Genera reportes en PDF de quejas y usuarios</p>
+      </div>
+      <div class="report-icon">📋</div>
+    </div>
+
+    <div class="report-options">
+      <div class="option-group">
+        <label class="option-label">
+          <input
+            type="radio"
+            name="tipoReporte"
+            value="comentarios"
+            [(ngModel)]="tipoReporte"
+            class="radio-input"
+          />
+          <span class="option-text">
+            <span class="option-title">Reporte de Quejas</span>
+            <span class="option-description">Descargar registro de comentarios y problemas reportados</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="option-group">
+        <label class="option-label">
+          <input
+            type="radio"
+            name="tipoReporte"
+            value="usuarios"
+            [(ngModel)]="tipoReporte"
+            class="radio-input"
+          />
+          <span class="option-text">
+            <span class="option-title">Reporte de Usuarios</span>
+            <span class="option-description">Descargar registro de usuarios registrados en el sistema</span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="report-stats">
+      <div class="stat-box">
+        <div class="stat-number">{{ comentarios.length }}</div>
+        <div class="stat-label">Quejas Registradas</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">{{ usuarios.length }}</div>
+        <div class="stat-label">Usuarios Activos</div>
+      </div>
+    </div>
+
+    <button (click)="descargarReporte()" [disabled]="generandoPDF" class="btn-descargar">
+      <span *ngIf="!generandoPDF">📥 Descargar {{ tipoReporte === 'comentarios' ? 'Reporte de Quejas' : 'Reporte de Usuarios' }}</span>
+      <span *ngIf="generandoPDF">⏳ Generando PDF...</span>
+    </button>
+
+    <div class="report-info">
+      <p>Los reportes incluyen toda la información relevante y se generan en formato PDF listo para compartir o imprimir.</p>
+    </div>
+  </div>
+</div>
