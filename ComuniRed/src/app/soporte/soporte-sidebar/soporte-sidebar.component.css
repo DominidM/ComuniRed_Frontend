@@ -1,6 +1,6 @@
 .sidebar-container {
   width: 100%;
-  height: 100vh;
+  height: 100%; /* Respetar la altura del layout padre en lugar de usar 50vh/100vh */
   display: flex;
   flex-direction: column;
   padding: 12px;
@@ -8,12 +8,14 @@
   box-sizing: border-box;
   overflow: hidden;
   gap: 12px;
+  min-height: 0; /* permitir que los hijos con overflow funcionen correctamente */
 }
 
 [data-theme='dark'] .sidebar-container {
   background: #0f172a;
   border-right: 1px solid #1f2933;
 }
+
 
 /* MENÚ CON SCROLL INTELIGENTE */
 .sidebar-menu {
@@ -28,6 +30,12 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
   padding-right: 4px;
+}
+
+/* Asegurar que la sección de perfil quede fuera del scroll del menú */
+.perfil-header {
+  flex-shrink: 0;
+  z-index: 5;
 }
 
 [data-theme='dark'] .sidebar-menu {
@@ -96,6 +104,26 @@
   white-space: nowrap;
   color: inherit;
   line-height: 1.3;
+}
+
+/* Ajustes responsive para sidebar */
+@media (max-width: 992px) {
+  .icon-wrap { width: 18px; height: 18px; }
+  .sidebar-link { padding: 10px 10px; gap: 8px; }
+  .link-label { font-size: 13px; }
+}
+
+@media (max-width: 768px) {
+  .sidebar-container { padding: 8px; gap: 8px; }
+  .icon-wrap { width: 20px; height: 20px; }
+  .sidebar-link { justify-content: center; padding: 10px 6px; gap: 0; }
+  .link-label { display: none; }
+  .perfil .avatar { width: 32px; height: 32px; }
+}
+
+@media (max-width: 480px) {
+  .sidebar-container { padding: 6px; }
+  .perfil .avatar { width: 30px; height: 30px; }
 }
 
 .sidebar-link:hover:not(.active) {

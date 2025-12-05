@@ -30,7 +30,7 @@ mat-sidenav-container.sidenav-container {
 }
 
 /* ==================== SIDEBAR (SIN POSITION FIXED) ==================== */
-mat-sidenav.app-sidebar {
+mat-sidenav.app-public-sidebar {
   width: var(--sidebar-width) !important;
   height: 100% !important;
   overflow: hidden !important;
@@ -40,7 +40,7 @@ mat-sidenav.app-sidebar {
   /* ✅ NO uses position: fixed aquí */
 }
 
-mat-sidenav.app-sidebar::ng-deep .mat-drawer-inner-container {
+mat-sidenav.app-public-sidebar::ng-deep .mat-drawer-inner-container {
   overflow: hidden !important;
 }
 
@@ -110,7 +110,7 @@ app-rightbar::-webkit-scrollbar-thumb {
     display: none; 
   }
   
-  mat-sidenav.app-sidebar { 
+  mat-sidenav.app-public-sidebar { 
     width: 80% !important; 
     max-width: 290px !important; 
   }

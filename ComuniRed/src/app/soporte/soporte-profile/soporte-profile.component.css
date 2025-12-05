@@ -6,7 +6,7 @@
 
 .editar-perfil-container {
   width: 100%;
-  max-width: 1100px;
+  max-width: none;
   margin: 0; /* quitar centrado, alineado al layout */
   background: #fff;
   padding: 2rem;

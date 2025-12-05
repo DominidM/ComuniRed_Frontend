@@ -6,7 +6,7 @@ import { UsuarioService } from '../../services/usuario.service';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
-  selector: 'app-sidebar',
+  selector: 'app-public-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule, MatIconModule],
   templateUrl: './sidebar.component.html',

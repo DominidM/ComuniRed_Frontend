@@ -4,26 +4,51 @@
   height: 100vh;
   width: 100%;
   background: #eef1f7;
+  /* Mantener el layout contenido en la ventana y evitar scroll de la página */
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Variables de layout (ajustables por breakpoint) */
+.soporte-container {
+  --sidebar-width: 220px;
+  --layout-gap: 1rem;
+  --main-padding: 1rem;
+}
+
+/* Anular reglas globales que aplican margin-left/width a .main-content y layout-content */
+.soporte-container,
+.soporte-container .layout-content,
+.soporte-container .main-content {
+  margin-left: 0 !important;
+  margin-top: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 /* LAYOUT PRINCIPAL - SIDEBAR A LA IZQUIERDA */
 .layout-content {
+  /* Grid principal: sidebar + contenido */
   display: grid;
-  grid-template-columns: 260px 1fr;
-  height: 100%;
-  overflow: hidden;
-  gap: 0;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  gap: var(--layout-gap);
+  align-items: start;
+  justify-items: start;
+  width: 100%;
+  transition: grid-template-columns 180ms ease, gap 120ms ease;
 }
 
 /* SIDEBAR OCUPA TODO EL LATERAL */
 app-sidebar {
-  width: 260px;
-  height: 100%;
+  width: var(--sidebar-width); /* Ancho controlado por variable */
+  height: 100%; /* Use 100% para respetar el layout padre, evitar 100vh */
   background: #ffffff;
   border-right: 1px solid #e2e8f0;
   overflow: hidden;
   padding: 0;
   margin: 0;
+  box-sizing: border-box;
 }
 
 [data-theme='dark'] app-sidebar {
@@ -35,10 +60,12 @@ app-sidebar {
 .main-content {
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 1.5rem;
+  padding: var(--main-padding);
   background: #f9fafb;
   height: 100%;
   box-sizing: border-box;
+  width: 100%; /* Ocupar todo el espacio disponible */
+  max-width: none; /* No limitar ancho */
 }
 
 [data-theme='dark'] .main-content {
@@ -67,41 +94,83 @@ app-sidebar {
 }
 
 /* RESPONSIVE */
-@media (max-width: 1024px) {
-  .layout-content {
-    grid-template-columns: 220px 1fr;
-  }
+/* Breakpoints: fluidos y ordenados */
+@media (max-width: 1400px) {
+  .soporte-container { --sidebar-width: 220px; --layout-gap: 1rem; --main-padding: 1rem; }
+}
 
-  app-sidebar {
-    width: 220px;
-  }
+@media (max-width: 1200px) {
+  /* Tablet grande */
+  .soporte-container { --sidebar-width: 180px; --layout-gap: 1rem; --main-padding: 1rem; }
+}
+
+@media (max-width: 992px) {
+  /* Tablet pequeño / desktop estrecho: sidebar compacta */
+  .soporte-container { --sidebar-width: 120px; --layout-gap: 0.75rem; --main-padding: 0.9rem; }
 }
 
 @media (max-width: 768px) {
-  .layout-content {
-    grid-template-columns: 80px 1fr;
-    gap: 0;
-  }
-
-  app-sidebar {
-    width: 80px;
-  }
-
-  .main-content {
-    padding: 1rem;
-  }
+  /* Mobile landscape / tablet: icon-only sidebar */
+  .soporte-container { --sidebar-width: 72px; --layout-gap: 0.5rem; --main-padding: 0.75rem; }
+  .layout-content { grid-template-columns: var(--sidebar-width) minmax(0, 1fr); }
+  app-sidebar .link-label { display: none; }
 }
 
 @media (max-width: 480px) {
+  /* Mobile portrait: sidebar overlay */
+  .soporte-container { --sidebar-width: 0; --layout-gap: 0; --main-padding: 0.5rem; }
+  .layout-content { grid-template-columns: 1fr; }
+  app-sidebar { position: fixed; left: 0; top: 0; height: 100%; width: 280px; transform: translateX(-110%); transition: transform 220ms ease; z-index: 1100; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+  app-sidebar.open { transform: translateX(0); }
+}
+
+@media (max-width: 768px) {
+  /* Móvil grande / tablet pequeña: colapsar a icon-only (72px) */
   .layout-content {
-    grid-template-columns: 70px 1fr;
+    grid-template-columns: 72px 1fr; /* Sidebar icon-only */
+    gap: 0.5rem;
   }
 
   app-sidebar {
-    width: 70px;
+    width: 72px;
+    height: 100%; /* respetar la altura del contenedor padre */
+    border-right: 1px solid transparent;
   }
 
   .main-content {
     padding: 0.75rem;
+  }
+
+  /* Ocultar etiquetas de los links para versión icon-only */
+  app-sidebar .link-label {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Pantallas muy pequeñas: usar layout de una sola columna y sidebar overlay */
+  .layout-content {
+    grid-template-columns: 1fr;
+  }
+
+  app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 280px; /* ancho del overlay cuando se abre */
+    transform: translateX(-110%);
+    transition: transform 220ms ease;
+    z-index: 1100;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+
+  /* Clase utilitaria que puede activar la apertura del overlay desde JS */
+  app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    padding: 0.5rem;
   }
 }
