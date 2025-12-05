@@ -1,7 +1,9 @@
 .seguimiento-container {
   padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  margin: 0; /* ocupar todo el ancho disponible */
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
   background: #f9fafb;
   min-height: 100vh;
 }

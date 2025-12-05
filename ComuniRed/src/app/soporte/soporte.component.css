@@ -3,39 +3,54 @@
   grid-template-rows: auto 1fr;
   height: 100vh;
   width: 100%;
-  overflow: hidden;
-  background: #f5f5f5;
+  background: #eef1f7;
 }
 
+/* LAYOUT PRINCIPAL - SIDEBAR A LA IZQUIERDA */
 .layout-content {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 260px 1fr;
   height: 100%;
   overflow: hidden;
+  gap: 0;
 }
 
+/* SIDEBAR OCUPA TODO EL LATERAL */
 app-sidebar {
-  width: 220px;
+  width: 260px;
   height: 100%;
-  border-right: 1px solid #e2e8f0;
   background: #ffffff;
+  border-right: 1px solid #e2e8f0;
   overflow: hidden;
+  padding: 0;
+  margin: 0;
 }
 
+[data-theme='dark'] app-sidebar {
+  background: #0f172a;
+  border-right-color: #1f2933;
+}
+
+/* CONTENIDO PRINCIPAL A LA DERECHA */
 .main-content {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 1.5rem;
   background: #f9fafb;
   height: 100%;
+  box-sizing: border-box;
+}
+
+[data-theme='dark'] .main-content {
+  background: #020617;
 }
 
 .main-content::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .main-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
 
 .main-content::-webkit-scrollbar-thumb {
@@ -43,30 +58,50 @@ app-sidebar {
   border-radius: 4px;
 }
 
+[data-theme='dark'] .main-content::-webkit-scrollbar-thumb {
+  background: #3f4752;
+}
+
 .main-content::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
-@media (max-width: 768px) {
+/* RESPONSIVE */
+@media (max-width: 1024px) {
   .layout-content {
-    grid-template-columns: 72px 1fr;
+    grid-template-columns: 220px 1fr;
   }
 
   app-sidebar {
-    width: 72px;
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout-content {
+    grid-template-columns: 80px 1fr;
+    gap: 0;
+  }
+
+  app-sidebar {
+    width: 80px;
+  }
+
+  .main-content {
+    padding: 1rem;
   }
 }
 
 @media (max-width: 480px) {
   .layout-content {
-    grid-template-columns: 60px 1fr;
+    grid-template-columns: 70px 1fr;
   }
 
   app-sidebar {
-    width: 60px;
+    width: 70px;
   }
 
   .main-content {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 }
