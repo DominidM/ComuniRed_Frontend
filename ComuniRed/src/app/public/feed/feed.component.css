@@ -1976,7 +1976,7 @@
 
 /* ==================== EMPTY STATE ==================== */
 .no-posts {
-  background: white;
+  background: var(--cr-background);
   padding: 4rem 2rem;
   border-radius: 16px;
   text-align: center;
@@ -1993,12 +1993,12 @@
 }
 
 .no-posts h3 {
-  color: #1a202c;
+  color: var(--cr-text);
   margin-bottom: 0.5rem;
 }
 
 .no-posts p {
-  color: #718096;
+  color: var(--cr-text);
   margin-bottom: 1.5rem;
 }
 
