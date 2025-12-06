@@ -15,11 +15,11 @@ export class SoporteSidebarComponent implements OnInit {
   usuario: Usuario | null = null;
 
   menuItems = [
-    { 
+    /*{ 
       label: 'Editar Reportes', 
       icon: 'edit', 
       route: '/soporte/reporte-editar' 
-    },
+    },*/
     { 
       label: 'Clasificacion',
       icon: 'label',  

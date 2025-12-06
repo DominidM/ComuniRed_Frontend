@@ -153,13 +153,13 @@ export const routes: Routes = [
     canActivateChild: [AuthGuard],
     data: { roles: ['68ca68bb0bc4d9ca3267b665'] },
     children: [
-      { path: 'reporte-editar', component: SoporteReportComponent},
+      //{ path: 'reporte-editar', component: SoporteReportComponent},*/
       { path: 'clasificacion', component: SoporteClasificacionComponent},
       { path: 'validacion', component: SoporteValidacionComponent},
       { path: 'seguimiento', component: SoporteSeguimientoComponent},
       { path: 'comentarios', component: SoporteComentariosComponent},
       { path: 'perfil', component: SoporteProfileComponent},
-      { path: '', redirectTo: 'reporte-editar', pathMatch: 'full' }
+      { path: '', redirectTo: 'clasificacion', pathMatch: 'full' }
     ]
   },
 
