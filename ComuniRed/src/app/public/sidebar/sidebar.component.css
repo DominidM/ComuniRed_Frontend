@@ -1,27 +1,31 @@
+/* ===== HOST ===== */
 :host {
   display: block;
-  height: calc(100vh - 67px); /* ✅ Resta la altura del navbar */
+  height: 100%;
   overflow: hidden;
-  position: fixed;
-  top: 72px ; /* ✅ Empieza debajo del navbar */
-  left: 0;
-  width: 240px;
-  z-index: 50; /* ✅ Menor que el navbar (que debería ser 100) */
 }
 
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
 .sidebar-container {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #fdfcfc;
+  background: #ffffff;
   box-sizing: border-box;
   overflow: hidden;
   position: relative;
   border-right: 1px solid #e2e8f0;
 }
 
-/* ✅ MENÚ CON SCROLL */
+[data-theme='dark'] .sidebar-container {
+  background: #0f172a;
+  border-right-color: #1f2933;
+}
+
+
+/* ===== MENÚ CON SCROLL ===== */
 .sidebar-menu {
   flex: 1;
   display: flex;
@@ -31,8 +35,12 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
   min-height: 0;
+}
+
+[data-theme='dark'] .sidebar-menu {
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
 .sidebar-menu::-webkit-scrollbar {
@@ -44,14 +52,20 @@
 }
 
 .sidebar-menu::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 2px;
 }
 
 .sidebar-menu::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.25);
 }
 
+[data-theme='dark'] .sidebar-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+
+/* ===== LINKS DEL MENÚ ===== */
 .sidebar-link {
   display: flex;
   align-items: center;
@@ -70,6 +84,10 @@
   outline: none;
 }
 
+[data-theme='dark'] .sidebar-link {
+  color: #e5e7eb;
+}
+
 .icon-wrap {
   width: 22px;
   height: 22px;
@@ -79,6 +97,10 @@
   color: #64748b;
   flex-shrink: 0;
   transition: color 150ms ease;
+}
+
+[data-theme='dark'] .icon-wrap {
+  color: #9ca3af;
 }
 
 .link-label {
@@ -93,11 +115,16 @@
   background: #f1f5f9;
 }
 
+[data-theme='dark'] .sidebar-link:hover:not(.active) {
+  background: #1f2933;
+}
+
+/* LINK ACTIVO */
 .sidebar-link.active {
-  background: #000000;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: #ffffff !important;
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(15,23,42,0.1);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
 }
 
 .sidebar-link.active .icon-wrap {
@@ -113,7 +140,8 @@
   color: inherit;
 }
 
-/* ✅ FOOTER FIJO AL FONDO */
+
+/* ===== FOOTER FIJO AL FONDO ===== */
 .sidebar-footer {
   flex-shrink: 0;
   display: flex;
@@ -121,18 +149,26 @@
   gap: 8px;
   padding: 14px 16px;
   border-top: 1px solid #e2e8f0;
-  background: #fdfcfc;
-  z-index: 200;
+  background: #ffffff;
+  z-index: 10;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
 }
 
+[data-theme='dark'] .sidebar-footer {
+  background: #0f172a;
+  border-top-color: #1f2933;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+/* ===== USER CARD ===== */
 .user-card {
   display: flex;
   align-items: center;
   height: 56px;
   padding: 0 12px;
   border-radius: 12px;
-  background: #ffffff;
+  background: #f9fafb;
   border: 1px solid #e2e8f0;
   overflow: hidden;
   box-sizing: border-box;
@@ -140,9 +176,18 @@
   cursor: pointer;
 }
 
+[data-theme='dark'] .user-card {
+  background: #1a202c;
+  border-color: #2d3748;
+}
+
 .user-card:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
+}
+
+[data-theme='dark'] .user-card:hover {
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
 }
 
 .user-left {
@@ -166,47 +211,58 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.user-avatar { 
-  width: 100%; 
-  height: 100%; 
+.user-avatar {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
-.user-info { 
-  display: flex; 
-  flex-direction: column; 
+.user-info {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  min-width: 0; 
+  min-width: 0;
   gap: 2px;
   overflow: hidden;
 }
 
-.user-name { 
+.user-name {
   font-size: 14px;
-  font-weight: 700; 
+  font-weight: 700;
   color: #0f172a;
-  white-space: nowrap; 
-  overflow: hidden; 
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.user-email { 
+[data-theme='dark'] .user-name {
+  color: #ffffff;
+}
+
+.user-status {
   font-size: 12px;
   color: #64748b;
-  white-space: nowrap; 
-  overflow: hidden; 
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
+[data-theme='dark'] .user-status {
+  color: #9ca3af;
+}
+
+
+/* ===== BOTÓN LOGOUT ===== */
 .logout-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   width: 100%;
   height: 40px;
   padding: 0 12px;
   border-radius: 12px;
-  border: 1px solid rgba(239,68,68,0.2);
+  border: 1px solid rgba(239, 68, 68, 0.2);
   color: #ef4444;
   background: transparent;
   font-size: 14px;
@@ -214,56 +270,91 @@
   cursor: pointer;
   transition: all 150ms ease;
   outline: none;
+  box-sizing: border-box;
+}
+
+[data-theme='dark'] .logout-btn {
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
 }
 
 .logout-btn:hover {
-  background: rgba(239,68,68,0.05);
+  background: rgba(239, 68, 68, 0.05);
   border-color: #ef4444;
   transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(239,68,68,0.2);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
 }
 
-.logout-btn mat-icon { 
+[data-theme='dark'] .logout-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.logout-btn mat-icon {
   font-size: 18px;
   width: 18px;
   height: 18px;
   color: inherit;
+  flex-shrink: 0;
 }
 
-/* ✅ MOBILE - Sidebar colapsado */
+.logout-btn span {
+  white-space: nowrap;
+}
+
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  :host {
-    width: 60px;
-  }
-  
   .sidebar-menu {
     padding: 12px 8px;
   }
-  
-  .link-label, 
-  .user-info, 
-  .logout-btn span { 
-    display: none; 
+
+  .sidebar-link {
+    justify-content: center;
+    padding: 10px 8px;
   }
-  
-  .sidebar-link { 
-    justify-content: center; 
-    padding: 8px;
+
+  .link-label {
+    display: none;
   }
-  
+
+  .sidebar-footer {
+    padding: 12px 8px;
+  }
+
   .user-card {
     justify-content: center;
     padding: 0;
     width: 44px;
     height: 44px;
+    margin: 0 auto;
   }
-  
+
   .user-left {
     justify-content: center;
   }
-  
+
+  .user-info {
+    display: none;
+  }
+
   .logout-btn {
     justify-content: center;
     padding: 0;
+  }
+
+  .logout-btn span {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-avatar-wrap {
+    width: 32px;
+    height: 32px;
+  }
+
+  .user-card {
+    width: 40px;
+    height: 40px;
   }
 }

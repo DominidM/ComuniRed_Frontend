@@ -1,3 +1,26 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+/* fondo general de la vista soporte */
+.soporte-layout {
+  background: var(--bg-alt);
+  color: var(--text);
+}
+
+/* cards y contenedores principales */
+.card,
+.stats-card,
+.reporte-card,
+.sidebar-container,
+.filtros {
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--border);
+  box-shadow: 0 1px 3px var(--shadow-color);
+}
+
 .soporte-container {
   display: grid;
   grid-template-rows: auto 1fr;
