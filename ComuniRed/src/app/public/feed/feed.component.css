@@ -3,9 +3,9 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  background: #fff;
+  background: var(--cr-background);
   min-height: 100vh;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--cr-border);
   border-radius: 8px;
 }
 
@@ -88,7 +88,7 @@
 
 /* ==================== CARD BASE ==================== */
 .card {
-  background: white;
+  background: var(--cr-background);
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin-bottom: 1.5rem;
@@ -120,18 +120,17 @@
 .create-input {
   flex: 1;
   padding: 1rem 1.5rem;
-  background: #f7fafc;
-  border: 2px solid #e2e8f0;
+  background: var(--cr-search);
+  border: 2px solid var(--cr-border);
   border-radius: 24px;
   text-align: left;
   color: #a0aec0;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .create-input:hover {
-  background: #edf2f7;
+  background: var(--cr-search);
   border-color: #cbd5e0;
 }
 
@@ -149,8 +148,8 @@
 .create-action {
   flex: 1;
   padding: 0.75rem;
-  background: white;
-  border: 2px solid #e2e8f0;
+  background: var(--cr-background-content);
+  border: 2px solid var(--cr-border);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -158,12 +157,11 @@
   gap: 0.5rem;
   cursor: pointer;
   font-weight: 600;
-  color: #4a5568;
-  transition: all 0.2s ease;
+  color: var(--cr-text);
 }
 
 .create-action:hover {
-  background: #f7fafc;
+  background: var(--cr-background-content);
   border-color: #667eea;
   color: #667eea;
 }
@@ -238,6 +236,7 @@
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
+  transition: background 0.2s ease;
 }
 
 .modal-close:hover {
@@ -296,6 +295,7 @@
   border-radius: 12px;
   font-size: 1rem;
   outline: none;
+  transition: border-color 0.2s ease;
 }
 
 .form-input:focus,
@@ -315,6 +315,7 @@
   padding: 2rem;
   text-align: center;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .upload-area:hover {
@@ -365,6 +366,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .remove-image:hover {
@@ -386,6 +388,7 @@
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-cancel {
@@ -419,6 +422,7 @@
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin-bottom: 1.5rem;
+  transition: transform 0.3s ease;
 }
 
 .post-card:hover {
@@ -427,6 +431,9 @@
 }
 
 .post-header {
+  background: var(--cr-background-content);
+  border: var(--cr-border);
+  color: var(--cr-text);
   display: flex;
   gap: 1rem;
   padding: 1.5rem;
@@ -445,6 +452,7 @@
 
 .avatar.clickable {
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
 .avatar.clickable:hover {
@@ -470,7 +478,9 @@
 }
 
 .post-author.clickable {
+  color: var(--cr-text);
   cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .post-author.clickable:hover {
@@ -501,6 +511,7 @@
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
+  transition: background 0.2s ease;
   color: #718096;
   font-size: 1.5rem;
 }
@@ -528,6 +539,7 @@
   background: white;
   text-align: left;
   cursor: pointer;
+  transition: background 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -549,13 +561,13 @@
 .post-heading {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--cr-text);
   margin: 0.5rem 0;
   line-height: 1.4;
 }
 
 .post-text {
-  color: #4a5568;
+  color: var(--cr-text);
   line-height: 1.6;
   margin: 0.5rem 0 1rem;
 }
@@ -606,7 +618,7 @@
   max-height: 500px;
   text-align: center;
   padding: 1rem 0;
-  background: #f7fafc;
+  background: var(--cr-background-content);
 }
 
 .post-image {
@@ -636,9 +648,9 @@
 /* ==================== VOTOS ==================== */
 .vote-section {
   padding: 1rem 1.5rem;
-  background: #f7fafc;
-  border-top: 1px solid #e2e8f0;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--cr-background-content);
+  border-top: 1px solid var(--cr-border);
+  border-bottom: 1px solid var(--cr-border);
 }
 
 .vote-question {
@@ -647,7 +659,7 @@
   align-items: center;
   margin-bottom: 1rem;
   font-weight: 600;
-  color: var(--cr-text);
+  color: #1a202c;
 }
 
 .vote-count {
@@ -664,11 +676,12 @@
 .vote-btn {
   flex: 1;
   padding: 0.75rem;
-  border: 2px solid var(--cr-border);
+  border: 2px solid #e2e8f0;
   border-radius: 12px;
-  background: var(--cr-background);
+  background: white;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .vote-btn.accept {
@@ -676,7 +689,7 @@
 }
 
 .vote-btn.accept:hover:not(:disabled) {
-  background: var(--cr-background);
+  background: #f0fff4;
   border-color: #48bb78;
 }
 
@@ -691,7 +704,7 @@
 }
 
 .vote-btn.reject:hover:not(:disabled) {
-  background: var(--cr-background);
+  background: #fff5f5;
   border-color: #f56565;
 }
 
@@ -711,8 +724,8 @@
   display: flex;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: white;
+  border-bottom: 1px solid var(--cr-border);
+  background: var(--cr-background-content);
 }
 
 .reaction-btn {
@@ -724,6 +737,7 @@
   border: 2px solid transparent;
   border-radius: 20px;
   cursor: pointer;
+  transition: all 0.2s ease;
   font-weight: 600;
   color: #4a5568;
 }
@@ -758,8 +772,8 @@
   display: flex;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: white;
+  border-bottom: 1px solid var(--cr-border);
+  background: var(--cr-background-content);
 }
 
 .left-actions,
@@ -779,10 +793,11 @@
   cursor: pointer;
   font-weight: 600;
   color: #4a5568;
+  transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background: var(--cr-background-content);
+  background: #f7fafc;
   color: #667eea;
 }
 
@@ -842,6 +857,7 @@
 
 .comment-avatar.clickable {
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
 .comment-avatar.clickable:hover {
@@ -856,6 +872,7 @@
 
 .comment-author.clickable {
   cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .comment-author.clickable:hover {
@@ -883,6 +900,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
 .comment-action-btn:hover {
@@ -927,6 +945,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
   font-size: 1rem;
 }
 
@@ -964,6 +983,7 @@
   border-radius: 20px;
   font-size: 0.875rem;
   outline: none;
+  transition: border-color 0.2s ease;
   background: #f7fafc;
 }
 
@@ -983,6 +1003,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
   flex-shrink: 0;
   font-size: 1.25rem;
 }
@@ -1048,6 +1069,7 @@
   cursor: pointer;
   font-weight: 600;
   color: #4a5568;
+  transition: all 0.2s ease;
 }
 
 .pagination-btn:hover:not(:disabled) {
@@ -1076,6 +1098,7 @@
   cursor: pointer;
   font-weight: 600;
   color: #4a5568;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;

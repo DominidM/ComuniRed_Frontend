@@ -7,83 +7,88 @@
   --rb-gap: 18px;
   --rb-radius: 14px;
 
-  --rb-bg: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,255,255,0.9));
-  --rb-section-bg: rgba(255,255,255,0.96);
-  --rb-border: rgba(255,255,255,0.72);
-  --rb-inset: rgba(255,255,255,0.45);
+  --rb-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.9));
+  --rb-section-bg: rgba(255, 255, 255, 0.96);
+  --rb-border: rgba(255, 255, 255, 0.72);
+  --rb-inset: rgba(255, 255, 255, 0.45);
   --rb-ink: #111111;
   --rb-muted: #6e7075;
   --rb-accent: #0066ff;
-  --rb-shadow-1: 0 12px 36px rgba(0,0,0,0.06);
-  --rb-shadow-2: 0 6px 18px rgba(0,0,0,0.04);
-  --rb-button-bg: linear-gradient(135deg,#222,#161616);
-  --rb-button-hover: linear-gradient(135deg,#0077ff,#005bb5);
-  --rb-button-shadow: 0 8px 24px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.12);
+  --rb-shadow-1: 0 12px 36px rgba(0, 0, 0, 0.06);
+  --rb-shadow-2: 0 6px 18px rgba(0, 0, 0, 0.04);
+  --rb-button-bg: linear-gradient(135deg, #222, #161616);
+  --rb-button-hover: linear-gradient(135deg, #0077ff, #005bb5);
+  --rb-button-shadow: 0 8px 24px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 /* Dark mode overrides */
 html.dark {
-  --rb-bg: linear-gradient(135deg, rgba(20,22,24,0.94), rgba(22,24,26,0.9));
-  --rb-section-bg: linear-gradient(135deg, rgba(18,20,22,0.9), rgba(22,24,26,0.86));
-  --rb-border: rgba(255,255,255,0.04);
-  --rb-inset: rgba(255,255,255,0.02);
+  --rb-bg: linear-gradient(135deg, rgba(20, 22, 24, 0.94), rgba(22, 24, 26, 0.9));
+  --rb-section-bg: linear-gradient(135deg, rgba(18, 20, 22, 0.9), rgba(22, 24, 26, 0.86));
+  --rb-border: rgba(255, 255, 255, 0.04);
+  --rb-inset: rgba(255, 255, 255, 0.02);
   --rb-ink: #e8e8ea;
   --rb-muted: #9aa4ad;
   --rb-accent: #57a6ff;
-  --rb-shadow-1: 0 12px 36px rgba(0,0,0,0.36);
-  --rb-shadow-2: 0 6px 18px rgba(0,0,0,0.28);
-  --rb-button-bg: linear-gradient(135deg,#333438,#1b1b1d);
-  --rb-button-hover: linear-gradient(135deg,#57a6ff,#2f7fe4);
-  --rb-button-shadow: 0 8px 28px rgba(0,0,0,0.6), 0 6px 18px rgba(0,0,0,0.45);
+  --rb-shadow-1: 0 12px 36px rgba(0, 0, 0, 0.36);
+  --rb-shadow-2: 0 6px 18px rgba(0, 0, 0, 0.28);
+  --rb-button-bg: linear-gradient(135deg, #333438, #1b1b1d);
+  --rb-button-hover: linear-gradient(135deg, #57a6ff, #2f7fe4);
+  --rb-button-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), 0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
-/* -------------------- Container -------------------- */
 .rightbar-container {
   max-width: var(--rb-max-width);
   min-width: var(--rb-min-width);
-  background: var(--rb-bg);
+  background: var(--cr-background);
   backdrop-filter: blur(14px) saturate(120%);
   -webkit-backdrop-filter: blur(14px) saturate(120%);
   border: 1px solid var(--rb-border);
-  padding: 116px 14px 0 14px;
+  position: fixed;
+  top: 60px;
+  right: 1px;
+  height: calc(100vh - 40px);
+  padding: 18px 14px 28px 14px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--rb-gap);
-  position: sticky;
-  top: 20px;
-  margin-right: 20px;
+
   box-shadow: var(--rb-shadow-1), var(--rb-shadow-2), 0 0 0 1px var(--rb-inset) inset;
-  border-radius: 18px 0 0 18px;
+  border-radius: 18px;
+
   z-index: 100;
-  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
   overflow-y: auto;
   overflow-x: hidden;
-  
 }
 
 /* Slight hover effect only on big screens */
 @media (min-width: 1025px) {
-  .rightbar-container:hover { transform: translateX(-2px); }
+  .rightbar-container:hover {
+    transform: translateX(-2px);
+  }
 }
 
 /* -------------------- Section -------------------- */
 .rightbar-section {
+  color: var(--cr-text);
   background: var(--rb-section-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--rb-border);
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
   padding: 14px;
-  margin-bottom: 14px;
-  transition: transform 220ms cubic-bezier(0.2,0.8,0.2,1), box-shadow 220ms ease, background 200ms ease, border-color 200ms ease;
+  margin-bottom: 10px;
   position: relative;
   overflow: hidden;
-   border: 1px solid #e2e8f0;
-    border-radius: 8px;
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
 }
-.rightbar-section:last-child { margin-bottom: 0; }
+
+.rightbar-section:last-child {
+  margin-bottom: 0;
+}
 
 /* subtle shine */
 .rightbar-section::before {
@@ -93,165 +98,225 @@ html.dark {
   left: -70%;
   width: 60%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
   transition: left 0.9s ease;
   pointer-events: none;
 }
-.rightbar-section:hover::before { left: 100%; }
+
+.rightbar-section:hover::before {
+  left: 100%;
+}
 
 /* Hover reduced */
-.rightbar-section:hover { transform: translateY(-3px) scale(1.005); box-shadow: 0 12px 36px rgba(0,0,0,0.06); }
+.rightbar-section:hover {
+  transform: translateY(-3px) scale(1.005);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+}
 
 /* -------------------- Titles -------------------- */
 .rightbar-section-title {
   font-size: 1.02em;
   font-weight: 600;
   color: var(--rb-ink);
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:10px;
-  position:relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  position: relative;
 }
-.rightbar-section-title mat-icon { color: var(--rb-muted); transition: transform 260ms ease, color 200ms ease; }
-.rightbar-section:hover .rightbar-section-title mat-icon { transform: scale(1.06); color: var(--rb-accent); }
+
+.rightbar-section-title mat-icon {
+  color: var(--rb-muted);
+  transition: transform 260ms ease, color 200ms ease;
+}
+
+.rightbar-section:hover .rightbar-section-title mat-icon {
+  transform: scale(1.06);
+  color: var(--rb-accent);
+}
 
 /* underline */
 .rightbar-section-title::after {
   content: '';
-  position:absolute;
-  bottom:-4px;
-  left:0;
-  width:0;
-  height:2px;
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
   background: linear-gradient(90deg, var(--rb-accent), #00ccff);
   transition: width 260ms ease;
-  border-radius:2px;
+  border-radius: 2px;
 }
-.rightbar-section:hover .rightbar-section-title::after { width:36%; }
+
+.rightbar-section:hover .rightbar-section-title::after {
+  width: 36%;
+}
 
 /* -------------------- Lists -------------------- */
-.trend-list, .district-list { display:flex; flex-direction:column; gap:10px; }
+.trend-list,
+.district-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
 /* Trend item */
 .trend-item {
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  padding:10px;
-  border-radius:10px;
-  background: rgba(255,255,255,0.92);
-  transition: background 200ms ease, transform 200ms ease, box-shadow 200ms ease;
-  position:relative;
-  overflow:hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--cr-background-content);
+  position: relative;
+  overflow: hidden;
   color: var(--rb-ink);
 }
 
 /* Dark-specific item background for readability */
-html.dark .trend-item { background: rgba(30,32,34,0.76); color: var(--rb-ink); }
+html.dark .trend-item {
+  background: rgba(30, 32, 34, 0.76);
+  color: var(--rb-ink);
+}
 
 /* Hover mild */
-.trend-item:hover { transform: translateX(4px) scale(1.01); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+.trend-item:hover {
+  transform: translateX(4px) scale(1.01);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
 
 /* Hashtag color */
-.trend-hashtag { font-weight:600; color: var(--rb-ink); }
+.trend-hashtag {
+  font-weight: 600;
+  color: var(--rb-ink);
+}
 
 /* Counter badge */
 .trend-count {
-  display:inline-block;
-  background: linear-gradient(135deg, #1c1c1c, #2c2e33);
-  color: #fff;
-  border-radius:10px;
-  font-size:0.82em;
-  padding:6px 10px;
-  font-weight:700;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  display: inline-block;
+  background: linear-gradient(var(--cr-background));
+  color: var(--cr-text);
+  border-radius: 10px;
+  font-size: 0.82em;
+  padding: 6px 10px;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 /* In dark mode make count more visible (light border & clear background) */
 html.dark .trend-count {
-  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
   color: var(--rb-ink);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: none;
-  font-weight:600;
+  font-weight: 600;
 }
 
 /* -------------------- District items -------------------- */
 .district-item {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  font-size:0.95em;
-  padding:10px;
-  border-radius:10px;
-  background: rgba(255,255,255,0.92);
-  transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.95em;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--cr-background-content);
   color: var(--rb-ink);
 }
-html.dark .district-item { background: rgba(30,32,34,0.72); color: var(--rb-ink); }
 
-.district-item:hover { transform: translateX(4px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+html.dark .district-item {
+  background: rgba(30, 32, 34, 0.72);
+  color: var(--rb-ink);
+}
 
-.district-name { font-weight:600; color: var(--rb-ink); }
-.district-distance { font-size:0.86em; color: var(--rb-muted); }
+.district-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.district-name {
+  font-weight: 600;
+  color: var(--rb-ink);
+}
+
+.district-distance {
+  font-size: 0.86em;
+  color: var(--rb-muted);
+}
 
 /* district count badge */
 .district-count {
-  background: rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.95);
   color: #222;
-  border-radius:8px;
-  padding:6px 8px;
-  font-weight:700;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
+
 html.dark .district-count {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   color: var(--rb-ink);
-  border: 1px solid rgba(255,255,255,0.04);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   box-shadow: none;
 }
 
 /* -------------------- Stats -------------------- */
 /* Forzar contraste alto en stats (tanto en light como en dark) */
 .rightbar-stats {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:14px 12px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(250,251,252,0.95));
-  border-radius:12px;
-  color: var(--rb-ink);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
-  border: 1px solid rgba(0,0,0,0.04);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px 12px;
+  background: linear-gradient(var(--cr-background));
+  border-radius: 12px;
+  color: var(--cr-text);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--cr-border);
 }
+
 html.dark .rightbar-stats {
-  background: linear-gradient(135deg, rgba(20,22,24,0.84), rgba(22,24,26,0.78));
-  border: 1px solid rgba(255,255,255,0.03);
+  background: linear-gradient(135deg, rgba(20, 22, 24, 0.84), rgba(22, 24, 26, 0.78));
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 /* Asegurar que los valores se muestren con opacidad completa y contraste */
-.stats-row { display:grid; grid-template-columns:auto auto; gap:12px 10px; align-items:center; width:100%; }
+.stats-row {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 12px 10px;
+  align-items: center;
+  width: 100%;
+}
+
 .stats-value {
-  font-size:1.6em;
-  font-weight:800;
-  color: #121223 !important;
+  font-size: 1.6em;
+  font-weight: 800;
+  color: var(--cr-text) !important;
   opacity: 1 !important;
-  text-align:center;
+  text-align: center;
   line-height: 1;
 }
+
 .stats-label {
-  color: #121223 !important;
+  color: var(--cr-text) !important;
   opacity: 1 !important;
   font-weight: 600;
   font-size: 0.95em;
   text-align: center;
 }
-.stats-green { color:#18b652; }
+
+.stats-green {
+  color: #18b652;
+}
 
 /* -------------------- Spacer -------------------- */
-.rightbar-spacer { height: 72px; flex-shrink:0; pointer-events:none; }
+.rightbar-spacer {
+  height: 72px;
+  flex-shrink: 0;
+  pointer-events: none;
+}
 
 /* -------------------- Accessibility button -------------------- */
 /* Forzar visibilidad del botón en ambos temas */
@@ -261,78 +326,138 @@ html.dark .rightbar-stats {
   bottom: 120px;
   background: var(--rb-button-bg);
   color: #fff;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 50%;
   width: 52px;
   height: 52px;
   box-shadow: var(--rb-button-shadow);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   z-index: 999;
-  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
   overflow: hidden;
 }
+
 /* Hover leve */
 .rightbar-accessibility-btn:hover {
   background: var(--rb-button-hover);
   transform: translateY(-6px) scale(1.03);
-  box-shadow: 0 18px 48px rgba(0,0,0,0.18);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
 }
+
 /* Asegurar contraste del icono */
 .rightbar-accessibility-btn mat-icon {
   color: #ffffff !important;
   font-size: 20px;
-  transition: transform 260ms ease, filter 200ms ease;
 }
+
 /* En caso de tema claro forzamos fondo oscuro para que blanco del icono resalte */
 @media (prefers-color-scheme: light) {
   .rightbar-accessibility-btn {
-    background: linear-gradient(135deg,#222,#161616);
-    border: 1px solid rgba(255,255,255,0.04);
+    background: linear-gradient(135deg, #222, #161616);
+    border: 1px solid rgba(255, 255, 255, 0.04);
   }
 }
+
 /* En dark reforzar fondo y borde sutil */
 html.dark .rightbar-accessibility-btn {
-  background: linear-gradient(135deg,#2b2d30,#17171a);
-  border: 1px solid rgba(255,255,255,0.04);
+  background: linear-gradient(135deg, #2b2d30, #17171a);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 /* -------------------- Animations toned down -------------------- */
-.trend-item, .district-item { animation: slideIn 360ms ease-out both; }
-@keyframes slideIn { from { opacity:0; transform: translateX(8px);} to { opacity:1; transform: translateX(0);} }
-.rightbar-section { animation: fadeUp 380ms ease-out both; }
-@keyframes fadeUp { from { opacity:0; transform: translateY(6px);} to { opacity:1; transform: translateY(0);} }
+.trend-item,
+.district-item {
+  animation: slideIn 360ms ease-out both;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.rightbar-section {
+  animation: fadeUp 380ms ease-out both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* -------------------- Responsive -------------------- */
 @media (max-width: 600px) {
-  app-rightbar { display:none; }
-  .rightbar-accessibility-btn { right:16px; bottom:80px; width:48px; height:48px; }
+  app-rightbar {
+    display: none;
+  }
+
+  .rightbar-accessibility-btn {
+    right: 16px;
+    bottom: 80px;
+    width: 48px;
+    height: 48px;
+  }
 }
+
 @media (min-width:601px) and (max-width:1024px) {
-  app-rightbar { flex:0 0 280px; max-width:280px; }
-  .rightbar-container { max-width:280px; min-width:240px; padding:14px 12px 28px 12px; gap:14px; }
-  .rightbar-section { padding:12px; margin-bottom:12px; }
-  .rightbar-section-title { font-size:1em; margin-bottom:8px; }
+  app-rightbar {
+    flex: 0 0 280px;
+    max-width: 280px;
+  }
+
+  .rightbar-container {
+    max-width: 280px;
+    min-width: 240px;
+    padding: 14px 12px 28px 12px;
+    gap: 14px;
+  }
+
+  .rightbar-section {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .rightbar-section-title {
+    font-size: 1em;
+    margin-bottom: 8px;
+  }
 }
 
 /* Respect user reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
   }
 }
+
 /* ==== PARCHE: override muy específico para rightbar stats y badges ==== */
 
 /* selector deliberadamente muy específico para ganar sobre "html.dark *" */
 html.dark body app-root app-feed app-rightbar .rightbar-container .rightbar-section.rightbar-stats,
 html.dark body app-root app-feed app-rightbar .rightbar-container .rightbar-section.rightbar-stats * {
-  background: linear-gradient(180deg, rgba(18,20,22,0.98), rgba(14,16,18,0.98)) !important;
-  border: 1px solid rgba(255,255,255,0.04) !important;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.6) !important;
+  background: linear-gradient(180deg, rgba(18, 20, 22, 0.98), rgba(14, 16, 18, 0.98)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6) !important;
   color: #ffffff !important;
   opacity: 1 !important;
   background-clip: padding-box !important;
@@ -350,9 +475,9 @@ html.dark body app-root app-feed app-rightbar .rightbar-container .rightbar-sect
 /* badges a la derecha (34,28,19,15) */
 html.dark body app-root app-feed app-rightbar .rightbar-container .district-count,
 html.dark body app-root app-feed app-rightbar .rightbar-container .trend-count {
-  background: rgba(255,255,255,0.10) !important;
+  background: rgba(255, 255, 255, 0.10) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
   box-shadow: none !important;
   opacity: 1 !important;
 }
@@ -365,6 +490,7 @@ html.dark body app-root app-feed app-rightbar .rightbar-container * {
   color: inherit !important;
   opacity: 1 !important;
 }
+
 /* ===== FIX: Botón de accesibilidad visible en AMBOS modos ===== */
 
 .rightbar-accessibility-btn {
@@ -391,7 +517,7 @@ html.dark body app-root app-feed app-rightbar .rightbar-container * {
   background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
+  box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.3),
     0 4px 12px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
@@ -400,7 +526,7 @@ html.dark body app-root app-feed app-rightbar .rightbar-container * {
 .rightbar-accessibility-btn:hover {
   background: linear-gradient(135deg, #0077ff, #005bb5);
   transform: translateY(-6px) scale(1.05);
-  box-shadow: 
+  box-shadow:
     0 12px 32px rgba(0, 119, 255, 0.4),
     0 6px 16px rgba(0, 91, 181, 0.3);
 }
@@ -424,7 +550,7 @@ html.dark body app-root app-feed app-rightbar .rightbar-container * {
 html.dark .rightbar-accessibility-btn {
   background: linear-gradient(135deg, #2b2d30, #1a1b1d);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 
+  box-shadow:
     0 8px 28px rgba(0, 0, 0, 0.6),
     0 6px 18px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(255, 255, 255, 0.04) inset;
@@ -432,7 +558,7 @@ html.dark .rightbar-accessibility-btn {
 
 html.dark .rightbar-accessibility-btn:hover {
   background: linear-gradient(135deg, #57a6ff, #2f7fe4);
-  box-shadow: 
+  box-shadow:
     0 12px 36px rgba(87, 166, 255, 0.35),
     0 6px 18px rgba(47, 127, 228, 0.25);
 }
@@ -445,7 +571,7 @@ html.dark .rightbar-accessibility-btn:hover {
     width: 48px;
     height: 48px;
   }
-  
+
   .rightbar-accessibility-btn mat-icon {
     font-size: 20px !important;
     width: 20px !important;
@@ -465,8 +591,15 @@ html.dark .rightbar-accessibility-btn:focus-visible {
 
 /* ===== ANIMACIÓN DE PULSO (opcional) ===== */
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 119, 255, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(0, 119, 255, 0); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 119, 255, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 119, 255, 0);
+  }
 }
 
 .rightbar-accessibility-btn.pulse {
@@ -516,7 +649,7 @@ html.dark .rightbar-accessibility-btn[aria-expanded="true"] {
   background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
+  box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.3),
     0 4px 12px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
@@ -525,7 +658,7 @@ html.dark .rightbar-accessibility-btn[aria-expanded="true"] {
 .rightbar-accessibility-btn:hover {
   background: linear-gradient(135deg, #0077ff, #005bb5);
   transform: translateY(-6px) scale(1.05);
-  box-shadow: 
+  box-shadow:
     0 12px 32px rgba(0, 119, 255, 0.4),
     0 6px 16px rgba(0, 91, 181, 0.3);
 }
@@ -549,7 +682,7 @@ html.dark .rightbar-accessibility-btn[aria-expanded="true"] {
 html.dark .rightbar-accessibility-btn {
   background: linear-gradient(135deg, #2b2d30, #1a1b1d);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 
+  box-shadow:
     0 8px 28px rgba(0, 0, 0, 0.6),
     0 6px 18px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(255, 255, 255, 0.04) inset;
@@ -557,7 +690,7 @@ html.dark .rightbar-accessibility-btn {
 
 html.dark .rightbar-accessibility-btn:hover {
   background: linear-gradient(135deg, #57a6ff, #2f7fe4);
-  box-shadow: 
+  box-shadow:
     0 12px 36px rgba(87, 166, 255, 0.35),
     0 6px 18px rgba(47, 127, 228, 0.25);
 }
@@ -580,14 +713,14 @@ html.dark .rightbar-accessibility-btn[aria-expanded="true"] {
   width: 280px !important;
   max-width: calc(100vw - 40px) !important;
   padding: 16px !important;
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,251,252,0.96)) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 251, 252, 0.96)) !important;
   color: #111111 !important;
   border-radius: 14px !important;
-  border: 1px solid rgba(0,0,0,0.08) !important;
-  box-shadow: 
-    0 12px 36px rgba(0,0,0,0.15), 
-    0 4px 12px rgba(0,0,0,0.08),
-    0 0 0 1px rgba(255,255,255,0.5) inset !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset !important;
   z-index: 1400 !important;
   font-size: 0.95rem !important;
   backdrop-filter: blur(12px) saturate(120%) !important;
@@ -603,13 +736,13 @@ html.dark .rightbar-accessibility-btn[aria-expanded="true"] {
 
 /* Modo oscuro del panel */
 html.dark .accessibility-panel {
-  background: linear-gradient(180deg, rgba(20,22,24,0.98), rgba(24,26,28,0.96)) !important;
+  background: linear-gradient(180deg, rgba(20, 22, 24, 0.98), rgba(24, 26, 28, 0.96)) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255,255,255,0.06) !important;
-  box-shadow: 
-    0 12px 36px rgba(0,0,0,0.55), 
-    0 4px 12px rgba(0,0,0,0.35),
-    0 0 0 1px rgba(255,255,255,0.04) inset !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.55),
+    0 4px 12px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset !important;
 }
 
 /* Flecha triangular apuntando hacia el botón */
@@ -622,14 +755,14 @@ html.dark .accessibility-panel {
   height: 0;
   border-left: 9px solid transparent;
   border-right: 9px solid transparent;
-  border-top: 9px solid rgba(255,255,255,0.98);
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+  border-top: 9px solid rgba(255, 255, 255, 0.98);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
   pointer-events: none;
 }
 
 html.dark .accessibility-panel::after {
-  border-top-color: rgba(20,22,24,0.98);
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  border-top-color: rgba(20, 22, 24, 0.98);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
 }
 
 /* Estado visible */
@@ -672,7 +805,7 @@ html.dark .accessibility-panel h3 {
 }
 
 html.dark .accessibility-panel label {
-  color: rgba(255,255,255,0.92) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
 }
 
 /* Acciones: botones */
@@ -692,22 +825,22 @@ html.dark .accessibility-panel label {
   height: 36px !important;
   padding: 0 12px !important;
   border-radius: 9px !important;
-  border: 1px solid rgba(0,0,0,0.08) !important;
-  background: rgba(0,0,0,0.04) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background: rgba(0, 0, 0, 0.04) !important;
   color: #111111 !important;
   font-weight: 600 !important;
   font-size: 0.9rem !important;
   cursor: pointer !important;
   transition: all 150ms ease !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
 }
 
 html.dark .accessibility-panel .acc-actions button,
 html.dark .accessibility-panel .acc-close {
-  border: 1px solid rgba(255,255,255,0.08) !important;
-  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
   color: #ffffff !important;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.35) inset !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) inset !important;
 }
 
 /* Botones A-, A, A+ más pequeños */
@@ -720,40 +853,40 @@ html.dark .accessibility-panel .acc-close {
 /* Hover states */
 .accessibility-panel .acc-actions button:hover,
 .accessibility-panel .acc-close:hover {
-  background: rgba(0,0,0,0.08) !important;
+  background: rgba(0, 0, 0, 0.08) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.12) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
 html.dark .accessibility-panel .acc-actions button:hover,
 html.dark .accessibility-panel .acc-close:hover {
-  background: rgba(255,255,255,0.10) !important;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.4) inset !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4) inset !important;
 }
 
 /* Focus states */
 .accessibility-panel .acc-actions button:focus-visible,
 .accessibility-panel .acc-close:focus-visible {
-  outline: 3px solid rgba(0,119,255,0.3) !important;
+  outline: 3px solid rgba(0, 119, 255, 0.3) !important;
   outline-offset: 2px !important;
 }
 
 html.dark .accessibility-panel .acc-actions button:focus-visible,
 html.dark .accessibility-panel .acc-close:focus-visible {
-  outline-color: rgba(87,166,255,0.4) !important;
+  outline-color: rgba(87, 166, 255, 0.4) !important;
 }
 
 /* Estado activo (aria-pressed) */
 .accessibility-panel .acc-actions button[aria-pressed="true"] {
-  background: linear-gradient(135deg, rgba(0,119,255,0.15), rgba(0,91,181,0.1)) !important;
-  border-color: rgba(0,119,255,0.3) !important;
+  background: linear-gradient(135deg, rgba(0, 119, 255, 0.15), rgba(0, 91, 181, 0.1)) !important;
+  border-color: rgba(0, 119, 255, 0.3) !important;
   color: #0077ff !important;
   font-weight: 700 !important;
 }
 
 html.dark .accessibility-panel .acc-actions button[aria-pressed="true"] {
-  background: linear-gradient(135deg, rgba(87,166,255,0.18), rgba(47,127,228,0.12)) !important;
-  border-color: rgba(87,166,255,0.28) !important;
+  background: linear-gradient(135deg, rgba(87, 166, 255, 0.18), rgba(47, 127, 228, 0.12)) !important;
+  border-color: rgba(87, 166, 255, 0.28) !important;
   color: #57a6ff !important;
 }
 
@@ -765,34 +898,34 @@ html.dark .accessibility-panel .acc-actions button[aria-pressed="true"] {
     width: 48px;
     height: 48px;
   }
-  
+
   .rightbar-accessibility-btn mat-icon {
     font-size: 20px !important;
     width: 20px !important;
     height: 20px !important;
   }
-  
+
   .accessibility-panel {
     right: 16px !important;
     bottom: 140px !important;
     width: calc(100vw - 32px) !important;
     max-width: 340px !important;
   }
-  
+
   .accessibility-panel::after {
     right: 20px !important;
   }
-  
+
   .accessibility-panel .acc-row {
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 8px !important;
   }
-  
+
   .accessibility-panel .acc-actions {
     justify-content: stretch !important;
   }
-  
+
   .accessibility-panel .acc-actions button {
     flex: 1 !important;
   }
