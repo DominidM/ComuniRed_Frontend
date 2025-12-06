@@ -1,0 +1,237 @@
+<div class="soporte-comentarios-root">
+  <div class="header">
+    <h2>🗨️ Moderación de Comentarios</h2>
+    
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-number">{{ totalComentarios }}</div>
+        <div class="stat-label">Total de Comentarios</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filtros-container">
+    <div class="filtro-group">
+      <label>🔍 Buscar:</label>
+      <input 
+        type="text" 
+        [(ngModel)]="filtroTexto" 
+        (ngModelChange)="onFiltroChange()"
+        placeholder="Buscar en comentarios, autor o publicación..."
+        class="input-buscar">
+    </div>
+
+    <div class="filtro-group">
+      <label>📊 Estado:</label>
+      <select [(ngModel)]="filtroEstado" (ngModelChange)="onFiltroChange()" class="select-filtro">
+        <option value="todos">Todos</option>
+        <option value="pendiente">🕐 Pendientes</option>
+        <option value="aprobado">✅ Aprobados</option>
+        <option value="rechazado">❌ Rechazados</option>
+      </select>
+    </div>
+
+    <div class="filtro-group">
+      <label>📅 Orden:</label>
+      <select [(ngModel)]="filtroFecha" (ngModelChange)="onFiltroChange()" class="select-filtro">
+        <option value="recientes">Más recientes</option>
+        <option value="antiguos">Más antiguos</option>
+      </select>
+    </div>
+
+    <button class="btn-refrescar" (click)="cargarComentarios()">
+      🔄 Refrescar
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando comentarios...</p>
+  </div>
+
+  <div *ngIf="!loading && comentariosFiltrados.length > 0" class="comentarios-list">
+    <div 
+      *ngFor="let comentario of comentariosFiltrados" 
+      class="comentario-card"
+      [ngClass]="{
+        'card-rechazado': comentario.estado === 'rechazado',
+        'card-aprobado': comentario.estado === 'aprobado',
+        'card-pendiente': comentario.estado === 'pendiente'
+      }">
+      
+      <div class="comentario-header">
+        <div class="autor-info">
+          <img 
+            [src]="comentario.autor.foto_perfil || 'assets/img/default-avatar.png'" 
+            alt="Avatar"
+            class="avatar"
+            (error)="$event.target.src='assets/img/default-avatar.png'">
+          <div>
+            <div class="autor-nombre">
+              {{ comentario.autor.nombre }} {{ comentario.autor.apellido }}
+            </div>
+            <div class="fecha">{{ comentario.fecha_creacion | date:'medium' }}</div>
+          </div>
+        </div>
+
+        <div class="badges">
+          <span 
+            class="badge"
+            [ngClass]="getEstadoClass(comentario.estado)">
+            {{ comentario.estado || 'Sin revisar' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="comentario-body">
+        <div class="comentario-texto">
+          {{ comentario.texto }}
+        </div>
+      </div>
+
+      <div class="comentario-contexto">
+        <div class="contexto-label">📋 Publicación:</div>
+        <div class="contexto-content">
+          <div class="queja-imagen-wrapper" *ngIf="comentario.queja.imagen_url">
+            <img 
+              [src]="comentario.queja.imagen_url" 
+              alt="Imagen de la publicación"
+              class="queja-imagen"
+              (click)="abrirImagenGrande(comentario.queja.imagen_url)"
+              (error)="$event.target.style.display='none'">
+            <div class="imagen-overlay" (click)="abrirImagenGrande(comentario.queja.imagen_url)">
+              <span>🔍 Ver imagen</span>
+            </div>
+          </div>
+          
+          <div class="queja-info">
+            <strong>{{ comentario.queja.titulo }}</strong>
+            <p>{{ comentario.queja.descripcion.substring(0, 100) }}...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="comentario-acciones">
+        <button class="btn btn-ver" (click)="verDetalle(comentario)">
+          👁️ Ver detalle
+        </button>
+        
+        <button 
+          *ngIf="comentario.estado !== 'aprobado'" 
+          class="btn btn-aprobar" 
+          (click)="aprobarComentario(comentario)">
+          ✅ Aprobar
+        </button>
+        
+        <button 
+          *ngIf="comentario.estado !== 'rechazado'" 
+          class="btn btn-rechazar" 
+          (click)="rechazarComentario(comentario)">
+          ⚠️ Rechazar
+        </button>
+        
+        <button class="btn btn-eliminar" (click)="eliminarComentario(comentario)">
+          🗑️ Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && comentariosFiltrados.length === 0" class="empty-state">
+    <div class="empty-icon">💬</div>
+    <h3>No hay comentarios</h3>
+    <p *ngIf="filtroTexto || filtroEstado !== 'todos'">
+      Intenta cambiar los filtros de búsqueda
+    </p>
+    <p *ngIf="!filtroTexto && filtroEstado === 'todos'">
+      No hay comentarios registrados en el sistema
+    </p>
+  </div>
+
+  <div *ngIf="showModalDetalle" class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📄 Detalle del Comentario</h3>
+        <button class="btn-close" (click)="cerrarModal()">×</button>
+      </div>
+
+      <div class="modal-body" *ngIf="comentarioSeleccionado">
+        <div class="detalle-section">
+          <h4>👤 Autor</h4>
+          <div class="autor-detalle">
+            <img 
+              [src]="comentarioSeleccionado.autor.foto_perfil || 'assets/img/default-avatar.png'" 
+              alt="Avatar"
+              class="avatar-grande"
+              (error)="$event.target.src='assets/img/default-avatar.png'">
+            <div>
+              <div class="nombre-grande">
+                {{ comentarioSeleccionado.autor.nombre }} {{ comentarioSeleccionado.autor.apellido }}
+              </div>
+              <div class="id-autor">ID: {{ comentarioSeleccionado.autor.id }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detalle-section">
+          <h4>💬 Comentario</h4>
+          <div class="comentario-texto-grande">
+            {{ comentarioSeleccionado.texto }}
+          </div>
+          <div class="fecha-detalle">
+            📅 {{ comentarioSeleccionado.fecha_creacion | date:'full' }}
+          </div>
+        </div>
+
+        <div class="detalle-section">
+          <h4>📊 Estado</h4>
+          <div class="estado-info">
+            <span class="badge-grande" [ngClass]="getEstadoClass(comentarioSeleccionado.estado)">
+              {{ comentarioSeleccionado.estado || 'Sin revisar' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detalle-section">
+          <h4>📋 Publicación Asociada</h4>
+          <div class="publicacion-info">
+            <img 
+              *ngIf="comentarioSeleccionado.queja.imagen_url" 
+              [src]="comentarioSeleccionado.queja.imagen_url" 
+              alt="Imagen de la publicación"
+              class="queja-imagen-modal"
+              (click)="abrirImagenGrande(comentarioSeleccionado.queja.imagen_url)"
+              (error)="$event.target.style.display='none'">
+            
+            <strong>{{ comentarioSeleccionado.queja.titulo }}</strong>
+            <p>{{ comentarioSeleccionado.queja.descripcion }}</p>
+            <a [routerLink]="['/public/feed/queja', comentarioSeleccionado.queja.id]" class="link-publicacion">
+              Ver publicación completa →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cerrarModal()">Cerrar</button>
+        <button 
+          *ngIf="comentarioSeleccionado && comentarioSeleccionado.estado !== 'aprobado'"
+          class="btn btn-aprobar" 
+          (click)="aprobarComentario(comentarioSeleccionado); cerrarModal()">
+          ✅ Aprobar
+        </button>
+        <button 
+          *ngIf="comentarioSeleccionado && comentarioSeleccionado.estado !== 'rechazado'"
+          class="btn btn-rechazar" 
+          (click)="rechazarComentario(comentarioSeleccionado); cerrarModal()">
+          ⚠️ Rechazar
+        </button>
+        <button 
+          class="btn btn-eliminar" 
+          (click)="eliminarComentario(comentarioSeleccionado!); cerrarModal()">
+          🗑️ Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
