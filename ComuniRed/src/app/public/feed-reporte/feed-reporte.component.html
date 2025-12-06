@@ -60,7 +60,9 @@
 
             <!-- Menú de 3 puntos -->
             <div class="post-menu-container" *ngIf="canEditQueja()">
-              <button class="post-menu" aria-label="Más opciones" (click)="queja.showMenu = !queja.showMenu">⋯</button>
+              <button class="post-menu-btn" (click)="queja.showMenu = !queja.showMenu">
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
               
               <div *ngIf="queja.showMenu" class="post-menu-dropdown">
                 <button class="menu-item" (click)="openEditQueja(); queja.showMenu = false">
@@ -77,7 +79,7 @@
           <p class="post-text">{{ queja.descripcion }}</p>
 
           <div class="post-tags">
-            <span class="tag category-tag">
+            <span class="tag categoria-tag">
               <i class="bi bi-tag-fill"></i>
               {{ queja.categoria.nombre }}
             </span>
@@ -102,7 +104,9 @@
             [class.active]="queja.reactions.userReaction"
             (click)="toggleReactionMenu(queja.id, $event)"
             title="Reaccionar">
-            <i [class]="queja.reactions.userReaction === 'like' ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+            <span class="reaction-emoji">
+              {{ queja.reactions.userReaction ? getReactionIcon(queja.reactions.userReaction) : '👍' }}
+            </span>
             <span class="count">{{ queja.reactions.total || 0 }}</span>
           </button>
 
@@ -154,23 +158,6 @@
           <i class="bi bi-chat-left-text"></i>
           <span class="count">{{ getCommentsCount() }}</span>
         </button>
-      </div>
-
-      <!-- Acciones adicionales -->
-      <div class="post-actions">
-        <div class="left-actions">
-          <button class="action-btn" (click)="toggleCommentsInline()">
-            <span class="action-emoji">💬</span>
-            <span class="action-text">Comentar</span>
-          </button>
-        </div>
-
-        <div class="right-actions">
-          <button class="action-btn" (click)="volver()">
-            <span class="action-emoji">←</span>
-            <span class="action-text">Volver</span>
-          </button>
-        </div>
       </div>
 
       <!-- ===== COMENTARIOS INLINE (Solo 3 preview) ===== -->
@@ -228,9 +215,10 @@
         </div>
 
         <!-- Input para agregar comentario -->
-        <div class="comment-input-container">
+        <div class="add-comment-preview-wrapper">
           <img [src]="user?.avatarUrl || 'assets/img/default-avatar.png'" class="comment-avatar-preview" />
           <input 
+            #commentInput
             type="text" 
             [(ngModel)]="newCommentInline"
             placeholder="Escribe un comentario..."
@@ -385,50 +373,41 @@
 
   <!-- MODAL EDITAR REPORTE -->
   <div *ngIf="showEditModal && editingQueja" class="modal-overlay" (click)="closeEditModal()">
-    <div class="modal-container" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="bi bi-pencil"></i> Editar Reporte</h2>
-        <button class="modal-close" (click)="closeEditModal()" aria-label="Cerrar">✕</button>
+    <div class="modal-edit" (click)="$event.stopPropagation()">
+      <div class="modal-header-edit">
+        <h3><i class="bi bi-pencil"></i> Editar Reporte</h3>
+        <button class="modal-close-btn" (click)="closeEditModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
       </div>
 
-      <div class="modal-body">
-        <form class="create-form">
-          <div class="form-group">
-            <label for="edit-titulo" class="form-label">Título</label>
-            <input 
-              type="text" 
-              id="edit-titulo" 
-              class="form-input"
-              [(ngModel)]="editingQueja.titulo"
-              name="titulo"
-              maxlength="100" />
-          </div>
+      <div class="modal-body-edit">
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" 
+                [(ngModel)]="editingQueja.titulo" 
+                class="form-input" 
+                maxlength="100" />
+        </div>
 
-          <div class="form-group">
-            <label for="edit-descripcion" class="form-label">Descripción</label>
-            <textarea 
-              id="edit-descripcion" 
-              class="form-textarea"
-              [(ngModel)]="editingQueja.descripcion"
-              name="descripcion"
-              rows="4"></textarea>
-          </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="editingQueja.descripcion" 
+                    class="form-textarea" 
+                    rows="4"></textarea>
+        </div>
 
-          <div class="form-group">
-            <label for="edit-ubicacion" class="form-label">📍 Ubicación</label>
-            <input 
-              type="text" 
-              id="edit-ubicacion" 
-              class="form-input"
-              [(ngModel)]="editingQueja.ubicacion"
-              name="ubicacion" />
-          </div>
-        </form>
+        <div class="form-group">
+          <label>Ubicación</label>
+          <input type="text" 
+                [(ngModel)]="editingQueja.ubicacion" 
+                class="form-input" />
+        </div>
       </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-cancel" (click)="closeEditModal()">Cancelar</button>
-        <button class="btn btn-primary" (click)="saveEditQueja()" [disabled]="loading">
+      <div class="modal-footer-edit">
+        <button class="btn-cancel-edit" (click)="closeEditModal()">Cancelar</button>
+        <button class="btn-save-edit" (click)="saveEditQueja()" [disabled]="loading">
           {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
         </button>
       </div>

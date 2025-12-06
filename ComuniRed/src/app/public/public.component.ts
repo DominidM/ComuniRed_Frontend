@@ -33,13 +33,13 @@ export class PublicComponent {
     this.checkScreenSize();
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onResize() {
     this.checkScreenSize();
   }
 
   checkScreenSize() {
-    this.isDesktop = window.innerWidth > 768; // ✅ Cambiado de 900 a 768
+    this.isDesktop = window.innerWidth > 768;
   }
 
   get sidenavMode(): 'side' | 'over' {

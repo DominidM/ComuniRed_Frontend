@@ -8,6 +8,7 @@ import { ReaccionService } from '../../services/reaccion.service';
 import { ComentarioService } from '../../services/comentario.service';
 import { CategoriaService, Categoria } from '../../services/categoria.service';
 import { UsuarioService } from '../../services/usuario.service';
+import { HistorialEventoService, HistorialEvento } from '../../services/historial-evento.service';
 
 @Component({
   selector: 'app-feed',
@@ -25,7 +26,6 @@ export class FeedComponent implements OnInit {
   loading = false;
   categorias: Categoria[] = [];
   commentTexts: { [postId: string]: string } = {};
-  searchTerm = '';
   selectedCategory = '';
   selectedStatus = '';
   sortBy: 'recent' | 'popular' | 'votes' = 'recent';
@@ -52,7 +52,6 @@ export class FeedComponent implements OnInit {
   page = 0;
   hasMore = true;
 
-  // ✅ PROPIEDADES PARA COMENTARIOS Y REACCIONES
   showReactionMenu: { [postId: string]: boolean } = {};
   showCommentsInline: { [postId: string]: boolean } = {};
   showCommentMenuModal: { [commentId: string]: boolean } = {};
@@ -60,10 +59,14 @@ export class FeedComponent implements OnInit {
   reportsPerPage = 10;
   totalReports = 0;
 
-  // ✅ PROPIEDADES PARA MODAL DE COMENTARIOS
   showCommentsModal = false;
   selectedReporteForComments: Queja | null = null;
   newCommentText = '';
+
+  showHistorialModal = false;
+  selectedQuejaHistorial: Queja | null = null;
+  historialEventos: HistorialEvento[] = [];
+  loadingHistorial = false;
 
   constructor(
     private quejaService: QuejaService,
@@ -71,15 +74,16 @@ export class FeedComponent implements OnInit {
     private comentarioService: ComentarioService,
     private categoriaService: CategoriaService,
     private usuarioService: UsuarioService,
+    private historialService: HistorialEventoService,
     private router: Router
   ) {}
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
+  @HostListener('document:click')
+  onDocumentClick(): void {
     this.closeAllReactionMenus();
   }
 
-  @HostListener('window:scroll', ['$event'])
+  @HostListener('window:scroll')
   onScroll(): void {
     const scrollPosition = window.pageYOffset + window.innerHeight;
     const pageHeight = document.documentElement.scrollHeight;
@@ -138,8 +142,6 @@ export class FeedComponent implements OnInit {
     this.loading = true;
     this.quejaService.obtenerQuejas(this.user.id).subscribe({
       next: (quejas) => {
-        console.log('📦 Quejas cargadas del backend:', quejas);
-        
         this.posts = JSON.parse(JSON.stringify(quejas)).map((q: any) => {
           const reactions = {
             total: q.reactions?.total || 0,
@@ -171,12 +173,11 @@ export class FeedComponent implements OnInit {
           };
         });
         
-        console.log('✅ Posts procesados:', this.posts);
         this.applyFilters();
         this.loading = false;
       },
       error: (err: any) => {
-        console.error('❌ Error cargando quejas:', err);
+        console.error('Error cargando quejas:', err);
         this.loading = false;
         this.showToastMessage('Error al cargar reportes');
       }
@@ -191,15 +192,6 @@ export class FeedComponent implements OnInit {
 
   applyFilters(): void {
     let filtered = [...this.posts];
-
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(p => 
-        p.titulo.toLowerCase().includes(term) ||
-        p.descripcion.toLowerCase().includes(term) ||
-        p.ubicacion?.toLowerCase().includes(term)
-      );
-    }
 
     if (this.selectedCategory) {
       filtered = filtered.filter(p => p.categoria?.id === this.selectedCategory);
@@ -234,10 +226,6 @@ export class FeedComponent implements OnInit {
     }
   }
 
-  onSearchChange(): void {
-    this.applyFilters();
-  }
-
   onCategoryFilterChange(): void {
     this.applyFilters();
   }
@@ -247,14 +235,12 @@ export class FeedComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.searchTerm = '';
     this.selectedCategory = '';
     this.selectedStatus = '';
     this.sortBy = 'recent';
     this.applyFilters();
   }
 
-  // ==================== REACCIONES ====================
   closeAllReactionMenus(): void {
     this.showReactionMenu = {};
   }
@@ -324,7 +310,6 @@ export class FeedComponent implements OnInit {
     return post.reactions?.counts?.[type] ?? 0;
   }
 
-  // ==================== VOTOS ====================
   vote(post: Queja, choice: 'accept' | 'reject'): void {
     if (!this.canVote(post) || !this.user?.id) return;
 
@@ -361,7 +346,6 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  // ==================== COMENTARIOS INLINE ====================
   toggleComments(post: Queja): void {
     post.showComments = !post.showComments;
   }
@@ -371,6 +355,7 @@ export class FeedComponent implements OnInit {
 
     const tempComment = {
       id: 'temp-' + Date.now(),
+      queja_id: post.id,
       texto: text.trim(),
       author: {
         id: this.user.id,
@@ -478,7 +463,6 @@ export class FeedComponent implements OnInit {
     return (post.comments || []).length > 3;
   }
 
-  // ==================== MODAL DE COMENTARIOS ====================
   openCommentsModal(reporte: Queja): void {
     this.selectedReporteForComments = JSON.parse(JSON.stringify(reporte));
     this.showCommentsModal = true;
@@ -497,6 +481,7 @@ export class FeedComponent implements OnInit {
 
     const tempComment = {
       id: 'temp-' + Date.now(),
+      queja_id: this.selectedReporteForComments.id,
       texto: this.newCommentText.trim(),
       author: {
         id: this.user.id,
@@ -637,7 +622,6 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  // ==================== EDITAR/ELIMINAR REPORTE ====================
   canEditQueja(post: Queja): boolean {
     return post.usuario?.id === this.user?.id;
   }
@@ -704,7 +688,6 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  // ==================== CREAR REPORTE ====================
   openCreateReport(): void {
     this.showCreateModal = true;
     this.resetQuejaForm();
@@ -794,7 +777,6 @@ export class FeedComponent implements OnInit {
       this.newQueja.imagenFile || undefined
     ).subscribe({
       next: (nuevaQueja) => {
-        console.log('Queja creada exitosamente', nuevaQueja);
         this.loadPosts();
         this.closeCreateModal();
         this.loading = false;
@@ -808,7 +790,6 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  // ==================== OTRAS ACCIONES ====================
   toggleBookmark(post: Queja): void {
     (post as any).meta = (post as any).meta || {};
     (post as any).meta.saved = !((post as any).meta.saved);
@@ -844,7 +825,6 @@ export class FeedComponent implements OnInit {
     this.showToastMessage('JSON descargado');
   }
 
-  // ==================== PAGINACIÓN ====================
   getPaginatedPosts(): Queja[] {
     const posts = this.displayedPosts;
     this.totalReports = posts.length;
@@ -907,7 +887,6 @@ export class FeedComponent implements OnInit {
     return pages;
   }
 
-  // ==================== UTILIDADES ====================
   verPerfilUsuario(usuario: Usuario): void {
     if (!usuario?.id) return;
     
@@ -916,6 +895,181 @@ export class FeedComponent implements OnInit {
     } else {
       this.router.navigate(['/public/user-profile', usuario.id]);
     }
+  }
+
+  openHistorialModal(queja: Queja): void {
+    this.selectedQuejaHistorial = queja;
+    this.showHistorialModal = true;
+    this.loadingHistorial = true;
+    
+    this.historialService.obtenerHistorialPorQueja(queja.id).subscribe({
+      next: (eventos) => {
+        this.historialEventos = this.historialService.ordenarPorFecha(eventos, false);
+        this.loadingHistorial = false;
+      },
+      error: (err) => {
+        console.error('Error cargando historial:', err);
+        this.loadingHistorial = false;
+        this.showToastMessage('Error al cargar historial');
+      }
+    });
+  }
+
+  closeHistorialModal(): void {
+    this.showHistorialModal = false;
+    this.selectedQuejaHistorial = null;
+    this.historialEventos = [];
+  }
+
+  getEventoIcono(tipo: string): string {
+    return this.historialService.obtenerIconoPorTipo(tipo);
+  }
+
+  getEventoTexto(tipo: string): string {
+    return this.historialService.obtenerTextoTipo(tipo);
+  }
+
+  getEventoColor(tipo: string): string {
+    return this.historialService.obtenerColorPorTipo(tipo);
+  }
+
+  formatearFechaEvento(fecha: string): string {
+    return this.historialService.formatearFechaRelativa(fecha);
+  }
+
+  hasHistorial(post: Queja): boolean {
+    return post.fecha_clasificacion != null || post.nivel_riesgo != null;
+  }
+
+  hasRiesgo(post: Queja): boolean {
+    return !!post.nivel_riesgo;
+  }
+
+  getNivelRiesgo(post: Queja): string {
+    return post.nivel_riesgo || '';
+  }
+
+  getRiesgoBadgeClass(nivel: string): string {
+    switch (nivel?.toUpperCase()) {
+      case 'BAJO':
+        return 'badge bg-success';
+      case 'MEDIO':
+        return 'badge bg-warning';
+      case 'ALTO':
+        return 'badge bg-orange';
+      case 'CRITICO':
+        return 'badge bg-danger';
+      default:
+        return 'badge bg-secondary';
+    }
+  }
+
+  getRiesgoTexto(nivel: string): string {
+    switch (nivel?.toUpperCase()) {
+      case 'BAJO':
+        return 'Riesgo Bajo';
+      case 'MEDIO':
+        return 'Riesgo Medio';
+      case 'ALTO':
+        return 'Riesgo Alto';
+      case 'CRITICO':
+        return '⚠️ Crítico';
+      default:
+        return nivel;
+    }
+  }
+
+  getRiesgoIcon(nivel: string): string {
+    switch (nivel?.toUpperCase()) {
+      case 'BAJO':
+        return '🟢';
+      case 'MEDIO':
+        return '🟡';
+      case 'ALTO':
+        return '🟠';
+      case 'CRITICO':
+        return '🔴';
+      default:
+        return '⚪';
+    }
+  }
+
+  getEstadoTexto(post: Queja): string {
+    return post.estado?.nombre || 'Sin estado';
+  }
+
+  getEstadoClave(post: Queja): string {
+    return post.estado?.clave || '';
+  }
+
+  getEstadoBadgeClass(clave: string): string {
+    switch (clave?.toLowerCase()) {
+      case 'nulo':
+        return 'badge bg-secondary';
+      case 'votacion':
+        return 'badge bg-primary';
+      case 'pendiente':
+        return 'badge bg-warning';
+      case 'aprobada':
+        return 'badge bg-success';
+      case 'asignada':
+        return 'badge bg-info';
+      case 'clasificada':
+        return 'badge bg-purple';
+      case 'en_proceso':
+        return 'badge bg-info';
+      case 'observado':
+        return 'badge bg-warning';
+      case 'resuelto':
+        return 'badge bg-success';
+      case 'cancelado':
+        return 'badge bg-danger';
+      default:
+        return 'badge bg-secondary';
+    }
+  }
+
+  isQuejaResuelta(post: Queja): boolean {
+    return post.estado?.clave === 'resuelto';
+  }
+
+  isQuejaEnProceso(post: Queja): boolean {
+    return post.estado?.clave === 'en_proceso' || post.estado?.clave === 'asignada';
+  }
+
+  isQuejaPendiente(post: Queja): boolean {
+    return post.estado?.clave === 'pendiente' || post.estado?.clave === 'aprobada';
+  }
+
+  isQuejaAsignada(post: Queja): boolean {
+    return post.estado?.clave === 'asignada' || post.estado?.clave === 'en_proceso';
+  }
+
+  isQuejaEnVotacion(post: Queja): boolean {
+    return post.estado?.clave === 'votacion';
+  }
+
+  getFechaClasificacion(post: Queja): string {
+    if (!post.fecha_clasificacion) return '';
+    return this.formatDate(post.fecha_clasificacion);
+  }
+
+  hasClasificacion(post: Queja): boolean {
+    return !!post.nivel_riesgo && !!post.fecha_clasificacion;
+  }
+
+  getVotingProgress(post: Queja): number {
+    const total = post.votes.total;
+    const minVotes = 5;
+    return Math.min((total / minVotes) * 100, 100);
+  }
+
+  needsMoreVotes(post: Queja): boolean {
+    return post.votes.total < 5 && this.isQuejaEnVotacion(post);
+  }
+
+  getVotesNeeded(post: Queja): number {
+    return Math.max(5 - post.votes.total, 0);
   }
 
   getAvatarUrl(post: Queja): string {
@@ -975,7 +1129,7 @@ export class FeedComponent implements OnInit {
   }
 
   canVote(post: Queja): boolean {
-    return post.canVote && !post.userVote;
+    return post.canVote && !post.userVote && this.isQuejaEnVotacion(post);
   }
 
   getLikeEmoji(post: Queja): string {
@@ -1032,7 +1186,7 @@ export class FeedComponent implements OnInit {
   }
 
   get displayedPosts(): Queja[] {
-    return this.searchTerm || this.selectedCategory || this.selectedStatus 
+    return this.selectedCategory || this.selectedStatus 
       ? this.filteredPosts 
       : this.posts;
   }

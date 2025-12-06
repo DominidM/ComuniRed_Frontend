@@ -1,27 +1,12 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { QuejaService, Queja, Usuario } from '../../services/queja.service';
 import { ReaccionService } from '../../services/reaccion.service';
+import { ComentarioService, Comentario } from '../../services/comentario.service';
 import { CategoriaService, Categoria } from '../../services/categoria.service';
-import { ComentarioService } from '../../services/comentario.service';
 import { UsuarioService } from '../../services/usuario.service';
-
-interface TrendingStats {
-  totalReportes: number;
-  categoriaTop: string;
-  reportePopular: string;
-  reportesEstaSemana: number;
-}
-
-interface CategoriaConConteo extends Categoria {
-  count: number;
-  icon: string;
-  description: string;
-}
-
-type PeriodoTiempo = 7 | 15 | 30;
 
 @Component({
   selector: 'app-trending',
@@ -31,78 +16,64 @@ type PeriodoTiempo = 7 | 15 | 30;
   styleUrls: ['./trending.component.css']
 })
 export class TrendingComponent implements OnInit {
-
   Math = Math;
-
-  currentView: 'populares' | 'recientes' | 'categorias' = 'populares';
+  
+  posts: Queja[] = [];
+  filteredPosts: Queja[] = [];
   loading = false;
+  
   user: { id?: string; name: string; avatarUrl: string } | null = null;
   
-  reportesPopulares: Queja[] = [];
-  reportesRecientes: Queja[] = [];
-  categorias: CategoriaConConteo[] = [];
-  todasLasQuejas: Queja[] = [];
+  categorias: any[] = [];
+  selectedCategory = '';
+  sortBy: 'recent' | 'popular' | 'votes' = 'popular';
   
-  selectedCategoryId: string | null = null;
-  selectedCategoryName: string = '';
-  selectedPeriodo: PeriodoTiempo = 7;
+  showReactionMenu: { [postId: string]: boolean } = {};
+  showCommentMenuModal: { [commentId: string]: boolean } = {};
+  showCommentsInline: { [postId: string]: boolean } = {};
   
+  // Modales
   showCommentsModal = false;
+  showEditModal = false;
+  
+  // Comentarios
   selectedReporteForComments: Queja | null = null;
   newCommentText = '';
-  
   editingCommentId: string | null = null;
   editingCommentText = '';
   
-  showEditModal = false;
+  // Edición de queja
   editingQueja: Queja | null = null;
   
-  stats: TrendingStats = {
-    totalReportes: 0,
-    categoriaTop: 'Cargando...',
-    reportePopular: 'Cargando...',
-    reportesEstaSemana: 0
-  };
-  
+  // Toast
   toastMessage = '';
   showToast = false;
-
-  // ✅ NUEVAS PROPIEDADES
-  showReactionMenu: { [postId: string]: boolean } = {};
-  commentPages: { [postId: string]: number } = {};
-  commentsPerPage = 10;
-  initialCommentsToLoad = 20;
-  showCommentsInline: { [postId: string]: boolean } = {};
-
+  
+  // Paginación
   currentPage = 1;
   reportsPerPage = 10;
   totalReports = 0;
-
   
-
-  private categoriaIcons: { [key: string]: string } = {
-    'Vías': 'bi-sign-stop',
-    'Baches': 'bi-sign-stop',
-    'Alumbrado': 'bi-lightbulb',
-    'Alumbrado Público': 'bi-lightbulb',
-    'Agua y Saneamiento': 'bi-droplet',
-    'Agua': 'bi-droplet',
-    'Alcantarillado': 'bi-droplet',
-    'Limpieza': 'bi-trash',
-    'Basura': 'bi-trash',
-    'Seguridad': 'bi-shield-exclamation',
-    'Señalización': 'bi-exclamation-triangle',
-    'Tránsito': 'bi-exclamation-triangle'
+  // Vista actual
+  currentView: 'populares' | 'recientes' | 'categorias' = 'populares';
+  selectedPeriodo = 7;
+  selectedCategoryName = '';
+  
+  // Stats
+  stats = {
+    reportePopular: '-',
+    reportesEstaSemana: 0,
+    categoriaTop: '-',
+    totalReportes: 0
   };
 
   constructor(
+    private router: Router,
     private quejaService: QuejaService,
     private reaccionService: ReaccionService,
-    private categoriaService: CategoriaService,
     private comentarioService: ComentarioService,
-    private usuarioService: UsuarioService,
-    private router: Router,
-    private route: ActivatedRoute
+    private categoriaService: CategoriaService,
+    private usuarioService: UsuarioService
   ) {}
 
   @HostListener('document:click', ['$event'])
@@ -112,14 +83,8 @@ export class TrendingComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUser();
-    this.loadData();
-    
-    this.route.queryParams.subscribe(params => {
-      if (params['categoria']) {
-        this.selectedCategoryId = params['categoria'];
-        this.currentView = 'populares';
-      }
-    });
+    this.loadCategorias();
+    this.cargarReportes();
   }
 
   loadUser(): void {
@@ -136,188 +101,303 @@ export class TrendingComponent implements OnInit {
     }
   }
 
-  loadData(): void {
-    if (!this.user?.id) return;
+  loadCategorias(): void {
+    this.categoriaService.obtenerCategorias(0, 100).subscribe({
+      next: (page) => {
+        this.categorias = page.content
+          .filter(c => c.activo)
+          .map(cat => ({
+            ...cat,
+            count: 0,
+            icon: 'bi-tag',
+            description: cat.descripcion || 'Sin descripción'
+          }));
+      },
+      error: (err) => {
+        console.error('Error cargando categorías', err);
+        this.categorias = [];
+      }
+    });
+  }
 
-    this.loading = true;
+  cargarReportes(): void {
+    if (!this.user?.id) return;
     
+    this.loading = true;
     this.quejaService.obtenerQuejas(this.user.id).subscribe({
       next: (quejas) => {
-        const quejasClonadas = JSON.parse(JSON.stringify(quejas));
-        const quejasRecientes = this.filtrarPorPeriodo(quejasClonadas);
+        this.posts = JSON.parse(JSON.stringify(quejas)).map((q: any) => {
+          const reactions = {
+            total: q.reactions?.total || 0,
+            userReaction: q.reactions?.userReaction || undefined,
+            counts: {
+              like: q.reactions?.counts?.['like'] || 0,
+              love: q.reactions?.counts?.['love'] || 0,
+              wow: q.reactions?.counts?.['wow'] || 0,
+              helpful: q.reactions?.counts?.['helpful'] || 0,
+              dislike: q.reactions?.counts?.['dislike'] || 0,
+              report: q.reactions?.counts?.['report'] || 0
+            }
+          };
+
+          const votes = {
+            yes: q.votes?.yes || 0,
+            no: q.votes?.no || 0,
+            total: q.votes?.total || 0
+          };
+
+          return {
+            ...q,
+            reactions,
+            votes,
+            userVote: q.userVote || null,
+            canVote: q.canVote !== undefined ? q.canVote : !q.userVote,
+            showComments: false,
+            showMenu: false,
+            comments: q.comments || [],
+            commentsCount: q.commentsCount || 0
+          };
+        });
         
-        this.todasLasQuejas = quejasRecientes.map((q: any) => ({ 
-          ...q, 
-          showMenu: false,
-          comments: Array.isArray(q.comments) ? [...q.comments] : []
-        }));
-        
-        this.processQuejas(this.todasLasQuejas);
-        this.loadCategorias();
+        this.updateStats();
+        this.applyFilters();
         this.loading = false;
       },
       error: (err: any) => {
         console.error('Error cargando quejas:', err);
         this.loading = false;
+        this.showToastMessage('Error al cargar reportes');
       }
     });
   }
 
-  filtrarPorPeriodo(quejas: Queja[]): Queja[] {
-    const fechaLimite = new Date();
-    fechaLimite.setDate(fechaLimite.getDate() - this.selectedPeriodo);
-    return quejas.filter(q => new Date(q.fecha_creacion) >= fechaLimite);
-  }
-
-  cambiarPeriodo(dias: PeriodoTiempo): void {
-    this.selectedPeriodo = dias;
-    this.loadData();
-    const periodoTexto = dias === 7 ? 'última semana' : dias === 15 ? 'últimos 15 días' : 'último mes';
-    this.showToastMessage(`Mostrando reportes de ${periodoTexto}`);
-  }
-
-  getPeriodoTexto(): string {
-    switch (this.selectedPeriodo) {
-      case 7: return 'la última semana';
-      case 15: return 'los últimos 15 días';
-      case 30: return 'el último mes';
-      default: return 'la última semana';
+  updateStats(): void {
+    this.stats.totalReportes = this.posts.length;
+    
+    if (this.posts.length > 0) {
+      const sorted = [...this.posts].sort((a, b) => 
+        (b.reactions?.total || 0) - (a.reactions?.total || 0)
+      );
+      this.stats.reportePopular = sorted[0]?.titulo.substring(0, 20) + '...' || '-';
+      
+      const categoryCounts: { [key: string]: number } = {};
+      this.posts.forEach(p => {
+        const catName = p.categoria?.nombre || 'Sin categoría';
+        categoryCounts[catName] = (categoryCounts[catName] || 0) + 1;
+      });
+      
+      const topCat = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0];
+      this.stats.categoriaTop = topCat ? topCat[0] : '-';
+      
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      this.stats.reportesEstaSemana = this.posts.filter(p => 
+        new Date(p.fecha_creacion) > weekAgo
+      ).length;
     }
   }
 
-  loadCategorias(): void {
-    this.categoriaService.obtenerCategorias(0, 100).subscribe({
-      next: (page) => this.processCategorias(page.content),
-      error: (err: any) => console.error('Error cargando categorías:', err)
-    });
+  applyFilters(): void {
+    let filtered = [...this.posts];
+
+    if (this.selectedCategory) {
+      filtered = filtered.filter(p => p.categoria?.id === this.selectedCategory);
+    }
+
+    filtered = this.sortPosts(filtered);
+
+    this.filteredPosts = filtered;
+    this.currentPage = 1;
   }
 
-  processQuejas(quejas: Queja[]): void {
-    const unaSemanaAtras = new Date();
-    unaSemanaAtras.setDate(unaSemanaAtras.getDate() - 7);
-    
-    this.reportesRecientes = [...quejas].sort((a, b) => 
-      new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime()
-    );
-
-    this.reportesPopulares = [...quejas].sort((a, b) => 
-      (b.reactions?.total || 0) - (a.reactions?.total || 0)
-    );
-
-    this.stats.totalReportes = quejas.length;
-    this.stats.reportesEstaSemana = quejas.filter(q => 
-      new Date(q.fecha_creacion) > unaSemanaAtras
-    ).length;
-
-    const categoriaCounts: { [key: string]: number } = {};
-    quejas.forEach(q => {
-      const catName = q.categoria?.nombre || 'Sin categoría';
-      categoriaCounts[catName] = (categoriaCounts[catName] || 0) + 1;
-    });
-
-    const topCategoria = Object.entries(categoriaCounts).sort((a, b) => b[1] - a[1])[0];
-    this.stats.categoriaTop = topCategoria ? topCategoria[0] : 'N/A';
-
-    if (this.reportesPopulares.length > 0) {
-      this.stats.reportePopular = this.reportesPopulares[0].titulo;
+  sortPosts(posts: Queja[]): Queja[] {
+    switch (this.sortBy) {
+      case 'recent':
+        return posts.sort((a, b) => 
+          new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime()
+        );
+      case 'popular':
+        return posts.sort((a, b) => 
+          (b.reactions?.total || 0) - (a.reactions?.total || 0)
+        );
+      case 'votes':
+        return posts.sort((a, b) => 
+          this.getTotalVotes(b) - this.getTotalVotes(a)
+        );
+      default:
+        return posts;
     }
   }
 
-  processCategorias(categorias: Categoria[]): void {
-    const categoriaCounts: { [key: string]: number } = {};
-    
-    this.todasLasQuejas.forEach(q => {
-      const catId = q.categoria?.id;
-      if (catId) categoriaCounts[catId] = (categoriaCounts[catId] || 0) + 1;
-    });
-
-    this.categorias = categorias
-      .filter(c => c.activo)
-      .map(cat => ({
-        ...cat,
-        count: categoriaCounts[cat.id] || 0,
-        icon: this.getCategoryIcon(cat.nombre),
-        description: this.getCategoryDescription(cat.nombre)
-      }))
-      .sort((a, b) => b.count - a.count);
+  onCategoryFilterChange(): void {
+    this.applyFilters();
   }
 
-  getCategoryIcon(nombre: string): string {
-    return this.categoriaIcons[nombre] || 'bi-folder';
+  onSortChange(): void {
+    this.applyFilters();
   }
 
-  getCategoryDescription(nombre: string): string {
-    const descriptions: { [key: string]: string } = {
-      'Vías': 'Problemas en el pavimento',
-      'Baches': 'Problemas en el pavimento',
-      'Alumbrado': 'Fallos en iluminación',
-      'Alumbrado Público': 'Fallos en iluminación',
-      'Agua y Saneamiento': 'Problemas de drenaje',
-      'Agua': 'Problemas de agua potable',
-      'Alcantarillado': 'Problemas de drenaje',
-      'Limpieza': 'Acumulación de residuos',
-      'Basura': 'Acumulación de residuos',
-      'Seguridad': 'Problemas de seguridad',
-      'Señalización': 'Señales deterioradas',
-      'Tránsito': 'Problemas de tráfico'
-    };
-    return descriptions[nombre] || 'Reportes varios';
+  clearFilters(): void {
+    this.selectedCategory = '';
+    this.sortBy = 'popular';
+    this.applyFilters();
   }
+
+  // ============================================
+  // VISTAS Y NAVEGACIÓN
+  // ============================================
 
   changeView(view: 'populares' | 'recientes' | 'categorias'): void {
     this.currentView = view;
-    this.currentPage = 1;
-    if (view === 'categorias') this.clearCategoryFilter();
+    if (view === 'populares') {
+      this.sortBy = 'popular';
+    } else if (view === 'recientes') {
+      this.sortBy = 'recent';
+    }
+    this.applyFilters();
   }
-
 
   isViewActive(view: string): boolean {
     return this.currentView === view;
   }
 
-  getReportes(): Queja[] {
-    let reportes = this.currentView === 'recientes' ? this.reportesRecientes : this.reportesPopulares;
-    if (this.selectedCategoryId) {
-      reportes = reportes.filter(r => r.categoria.id === this.selectedCategoryId);
-    }
-    return reportes;
-  }
-
-  verCategoria(categoria: CategoriaConConteo): void {
-    this.selectedCategoryId = categoria.id;
-    this.selectedCategoryName = categoria.nombre;
-    this.currentView = 'populares';
-    this.showToastMessage(`Filtrando por: ${categoria.nombre}`);
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { categoria: categoria.id },
-      queryParamsHandling: 'merge'
-    });
+  hasActiveFilter(): boolean {
+    return !!this.selectedCategory;
   }
 
   clearCategoryFilter(): void {
-    this.selectedCategoryId = null;
+    this.selectedCategory = '';
     this.selectedCategoryName = '';
-    this.currentPage = 1;
-    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+    this.applyFilters();
   }
 
-
-  hasActiveFilter(): boolean {
-    return !!this.selectedCategoryId;
+  cambiarPeriodo(dias: number): void {
+    this.selectedPeriodo = dias;
+    // Aquí puedes agregar lógica para filtrar por período
   }
 
-  // ==================== REACCIONES ====================
+  getPeriodoTexto(): string {
+    if (this.selectedPeriodo === 7) return 'Esta semana';
+    if (this.selectedPeriodo === 15) return 'Últimos 15 días';
+    return 'Este mes';
+  }
+
+  verCategoria(categoria: any): void {
+    this.selectedCategory = categoria.id;
+    this.selectedCategoryName = categoria.nombre;
+    this.currentView = 'populares';
+    this.applyFilters();
+  }
+
+  getReportes(): Queja[] {
+    return this.selectedCategory ? this.filteredPosts : this.posts;
+  }
+
+  // ============================================
+  // VOTACIÓN
+  // ============================================
+
+  isQuejaEnVotacion(post: Queja): boolean {
+    return post.estado?.clave === 'votacion';
+  }
+
+  hasVotes(post: Queja): boolean {
+    return !!post.votes;
+  }
+
+  canVote(post: Queja): boolean {
+    return !post.userVote && this.isQuejaEnVotacion(post);
+  }
+
+  getTotalVotes(post: Queja): number {
+    return (post.votes?.yes || 0) + (post.votes?.no || 0);
+  }
+
+  getYesVotes(post: Queja): number {
+    return post.votes?.yes || 0;
+  }
+
+  getNoVotes(post: Queja): number {
+    return post.votes?.no || 0;
+  }
+
+  getVotingProgress(post: Queja): number {
+    const total = this.getTotalVotes(post);
+    return Math.min((total / 5) * 100, 100);
+  }
+
+  needsMoreVotes(post: Queja): boolean {
+    return this.getTotalVotes(post) < 5;
+  }
+
+  getVotesNeeded(post: Queja): number {
+    return Math.max(0, 5 - this.getTotalVotes(post));
+  }
+
+  vote(post: Queja, voteType: 'accept' | 'reject'): void {
+    if (!this.user?.id || !this.canVote(post)) {
+      return;
+    }
+
+    const voteValue = voteType === 'accept' ? 'YES' : 'NO';
+    
+    const previousVotes = { ...post.votes };
+    const previousUserVote = post.userVote;
+
+    if (voteType === 'accept') {
+      post.votes.yes = (post.votes.yes || 0) + 1;
+    } else {
+      post.votes.no = (post.votes.no || 0) + 1;
+    }
+    post.votes.total = (post.votes.yes || 0) + (post.votes.no || 0);
+    post.userVote = voteValue;
+
+    this.quejaService.votarQueja(post.id, this.user.id, voteValue).subscribe({
+      next: (updatedQueja) => {
+        post.votes = updatedQueja.votes;
+        post.userVote = updatedQueja.userVote;
+        post.canVote = updatedQueja.canVote;
+        this.showToastMessage('Voto registrado exitosamente');
+      },
+      error: (err: any) => {
+        console.error('Error al votar:', err);
+        post.votes = previousVotes;
+        post.userVote = previousUserVote;
+        this.showToastMessage('Error al registrar el voto');
+      }
+    });
+  }
+
+  // ============================================
+  // ESTADOS
+  // ============================================
+
+  isQuejaEnProceso(post: Queja): boolean {
+    return post.estado?.clave === 'en_proceso';
+  }
+
+  isQuejaResuelta(post: Queja): boolean {
+    return post.estado?.clave === 'resuelto' || post.estado?.clave === 'resuelta';
+  }
+
+  isQuejaPendiente(post: Queja): boolean {
+    return post.estado?.clave === 'pendiente' || post.estado?.clave === 'aprobada';
+  }
+
+  // ============================================
+  // REACCIONES
+  // ============================================
+
+  closeAllReactionMenus(): void {
+    this.showReactionMenu = {};
+  }
+
   toggleReactionMenu(postId: string, event: Event): void {
     event.stopPropagation();
     Object.keys(this.showReactionMenu).forEach(key => {
       if (key !== postId) this.showReactionMenu[key] = false;
     });
     this.showReactionMenu[postId] = !this.showReactionMenu[postId];
-  }
-
-  closeAllReactionMenus(): void {
-    this.showReactionMenu = {};
   }
 
   selectReaction(post: Queja, type: string, event: Event): void {
@@ -350,7 +430,10 @@ export class TrendingComponent implements OnInit {
     post.reactions.total = total;
 
     this.reaccionService.toggleReaccion(post.id, type, this.user.id).subscribe({
-      next: (updated) => post.reactions = updated,
+      next: (updated) => {
+        post.reactions = updated;
+        this.applyFilters();
+      },
       error: (err: any) => {
         console.error('Error al reaccionar', err);
         post.reactions = previousReactions;
@@ -362,32 +445,62 @@ export class TrendingComponent implements OnInit {
     return post.reactions?.counts?.[type] ?? 0;
   }
 
-  getReactionIcon(type: string): string {
+  getReactionIcon(reaction: string): string {
     const icons: { [key: string]: string } = {
-      'like': '❤️',
-      'love': '😍',
-      'wow': '😮',
-      'helpful': '👍',
-      'dislike': '👎'
+      like: '❤️',
+      love: '😍',
+      wow: '😮',
+      helpful: '👍',
+      dislike: '👎'
     };
-    return icons[type] || '👍';
+    return icons[reaction] || '👍';
   }
 
-  // ==================== COMENTARIOS INLINE ====================
-  toggleCommentsInline(postId: string): void {
-    this.showCommentsInline[postId] = !this.showCommentsInline[postId];
-    if (!this.commentPages[postId]) {
-      this.commentPages[postId] = 2; // Cargar primeros 20 (2 páginas de 10)
-    }
+  // ============================================
+  // COMENTARIOS
+  // ============================================
+
+  getCommentsCount(reporte: Queja): number {
+    return reporte.commentsCount || (reporte.comments || []).length;
   }
 
-  addCommentInline(post: Queja, inputElement: HTMLInputElement): void {
-    const text = inputElement.value;
-    if (!text?.trim() || !this.user?.id) return;
+  getPreviewComments(reporte: Queja): any[] {
+    return (reporte.comments || []).slice(0, 3);
+  }
+
+  hasMoreComments(reporte: Queja): boolean {
+    return this.getCommentsCount(reporte) > 3;
+  }
+
+  canEditComment(comment: any): boolean {
+    return comment.author?.id === this.user?.id;
+  }
+
+  getCommentAuthor(comment: any): string {
+    return `${comment.author?.nombre || ''} ${comment.author?.apellido || ''}`.trim() || 'Usuario';
+  }
+
+  formatCommentDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return 'justo ahora';
+    if (diffInSeconds < 3600) return `hace ${Math.floor(diffInSeconds / 60)} min`;
+    if (diffInSeconds < 86400) return `hace ${Math.floor(diffInSeconds / 3600)}h`;
+    if (diffInSeconds < 172800) return 'hace 1 día';
+    if (diffInSeconds < 604800) return `hace ${Math.floor(diffInSeconds / 86400)} días`;
+    
+    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  }
+
+  addCommentInline(reporte: Queja, inputElement: HTMLInputElement): void {
+    const text = inputElement.value.trim();
+    if (!text || !this.user?.id) return;
 
     const tempComment = {
       id: 'temp-' + Date.now(),
-      texto: text.trim(),
+      texto: text,
       author: {
         id: this.user.id,
         nombre: this.user.name.split(' ')[0] || 'Usuario',
@@ -395,109 +508,45 @@ export class TrendingComponent implements OnInit {
         foto_perfil: this.user.avatarUrl
       },
       fecha_creacion: new Date().toISOString(),
-      fecha_modificacion: undefined
+      showMenu: false
     };
 
-    if (!Array.isArray(post.comments)) {
-      post.comments = [];
+    if (!Array.isArray(reporte.comments)) {
+      reporte.comments = [];
     }
 
-    post.comments = [...post.comments, tempComment as any];
-    post.commentsCount = post.comments.length;
+    reporte.comments = [...reporte.comments, tempComment as any];
+    reporte.commentsCount = reporte.comments.length;
     inputElement.value = '';
 
-    this.comentarioService.agregarComentario(post.id, this.user.id, text.trim()).subscribe({
+    this.comentarioService.agregarComentario(reporte.id, this.user.id, text).subscribe({
       next: (newComment) => {
-        const commentIndex = post.comments.findIndex(c => c.id === tempComment.id);
+        const commentIndex = reporte.comments.findIndex(c => c.id === tempComment.id);
         if (commentIndex !== -1) {
-          post.comments = [
-            ...post.comments.slice(0, commentIndex),
+          reporte.comments = [
+            ...reporte.comments.slice(0, commentIndex),
             newComment,
-            ...post.comments.slice(commentIndex + 1)
+            ...reporte.comments.slice(commentIndex + 1)
           ];
         }
         this.showToastMessage('Comentario agregado');
       },
       error: (err: any) => {
         console.error('Error al comentar', err);
-        post.comments = post.comments.filter(c => c.id !== tempComment.id);
-        post.commentsCount = post.comments.length;
+        reporte.comments = reporte.comments.filter(c => c.id !== tempComment.id);
+        reporte.commentsCount = reporte.comments.length;
         this.showToastMessage('Error al agregar comentario');
       }
     });
   }
 
-  getVisibleComments(post: Queja): any[] {
-    if (!post.comments) return [];
-    const page = this.commentPages[post.id] || 2;
-    return post.comments.slice(0, page * this.commentsPerPage);
-  }
-
-  hasMoreCommentsToLoad(post: Queja): boolean {
-    if (!post.comments) return false;
-    const page = this.commentPages[post.id] || 2;
-    return post.comments.length > page * this.commentsPerPage;
-  }
-
-  loadMoreComments(post: Queja): void {
-    const currentPage = this.commentPages[post.id] || 2;
-    this.commentPages[post.id] = currentPage + 1;
-  }
-
-  startEditCommentInline(post: Queja, comment: any): void {
-    this.editingCommentId = comment.id;
-    this.editingCommentText = comment.texto;
-  }
-
-  saveEditCommentInline(post: Queja): void {
-    if (!this.editingCommentId || !this.editingCommentText.trim() || !this.user?.id) return;
-
-    const commentIndex = post.comments.findIndex(c => c.id === this.editingCommentId);
-    if (commentIndex !== -1) {
-      const previousText = post.comments[commentIndex].texto;
-
-      post.comments = [
-        ...post.comments.slice(0, commentIndex),
-        {
-          ...post.comments[commentIndex],
-          texto: this.editingCommentText.trim(),
-          fecha_modificacion: new Date().toISOString()
-        } as any,
-        ...post.comments.slice(commentIndex + 1)
-      ];
-
-      this.comentarioService.actualizarComentario(
-        this.editingCommentId,
-        this.user.id,
-        this.editingCommentText.trim()
-      ).subscribe({
-        next: () => {
-          this.showToastMessage('Comentario actualizado');
-          this.cancelEditComment();
-        },
-        error: (err: any) => {
-          console.error('Error al actualizar comentario', err);
-          post.comments = [
-            ...post.comments.slice(0, commentIndex),
-            {
-              ...post.comments[commentIndex],
-              texto: previousText
-            },
-            ...post.comments.slice(commentIndex + 1)
-          ];
-          this.showToastMessage('Error al actualizar comentario');
-        }
-      });
-    }
-  }
-
-  deleteCommentInline(post: Queja, comment: any): void {
+  deleteCommentInline(reporte: Queja, comment: any): void {
     if (!this.user?.id || !confirm('¿Eliminar este comentario?')) return;
 
     this.comentarioService.eliminarComentario(comment.id, this.user.id).subscribe({
       next: () => {
-        post.comments = post.comments.filter(c => c.id !== comment.id);
-        post.commentsCount = post.comments.length;
+        reporte.comments = reporte.comments.filter(c => c.id !== comment.id);
+        reporte.commentsCount = reporte.comments.length;
         this.showToastMessage('Comentario eliminado');
       },
       error: (err: any) => {
@@ -507,9 +556,8 @@ export class TrendingComponent implements OnInit {
     });
   }
 
-  // ==================== MODAL COMENTARIOS ====================
   openCommentsModal(reporte: Queja): void {
-    this.selectedReporteForComments = JSON.parse(JSON.stringify(reporte));
+    this.selectedReporteForComments = reporte;
     this.showCommentsModal = true;
   }
 
@@ -533,7 +581,8 @@ export class TrendingComponent implements OnInit {
         apellido: this.user.name.split(' ')[1] || '',
         foto_perfil: this.user.avatarUrl
       },
-      fecha_creacion: new Date().toISOString()
+      fecha_creacion: new Date().toISOString(),
+      showMenu: false
     };
 
     if (!Array.isArray(this.selectedReporteForComments.comments)) {
@@ -543,24 +592,10 @@ export class TrendingComponent implements OnInit {
     this.selectedReporteForComments.comments = [...this.selectedReporteForComments.comments, tempComment as any];
     this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
 
-    const quejaIndex = this.todasLasQuejas.findIndex(q => q.id === this.selectedReporteForComments!.id);
-    if (quejaIndex !== -1) {
-      this.todasLasQuejas[quejaIndex] = {
-        ...this.todasLasQuejas[quejaIndex],
-        comments: [...this.selectedReporteForComments.comments],
-        commentsCount: this.selectedReporteForComments.commentsCount
-      };
-      this.processQuejas(this.todasLasQuejas);
-    }
-
     const commentText = this.newCommentText.trim();
     this.newCommentText = '';
 
-    this.comentarioService.agregarComentario(
-      this.selectedReporteForComments.id, 
-      this.user.id, 
-      commentText
-    ).subscribe({
+    this.comentarioService.agregarComentario(this.selectedReporteForComments.id, this.user.id, commentText).subscribe({
       next: (newComment) => {
         if (this.selectedReporteForComments) {
           const commentIndex = this.selectedReporteForComments.comments.findIndex(c => c.id === tempComment.id);
@@ -596,7 +631,7 @@ export class TrendingComponent implements OnInit {
   }
 
   saveEditComment(): void {
-    if (!this.editingCommentId || !this.editingCommentText.trim() || !this.selectedReporteForComments) return;
+    if (!this.editingCommentId || !this.editingCommentText.trim() || !this.selectedReporteForComments || !this.user?.id) return;
 
     const commentIndex = this.selectedReporteForComments.comments.findIndex(c => c.id === this.editingCommentId);
     if (commentIndex !== -1) {
@@ -614,7 +649,7 @@ export class TrendingComponent implements OnInit {
 
       this.comentarioService.actualizarComentario(
         this.editingCommentId,
-        this.user!.id!,
+        this.user.id,
         this.editingCommentText.trim()
       ).subscribe({
         next: () => {
@@ -657,18 +692,20 @@ export class TrendingComponent implements OnInit {
     });
   }
 
-  canEditComment(comment: any): boolean {
-    return comment.author?.id === this.user?.id;
+  // ============================================
+  // EDITAR/ELIMINAR QUEJA
+  // ============================================
+
+  canEditQueja(reporte: Queja): boolean {
+    return reporte.usuario?.id === this.user?.id;
   }
 
-  // ==================== EDITAR REPORTE ====================
-  togglePostMenu(post: Queja): void {
-    post.showMenu = !post.showMenu;
-    this.closeAllReactionMenus();
+  togglePostMenu(reporte: Queja): void {
+    reporte.showMenu = !reporte.showMenu;
   }
 
-  openEditQueja(queja: Queja): void {
-    this.editingQueja = JSON.parse(JSON.stringify(queja));
+  openEditQueja(reporte: Queja): void {
+    this.editingQueja = JSON.parse(JSON.stringify(reporte));
     this.showEditModal = true;
   }
 
@@ -692,17 +729,18 @@ export class TrendingComponent implements OnInit {
       this.user.id
     ).subscribe({
       next: (updated) => {
-        const index = this.todasLasQuejas.findIndex(q => q.id === updated.id);
+        const index = this.posts.findIndex(p => p.id === updated.id);
         if (index !== -1) {
-          this.todasLasQuejas[index] = { 
+          this.posts[index] = { 
             ...updated, 
             showMenu: false,
-            fue_editado: true 
+            fue_editado: true,
+            comments: this.posts[index].comments || []
           };
-          this.processQuejas(this.todasLasQuejas);
         }
         this.closeEditModal();
         this.loading = false;
+        this.applyFilters();
         this.showToastMessage('Reporte actualizado');
       },
       error: (err: any) => {
@@ -713,15 +751,15 @@ export class TrendingComponent implements OnInit {
     });
   }
 
-  deleteQueja(queja: Queja): void {
+  deleteQueja(reporte: Queja): void {
     if (!this.user?.id || !confirm('¿Eliminar este reporte permanentemente?')) return;
 
     this.loading = true;
 
-    this.quejaService.eliminarQueja(queja.id, this.user.id).subscribe({
+    this.quejaService.eliminarQueja(reporte.id, this.user.id).subscribe({
       next: () => {
-        this.todasLasQuejas = this.todasLasQuejas.filter(q => q.id !== queja.id);
-        this.processQuejas(this.todasLasQuejas);
+        this.posts = this.posts.filter(p => p.id !== reporte.id);
+        this.applyFilters();
         this.loading = false;
         this.showToastMessage('Reporte eliminado');
       },
@@ -733,119 +771,16 @@ export class TrendingComponent implements OnInit {
     });
   }
 
-  canEditQueja(queja: Queja): boolean {
-    return queja.usuario?.id === this.user?.id;
-  }
+  // ============================================
+  // PAGINACIÓN
+  // ============================================
 
-  // ==================== UTILIDADES ====================
-
-  getPreviewComments(reporte: Queja): any[] {
-    return (reporte.comments || []).slice(0, 3);
-  }
-
-  hasMoreComments(reporte: Queja): boolean {
-    return (reporte.comments || []).length > 3;
-  }
-
-  
-  getCommentsCount(reporte: Queja): number {
-    return reporte.commentsCount || (reporte.comments || []).length;
-  }
-
-  toggleCommentMenu(commentId: string): void {
-    if (this.editingCommentId === commentId) {
-      this.editingCommentId = null;
-    } else {
-      this.editingCommentId = commentId;
-    }
-  }
-
-  verPerfilUsuario(usuario: Usuario): void {
-    if (!usuario?.id) return;
-    if (usuario.id === this.user?.id) {
-      this.router.navigate(['/public/profile']);
-    } else {
-      this.router.navigate(['/public/user-profile', usuario.id]);
-    }
-  }
-
-  getEstadoClass(estado: string): string {
-    const estadoMap: { [key: string]: string } = {
-      'Pendiente': 'estado-pendiente',
-      'En Proceso': 'estado-proceso',
-      'Resuelta': 'estado-resuelta',
-      'Rechazada': 'estado-rechazada'
-    };
-    return estadoMap[estado] || 'estado-pendiente';
-  }
-
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return 'hace unos minutos';
-    if (diffInHours < 24) return `hace ${diffInHours}h`;
-    if (diffInHours < 48) return 'hace 1 día';
-    const days = Math.floor(diffInHours / 24);
-    return `hace ${days} ${days === 1 ? 'día' : 'días'}`;
-  }
-
-  formatCommentDate(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) return 'justo ahora';
-    if (diffInSeconds < 3600) return `hace ${Math.floor(diffInSeconds / 60)} min`;
-    if (diffInSeconds < 86400) return `hace ${Math.floor(diffInSeconds / 3600)}h`;
-    if (diffInSeconds < 172800) return 'hace 1 día';
-    if (diffInSeconds < 604800) return `hace ${Math.floor(diffInSeconds / 86400)} días`;
-    
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-  }
-
-  getImageUrl(reporte: Queja): string {
-    return reporte.imagen_url || reporte.evidence?.[0]?.url || 'assets/img/placeholder-report.jpg';
-  }
-
-  hasImage(reporte: Queja): boolean {
-    return !!(reporte.imagen_url || (reporte.evidence && reporte.evidence.length > 0));
-  }
-
-  getAvatarUrl(usuario: Usuario): string {
-    return usuario?.foto_perfil || 'assets/img/default-avatar.png';
-  }
-
-  getAuthorName(usuario: Usuario): string {
-    return `${usuario.nombre} ${usuario.apellido}`.trim() || 'Usuario';
-  }
-
-  getCommentAuthor(comment: any): string {
-    return `${comment.author?.nombre || ''} ${comment.author?.apellido || ''}`.trim() || 'Usuario';
-  }
-
-  showToastMessage(message: string): void {
-    this.toastMessage = message;
-    this.showToast = true;
-    setTimeout(() => this.showToast = false, 3000);
-  }
-
-  trackByPostId(index: number, post: Queja): string {
-    return post.id;
-  }
-
-  trackByComment(index: number, comment: any): string {
-    return comment.id;
-  }
-
-    // ==================== PAGINACIÓN DE REPORTES ====================
   getPaginatedReportes(): Queja[] {
-    const reportes = this.getReportes();
-    this.totalReports = reportes.length;
+    const posts = this.getReportes();
+    this.totalReports = posts.length;
     const startIndex = (this.currentPage - 1) * this.reportsPerPage;
     const endIndex = startIndex + this.reportsPerPage;
-    return reportes.slice(startIndex, endIndex);
+    return posts.slice(startIndex, endIndex);
   }
 
   getTotalPages(): number {
@@ -884,7 +819,7 @@ export class TrendingComponent implements OnInit {
     } else {
       if (this.currentPage <= 4) {
         for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push(-1); // Ellipsis
+        pages.push(-1);
         pages.push(totalPages);
       } else if (this.currentPage >= totalPages - 3) {
         pages.push(1);
@@ -902,4 +837,77 @@ export class TrendingComponent implements OnInit {
     return pages;
   }
 
+  // ============================================
+  // UTILIDADES
+  // ============================================
+
+  verPerfilUsuario(usuario: Usuario): void {
+    if (!usuario?.id) return;
+    if (usuario.id === this.user?.id) {
+      this.router.navigate(['/public/profile']);
+    } else {
+      this.router.navigate(['/public/user-profile', usuario.id]);
+    }
+  }
+
+  getAvatarUrl(usuario: Usuario): string {
+    return usuario?.foto_perfil || 'assets/img/default-avatar.png';
+  }
+
+  getAuthorName(usuario: Usuario): string {
+    return `${usuario.nombre} ${usuario.apellido}`.trim() || 'Usuario';
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'hace unos minutos';
+    if (diffInHours < 24) return `hace ${diffInHours}h`;
+    if (diffInHours < 48) return 'hace 1 día';
+    const days = Math.floor(diffInHours / 24);
+    return `hace ${days} ${days === 1 ? 'día' : 'días'}`;
+  }
+
+  hasImage(reporte: Queja): boolean {
+    return !!(reporte.imagen_url || (reporte.evidence && reporte.evidence.length > 0));
+  }
+
+  getImageUrl(reporte: Queja): string {
+    return reporte.imagen_url || reporte.evidence?.[0]?.url || '';
+  }
+
+  getEstadoClass(estado: string): string {
+    const estadoMap: { [key: string]: string } = {
+      'Pendiente': 'estado-pendiente',
+      'En Proceso': 'estado-proceso',
+      'Resuelta': 'estado-resuelta',
+      'Rechazada': 'estado-rechazada',
+      'En Votación': 'estado-votacion'
+    };
+    return estadoMap[estado] || 'estado-pendiente';
+  }
+
+  getCategoryName(post: Queja): string {
+    return post.categoria?.nombre || 'Sin categoría';
+  }
+
+  get displayedPosts(): Queja[] {
+    return this.selectedCategory ? this.filteredPosts : this.posts;
+  }
+
+  showToastMessage(message: string): void {
+    this.toastMessage = message;
+    this.showToast = true;
+    setTimeout(() => this.showToast = false, 3000);
+  }
+
+  trackByComment(index: number, comment: any): string {
+    return comment.id;
+  }
+
+  trackByPostId(index: number, post: Queja): string {
+    return post.id;
+  }
 }
