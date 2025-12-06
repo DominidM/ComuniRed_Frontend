@@ -231,8 +231,8 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background: white;
-  border: 1px solid var(--gray-200);
+  background: var(--cr-background);
+  border: 1px solid var(--cr-border);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
@@ -243,14 +243,14 @@
 .crud-estado-queja-table th {
   padding: 1rem 1.5rem;
   text-align: left;
-  background: var(--gray-50);
-  color: var(--gray-700);
+  background: #000000;
+  color: #ffffff;
   font-weight: 600;
   font-size: 0.875rem;
   text-transform: none;
   letter-spacing: normal;
-  border-bottom: 1px solid var(--gray-200);
-  border-right: 1px solid var(--gray-200);
+  border-bottom: 1px solid #444444;
+  border-right: 1px solid #222222;
 }
 
 .crud-estado-queja-table th:last-child {
@@ -259,12 +259,12 @@
 
 .crud-estado-queja-table td {
   padding: 1rem 1.5rem;
-  color: var(--gray-900);
+  color: var(--cr-text);
   font-size: 0.875rem;
   font-weight: 400;
-  border-bottom: 1px solid var(--gray-100);
-  border-right: 1px solid var(--gray-100);
-  background: white;
+  border-bottom: 1px solid var(--cr-border);
+  border-right: 1px solid var(--cr-border);
+  background: var(--cr-background-content);
 }
 
 .crud-estado-queja-table td:last-child {
@@ -272,16 +272,15 @@
 }
 
 .crud-estado-queja-table tbody tr:nth-child(even) td {
-  background: var(--gray-50);
+  background: var(--cr-search);
 }
 
 .crud-estado-queja-table tbody tr:nth-child(odd) td {
-  background: rgba(235, 234, 234, 0.63);
+  background: var(--cr-background-content);
 }
 
 .crud-estado-queja-table tr:hover td {
-  background: #e0f2fe !important;
-  transform: none;
+  background: color-mix(in srgb, var(--primary-color) 10%, var(--cr-background-content)) !important;
 }
 
 .crud-estado-queja-table tr:last-child td {
