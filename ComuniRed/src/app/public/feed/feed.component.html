@@ -1,765 +1,765 @@
-<div class="feed-container">
-  
-  <!-- Toast Notification -->
-  <div *ngIf="showToast" class="toast-notification">
-    {{ toastMessage }}
-  </div>
-
-  <!-- Loading Overlay -->
-  <div *ngIf="loading" class="loading-overlay">
-    <div class="spinner"></div>
-  </div>
-
-  <!-- Crear Reporte -->
-  <div class="create-card card">
-    <div class="create-top">
-      <div class="create-avatar">
-        <img [src]="user?.avatarUrl" [alt]="user?.name" class="user-avatar" />
-      </div>
-      <button class="create-input" (click)="openCreateReport()" aria-label="Crear reporte">
-        ¿Qué problema de infraestructura quieres reportar?
-      </button>
+  <div class="feed-container">
+    
+    <!-- Toast Notification -->
+    <div *ngIf="showToast" class="toast-notification">
+      {{ toastMessage }}
     </div>
 
-    <div class="create-sep"></div>
-
-    <div class="create-actions">
-      <button class="create-action" type="button" (click)="openCreateReportWithMedia()">
-        <i class="bi bi-image create-icon"></i>
-        <span>Foto/Video</span>
-      </button>
-      <button class="create-action" type="button" (click)="openCreateReportWithLocation()">
-        <i class="bi bi-geo-alt-fill create-icon"></i>
-        <span>Ubicación</span>
-      </button>
+    <!-- Loading Overlay -->
+    <div *ngIf="loading" class="loading-overlay">
+      <div class="spinner"></div>
     </div>
-  </div>
 
-  <!-- Modal Crear Reporte -->
-  <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
-    <div class="modal-container" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2 class="modal-title">Crear Reporte</h2>
-        <button class="modal-close" (click)="closeCreateModal()" aria-label="Cerrar">✕</button>
+    <!-- Crear Reporte -->
+    <div class="create-card card">
+      <div class="create-top">
+        <div class="create-avatar">
+          <img [src]="user?.avatarUrl" [alt]="user?.name" class="user-avatar" />
+        </div>
+        <button class="create-input" (click)="openCreateReport()" aria-label="Crear reporte">
+          ¿Qué problema de infraestructura quieres reportar?
+        </button>
       </div>
 
-      <div class="modal-body">
-        <div class="modal-user">
-          <img [src]="user?.avatarUrl" [alt]="user?.name" class="modal-avatar" />
-          <span class="modal-username">{{ user?.name }}</span>
+      <div class="create-sep"></div>
+
+      <div class="create-actions">
+        <button class="create-action" type="button" (click)="openCreateReportWithMedia()">
+          <i class="bi bi-image create-icon"></i>
+          <span>Foto/Video</span>
+        </button>
+        <button class="create-action" type="button" (click)="openCreateReportWithLocation()">
+          <i class="bi bi-geo-alt-fill create-icon"></i>
+          <span>Ubicación</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Crear Reporte -->
+    <div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">Crear Reporte</h2>
+          <button class="modal-close" (click)="closeCreateModal()" aria-label="Cerrar">✕</button>
         </div>
 
-        <form class="create-form">
-          <div class="form-group">
-            <label for="titulo" class="form-label">Título del problema</label>
-            <input 
-              type="text" 
-              id="titulo" 
-              class="form-input"
-              [(ngModel)]="newQueja.titulo"
-              name="titulo"
-              placeholder="Ej: Bache peligroso en la avenida principal"
-              maxlength="100"
-            />
+        <div class="modal-body">
+          <div class="modal-user">
+            <img [src]="user?.avatarUrl" [alt]="user?.name" class="modal-avatar" />
+            <span class="modal-username">{{ user?.name }}</span>
           </div>
 
-          <div class="form-group">
-            <label for="descripcion" class="form-label">Descripción detallada</label>
-            <textarea 
-              id="descripcion" 
-              class="form-textarea"
-              [(ngModel)]="newQueja.descripcion"
-              name="descripcion"
-              placeholder="Describe el problema de infraestructura que quieres reportar..."
-              rows="4"
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="categoria" class="form-label">Categoría</label>
-            <select 
-              id="categoria" 
-              class="form-select"
-              [(ngModel)]="newQueja.categoriaId"
-              name="categoria"
-            >
-              <option value="">Selecciona una categoría</option>
-              <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="ubicacion" class="form-label">📍 Ubicación</label>
-            <input 
-              type="text" 
-              id="ubicacion" 
-              class="form-input"
-              [(ngModel)]="newQueja.ubicacion"
-              name="ubicacion"
-              placeholder="Ej: Av. Principal 123, San Isidro"
-            />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">🖼️ Foto del problema (opcional, máx 5MB)</label>
-            <div class="upload-area" (click)="fileInput.click()">
+          <form class="create-form">
+            <div class="form-group">
+              <label for="titulo" class="form-label">Título del problema</label>
               <input 
-                #fileInput
-                type="file" 
-                accept="image/*" 
-                (change)="onFileSelected($event)"
-                style="display: none;"
+                type="text" 
+                id="titulo" 
+                class="form-input"
+                [(ngModel)]="newQueja.titulo"
+                name="titulo"
+                placeholder="Ej: Bache peligroso en la avenida principal"
+                maxlength="100"
               />
-              <div *ngIf="!newQueja.imagenPreview" class="upload-placeholder">
-                <span class="upload-icon">📷</span>
-                <span class="upload-text">Click para subir una foto</span>
-              </div>
-              <div *ngIf="newQueja.imagenPreview" class="image-preview">
-                <img [src]="newQueja.imagenPreview" alt="Preview" />
-                <button 
-                  type="button" 
-                  class="remove-image" 
-                  (click)="removeImage($event)"
-                >
-                  ✕
-                </button>
+            </div>
+
+            <div class="form-group">
+              <label for="descripcion" class="form-label">Descripción detallada</label>
+              <textarea 
+                id="descripcion" 
+                class="form-textarea"
+                [(ngModel)]="newQueja.descripcion"
+                name="descripcion"
+                placeholder="Describe el problema de infraestructura que quieres reportar..."
+                rows="4"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="categoria" class="form-label">Categoría</label>
+              <select 
+                id="categoria" 
+                class="form-select"
+                [(ngModel)]="newQueja.categoriaId"
+                name="categoria"
+              >
+                <option value="">Selecciona una categoría</option>
+                <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ubicacion" class="form-label">📍 Ubicación</label>
+              <input 
+                type="text" 
+                id="ubicacion" 
+                class="form-input"
+                [(ngModel)]="newQueja.ubicacion"
+                name="ubicacion"
+                placeholder="Ej: Av. Principal 123, San Isidro"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">🖼️ Foto del problema (opcional, máx 5MB)</label>
+              <div class="upload-area" (click)="fileInput.click()">
+                <input 
+                  #fileInput
+                  type="file" 
+                  accept="image/*" 
+                  (change)="onFileSelected($event)"
+                  style="display: none;"
+                />
+                <div *ngIf="!newQueja.imagenPreview" class="upload-placeholder">
+                  <span class="upload-icon">📷</span>
+                  <span class="upload-text">Click para subir una foto</span>
+                </div>
+                <div *ngIf="newQueja.imagenPreview" class="image-preview">
+                  <img [src]="newQueja.imagenPreview" alt="Preview" />
+                  <button 
+                    type="button" 
+                    class="remove-image" 
+                    (click)="removeImage($event)"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </form>
-      </div>
-
-      <div class="modal-footer">
-        <button 
-          type="button" 
-          class="btn btn-cancel" 
-          (click)="closeCreateModal()"
-        >
-          Cancelar
-        </button>
-        <button 
-          type="button" 
-          class="btn btn-primary" 
-          (click)="submitQueja()"
-          [disabled]="!isFormValid() || loading"
-        >
-          {{ loading ? 'Publicando...' : 'Publicar Reporte' }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Editar Reporte -->
-  <div *ngIf="showEditModal && editingQueja" class="modal-overlay" (click)="closeEditModal()">
-    <div class="modal-container" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2 class="modal-title">Editar Reporte</h2>
-        <button class="modal-close" (click)="closeEditModal()" aria-label="Cerrar">✕</button>
-      </div>
-
-      <div class="modal-body">
-        <form class="create-form">
-          <div class="form-group">
-            <label for="edit-titulo" class="form-label">Título</label>
-            <input 
-              type="text" 
-              id="edit-titulo" 
-              class="form-input"
-              [(ngModel)]="editingQueja.titulo"
-              name="titulo"
-              maxlength="100"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="edit-descripcion" class="form-label">Descripción</label>
-            <textarea 
-              id="edit-descripcion" 
-              class="form-textarea"
-              [(ngModel)]="editingQueja.descripcion"
-              name="descripcion"
-              rows="4"
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-ubicacion" class="form-label">📍 Ubicación</label>
-            <input 
-              type="text" 
-              id="edit-ubicacion" 
-              class="form-input"
-              [(ngModel)]="editingQueja.ubicacion"
-              name="ubicacion"
-            />
-          </div>
-        </form>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-cancel" (click)="closeEditModal()">Cancelar</button>
-        <button class="btn btn-primary" (click)="saveEditQueja()" [disabled]="loading">
-          {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Posts -->
-  <ng-container *ngIf="displayedPosts.length > 0; else emptyState">
-    <div *ngFor="let post of getPaginatedPosts(); trackBy: trackByPostId" class="post-card">
-      
-      <!-- Header del Post -->
-      <div class="post-header">
-        <div class="avatar-container" (click)="verPerfilUsuario(post.usuario)">
-          <img [src]="getAvatarUrl(post)" [alt]="getAuthorName(post)" class="avatar clickable" />
+          </form>
         </div>
 
-        <div class="post-info">
-          <div class="post-title-row">
-            <div class="post-author-section">
-              <div class="post-author clickable" (click)="verPerfilUsuario(post.usuario)">
-                {{ getAuthorName(post) }}
-              </div>
-              <div class="post-meta">
-                <span class="post-date">{{ getPostDate(post) }}</span>
-                <ng-container *ngIf="hasLocation(post)">
-                  <span class="dot-sep">•</span>
-                  <span class="post-location">📍 {{ getLocation(post) }}</span>
-                </ng-container>
-              </div>
-            </div>
-
-            <!-- Menú de 3 puntos -->
-            <div class="post-menu-container">
-              <button class="post-menu" aria-label="Más opciones" (click)="post.showMenu = !post.showMenu">⋯</button>
-              
-              <div *ngIf="post.showMenu" class="post-menu-dropdown">
-                <button 
-                  *ngIf="canEditQueja(post)" 
-                  class="menu-item"
-                  (click)="openEditQueja(post); post.showMenu = false"
-                >
-                  ✏️ Editar
-                </button>
-                <button 
-                  *ngIf="canEditQueja(post)" 
-                  class="menu-item danger"
-                  (click)="deleteQueja(post); post.showMenu = false"
-                >
-                  🗑️ Eliminar
-                </button>
-                <button class="menu-item" (click)="sharePost(post); post.showMenu = false">
-                  📤 Compartir
-                </button>
-                <button class="menu-item" (click)="toggleBookmark(post); post.showMenu = false">
-                  {{ getBookmarkEmoji(post) }} {{ getBookmarkText(post) }}
-                </button>
-                <button 
-                  *ngIf="hasHistorial(post)" 
-                  class="menu-item" 
-                  (click)="openHistorialModal(post); post.showMenu = false"
-                >
-                  📜 Ver Historial
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <h3 class="post-heading">{{ getTitle(post) }}</h3>
-          <p class="post-text">{{ getDescription(post) }}</p>
-
-          <!-- Tags con Estado y Riesgo -->
-          <div class="post-tags">
-            <span class="tag category-tag">{{ getCategoryName(post) }}</span>
-            
-            <!-- Badge de Estado -->
-            <span *ngIf="post.estado" [class]="getEstadoBadgeClass(getEstadoClave(post))">
-              {{ getEstadoTexto(post) }}
-            </span>
-
-            <!-- Badge de Nivel de Riesgo -->
-            <span *ngIf="hasRiesgo(post)" [class]="getRiesgoBadgeClass(getNivelRiesgo(post))">
-              {{ getRiesgoIcon(getNivelRiesgo(post)) }} {{ getRiesgoTexto(getNivelRiesgo(post)) }}
-            </span>
-          </div>
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn btn-cancel" 
+            (click)="closeCreateModal()"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="submitQueja()"
+            [disabled]="!isFormValid() || loading"
+          >
+            {{ loading ? 'Publicando...' : 'Publicar Reporte' }}
+          </button>
         </div>
       </div>
+    </div>
 
-      <!-- Imagen -->
-      <div class="post-image-wrapper">
-        <ng-container *ngIf="hasEvidence(post) || post.imagen_url; else imagePlaceholder">
-          <img [src]="getFirstEvidenceUrl(post)" [alt]="getTitle(post)" class="post-image" />
-        </ng-container>
+    <!-- Modal Editar Reporte -->
+    <div *ngIf="showEditModal && editingQueja" class="modal-overlay" (click)="closeEditModal()">
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">Editar Reporte</h2>
+          <button class="modal-close" (click)="closeEditModal()" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <form class="create-form">
+            <div class="form-group">
+              <label for="edit-titulo" class="form-label">Título</label>
+              <input 
+                type="text" 
+                id="edit-titulo" 
+                class="form-input"
+                [(ngModel)]="editingQueja.titulo"
+                name="titulo"
+                maxlength="100"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="edit-descripcion" class="form-label">Descripción</label>
+              <textarea 
+                id="edit-descripcion" 
+                class="form-textarea"
+                [(ngModel)]="editingQueja.descripcion"
+                name="descripcion"
+                rows="4"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-ubicacion" class="form-label">📍 Ubicación</label>
+              <input 
+                type="text" 
+                id="edit-ubicacion" 
+                class="form-input"
+                [(ngModel)]="editingQueja.ubicacion"
+                name="ubicacion"
+              />
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-cancel" (click)="closeEditModal()">Cancelar</button>
+          <button class="btn btn-primary" (click)="saveEditQueja()" [disabled]="loading">
+            {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts -->
+    <ng-container *ngIf="displayedPosts.length > 0; else emptyState">
+      <div *ngFor="let post of getPaginatedPosts(); trackBy: trackByPostId" class="post-card">
         
-        <ng-template #imagePlaceholder>
-          <div class="image-placeholder">
-            <div class="image-placeholder-icon">🖼️</div>
+        <!-- Header del Post -->
+        <div class="post-header">
+          <div class="avatar-container" (click)="verPerfilUsuario(post.usuario)">
+            <img [src]="getAvatarUrl(post)" [alt]="getAuthorName(post)" class="avatar clickable" />
           </div>
-        </ng-template>
-      </div>
 
-      <!-- Sección de Votación (SOLO si está en votación) -->
-      <div *ngIf="isQuejaEnVotacion(post) && hasVotes(post)" class="vote-section">
-        <div class="vote-header">
-          <div class="vote-question">
-            ¿Estás de acuerdo con este reporte?
-          </div>
-          <div class="vote-count-info">
-            <span class="vote-count">{{ getTotalVotes(post) }}/5 votos</span>
-          </div>
-        </div>
-
-        <!-- Barra de progreso -->
-        <div class="vote-progress-container">
-          <div class="vote-progress-bar">
-            <div 
-              class="vote-progress-fill" 
-              [style.width.%]="getVotingProgress(post)"
-              [class.complete]="getTotalVotes(post) >= 5"
-            ></div>
-          </div>
-          <span *ngIf="needsMoreVotes(post)" class="votes-needed-text">
-            Faltan {{ getVotesNeeded(post) }} votos para aprobar
-          </span>
-          <span *ngIf="getTotalVotes(post) >= 5" class="votes-complete-text">
-            ✅ Votos requeridos alcanzados
-          </span>
-        </div>
-
-        <!-- Botones de votación -->
-        <div class="vote-buttons">
-          <button
-            class="vote-btn accept"
-            [class.voted]="post.userVote === 'YES'"
-            [disabled]="!canVote(post)"
-            (click)="vote(post, 'accept')"
-            [title]="canVote(post) ? 'Votar a favor' : 'Ya votaste'"
-          >
-            <span class="vote-icon">✅</span>
-            <span class="vote-label">Sí</span>
-            <span class="vote-count-badge">{{ getYesVotes(post) }}</span>
-          </button>
-
-          <button
-            class="vote-btn reject"
-            [class.voted]="post.userVote === 'NO'"
-            [disabled]="!canVote(post)"
-            (click)="vote(post, 'reject')"
-            [title]="canVote(post) ? 'Votar en contra' : 'Ya votaste'"
-          >
-            <span class="vote-icon">❌</span>
-            <span class="vote-label">No</span>
-            <span class="vote-count-badge">{{ getNoVotes(post) }}</span>
-          </button>
-        </div>
-
-        <!-- Mensaje si ya votó -->
-        <div *ngIf="!canVote(post) && post.userVote" class="vote-thanks">
-          <i class="bi bi-check-circle-fill"></i>
-          Gracias por tu voto
-        </div>
-      </div>
-
-      <!-- Información de estado (si NO está en votación) -->
-      <div *ngIf="!isQuejaEnVotacion(post)" class="status-info-section">
-        <div class="status-info-item" *ngIf="isQuejaEnProceso(post)">
-          <i class="bi bi-hourglass-split"></i>
-          <span>Este reporte está siendo atendido</span>
-        </div>
-        <div class="status-info-item success" *ngIf="isQuejaResuelta(post)">
-          <i class="bi bi-check-circle-fill"></i>
-          <span>Este reporte ha sido resuelto</span>
-        </div>
-        <div class="status-info-item" *ngIf="isQuejaPendiente(post)">
-          <i class="bi bi-clock-fill"></i>
-          <span>Reporte aprobado - En espera de asignación</span>
-        </div>
-      </div>
-
-      <!-- Reacciones con menú estilo Facebook -->
-      <div class="reactions-bar">
-        <div class="reaction-picker-container">
-          <button 
-            class="reaction-btn main-reaction" 
-            [class.active]="post.reactions.userReaction"
-            (click)="toggleReactionMenu(post.id, $event)"
-            title="Reaccionar"
-          >
-            <i [class]="post.reactions.userReaction === 'like' ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
-            <span class="count">{{ post.reactions.total || 0 }}</span>
-          </button>
-
-          <!-- Menú de reacciones -->
-          <div *ngIf="showReactionMenu[post.id]" class="reactions-menu" (click)="$event.stopPropagation()">
-            <button class="reaction-option reaction-like" 
-                    (click)="selectReaction(post, 'like', $event)"
-                    [class.selected]="post.reactions.userReaction === 'like'">
-              <span class="emoji">❤️</span>
-              <span class="label">Me gusta</span>
-              <span class="count-small">{{ getReactionCount(post, 'like') }}</span>
-            </button>
-            
-            <button class="reaction-option reaction-love" 
-                    (click)="selectReaction(post, 'love', $event)"
-                    [class.selected]="post.reactions.userReaction === 'love'">
-              <span class="emoji">😍</span>
-              <span class="label">Me encanta</span>
-              <span class="count-small">{{ getReactionCount(post, 'love') }}</span>
-            </button>
-            
-            <button class="reaction-option reaction-wow" 
-                    (click)="selectReaction(post, 'wow', $event)"
-                    [class.selected]="post.reactions.userReaction === 'wow'">
-              <span class="emoji">😮</span>
-              <span class="label">Me asombra</span>
-              <span class="count-small">{{ getReactionCount(post, 'wow') }}</span>
-            </button>
-            
-            <button class="reaction-option reaction-helpful" 
-                    (click)="selectReaction(post, 'helpful', $event)"
-                    [class.selected]="post.reactions.userReaction === 'helpful'">
-              <span class="emoji">👍</span>
-              <span class="label">Útil</span>
-              <span class="count-small">{{ getReactionCount(post, 'helpful') }}</span>
-            </button>
-            
-            <button class="reaction-option reaction-dislike" 
-                    (click)="selectReaction(post, 'dislike', $event)"
-                    [class.selected]="post.reactions.userReaction === 'dislike'">
-              <span class="emoji">👎</span>
-              <span class="label">No me gusta</span>
-              <span class="count-small">{{ getReactionCount(post, 'dislike') }}</span>
-            </button>
-          </div>
-        </div>
-
-        <button class="reaction-btn" (click)="toggleComments(post)">
-          <i class="bi bi-chat-left-text"></i>
-          <span class="count">{{ getCommentsCount(post) }}</span>
-        </button>
-      </div>
-
-      <!-- Acciones adicionales -->
-      <div class="post-actions">
-        <div class="left-actions">
-          <button class="action-btn" (click)="toggleComments(post)">
-            <span class="action-emoji">💬</span>
-            <span class="action-text">Comentar</span>
-          </button>
-        </div>
-
-        <div class="right-actions">
-          <button class="action-btn" (click)="toggleBookmark(post)">
-            <span class="action-emoji">{{ getBookmarkEmoji(post) }}</span>
-            <span class="action-text">Guardar</span>
-          </button>
-
-          <button class="action-btn" (click)="sharePost(post)">
-            <span class="action-emoji">📤</span>
-            <span class="action-text">Compartir</span>
-          </button>
-
-          <button 
-            *ngIf="hasHistorial(post)" 
-            class="action-btn" 
-            (click)="openHistorialModal(post)"
-          >
-            <span class="action-emoji">📜</span>
-            <span class="action-text">Historial</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Sección de comentarios (solo 3 preview) -->
-      <div *ngIf="getShowComments(post)" class="comments-section">
-        <div class="comments-list-preview">
-          <div *ngFor="let comment of getPreviewComments(post); trackBy: trackByComment" 
-               class="comment-item-preview">
-            
-            <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
-                 [alt]="getCommentAuthor(comment)" 
-                 class="comment-avatar-preview clickable"
-                 (click)="verPerfilUsuario(comment.author)" />
-            
-            <div class="comment-content-preview">
-              <div class="comment-header-preview">
-                <strong class="comment-author-preview clickable" 
-                        (click)="verPerfilUsuario(comment.author)">
-                  {{ getCommentAuthor(comment) }}
-                </strong>
-                <span class="comment-date-preview">{{ formatCommentDate(comment.fecha_creacion) }}</span>
-                <span *ngIf="comment.fecha_modificacion" class="edited-badge-tiny">
-                  <i class="bi bi-pencil-fill"></i>
-                </span>
+          <div class="post-info">
+            <div class="post-title-row">
+              <div class="post-author-section">
+                <div class="post-author clickable" (click)="verPerfilUsuario(post.usuario)">
+                  {{ getAuthorName(post) }}
+                </div>
+                <div class="post-meta">
+                  <span class="post-date">{{ getPostDate(post) }}</span>
+                  <ng-container *ngIf="hasLocation(post)">
+                    <span class="dot-sep">•</span>
+                    <span class="post-location">📍 {{ getLocation(post) }}</span>
+                  </ng-container>
+                </div>
               </div>
-              <p class="comment-text-preview">{{ comment.texto }}</p>
+
+              <!-- Menú de 3 puntos -->
+              <div class="post-menu-container">
+                <button class="post-menu" aria-label="Más opciones" (click)="post.showMenu = !post.showMenu">⋯</button>
+                
+                <div *ngIf="post.showMenu" class="post-menu-dropdown">
+                  <button 
+                    *ngIf="canEditQueja(post)" 
+                    class="menu-item"
+                    (click)="openEditQueja(post); post.showMenu = false"
+                  >
+                    ✏️ Editar
+                  </button>
+                  <button 
+                    *ngIf="canEditQueja(post)" 
+                    class="menu-item danger"
+                    (click)="deleteQueja(post); post.showMenu = false"
+                  >
+                    🗑️ Eliminar
+                  </button>
+                  <button class="menu-item" (click)="sharePost(post); post.showMenu = false">
+                    📤 Compartir
+                  </button>
+                  <button class="menu-item" (click)="toggleBookmark(post); post.showMenu = false">
+                    {{ getBookmarkEmoji(post) }} {{ getBookmarkText(post) }}
+                  </button>
+                  <button 
+                    *ngIf="hasHistorial(post)" 
+                    class="menu-item" 
+                    (click)="openHistorialModal(post); post.showMenu = false"
+                  >
+                    📜 Ver Historial
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <!-- Menú de 3 puntos -->
-            <div class="comment-menu-container" *ngIf="canEditComment(comment)">
-              <button class="comment-menu-btn" 
-                      (click)="$event.stopPropagation(); showCommentMenuModal[comment.id] = !showCommentMenuModal[comment.id]">
-                <i class="bi bi-three-dots"></i>
+            <h3 class="post-heading">{{ getTitle(post) }}</h3>
+            <p class="post-text">{{ getDescription(post) }}</p>
+
+            <!-- Tags con Estado y Riesgo -->
+            <div class="post-tags">
+              <span class="tag category-tag">{{ getCategoryName(post) }}</span>
+              
+              <!-- Badge de Estado -->
+              <span *ngIf="post.estado" [class]="getEstadoBadgeClass(getEstadoClave(post))">
+                {{ getEstadoTexto(post) }}
+              </span>
+
+              <!-- Badge de Nivel de Riesgo -->
+              <span *ngIf="hasRiesgo(post)" [class]="getRiesgoBadgeClass(getNivelRiesgo(post))">
+                {{ getRiesgoIcon(getNivelRiesgo(post)) }} {{ getRiesgoTexto(getNivelRiesgo(post)) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Imagen -->
+        <div class="post-image-wrapper">
+          <ng-container *ngIf="hasEvidence(post) || post.imagen_url; else imagePlaceholder">
+            <img [src]="getFirstEvidenceUrl(post)" [alt]="getTitle(post)" class="post-image" />
+          </ng-container>
+          
+          <ng-template #imagePlaceholder>
+            <div class="image-placeholder">
+              <div class="image-placeholder-icon">🖼️</div>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Sección de Votación (SOLO si está en votación) -->
+        <div *ngIf="isQuejaEnVotacion(post) && hasVotes(post)" class="vote-section">
+          <div class="vote-header">
+            <div class="vote-question">
+              ¿Estás de acuerdo con este reporte?
+            </div>
+            <div class="vote-count-info">
+              <span class="vote-count">{{ getTotalVotes(post) }}/5 votos</span>
+            </div>
+          </div>
+
+          <!-- Barra de progreso -->
+          <div class="vote-progress-container">
+            <div class="vote-progress-bar">
+              <div 
+                class="vote-progress-fill" 
+                [style.width.%]="getVotingProgress(post)"
+                [class.complete]="getTotalVotes(post) >= 5"
+              ></div>
+            </div>
+            <span *ngIf="needsMoreVotes(post)" class="votes-needed-text">
+              Faltan {{ getVotesNeeded(post) }} votos para aprobar
+            </span>
+            <span *ngIf="getTotalVotes(post) >= 5" class="votes-complete-text">
+              ✅ Votos requeridos alcanzados
+            </span>
+          </div>
+
+          <!-- Botones de votación -->
+          <div class="vote-buttons">
+            <button
+              class="vote-btn accept"
+              [class.voted]="post.userVote === 'YES'"
+              [disabled]="!canVote(post)"
+              (click)="vote(post, 'accept')"
+              [title]="canVote(post) ? 'Votar a favor' : 'Ya votaste'"
+            >
+              <span class="vote-icon">✅</span>
+              <span class="vote-label">Sí</span>
+              <span class="vote-count-badge">{{ getYesVotes(post) }}</span>
+            </button>
+
+            <button
+              class="vote-btn reject"
+              [class.voted]="post.userVote === 'NO'"
+              [disabled]="!canVote(post)"
+              (click)="vote(post, 'reject')"
+              [title]="canVote(post) ? 'Votar en contra' : 'Ya votaste'"
+            >
+              <span class="vote-icon">❌</span>
+              <span class="vote-label">No</span>
+              <span class="vote-count-badge">{{ getNoVotes(post) }}</span>
+            </button>
+          </div>
+
+          <!-- Mensaje si ya votó -->
+          <div *ngIf="!canVote(post) && post.userVote" class="vote-thanks">
+            <i class="bi bi-check-circle-fill"></i>
+            Gracias por tu voto
+          </div>
+        </div>
+
+        <!-- Información de estado (si NO está en votación) -->
+        <div *ngIf="!isQuejaEnVotacion(post)" class="status-info-section">
+          <div class="status-info-item" *ngIf="isQuejaEnProceso(post)">
+            <i class="bi bi-hourglass-split"></i>
+            <span>Este reporte está siendo atendido</span>
+          </div>
+          <div class="status-info-item success" *ngIf="isQuejaResuelta(post)">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Este reporte ha sido resuelto</span>
+          </div>
+          <div class="status-info-item" *ngIf="isQuejaPendiente(post)">
+            <i class="bi bi-clock-fill"></i>
+            <span>Reporte aprobado - En espera de asignación</span>
+          </div>
+        </div>
+
+        <!-- Reacciones con menú estilo Facebook -->
+        <div class="reactions-bar">
+          <div class="reaction-picker-container">
+            <button 
+              class="reaction-btn main-reaction" 
+              [class.active]="post.reactions.userReaction"
+              (click)="toggleReactionMenu(post.id, $event)"
+              title="Reaccionar"
+            >
+              <i [class]="post.reactions.userReaction === 'like' ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+              <span class="count">{{ post.reactions.total || 0 }}</span>
+            </button>
+
+            <!-- Menú de reacciones -->
+            <div *ngIf="showReactionMenu[post.id]" class="reactions-menu" (click)="$event.stopPropagation()">
+              <button class="reaction-option reaction-like" 
+                      (click)="selectReaction(post, 'like', $event)"
+                      [class.selected]="post.reactions.userReaction === 'like'">
+                <span class="emoji">❤️</span>
+                <span class="label">Me gusta</span>
+                <span class="count-small">{{ getReactionCount(post, 'like') }}</span>
               </button>
-              <div *ngIf="showCommentMenuModal[comment.id]" 
-                   class="comment-menu-dropdown" 
-                   (click)="$event.stopPropagation()">
-                <button class="comment-menu-item" 
-                        (click)="openCommentsModal(post); startEditComment(comment); showCommentMenuModal[comment.id] = false">
-                  <i class="bi bi-pencil"></i> Editar
-                </button>
-                <button class="comment-menu-item danger" 
-                        (click)="deleteComment(post, comment.id); showCommentMenuModal[comment.id] = false">
-                  <i class="bi bi-trash"></i> Eliminar
-                </button>
-              </div>
+              
+              <button class="reaction-option reaction-love" 
+                      (click)="selectReaction(post, 'love', $event)"
+                      [class.selected]="post.reactions.userReaction === 'love'">
+                <span class="emoji">😍</span>
+                <span class="label">Me encanta</span>
+                <span class="count-small">{{ getReactionCount(post, 'love') }}</span>
+              </button>
+              
+              <button class="reaction-option reaction-wow" 
+                      (click)="selectReaction(post, 'wow', $event)"
+                      [class.selected]="post.reactions.userReaction === 'wow'">
+                <span class="emoji">😮</span>
+                <span class="label">Me asombra</span>
+                <span class="count-small">{{ getReactionCount(post, 'wow') }}</span>
+              </button>
+              
+              <button class="reaction-option reaction-helpful" 
+                      (click)="selectReaction(post, 'helpful', $event)"
+                      [class.selected]="post.reactions.userReaction === 'helpful'">
+                <span class="emoji">👍</span>
+                <span class="label">Útil</span>
+                <span class="count-small">{{ getReactionCount(post, 'helpful') }}</span>
+              </button>
+              
+              <button class="reaction-option reaction-dislike" 
+                      (click)="selectReaction(post, 'dislike', $event)"
+                      [class.selected]="post.reactions.userReaction === 'dislike'">
+                <span class="emoji">👎</span>
+                <span class="label">No me gusta</span>
+                <span class="count-small">{{ getReactionCount(post, 'dislike') }}</span>
+              </button>
             </div>
           </div>
 
-          <!-- Botón ver todos -->
-          <button *ngIf="hasMoreComments(post)" 
-                  class="view-all-modal-btn" 
-                  (click)="openCommentsModal(post)">
-            Ver todos los comentarios ({{ getCommentsCount(post) }})
+          <button class="reaction-btn" (click)="toggleComments(post)">
+            <i class="bi bi-chat-left-text"></i>
+            <span class="count">{{ getCommentsCount(post) }}</span>
           </button>
         </div>
 
-        <!-- Input para agregar comentario -->
-        <div class="comment-input-container">
-          <img [src]="user?.avatarUrl || 'assets/img/default-avatar.png'" class="comment-avatar-preview" />
-          <input 
-            type="text" 
-            [(ngModel)]="commentTexts[post.id]"
-            placeholder="Escribe un comentario..."
-            class="comment-input-preview"
-            (keyup.enter)="addComment(post, commentTexts[post.id] || '')"
-          />
-          <button 
-            class="btn-send-preview"
-            (click)="addComment(post, commentTexts[post.id] || '')"
-            [disabled]="!(commentTexts[post.id] || '').trim()"
-          >
+        <!-- Acciones adicionales -->
+        <div class="post-actions">
+          <div class="left-actions">
+            <button class="action-btn" (click)="toggleComments(post)">
+              <span class="action-emoji">💬</span>
+              <span class="action-text">Comentar</span>
+            </button>
+          </div>
+
+          <div class="right-actions">
+            <button class="action-btn" (click)="toggleBookmark(post)">
+              <span class="action-emoji">{{ getBookmarkEmoji(post) }}</span>
+              <span class="action-text">Guardar</span>
+            </button>
+
+            <button class="action-btn" (click)="sharePost(post)">
+              <span class="action-emoji">📤</span>
+              <span class="action-text">Compartir</span>
+            </button>
+
+            <button 
+              *ngIf="hasHistorial(post)" 
+              class="action-btn" 
+              (click)="openHistorialModal(post)"
+            >
+              <span class="action-emoji">📜</span>
+              <span class="action-text">Historial</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sección de comentarios (solo 3 preview) -->
+        <div *ngIf="getShowComments(post)" class="comments-section">
+          <div class="comments-list-preview">
+            <div *ngFor="let comment of getPreviewComments(post); trackBy: trackByComment" 
+                class="comment-item-preview">
+              
+              <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
+                  [alt]="getCommentAuthor(comment)" 
+                  class="comment-avatar-preview clickable"
+                  (click)="verPerfilUsuario(comment.author)" />
+              
+              <div class="comment-content-preview">
+                <div class="comment-header-preview">
+                  <strong class="comment-author-preview clickable" 
+                          (click)="verPerfilUsuario(comment.author)">
+                    {{ getCommentAuthor(comment) }}
+                  </strong>
+                  <span class="comment-date-preview">{{ formatCommentDate(comment.fecha_creacion) }}</span>
+                  <span *ngIf="comment.fecha_modificacion" class="edited-badge-tiny">
+                    <i class="bi bi-pencil-fill"></i>
+                  </span>
+                </div>
+                <p class="comment-text-preview">{{ comment.texto }}</p>
+              </div>
+
+              <!-- Menú de 3 puntos -->
+              <div class="comment-menu-container" *ngIf="canEditComment(comment)">
+                <button class="comment-menu-btn" 
+                        (click)="$event.stopPropagation(); showCommentMenuModal[comment.id] = !showCommentMenuModal[comment.id]">
+                  <i class="bi bi-three-dots"></i>
+                </button>
+                <div *ngIf="showCommentMenuModal[comment.id]" 
+                    class="comment-menu-dropdown" 
+                    (click)="$event.stopPropagation()">
+                  <button class="comment-menu-item" 
+                          (click)="openCommentsModal(post); startEditComment(comment); showCommentMenuModal[comment.id] = false">
+                    <i class="bi bi-pencil"></i> Editar
+                  </button>
+                  <button class="comment-menu-item danger" 
+                          (click)="deleteComment(post, comment.id); showCommentMenuModal[comment.id] = false">
+                    <i class="bi bi-trash"></i> Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón ver todos -->
+            <button *ngIf="hasMoreComments(post)" 
+                    class="view-all-modal-btn" 
+                    (click)="openCommentsModal(post)">
+              Ver todos los comentarios ({{ getCommentsCount(post) }})
+            </button>
+          </div>
+
+          <!-- Input para agregar comentario -->
+          <div class="comment-input-container">
+            <img [src]="user?.avatarUrl || 'assets/img/default-avatar.png'" class="comment-avatar-preview" />
+            <input 
+              type="text" 
+              [(ngModel)]="commentTexts[post.id]"
+              placeholder="Escribe un comentario..."
+              class="comment-input-preview"
+              (keyup.enter)="addComment(post, commentTexts[post.id] || '')"
+            />
+            <button 
+              class="btn-send-preview"
+              (click)="addComment(post, commentTexts[post.id] || '')"
+              [disabled]="!(commentTexts[post.id] || '').trim()"
+            >
+              <i class="bi bi-send-fill"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </ng-container>
+
+    <!-- Estado vacío -->
+    <ng-template #emptyState>
+      <div class="no-posts">
+        <div class="no-posts-inner">
+          <div class="no-posts-icon">🔍</div>
+          <h3>No se encontraron reportes</h3>
+          <p>Sé el primero en reportar un problema</p>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- MODAL DE COMENTARIOS -->
+    <div *ngIf="showCommentsModal" class="modal-overlay" (click)="closeCommentsModal()">
+      <div class="modal-comments" (click)="$event.stopPropagation()">
+        <div class="modal-header-comments">
+          <h3><i class="bi bi-chat-left-text"></i> Conversaciones</h3>
+          <button class="modal-close-btn" (click)="closeCommentsModal()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div class="modal-body-comments">
+          <div *ngIf="selectedReporteForComments">
+            <div class="report-summary">
+              <strong>{{ selectedReporteForComments.titulo }}</strong>
+              <span class="comments-count-modal">
+                {{ getCommentsCount(selectedReporteForComments) }} 
+                {{ getCommentsCount(selectedReporteForComments) === 1 ? 'comentario' : 'comentarios' }}
+              </span>
+            </div>
+
+            <div class="comments-list-modal">
+              <div *ngFor="let comment of selectedReporteForComments.comments || []; trackBy: trackByComment" 
+                  class="comment-item-modal">
+                
+                <div *ngIf="editingCommentId !== comment.id" class="comment-display-modal">
+                  <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
+                      [alt]="getCommentAuthor(comment)" 
+                      class="comment-avatar-modal clickable"
+                      (click)="verPerfilUsuario(comment.author)" />
+                  
+                  <div class="comment-content-modal">
+                    <div class="comment-header-modal">
+                      <div class="comment-header-left">
+                        <strong class="comment-author-modal clickable" 
+                                (click)="verPerfilUsuario(comment.author)">
+                          {{ getCommentAuthor(comment) }}
+                        </strong>
+                        <span class="comment-date-modal">{{ formatCommentDate(comment.fecha_creacion) }}</span>
+                        <span *ngIf="comment.fecha_modificacion" class="edited-badge-small">
+                          <i class="bi bi-pencil-fill"></i>
+                        </span>
+                      </div>
+
+                      <!-- Menú de 3 puntos en modal -->
+                      <div class="comment-menu-modal-container" *ngIf="canEditComment(comment)">
+                        <button class="comment-menu-modal-btn" 
+                                (click)="$event.stopPropagation(); showCommentMenuModal[comment.id] = !showCommentMenuModal[comment.id]">
+                          <i class="bi bi-three-dots"></i>
+                        </button>
+                        <div *ngIf="showCommentMenuModal[comment.id]" 
+                            class="comment-menu-modal-dropdown" 
+                            (click)="$event.stopPropagation()">
+                          <button class="comment-menu-modal-item" 
+                                  (click)="startEditComment(comment); showCommentMenuModal[comment.id] = false">
+                            <i class="bi bi-pencil"></i> Editar
+                          </button>
+                          <button class="comment-menu-modal-item danger" 
+                                  (click)="deleteCommentModal(comment); showCommentMenuModal[comment.id] = false">
+                            <i class="bi bi-trash"></i> Eliminar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <p class="comment-text-modal">{{ comment.texto }}</p>
+                  </div>
+                </div>
+
+                <div *ngIf="editingCommentId === comment.id" class="comment-edit-modal-full">
+                  <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
+                      class="comment-avatar-modal" />
+                  <div class="comment-edit-wrapper-modal">
+                    <input type="text" 
+                          class="comment-edit-input-modal"
+                          [(ngModel)]="editingCommentText"
+                          (keyup.enter)="saveEditCommentModal()"
+                          (keyup.escape)="cancelEditComment()" />
+                    <div class="comment-edit-actions-modal">
+                      <button class="btn-save-modal" (click)="saveEditCommentModal()">
+                        <i class="bi bi-check-lg"></i>
+                      </button>
+                      <button class="btn-cancel-modal" (click)="cancelEditComment()">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="!selectedReporteForComments.comments || selectedReporteForComments.comments.length === 0" 
+                  class="no-comments">
+                <i class="bi bi-chat-left"></i>
+                <p>Sé el primero en comentar</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer-comments">
+          <img [src]="user?.avatarUrl || 'assets/img/default-avatar.png'" class="comment-avatar-modal" />
+          <input type="text" 
+                [(ngModel)]="newCommentText" 
+                placeholder="Escribe un comentario..." 
+                class="comment-input-modal"
+                (keyup.enter)="addCommentModal()" />
+          <button class="btn-send-modal" (click)="addCommentModal()" [disabled]="!newCommentText.trim()">
             <i class="bi bi-send-fill"></i>
           </button>
         </div>
       </div>
-
     </div>
-  </ng-container>
 
-  <!-- Estado vacío -->
-  <ng-template #emptyState>
-    <div class="no-posts">
-      <div class="no-posts-inner">
-        <div class="no-posts-icon">🔍</div>
-        <h3>No se encontraron reportes</h3>
-        <p>Sé el primero en reportar un problema</p>
-      </div>
-    </div>
-  </ng-template>
+    <!-- MODAL DE HISTORIAL -->
+    <div *ngIf="showHistorialModal" class="modal-overlay" (click)="closeHistorialModal()">
+      <div class="modal-historial" (click)="$event.stopPropagation()">
+        <div class="modal-header-historial">
+          <h3><i class="bi bi-clock-history"></i> Historial del Reporte</h3>
+          <button class="modal-close-btn" (click)="closeHistorialModal()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
 
-  <!-- MODAL DE COMENTARIOS -->
-  <div *ngIf="showCommentsModal" class="modal-overlay" (click)="closeCommentsModal()">
-    <div class="modal-comments" (click)="$event.stopPropagation()">
-      <div class="modal-header-comments">
-        <h3><i class="bi bi-chat-left-text"></i> Conversaciones</h3>
-        <button class="modal-close-btn" (click)="closeCommentsModal()">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
-
-      <div class="modal-body-comments">
-        <div *ngIf="selectedReporteForComments">
-          <div class="report-summary">
-            <strong>{{ selectedReporteForComments.titulo }}</strong>
-            <span class="comments-count-modal">
-              {{ getCommentsCount(selectedReporteForComments) }} 
-              {{ getCommentsCount(selectedReporteForComments) === 1 ? 'comentario' : 'comentarios' }}
-            </span>
+        <div class="modal-body-historial">
+          <div *ngIf="selectedQuejaHistorial" class="historial-report-info">
+            <h4>{{ selectedQuejaHistorial.titulo }}</h4>
+            <div class="historial-badges">
+              <span [class]="getEstadoBadgeClass(getEstadoClave(selectedQuejaHistorial))">
+                {{ getEstadoTexto(selectedQuejaHistorial) }}
+              </span>
+              <span *ngIf="hasRiesgo(selectedQuejaHistorial)" 
+                    [class]="getRiesgoBadgeClass(getNivelRiesgo(selectedQuejaHistorial))">
+                {{ getRiesgoIcon(getNivelRiesgo(selectedQuejaHistorial)) }} 
+                {{ getRiesgoTexto(getNivelRiesgo(selectedQuejaHistorial)) }}
+              </span>
+            </div>
           </div>
 
-          <div class="comments-list-modal">
-            <div *ngFor="let comment of selectedReporteForComments.comments || []; trackBy: trackByComment" 
-                 class="comment-item-modal">
-              
-              <div *ngIf="editingCommentId !== comment.id" class="comment-display-modal">
-                <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
-                     [alt]="getCommentAuthor(comment)" 
-                     class="comment-avatar-modal clickable"
-                     (click)="verPerfilUsuario(comment.author)" />
-                
-                <div class="comment-content-modal">
-                  <div class="comment-header-modal">
-                    <div class="comment-header-left">
-                      <strong class="comment-author-modal clickable" 
-                              (click)="verPerfilUsuario(comment.author)">
-                        {{ getCommentAuthor(comment) }}
-                      </strong>
-                      <span class="comment-date-modal">{{ formatCommentDate(comment.fecha_creacion) }}</span>
-                      <span *ngIf="comment.fecha_modificacion" class="edited-badge-small">
-                        <i class="bi bi-pencil-fill"></i>
-                      </span>
-                    </div>
+          <div *ngIf="loadingHistorial" class="historial-loading">
+            <div class="spinner-small"></div>
+            <p>Cargando historial...</p>
+          </div>
 
-                    <!-- Menú de 3 puntos en modal -->
-                    <div class="comment-menu-modal-container" *ngIf="canEditComment(comment)">
-                      <button class="comment-menu-modal-btn" 
-                              (click)="$event.stopPropagation(); showCommentMenuModal[comment.id] = !showCommentMenuModal[comment.id]">
-                        <i class="bi bi-three-dots"></i>
-                      </button>
-                      <div *ngIf="showCommentMenuModal[comment.id]" 
-                           class="comment-menu-modal-dropdown" 
-                           (click)="$event.stopPropagation()">
-                        <button class="comment-menu-modal-item" 
-                                (click)="startEditComment(comment); showCommentMenuModal[comment.id] = false">
-                          <i class="bi bi-pencil"></i> Editar
-                        </button>
-                        <button class="comment-menu-modal-item danger" 
-                                (click)="deleteCommentModal(comment); showCommentMenuModal[comment.id] = false">
-                          <i class="bi bi-trash"></i> Eliminar
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <p class="comment-text-modal">{{ comment.texto }}</p>
-                </div>
+          <div *ngIf="!loadingHistorial && historialEventos.length > 0" class="timeline">
+            <div *ngFor="let evento of historialEventos" class="timeline-item">
+              <div class="timeline-marker" [class]="'marker-' + getEventoColor(evento.tipo_evento)">
+                <span class="timeline-icon">{{ getEventoIcono(evento.tipo_evento) }}</span>
               </div>
-
-              <div *ngIf="editingCommentId === comment.id" class="comment-edit-modal-full">
-                <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
-                     class="comment-avatar-modal" />
-                <div class="comment-edit-wrapper-modal">
-                  <input type="text" 
-                         class="comment-edit-input-modal"
-                         [(ngModel)]="editingCommentText"
-                         (keyup.enter)="saveEditCommentModal()"
-                         (keyup.escape)="cancelEditComment()" />
-                  <div class="comment-edit-actions-modal">
-                    <button class="btn-save-modal" (click)="saveEditCommentModal()">
-                      <i class="bi bi-check-lg"></i>
-                    </button>
-                    <button class="btn-cancel-modal" (click)="cancelEditComment()">
-                      <i class="bi bi-x-lg"></i>
-                    </button>
-                  </div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <span class="timeline-title">{{ getEventoTexto(evento.tipo_evento) }}</span>
+                  <span class="timeline-date">{{ formatearFechaEvento(evento.fecha_evento) }}</span>
+                </div>
+                <p class="timeline-description">{{ evento.descripcion }}</p>
+                <div *ngIf="evento.estado_anterior && evento.estado_nuevo" class="timeline-states">
+                  <span class="state-change">
+                    {{ evento.estado_anterior }} → {{ evento.estado_nuevo }}
+                  </span>
                 </div>
               </div>
             </div>
-
-            <div *ngIf="!selectedReporteForComments.comments || selectedReporteForComments.comments.length === 0" 
-                 class="no-comments">
-              <i class="bi bi-chat-left"></i>
-              <p>Sé el primero en comentar</p>
-            </div>
           </div>
-        </div>
-      </div>
 
-      <div class="modal-footer-comments">
-        <img [src]="user?.avatarUrl || 'assets/img/default-avatar.png'" class="comment-avatar-modal" />
-        <input type="text" 
-               [(ngModel)]="newCommentText" 
-               placeholder="Escribe un comentario..." 
-               class="comment-input-modal"
-               (keyup.enter)="addCommentModal()" />
-        <button class="btn-send-modal" (click)="addCommentModal()" [disabled]="!newCommentText.trim()">
-          <i class="bi bi-send-fill"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DE HISTORIAL -->
-  <div *ngIf="showHistorialModal" class="modal-overlay" (click)="closeHistorialModal()">
-    <div class="modal-historial" (click)="$event.stopPropagation()">
-      <div class="modal-header-historial">
-        <h3><i class="bi bi-clock-history"></i> Historial del Reporte</h3>
-        <button class="modal-close-btn" (click)="closeHistorialModal()">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
-
-      <div class="modal-body-historial">
-        <div *ngIf="selectedQuejaHistorial" class="historial-report-info">
-          <h4>{{ selectedQuejaHistorial.titulo }}</h4>
-          <div class="historial-badges">
-            <span [class]="getEstadoBadgeClass(getEstadoClave(selectedQuejaHistorial))">
-              {{ getEstadoTexto(selectedQuejaHistorial) }}
-            </span>
-            <span *ngIf="hasRiesgo(selectedQuejaHistorial)" 
-                  [class]="getRiesgoBadgeClass(getNivelRiesgo(selectedQuejaHistorial))">
-              {{ getRiesgoIcon(getNivelRiesgo(selectedQuejaHistorial)) }} 
-              {{ getRiesgoTexto(getNivelRiesgo(selectedQuejaHistorial)) }}
-            </span>
+          <div *ngIf="!loadingHistorial && historialEventos.length === 0" class="no-historial">
+            <i class="bi bi-inbox"></i>
+            <p>No hay eventos registrados</p>
           </div>
-        </div>
-
-        <div *ngIf="loadingHistorial" class="historial-loading">
-          <div class="spinner-small"></div>
-          <p>Cargando historial...</p>
-        </div>
-
-        <div *ngIf="!loadingHistorial && historialEventos.length > 0" class="timeline">
-          <div *ngFor="let evento of historialEventos" class="timeline-item">
-            <div class="timeline-marker" [class]="'marker-' + getEventoColor(evento.tipo_evento)">
-              <span class="timeline-icon">{{ getEventoIcono(evento.tipo_evento) }}</span>
-            </div>
-            <div class="timeline-content">
-              <div class="timeline-header">
-                <span class="timeline-title">{{ getEventoTexto(evento.tipo_evento) }}</span>
-                <span class="timeline-date">{{ formatearFechaEvento(evento.fecha_evento) }}</span>
-              </div>
-              <p class="timeline-description">{{ evento.descripcion }}</p>
-              <div *ngIf="evento.estado_anterior && evento.estado_nuevo" class="timeline-states">
-                <span class="state-change">
-                  {{ evento.estado_anterior }} → {{ evento.estado_nuevo }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div *ngIf="!loadingHistorial && historialEventos.length === 0" class="no-historial">
-          <i class="bi bi-inbox"></i>
-          <p>No hay eventos registrados</p>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Paginación -->
-  <div *ngIf="getTotalPages() > 1" class="pagination-container">
-    <button class="pagination-btn" 
-            [disabled]="currentPage === 1" 
-            (click)="prevPage()">
-      <i class="bi bi-chevron-left"></i>
-      Anterior
-    </button>
+    <!-- Paginación -->
+    <div *ngIf="getTotalPages() > 1" class="pagination-container">
+      <button class="pagination-btn" 
+              [disabled]="currentPage === 1" 
+              (click)="prevPage()">
+        <i class="bi bi-chevron-left"></i>
+        Anterior
+      </button>
 
-    <div class="pagination-numbers">
-      <button *ngFor="let page of getPageNumbers()" 
-              class="pagination-number" 
-              [class.active]="page === currentPage"
-              [class.ellipsis]="page === -1"
-              [disabled]="page === -1"
-              (click)="page !== -1 && goToPage(page)">
-        {{ page === -1 ? '...' : page }}
+      <div class="pagination-numbers">
+        <button *ngFor="let page of getPageNumbers()" 
+                class="pagination-number" 
+                [class.active]="page === currentPage"
+                [class.ellipsis]="page === -1"
+                [disabled]="page === -1"
+                (click)="page !== -1 && goToPage(page)">
+          {{ page === -1 ? '...' : page }}
+        </button>
+      </div>
+
+      <button class="pagination-btn" 
+              [disabled]="currentPage === getTotalPages()" 
+              (click)="nextPage()">
+        Siguiente
+        <i class="bi bi-chevron-right"></i>
       </button>
     </div>
 
-    <button class="pagination-btn" 
-            [disabled]="currentPage === getTotalPages()" 
-            (click)="nextPage()">
-      Siguiente
-      <i class="bi bi-chevron-right"></i>
-    </button>
-  </div>
+    <div *ngIf="getTotalPages() > 1" class="pagination-info">
+      Mostrando {{ (currentPage - 1) * reportsPerPage + 1 }} - 
+      {{ Math.min(currentPage * reportsPerPage, totalReports) }} 
+      de {{ totalReports }} reportes
+    </div>
 
-  <div *ngIf="getTotalPages() > 1" class="pagination-info">
-    Mostrando {{ (currentPage - 1) * reportsPerPage + 1 }} - 
-    {{ Math.min(currentPage * reportsPerPage, totalReports) }} 
-    de {{ totalReports }} reportes
   </div>
-
-</div>

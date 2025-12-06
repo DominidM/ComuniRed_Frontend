@@ -1,4 +1,4 @@
-  <div class="trending-container">
+<div class="trending-container">
     <div *ngIf="showToast" class="toast-notification">{{ toastMessage }}</div>
 
     <div *ngIf="loading" class="loading-overlay">
@@ -51,7 +51,6 @@
         </div>
       </div>
     </div>
-
 
     <!-- FILTROS + SELECTOR DE PERÍODO EN LA MISMA LÍNEA -->
     <div class="filter-section">
@@ -165,6 +164,84 @@
           <div class="post-image-wrapper" *ngIf="hasImage(reporte)">
             <img [src]="getImageUrl(reporte)" [alt]="reporte.titulo" class="post-image" />
           </div>
+
+          <!-- ============================================ -->
+          <!-- 🔥 SECCIÓN DE VOTACIÓN (NUEVA) -->
+          <!-- ============================================ -->
+          <div *ngIf="isQuejaEnVotacion(reporte) && hasVotes(reporte)" class="vote-section">
+            <div class="vote-header">
+              <div class="vote-question">
+                ¿Estás de acuerdo con este reporte?
+              </div>
+              <div class="vote-count-info">
+                <span class="vote-count">{{ getTotalVotes(reporte) }}/5 votos</span>
+              </div>
+            </div>
+
+            <div class="vote-progress-container">
+              <div class="vote-progress-bar">
+                <div 
+                  class="vote-progress-fill" 
+                  [style.width.%]="getVotingProgress(reporte)"
+                  [class.complete]="getTotalVotes(reporte) >= 5"
+                ></div>
+              </div>
+              <span *ngIf="needsMoreVotes(reporte)" class="votes-needed-text">
+                Faltan {{ getVotesNeeded(reporte) }} votos para aprobar
+              </span>
+              <span *ngIf="getTotalVotes(reporte) >= 5" class="votes-complete-text">
+                ✅ Votos requeridos alcanzados
+              </span>
+            </div>
+
+            <div class="vote-buttons">
+              <button
+                class="vote-btn accept"
+                [class.voted]="reporte.userVote === 'YES'"
+                [disabled]="!canVote(reporte)"
+                (click)="vote(reporte, 'accept')"
+                [title]="canVote(reporte) ? 'Votar a favor' : 'Ya votaste'"
+              >
+                <span class="vote-icon">✅</span>
+                <span class="vote-label">Sí</span>
+                <span class="vote-count-badge">{{ getYesVotes(reporte) }}</span>
+              </button>
+
+              <button
+                class="vote-btn reject"
+                [class.voted]="reporte.userVote === 'NO'"
+                [disabled]="!canVote(reporte)"
+                (click)="vote(reporte, 'reject')"
+                [title]="canVote(reporte) ? 'Votar en contra' : 'Ya votaste'"
+              >
+                <span class="vote-icon">❌</span>
+                <span class="vote-label">No</span>
+                <span class="vote-count-badge">{{ getNoVotes(reporte) }}</span>
+              </button>
+            </div>
+
+            <div *ngIf="!canVote(reporte) && reporte.userVote" class="vote-thanks">
+              <i class="bi bi-check-circle-fill"></i>
+              Gracias por tu voto
+            </div>
+          </div>
+
+          <!-- Información de estado (cuando NO está en votación) -->
+          <div *ngIf="!isQuejaEnVotacion(reporte)" class="status-info-section">
+            <div class="status-info-item" *ngIf="isQuejaEnProceso(reporte)">
+              <i class="bi bi-hourglass-split"></i>
+              <span>Este reporte está siendo atendido</span>
+            </div>
+            <div class="status-info-item success" *ngIf="isQuejaResuelta(reporte)">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Este reporte ha sido resuelto</span>
+            </div>
+            <div class="status-info-item" *ngIf="isQuejaPendiente(reporte)">
+              <i class="bi bi-clock-fill"></i>
+              <span>Reporte aprobado - En espera de asignación</span>
+            </div>
+          </div>
+          <!-- ============================================ -->
 
           <!-- REACCIONES CON MENÚ DESPLEGABLE -->
           <div class="reactions-bar">
@@ -370,7 +447,6 @@
     </div>
 
     <!-- MODAL DE COMENTARIOS -->
-      <!-- MODAL DE COMENTARIOS -->
     <div *ngIf="showCommentsModal" class="modal-overlay" (click)="closeCommentsModal()">
       <div class="modal-comments" (click)="$event.stopPropagation()">
         <div class="modal-header-comments">
@@ -482,7 +558,6 @@
         </div>
       </div>
     </div>
-
 
     <!-- MODAL EDITAR REPORTE -->
     <div *ngIf="showEditModal && editingQueja" class="modal-overlay" (click)="closeEditModal()">

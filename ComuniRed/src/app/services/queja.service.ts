@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable, map } from 'rxjs';
 
-
 export interface Queja {
   id: string;
   titulo: string;
@@ -101,7 +100,7 @@ export interface HistorialEvento {
   usuario_id: string;
 }
 
-
+// ✅ Query principal con TODOS los campos necesarios
 const OBTENER_QUEJAS = gql`
   query ObtenerQuejas($usuarioActualId: ID!) {
     obtenerQuejas(usuarioActualId: $usuarioActualId) {
@@ -223,7 +222,6 @@ const OBTENER_QUEJA_POR_ID = gql`
         id
         texto
         fecha_creacion
-        fecha_modificacion
         author {
           id
           nombre
@@ -237,6 +235,7 @@ const OBTENER_QUEJA_POR_ID = gql`
     }
   }
 `;
+
 
 const QUEJAS_POR_USUARIO = gql`
   query QuejasPorUsuario($usuarioId: ID!, $usuarioActualId: ID!) {
@@ -319,11 +318,42 @@ const QUEJAS_APROBADAS = gql`
         clave
         nombre
       }
+      evidence {
+        id
+        url
+        tipo
+      }
       votes {
         yes
         no
         total
       }
+      reactions {
+        total
+        userReaction
+        counts {
+          like
+          love
+          wow
+          helpful
+          dislike
+          report
+        }
+      }
+      comments {
+        id
+        texto
+        fecha_creacion
+        author {
+          id
+          nombre
+          apellido
+          foto_perfil
+        }
+      }
+      commentsCount
+      canVote
+      userVote
     }
   }
 `;
@@ -375,6 +405,7 @@ const CREAR_QUEJA = gql`
       estado {
         id
         nombre
+        clave
       }
     }
   }
@@ -477,7 +508,27 @@ const CAMBIAR_ESTADO_QUEJA = gql`
   }
 `;
 
-
+const VOTAR_QUEJA = gql`
+  mutation VotarQueja($quejaId: ID!, $usuarioId: ID!, $voto: String!) {
+    votarQueja(quejaId: $quejaId, usuarioId: $usuarioId, voto: $voto) {
+      id
+      titulo
+      descripcion
+      votes {
+        yes
+        no
+        total
+      }
+      userVote
+      canVote
+      estado {
+        id
+        nombre
+        clave
+      }
+    }
+  }
+`;
 
 @Injectable({ providedIn: 'root' })
 export class QuejaService {
@@ -676,38 +727,14 @@ export class QuejaService {
   }
 
   votarQueja(quejaId: string, usuarioId: string, voto: string): Observable<Queja> {
-  const mutation = `
-    mutation {
-      votarQueja(
-        quejaId: "${quejaId}"
-        usuarioId: "${usuarioId}"
-        voto: ${voto}
-      ) {
-        id
-        titulo
-        descripcion
-        votes {
-          yes
-          no
-          total
-        }
-        userVote
-        canVote
-        estado {
-          id
-          nombre
-          clave
-        }
-      }
-    }
-  `;
-
-  return this.apollo.mutate<{ votarQueja: Queja }>({
-    mutation: gql`${mutation}`
-  }).pipe(
-    map(result => result.data?.votarQueja as Queja)
-  );
-}
-
-
+    return this.apollo
+      .mutate<{ votarQueja: Queja }>({
+        mutation: VOTAR_QUEJA,
+        variables: { quejaId, usuarioId, voto },
+        refetchQueries: [
+          { query: OBTENER_QUEJAS, variables: { usuarioActualId: usuarioId } }
+        ]
+      })
+      .pipe(map(result => result.data!.votarQueja));
+  }
 }

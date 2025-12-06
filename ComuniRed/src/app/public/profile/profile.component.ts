@@ -139,7 +139,6 @@ export class ProfileComponent implements OnInit {
       }
     });
 
-    // Contar comentarios
     this.comentarioService.contarComentariosPorUsuario(this.user.id).subscribe({
       next: (count: number) => {
         this.cantidadComentarios = count;
@@ -149,7 +148,6 @@ export class ProfileComponent implements OnInit {
       }
     });
 
-    // ✅ Contar reacciones del usuario
     this.reaccionService.contarReaccionesPorUsuario(this.user.id).subscribe({
       next: (count: number) => {
         this.cantidadReacciones = count;

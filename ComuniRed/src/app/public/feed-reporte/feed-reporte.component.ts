@@ -5,7 +5,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { QuejaService, Queja, Usuario } from '../../services/queja.service';
 import { ReaccionService } from '../../services/reaccion.service';
 import { ComentarioService } from '../../services/comentario.service';
-import { CategoriaService, Categoria } from '../../services/categoria.service';
 import { UsuarioService } from '../../services/usuario.service';
 
 @Component({
@@ -16,25 +15,16 @@ import { UsuarioService } from '../../services/usuario.service';
   styleUrls: ['./feed-reporte.component.css']
 })
 export class FeedReporteComponent implements OnInit {
-  Math = Math;
-  
   quejaId: string = '';
   queja: Queja | null = null;
-  posts: Queja[] = [];
-  filteredPosts: Queja[] = [];
   loading = false;
   error: string = '';
   
   user: { id?: string; name: string; avatarUrl: string } | null = null;
   
-  categorias: Categoria[] = [];
-  selectedCategory = '';
-  sortBy: 'recent' | 'popular' | 'votes' = 'recent';
-  
   showReactionMenu: { [postId: string]: boolean } = {};
   showCommentsModal = false;
   showCommentsInline = false;
-  showCommentMenuModal: { [commentId: string]: boolean } = {};
   
   newCommentText = '';
   newCommentInline = '';
@@ -48,17 +38,12 @@ export class FeedReporteComponent implements OnInit {
   showEditModal = false;
   editingQueja: Queja | null = null;
 
-  currentPage = 1;
-  reportsPerPage = 10;
-  totalReports = 0;
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private quejaService: QuejaService,
     private reaccionService: ReaccionService,
     private comentarioService: ComentarioService,
-    private categoriaService: CategoriaService,
     private usuarioService: UsuarioService
   ) {}
 
@@ -69,20 +54,24 @@ export class FeedReporteComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUser();
-    this.loadCategorias();
     
     this.route.params.subscribe(params => {
       this.quejaId = params['id'];
-      if (this.quejaId) {
+      console.log('📋 ID de queja recibido:', this.quejaId);
+      
+      if (this.quejaId && this.user?.id) {
         this.cargarQueja();
-      } else {
-        this.cargarReportes();
+      } else if (!this.user?.id) {
+        this.error = 'Usuario no autenticado';
+        console.error('❌ Usuario no autenticado');
       }
     });
   }
 
   loadUser(): void {
     const u = this.usuarioService.getUser();
+    console.log('👤 Usuario cargado:', u);
+    
     if (u) {
       const avatar = (u as any).foto_perfil || 'assets/img/default-avatar.png';
       this.user = { 
@@ -90,223 +79,85 @@ export class FeedReporteComponent implements OnInit {
         name: `${(u as any).nombre || ''} ${(u as any).apellido || ''}`.trim() || 'Usuario', 
         avatarUrl: avatar 
       };
+      console.log('✅ Usuario procesado:', this.user);
     } else {
       this.user = { name: 'Usuario', avatarUrl: 'assets/img/default-avatar.png' };
+      console.warn('⚠️ No hay usuario en sesión');
     }
   }
 
-  loadCategorias(): void {
-    this.categoriaService.obtenerCategorias(0, 100).subscribe({
-      next: (page) => {
-        this.categorias = page.content.filter(c => c.activo);
-      },
-      error: (err) => {
-        console.error('Error cargando categorías', err);
-        this.categorias = [];
-      }
-    });
-  }
-
   cargarQueja(): void {
-    if (!this.user?.id) return;
+    if (!this.user?.id) {
+      this.error = 'Debes iniciar sesión para ver este reporte';
+      this.loading = false;
+      console.error('❌ No hay usuario ID');
+      return;
+    }
+
+    if (!this.quejaId) {
+      this.error = 'ID de reporte no válido';
+      this.loading = false;
+      console.error('❌ No hay quejaId');
+      return;
+    }
     
     this.loading = true;
     this.error = '';
     
+    console.log('🔍 Cargando queja...');
+    console.log('   📌 ID:', this.quejaId);
+    console.log('   👤 Usuario:', this.user.id);
+    
     this.quejaService.obtenerQuejaPorId(this.quejaId, this.user.id).subscribe({
       next: (queja) => {
+        console.log('✅ Queja cargada exitosamente:', queja);
+        
         this.queja = {
           ...queja,
           showMenu: false,
-          comments: Array.isArray(queja.comments) ? [...queja.comments] : []
+          comments: Array.isArray(queja.comments) ? [...queja.comments] : [],
+          reactions: queja.reactions || { 
+            counts: {}, 
+            total: 0,
+            userReaction: undefined 
+          }
         };
+        
         this.loading = false;
+        console.log('📊 Estado de la queja:', {
+          titulo: this.queja.titulo,
+          comentarios: this.queja.comments?.length || 0,
+          reacciones: this.queja.reactions?.total || 0
+        });
       },
       error: (err) => {
-        console.error('Error cargando queja:', err);
-        this.error = 'No se pudo cargar el reporte';
-        this.loading = false;
-      }
-    });
-  }
-
-  cargarReportes(): void {
-    if (!this.user?.id) return;
-    
-    this.loading = true;
-    this.quejaService.obtenerQuejas(this.user.id).subscribe({
-      next: (quejas) => {
-        this.posts = JSON.parse(JSON.stringify(quejas)).map((q: any) => {
-          const reactions = {
-            total: q.reactions?.total || 0,
-            userReaction: q.reactions?.userReaction || undefined,
-            counts: {
-              like: q.reactions?.counts?.['like'] || 0,
-              love: q.reactions?.counts?.['love'] || 0,
-              wow: q.reactions?.counts?.['wow'] || 0,
-              helpful: q.reactions?.counts?.['helpful'] || 0,
-              dislike: q.reactions?.counts?.['dislike'] || 0,
-              report: q.reactions?.counts?.['report'] || 0
-            }
-          };
-
-          const votes = {
-            yes: q.votes?.yes || 0,
-            no: q.votes?.no || 0,
-            total: q.votes?.total || 0
-          };
-
-          return {
-            ...q,
-            reactions,
-            votes,
-            showComments: false,
-            showMenu: false,
-            comments: q.comments || [],
-            commentsCount: q.commentsCount || 0
-          };
+        console.error('❌ Error cargando queja:', err);
+        console.error('   Detalles:', {
+          message: err.message,
+          status: err.status,
+          statusText: err.statusText,
+          error: err.error
         });
         
-        this.applyFilters();
+        // Manejo de errores específicos
+        if (err.message?.includes('404') || err.status === 404) {
+          this.error = 'Este reporte no existe o ha sido eliminado';
+        } else if (err.message?.includes('403') || err.status === 403) {
+          this.error = 'No tienes permiso para ver este reporte';
+        } else if (err.message?.includes('Network') || err.status === 0) {
+          this.error = 'No se puede conectar con el servidor';
+        } else if (err.graphQLErrors && err.graphQLErrors.length > 0) {
+          this.error = err.graphQLErrors[0].message || 'Error al cargar el reporte';
+        } else {
+          this.error = 'No se pudo cargar el reporte. Intenta nuevamente';
+        }
+        
         this.loading = false;
-      },
-      error: (err: any) => {
-        console.error('Error cargando quejas:', err);
-        this.loading = false;
-        this.showToastMessage('Error al cargar reportes');
       }
     });
   }
 
-  applyFilters(): void {
-    let filtered = [...this.posts];
-
-    if (this.selectedCategory) {
-      filtered = filtered.filter(p => p.categoria?.id === this.selectedCategory);
-    }
-
-    filtered = this.sortPosts(filtered);
-
-    this.filteredPosts = filtered;
-    this.currentPage = 1;
-  }
-
-  sortPosts(posts: Queja[]): Queja[] {
-    switch (this.sortBy) {
-      case 'recent':
-        return posts.sort((a, b) => 
-          new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime()
-        );
-      case 'popular':
-        return posts.sort((a, b) => 
-          (b.reactions?.total || 0) - (a.reactions?.total || 0)
-        );
-      case 'votes':
-        return posts.sort((a, b) => 
-          this.getTotalVotes(b) - this.getTotalVotes(a)
-        );
-      default:
-        return posts;
-    }
-  }
-
-  onCategoryFilterChange(): void {
-    this.applyFilters();
-  }
-
-  onSortChange(): void {
-    this.applyFilters();
-  }
-
-  clearFilters(): void {
-    this.selectedCategory = '';
-    this.sortBy = 'recent';
-    this.applyFilters();
-  }
-
-  isQuejaEnVotacion(post: Queja): boolean {
-    return post.estado?.clave === 'votacion';
-  }
-
-  hasVotes(post: Queja): boolean {
-    return !!(post.votes && typeof post.votes.yes === 'number' && typeof post.votes.no === 'number');
-  }
-
-  canVote(post: Queja): boolean {
-    return !post.userVote && this.isQuejaEnVotacion(post);
-  }
-
-  getTotalVotes(post: Queja): number {
-    return (post.votes?.yes || 0) + (post.votes?.no || 0);
-  }
-
-  getYesVotes(post: Queja): number {
-    return post.votes?.yes || 0;
-  }
-
-  getNoVotes(post: Queja): number {
-    return post.votes?.no || 0;
-  }
-
-  getVotingProgress(post: Queja): number {
-    const total = this.getTotalVotes(post);
-    return Math.min((total / 5) * 100, 100);
-  }
-
-  needsMoreVotes(post: Queja): boolean {
-    return this.getTotalVotes(post) < 5;
-  }
-
-  getVotesNeeded(post: Queja): number {
-    return Math.max(0, 5 - this.getTotalVotes(post));
-  }
-
-  vote(post: Queja, voteType: 'accept' | 'reject'): void {
-    if (!this.user?.id || !this.canVote(post)) {
-      return;
-    }
-
-    const voteValue = voteType === 'accept' ? 'YES' : 'NO';
-    
-    const previousVotes = { ...post.votes };
-    const previousUserVote = post.userVote;
-
-    if (voteType === 'accept') {
-      post.votes.yes = (post.votes.yes || 0) + 1;
-    } else {
-      post.votes.no = (post.votes.no || 0) + 1;
-    }
-    post.votes.total = (post.votes.yes || 0) + (post.votes.no || 0);
-    post.userVote = voteValue;
-
-    this.quejaService.votarQueja(post.id, this.user.id, voteValue).subscribe({
-      next: (updatedQueja) => {
-        post.votes = updatedQueja.votes;
-        post.userVote = updatedQueja.userVote;
-        post.canVote = updatedQueja.canVote;
-        this.showToastMessage('Voto registrado exitosamente');
-      },
-      error: (err: any) => {
-        console.error('Error al votar:', err);
-        post.votes = previousVotes;
-        post.userVote = previousUserVote;
-        this.showToastMessage('Error al registrar el voto');
-      }
-    });
-  }
-
-  isQuejaEnProceso(post: Queja): boolean {
-    return post.estado?.clave === 'en_proceso';
-  }
-
-  isQuejaResuelta(post: Queja): boolean {
-    return post.estado?.clave === 'resuelto' || post.estado?.clave === 'resuelta';
-  }
-
-  isQuejaPendiente(post: Queja): boolean {
-    return post.estado?.clave === 'pendiente' || post.estado?.clave === 'aprobada';
-  }
-
+  // ==================== REACCIONES ====================
   closeAllReactionMenus(): void {
     this.showReactionMenu = {};
   }
@@ -328,7 +179,10 @@ export class FeedReporteComponent implements OnInit {
   toggleReaction(post: Queja, type: string): void {
     if (!this.user?.id) return;
 
-    const previousReactions = { ...post.reactions, counts: { ...post.reactions.counts } };
+    const previousReactions = { 
+      ...post.reactions, 
+      counts: { ...post.reactions.counts } 
+    };
     const previousUserReaction = post.reactions.userReaction;
 
     if (previousUserReaction === type) {
@@ -345,17 +199,20 @@ export class FeedReporteComponent implements OnInit {
       post.reactions.userReaction = type;
     }
     
-    const total = Object.values(post.reactions.counts).reduce((sum: number, val) => sum + (val ?? 0), 0);
+    const total = Object.values(post.reactions.counts).reduce(
+      (sum: number, val) => sum + (val ?? 0), 0
+    );
     post.reactions.total = total;
 
     this.reaccionService.toggleReaccion(post.id, type, this.user.id).subscribe({
       next: (updated) => {
         post.reactions = updated;
-        this.applyFilters();
+        console.log('✅ Reacción actualizada:', updated);
       },
       error: (err: any) => {
-        console.error('Error al reaccionar', err);
+        console.error('❌ Error al reaccionar:', err);
         post.reactions = previousReactions;
+        this.showToastMessage('Error al reaccionar');
       }
     });
   }
@@ -364,6 +221,18 @@ export class FeedReporteComponent implements OnInit {
     return post.reactions?.counts?.[type] ?? 0;
   }
 
+  getReactionIcon(type: string): string {
+    const icons: { [key: string]: string } = {
+      'like': '❤️',
+      'love': '😍',
+      'wow': '😮',
+      'helpful': '👍',
+      'dislike': '👎'
+    };
+    return icons[type] || '👍';
+  }
+
+  // ==================== COMENTARIOS INLINE ====================
   toggleCommentsInline(): void {
     this.showCommentsInline = !this.showCommentsInline;
   }
@@ -410,7 +279,7 @@ export class FeedReporteComponent implements OnInit {
         this.showToastMessage('Comentario agregado');
       },
       error: (err: any) => {
-        console.error('Error al comentar', err);
+        console.error('❌ Error al comentar:', err);
         if (this.queja) {
           this.queja.comments = this.queja.comments.filter(c => c.id !== tempComment.id);
           this.queja.commentsCount = this.queja.comments.length;
@@ -432,7 +301,7 @@ export class FeedReporteComponent implements OnInit {
         this.showToastMessage('Comentario eliminado');
       },
       error: (err: any) => {
-        console.error('Error al eliminar comentario', err);
+        console.error('❌ Error al eliminar comentario:', err);
         this.showToastMessage('Error al eliminar comentario');
       }
     });
@@ -446,6 +315,7 @@ export class FeedReporteComponent implements OnInit {
     return (this.queja?.comments || []).length > 3;
   }
 
+  // ==================== MODAL COMENTARIOS ====================
   openCommentsModal(): void {
     if (!this.queja) return;
     this.showCommentsModal = true;
@@ -499,7 +369,7 @@ export class FeedReporteComponent implements OnInit {
         this.showToastMessage('Comentario agregado');
       },
       error: (err: any) => {
-        console.error('Error al comentar', err);
+        console.error('❌ Error al comentar:', err);
         if (this.queja) {
           this.queja.comments = this.queja.comments.filter(c => c.id !== tempComment.id);
           this.queja.commentsCount = this.queja.comments.length;
@@ -546,7 +416,7 @@ export class FeedReporteComponent implements OnInit {
           this.cancelEditComment();
         },
         error: (err: any) => {
-          console.error('Error al actualizar comentario', err);
+          console.error('❌ Error al actualizar comentario:', err);
           if (this.queja) {
             this.queja.comments = [
               ...this.queja.comments.slice(0, commentIndex),
@@ -575,7 +445,7 @@ export class FeedReporteComponent implements OnInit {
         this.showToastMessage('Comentario eliminado');
       },
       error: (err: any) => {
-        console.error('Error al eliminar comentario', err);
+        console.error('❌ Error al eliminar comentario:', err);
         this.showToastMessage('Error al eliminar comentario');
       }
     });
@@ -589,6 +459,7 @@ export class FeedReporteComponent implements OnInit {
     return this.queja?.commentsCount || (this.queja?.comments || []).length;
   }
 
+  // ==================== EDITAR/ELIMINAR REPORTE ====================
   canEditQueja(): boolean {
     return this.queja?.usuario?.id === this.user?.id;
   }
@@ -619,6 +490,7 @@ export class FeedReporteComponent implements OnInit {
       this.user.id
     ).subscribe({
       next: (updated) => {
+        console.log('✅ Queja actualizada:', updated);
         this.queja = { 
           ...updated, 
           showMenu: false,
@@ -630,7 +502,7 @@ export class FeedReporteComponent implements OnInit {
         this.showToastMessage('Reporte actualizado');
       },
       error: (err: any) => {
-        console.error('Error al actualizar queja', err);
+        console.error('❌ Error al actualizar queja:', err);
         this.loading = false;
         this.showToastMessage('Error al actualizar reporte');
       }
@@ -650,77 +522,16 @@ export class FeedReporteComponent implements OnInit {
         }, 1500);
       },
       error: (err: any) => {
-        console.error('Error al eliminar queja', err);
+        console.error('❌ Error al eliminar queja:', err);
         this.loading = false;
         this.showToastMessage('Error al eliminar reporte');
       }
     });
   }
 
-  getPaginatedPosts(): Queja[] {
-    const posts = this.displayedPosts;
-    this.totalReports = posts.length;
-    const startIndex = (this.currentPage - 1) * this.reportsPerPage;
-    const endIndex = startIndex + this.reportsPerPage;
-    return posts.slice(startIndex, endIndex);
-  }
-
-  getTotalPages(): number {
-    return Math.ceil(this.totalReports / this.reportsPerPage);
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.getTotalPages()) {
-      this.currentPage = page;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.getTotalPages()) {
-      this.currentPage++;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  prevPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  getPageNumbers(): number[] {
-    const totalPages = this.getTotalPages();
-    const pages: number[] = [];
-    
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(totalPages);
-      } else if (this.currentPage >= totalPages - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(totalPages);
-      }
-    }
-    
-    return pages;
-  }
-
+  // ==================== UTILIDADES ====================
   volver(): void {
-    this.router.navigate(['/public/feed']);
+    this.router.navigate(['/public/profile']);
   }
 
   verPerfilUsuario(usuario: Usuario): void {
@@ -788,14 +599,6 @@ export class FeedReporteComponent implements OnInit {
     return estadoMap[estado] || 'estado-pendiente';
   }
 
-  getCategoryName(post: Queja): string {
-    return post.categoria?.nombre || 'Sin categoría';
-  }
-
-  get displayedPosts(): Queja[] {
-    return this.selectedCategory ? this.filteredPosts : this.posts;
-  }
-
   showToastMessage(message: string): void {
     this.toastMessage = message;
     this.showToast = true;
@@ -804,9 +607,5 @@ export class FeedReporteComponent implements OnInit {
 
   trackByComment(index: number, comment: any): string {
     return comment.id;
-  }
-
-  trackByPostId(index: number, post: Queja): string {
-    return post.id;
   }
 }

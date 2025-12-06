@@ -175,7 +175,6 @@
   }
 }
 
-
 /* ==================== FILTER SECTION CON SELECTOR DE PERÍODO ==================== */
 .filter-section {
   display: flex;
@@ -546,6 +545,11 @@
   color: #742a2a;
 }
 
+.estado-votacion {
+  background: #e9d8fd;
+  color: #44337a;
+}
+
 .post-image-wrapper {
   width: 100%;
   max-height: 500px;
@@ -567,7 +571,226 @@
   margin: 0 auto;
 }
 
+/* ==================== SECCIÓN DE VOTACIÓN ==================== */
+.vote-section {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-top: 3px solid #667eea;
+  border-bottom: 3px solid #667eea;
+}
 
+.vote-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.vote-question {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.vote-count-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vote-count {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #667eea;
+  background: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+.vote-progress-container {
+  margin-bottom: 1rem;
+}
+
+.vote-progress-bar {
+  width: 100%;
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.vote-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  transition: width 0.4s ease;
+  position: relative;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.vote-progress-fill.complete {
+  background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.votes-needed-text {
+  font-size: 0.875rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+.votes-complete-text {
+  font-size: 0.875rem;
+  color: #48bb78;
+  font-weight: 700;
+}
+
+.vote-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.vote-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border: 3px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vote-btn.accept {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  border-color: #48bb78;
+}
+
+.vote-btn.accept:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(72, 187, 120, 0.4);
+}
+
+.vote-btn.reject {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  color: white;
+  border-color: #f56565;
+}
+
+.vote-btn.reject:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(245, 101, 101, 0.4);
+}
+
+.vote-btn.voted {
+  background: #2d3748;
+  border-color: #2d3748;
+  position: relative;
+}
+
+.vote-btn.voted::after {
+  content: '✓ Votado';
+  position: absolute;
+  top: 0.25rem;
+  right: 0.5rem;
+  font-size: 0.7rem;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 0.125rem 0.5rem;
+  border-radius: 10px;
+}
+
+.vote-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.vote-icon {
+  font-size: 1.5rem;
+}
+
+.vote-label {
+  font-size: 1rem;
+}
+
+.vote-count-badge {
+  background: rgba(255, 255, 255, 0.3);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.vote-thanks {
+  text-align: center;
+  padding: 0.75rem;
+  background: #c6f6d5;
+  border-radius: 8px;
+  color: #22543d;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.vote-thanks i {
+  color: #48bb78;
+  font-size: 1.25rem;
+}
+
+/* Información de estado (cuando NO está en votación) */
+.status-info-section {
+  padding: 1rem 1.5rem;
+  background: #f7fafc;
+  border-top: 2px solid #e2e8f0;
+}
+
+.status-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.status-info-item i {
+  font-size: 1.25rem;
+  color: #667eea;
+}
+
+.status-info-item.success {
+  border-left-color: #48bb78;
+}
+
+.status-info-item.success i {
+  color: #48bb78;
+}
 
 /* ==================== REACCIONES CON MENÚ ==================== */
 .reactions-bar {
@@ -1281,7 +1504,6 @@
   flex: 1;
 }
 
-
 /* Menú de 3 puntos en el modal */
 .comment-menu-modal-container {
   position: relative;
@@ -1364,7 +1586,6 @@
   flex-direction: column;
   gap: 0.5rem;
 }
-
 
 .comment-author-modal {
   font-weight: 700;
@@ -1642,6 +1863,10 @@
 
   .post-header {
     padding: 1rem;
+  }
+
+  .vote-buttons {
+    grid-template-columns: 1fr;
   }
 
   .reactions-bar {
