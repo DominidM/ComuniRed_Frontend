@@ -4,17 +4,17 @@
   align-items: flex-start;
   min-height: 100vh;
   padding: 20px;
-  background: linear-gradient(var(--cr-background-content));
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4ff 100%);
 }
 
 .report-card {
-  background: var(--cr-background);
+  background: white;
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(95, 92, 246, 0.1);
   padding: 32px;
   max-width: 600px;
   width: 100%;
-  border: 1px solid var(--cr-border);
+  border: 1px solid #e5e7eb;
 }
 
 .report-header {
@@ -27,18 +27,19 @@
 .report-header h2 {
   font-size: 1.8em;
   font-weight: 700;
-  color: var(--cr-text);
+  color: #1f2937;
   margin: 0 0 8px 0;
 }
 
 .report-header p {
   font-size: 0.95em;
-  color: var(--cr-text);
+  color: #6b7280;
   margin: 0;
 }
 
 .report-icon {
   font-size: 3em;
+  opacity: 0.15;
 }
 
 .report-options {
@@ -59,8 +60,9 @@
   gap: 12px;
   padding: 16px;
   border-radius: 12px;
-  border: 2px solid var(--cr-border);
+  border: 2px solid #e5e7eb;
   cursor: pointer;
+  transition: all 0.3s ease;
   width: 100%;
 }
 
@@ -87,13 +89,13 @@
 
 .option-title {
   font-weight: 600;
-  color: var(--cr-text);
+  color: #1f2937;
   font-size: 1em;
 }
 
 .option-description {
   font-size: 0.85em;
-  color: var(--cr-text);
+  color: #6b7280;
 }
 
 .report-stats {
@@ -104,7 +106,7 @@
 }
 
 .stat-box {
-  background: linear-gradient(var(--cr-background-content));
+  background: linear-gradient(135deg, #f3f4ff 0%, #e0e7ff 100%);
   padding: 20px;
   border-radius: 12px;
   text-align: center;
@@ -156,15 +158,15 @@
 
 .report-info {
   padding: 16px;
-  background: var(--cr-background-content);
+  background: #f9fafb;
   border-radius: 10px;
-  border: var(--cr-border);
+  border-left: 4px solid #5f5cf6;
 }
 
 .report-info p {
   margin: 0;
   font-size: 0.9em;
-  color: var(--cr-text);
+  color: #6b7280;
   line-height: 1.5;
 }
 

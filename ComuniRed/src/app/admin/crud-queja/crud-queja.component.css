@@ -32,22 +32,6 @@
   font-size: 28px;
 }
 
-/* Top controls (per-page & total) */
-.top-controls {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-right: 12px;
-}
-.top-label { color: var(--muted); font-size:13px; }
-.top-select {
-  padding:6px 8px;
-  border-radius:6px;
-  border:1px solid #e6edf3;
-  background:#fff;
-}
-.top-total { color: var(--muted); font-size:13px; }
-
 /* Table wrapper */
 .table-wrapper {
   margin: 0 36px 40px 36px;
@@ -213,77 +197,121 @@
   color: var(--muted);
 }
 
-/* Pagination row centered */
-.pagination-row {
-  margin: 18px 0 36px 0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap: 10px;
-}
-.pagination-controls {
-  display:flex;
-  align-items:center;
-  gap: 18px;
-  background: transparent;
-}
-.pagination-btn {
-  padding: 10px 14px;
-  border-radius: 6px;
-  background: #fff;
-  border: 1px solid #e6edf3;
-  cursor: pointer;
-  font-weight:700;
-}
-.pagination-btn:disabled { opacity:0.5; cursor:not-allowed; }
-.pagination-info { font-weight:700; color:#111827; }
-
-/* Pagination summary text */
-.pagination-summary { color: var(--muted); font-size: 14px; }
-
 /* =========================
    MODAL: backdrop + dialog
    ========================= */
+
+/* overlay: slightly transparent but not too dark so admin sees context */
 .crud-queja-modal {
   position: fixed;
   inset: 0;
-
-  background: rgba(8,11,14,0.45);
+  background: rgba(8, 11, 14, 0.45);
+  /* darker for clarity */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1100;
-
+  /* below the dialog content */
+  -webkit-overflow-scrolling: touch;
 }
+
+/* Dialog card */
 .crud-queja-modal-content {
   width: 620px;
   max-width: calc(100% - 40px);
   background: var(--cr-background);
   border-radius: 10px;
-  padding: 20px 22px;
-  box-shadow: 0 12px 40px rgba(2,6,23,0.25);
+  padding: 20px 36px;
+  box-shadow: 0 12px 40px rgba(2, 6, 23, 0.25);
   z-index: 1150;
+  /* above overlay */
+  position: relative;
+  transform-origin: center top;
   animation: modalEnter 160ms ease-out;
 }
-@keyframes modalEnter { from { transform: translateY(-6px) scale(.995); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+
+/* Enter animation */
+@keyframes modalEnter {
+  from {
+    transform: translateY(-6px) scale(.995);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
 
 /* Form controls inside modal */
-.crud-queja-modal-content .form-group { margin-bottom: 12px; }
-.crud-queja-modal-content label { display:block; font-weight:600; margin-bottom:6px; color:#374151; font-size:13px; }
-.crud-queja-modal-content textarea, .crud-queja-modal-content input[type="text"], .crud-queja-modal-content input[type="url"], .crud-queja-modal-content select {
-  width:100%;
-  padding: 10px 12px;
-  border:1px solid #e6edf3;
-  border-radius:8px;
-  background: #fbfdff;
-  font-size:14px;
-  color: #0f172a;
+.crud-queja-modal-content .form-group {
+  margin-bottom: 12px;
+}
+
+.crud-queja-modal-content label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--cr-text);
+  font-size: 13px;
+}
+
+.crud-queja-modal-content textarea,
+.crud-queja-modal-content input[type="text"],
+.crud-queja-modal-content input[type="url"],
+.crud-queja-modal-content select {
+  width: 100%;
+  padding: 10px 1px;
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  background: var(--cr-background-content);
+  font-size: 14px;
+  color: var(--cr-text);
 }
 
 /* Modal action buttons row */
-.crud-queja-modal-actions { display:flex; justify-content:flex-end; gap: 10px; margin-top: 14px; }
-.btn-primary { background: var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:8px; font-weight:700; }
-.btn-cancel { background: #f3f4f6; color:#374151; border:1px solid #e6edf3; padding:9px 12px; border-radius:8px; }
+.crud-queja-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* Primary / cancel */
+.btn-primary {
+  background: var(--cr-background);
+  border: 1.5px solid var(--cr-border);
+  color: var(--cr-titulo);
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(5, 150, 105, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.btn-primary:hover {
+  background: var(--cr-background);
+  transform: translateY(-1px);
+}
+
+.btn-cancel {
+  background: var(--cr-background);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
+  padding: 9px 12px;
+  border-radius: 1px;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #eef2f7;
+}
 
 /* Small responsive modal tweaks */
 @media (max-width: 700px) {
@@ -298,8 +326,15 @@
   }
 }
 
-/* Floating FAB/chat button */
-.floating-fab, .chat-fab, .help-fab, .cr-chat-fab, #chat-fab {
+/* =========================
+   Floating FAB/chat button
+   ========================= */
+/* Add these selectors to ensure floating button is visible and above layout */
+.floating-fab,
+.chat-fab,
+.help-fab,
+.cr-chat-fab,
+#chat-fab {
   position: fixed !important;
   right: 20px !important;
   bottom: 20px !important;
@@ -309,8 +344,32 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  box-shadow: 0 8px 20px rgba(37,99,235,0.18) !important;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18) !important;
   z-index: 1300 !important;
+  /* ABOVE modal dialog (1150) so visible */
+  transition: transform .12s ease, box-shadow .12s ease !important;
+}
+
+/* If you prefer the FAB to be behind the modal, change z-index to 1000 or 1050 */
+
+/* FAB visual */
+.floating-fab {
+  background: linear-gradient(180deg, #6b46c1, #553c9a);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.floating-fab:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.2);
+}
+
+/* ensure the FAB inner icon scales correctly */
+.floating-fab svg,
+.floating-fab i {
+  width: 22px;
+  height: 22px;
 }
 
 /* utility */

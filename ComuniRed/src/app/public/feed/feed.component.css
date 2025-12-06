@@ -3,9 +3,9 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  background: var(--cr-background);
+  background: #fff;
   min-height: 100vh;
-  border: 1px solid var(--cr-border);
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
 }
 
@@ -88,7 +88,7 @@
 
 /* ==================== CARD BASE ==================== */
 .card {
-  background: var(--cr-background);
+  background: white;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin-bottom: 1.5rem;
@@ -120,17 +120,18 @@
 .create-input {
   flex: 1;
   padding: 1rem 1.5rem;
-  background: var(--cr-search);
-  border: 2px solid var(--cr-border);
+  background: #f7fafc;
+  border: 2px solid #e2e8f0;
   border-radius: 24px;
   text-align: left;
   color: #a0aec0;
   font-size: 1rem;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .create-input:hover {
-  background: var(--cr-search);
+  background: #edf2f7;
   border-color: #cbd5e0;
 }
 
@@ -148,8 +149,8 @@
 .create-action {
   flex: 1;
   padding: 0.75rem;
-  background: var(--cr-background-content);
-  border: 2px solid var(--cr-border);
+  background: white;
+  border: 2px solid #e2e8f0;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -157,11 +158,12 @@
   gap: 0.5rem;
   cursor: pointer;
   font-weight: 600;
-  color: var(--cr-text);
+  color: #4a5568;
+  transition: all 0.2s ease;
 }
 
 .create-action:hover {
-  background: var(--cr-background-content);
+  background: #f7fafc;
   border-color: #667eea;
   color: #667eea;
 }
@@ -425,9 +427,6 @@
 }
 
 .post-header {
-  background: var(--cr-background-content);
-  border: var(--cr-border);
-  color: var(--cr-text);
   display: flex;
   gap: 1rem;
   padding: 1.5rem;
@@ -471,7 +470,6 @@
 }
 
 .post-author.clickable {
-  color: var(--cr-text);
   cursor: pointer;
 }
 
@@ -551,13 +549,13 @@
 .post-heading {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--cr-text);
+  color: #1a202c;
   margin: 0.5rem 0;
   line-height: 1.4;
 }
 
 .post-text {
-  color: var(--cr-text);
+  color: #4a5568;
   line-height: 1.6;
   margin: 0.5rem 0 1rem;
 }
@@ -608,7 +606,7 @@
   max-height: 500px;
   text-align: center;
   padding: 1rem 0;
-  background: var(--cr-background-content);
+  background: #f7fafc;
 }
 
 .post-image {
@@ -638,9 +636,9 @@
 /* ==================== VOTOS ==================== */
 .vote-section {
   padding: 1rem 1.5rem;
-  background: var(--cr-background-content);
-  border-top: 1px solid var(--cr-border);
-  border-bottom: 1px solid var(--cr-border);
+  background: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .vote-question {
@@ -713,8 +711,8 @@
   display: flex;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--cr-border);
-  background: var(--cr-background-content);
+  border-bottom: 1px solid #e2e8f0;
+  background: white;
 }
 
 .reaction-btn {
@@ -760,8 +758,8 @@
   display: flex;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--cr-border);
-  background: var(--cr-background-content);
+  border-bottom: 1px solid #e2e8f0;
+  background: white;
 }
 
 .left-actions,

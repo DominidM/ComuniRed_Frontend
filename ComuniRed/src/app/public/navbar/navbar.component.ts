@@ -4,7 +4,6 @@ import { FormsModule } from "@angular/forms"
 import { Router } from "@angular/router"
 import { QuejaService } from "../../services/queja.service"
 import { UsuarioService } from "../../services/usuario.service"
-import { ThemeService } from "../../services/theme.service" // <-- 1. Importación de ThemeService
 
 interface SearchResult {
   type: "reporte" | "persona"
@@ -26,7 +25,7 @@ interface SearchResult {
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   query = ""
-  isDarkMode = false // <-- RENOMBRADO para ser consistente con AdminComponent
+  isDark = false
   notificationCount = 5
   logoUrl = "https://res.cloudinary.com/dxuk9bogw/image/upload/v1761270927/fcd83bdf-0f03-44bf-9f55-7cfdc8244e99.png"
   userAvatarUrl = "https://ui-avatars.com/api/?name=ComuniRed&background=0B3B36&color=fff"
@@ -50,21 +49,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private router: Router,
     private quejaService: QuejaService,
     private usuarioService: UsuarioService,
-    private themeService: ThemeService // <-- 2. Inyección de ThemeService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    // 3. Carga Inicial del Tema (replicando la lógica de AdminComponent.ngOnInit)
-    const savedTheme = localStorage.getItem('theme');
-
-    if (savedTheme === 'dark') {
-      this.isDarkMode = true;
-      document.documentElement.classList.add('dark-mode');
-    } else {
-      // Asegurar la limpieza en caso de que se haya cargado previamente un tema oscuro
-      document.documentElement.classList.remove('dark-mode');
-      this.isDarkMode = false;
-    }
+    const saved = localStorage.getItem("theme") || "light"
+    this.isDark = saved === "dark"
+    document.documentElement.classList.toggle("dark", this.isDark)
 
     const user = this.usuarioService.getUser()
     if (user) {
@@ -228,10 +218,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.notificationCount = 0
   }
 
-  // 4. Implementación de toggleTheme() usando ThemeService (Igual que AdminComponent)
   toggleTheme(): void {
-    this.themeService.toggleTheme();
-    this.isDarkMode = this.themeService.isDarkTheme();
+    document.documentElement.classList.toggle("dark")
+    this.isDark = document.documentElement.classList.contains("dark")
+    localStorage.setItem("theme", this.isDark ? "dark" : "light")
   }
 
   goHome(): void {

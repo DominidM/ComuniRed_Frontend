@@ -3,7 +3,6 @@ html.dark :host {
   font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Variables para modo oscuro (aplicadas vía clase .dark en root) */
 :host ::ng-deep .dark {
   --bg-primary: #0a0e27;
   --bg-secondary: #1a1f3a;
@@ -17,7 +16,6 @@ html.dark :host {
   background-color: #0a0e27;
   color: #ffffff;
 }
-
 /* NAVBAR (completo, fijo arriba) */
 :host {
   display: block;
@@ -32,22 +30,35 @@ html.dark :host {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
+  background: #ffffff;
+  /* Eliminar border-bottom y usar solo box-shadow */
+  border-bottom: none;
   box-shadow: 0 1px 0 0 rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 40;
-  transition:
+  /* Transición suave */
+  transition: 
     transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateY(0);
   will-change: transform;
 }
 
-/* modo oscuro específico para navbar */
-html.dark .cr-navbar,
-:host ::ng-deep .dark .cr-navbar {
+.cr-navbar.hidden {
+  transform: translateY(-100%);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+html.dark .cr-navbar {
   background: var(--bg-secondary, #1a1f3a);
   color: var(--text-primary, #ffffff);
+}
+
+:host ::ng-deep .dark .cr-navbar {
+  background: #1a1f3a;
+  /* Usar box-shadow en lugar de border */
   box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
@@ -86,7 +97,7 @@ html.dark .cr-navbar,
 
 .cr-logo__text {
   font-weight: 700;
-  color: var(--cr-text);
+  color: #0b3b36;
   font-size: 20px;
   letter-spacing: -0.02em;
   transition: color 0.3s ease;
@@ -112,15 +123,17 @@ html.dark .cr-navbar,
 }
 
 .cr-search {
-  width: 100%;
-  max-width: calc(100% - 40px);
+  width: 80% !important;
+;
+  max-width: calc(100% - 101px);
   display: flex;
   align-items: center;
   gap: 20px;
-  background: var(--cr-search);
-  padding: 6px 12px;
+  background: #f2f4f6;
+  padding: 12px 12px;
   border-radius: 22px;
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+  transition: all 0.3s ease;
   position: relative;
 }
 
@@ -128,11 +141,11 @@ html.dark .cr-navbar,
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.1);
 }
 
-/* modo oscuro para search */
 :host ::ng-deep .dark .cr-search {
   background: #272d48;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
+
 :host ::ng-deep .dark .cr-search:hover {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
@@ -192,7 +205,9 @@ html.dark .cr-navbar,
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Dropdown de resultados */
@@ -211,8 +226,14 @@ html.dark .cr-navbar,
 }
 
 @keyframes dropdownSlide {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 :host ::ng-deep .dark .search-dropdown {
@@ -223,7 +244,10 @@ html.dark .cr-navbar,
 
 .search-backdrop {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: transparent;
   z-index: 999;
 }
@@ -240,12 +264,27 @@ html.dark .cr-navbar,
   color: #a0aec0;
 }
 
-.search-loading { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
-.search-empty-icon { font-size: 3rem; margin-bottom: 0.5rem; }
-.search-empty p { margin: 0; font-size: 0.875rem; }
+.search-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.search-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.search-empty p {
+  margin: 0;
+  font-size: 0.875rem;
+}
 
 /* Items de resultados */
-.search-results { padding: 0.5rem 0; }
+.search-results {
+  padding: 0.5rem 0;
+}
 
 .search-result-item {
   display: flex;
@@ -256,12 +295,35 @@ html.dark .cr-navbar,
   transition: background 0.2s ease;
 }
 
-.search-result-item:hover { background: #f7fafc; }
-:host ::ng-deep .dark .search-result-item:hover { background: rgba(255, 255, 255, 0.05); }
+.search-result-item:hover {
+  background: #f7fafc;
+}
 
-.search-result-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
-.search-result-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-.search-result-content { flex: 1; min-width: 0; }
+:host ::ng-deep .dark .search-result-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.search-result-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.search-result-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.search-result-content {
+  flex: 1;
+  min-width: 0;
+}
 
 .search-result-title {
   font-weight: 600;
@@ -271,13 +333,30 @@ html.dark .cr-navbar,
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-:host ::ng-deep .dark .search-result-title { color: #e2e8f0; }
 
-.search-result-subtitle { font-size: 0.8rem; color: #718096; margin-top: 0.125rem; }
-:host ::ng-deep .dark .search-result-subtitle { color: #a0aec0; }
+:host ::ng-deep .dark .search-result-title {
+  color: #e2e8f0;
+}
 
-.search-result-arrow { color: #cbd5e0; font-size: 1.25rem; flex-shrink: 0; }
-:host ::ng-deep .dark .search-result-arrow { color: #4a5568; }
+.search-result-subtitle {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.125rem;
+}
+
+:host ::ng-deep .dark .search-result-subtitle {
+  color: #a0aec0;
+}
+
+.search-result-arrow {
+  color: #cbd5e0;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+:host ::ng-deep .dark .search-result-arrow {
+  color: #4a5568;
+}
 
 /* ==================== BOTONES ==================== */
 .cr-navbar__right {
@@ -302,62 +381,154 @@ html.dark .cr-navbar,
   transition: all 0.2s ease;
 }
 
-.cr-btn:hover { background-color: rgba(0, 0, 0, 0.05); }
-.cr-btn:active { background-color: rgba(0, 0, 0, 0.08); }
+.cr-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
 
-:host ::ng-deep .dark .cr-btn:hover { background-color: rgba(255, 255, 255, 0.08); }
-:host ::ng-deep .dark .cr-btn:active { background-color: rgba(255, 255, 255, 0.12); }
+.cr-btn:active {
+  background-color: rgba(0, 0, 0, 0.08);
+}
 
-.cr-btn:focus { outline: 2px solid rgba(11, 59, 54, 0.12); outline-offset: 2px; }
-:host ::ng-deep .dark .cr-btn:focus { outline: 2px solid rgba(255, 255, 255, 0.12); }
+:host ::ng-deep .dark .cr-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
 
-.cr-btn--icon svg { transition: stroke 0.3s ease, transform 0.3s ease; stroke: #333333; }
-:host ::ng-deep .dark .cr-btn--icon svg { stroke: #e5e5e5; }
-.cr-btn--icon:hover svg { transform: scale(1.1); }
+:host ::ng-deep .dark .cr-btn:active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.cr-btn:focus {
+  outline: 2px solid rgba(11, 59, 54, 0.12);
+  outline-offset: 2px;
+}
+
+:host ::ng-deep .dark .cr-btn:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.cr-btn--icon svg {
+  transition: stroke 0.3s ease, transform 0.3s ease;
+  stroke: #333333;
+}
+
+:host ::ng-deep .dark .cr-btn--icon svg {
+  stroke: #e5e5e5;
+}
+
+.cr-btn--icon:hover svg {
+  transform: scale(1.1);
+}
 
 .cr-badge {
   position: absolute;
-  top: -2px; right: -2px;
-  display: flex; align-items: center; justify-content: center;
+  top: -2px;
+  right: -2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(135deg, #e02424 0%, #c41e1e 100%);
   color: #ffffff;
-  min-width: 18px; height: 18px; font-size: 11px; font-weight: 600;
-  border-radius: 999px; padding: 0 5px;
+  min-width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0 5px;
   box-shadow: 0 2px 8px rgba(224, 36, 36, 0.4);
   border: 2px solid #ffffff;
   animation: pulse 2s infinite;
 }
-:host ::ng-deep .dark .cr-badge { border-color: #1a1f3a; }
 
-@keyframes pulse {
-  0%, 100% { box-shadow: 0 2px 8px rgba(224, 36, 36, 0.4); }
-  50% { box-shadow: 0 2px 12px rgba(224, 36, 36, 0.6); }
+:host ::ng-deep .dark .cr-badge {
+  border-color: #1a1f3a;
 }
 
-.cr-btn--avatar { width: 44px; height: 44px; padding: 0; border-radius: 50%; overflow: hidden; border: 2px solid transparent; transition: border-color 0.3s ease; }
-.cr-btn--avatar:hover { border-color: rgba(0, 0, 0, 0.1); }
-:host ::ng-deep .dark .cr-btn--avatar:hover { border-color: rgba(255, 255, 255, 0.1); }
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(224, 36, 36, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(224, 36, 36, 0.6);
+  }
+}
 
-.cr-avatar { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cr-btn--avatar {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.cr-btn--avatar:hover {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:host ::ng-deep .dark .cr-btn--avatar:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.cr-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 780px) {
-  .cr-search { width: 100%; max-width: 420px; }
-  .cr-navbar__left { min-width: 120px; }
-  .cr-logo__text { display: none; }
-  .cr-navbar__center { max-width: 100%; }
-  .search-dropdown { left: 1rem; right: 1rem; }
+  .cr-search {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .cr-navbar__left {
+    min-width: 120px;
+  }
+
+  .cr-logo__text {
+    display: none;
+  }
+
+  .cr-navbar__center {
+    max-width: 100%;
+  }
+
+  .search-dropdown {
+    left: 1rem;
+    right: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .cr-navbar { padding: 0 12px; }
-  .search-dropdown { left: 0; right: 0; border-radius: 12px; }
-  .cr-navbar__right { min-width: auto; gap: 4px; }
+  .cr-navbar {
+    padding: 0 12px;
+  }
+
+  .search-dropdown {
+    left: 0;
+    right: 0;
+    border-radius: 12px;
+  }
+
+  .cr-navbar__right {
+    min-width: auto;
+    gap: 4px;
+  }
 }
 
 /* ==================== FIX PARA LINEA VISIBLE ==================== */
-:host { overflow-x: hidden; }
-body { overflow-x: hidden; }
+/* Prevenir que elementos sticky muestren contenido fuera del viewport */
+:host {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+}
 
 /* Asegurar que el navbar no deje rastro visual */
 .cr-navbar::after {
@@ -371,5 +542,559 @@ body { overflow-x: hidden; }
   transition: background 0.3s ease;
 }
 
-.cr-navbar:not(.hidden)::after { background: rgba(15, 23, 42, 0.08); }
-:host ::ng-deep .dark .cr-navbar:not(.hidden)::after { background: rgba(255, 255, 255, 0.08); }
+.cr-navbar:not(.hidden)::after {
+  background: rgba(15, 23, 42, 0.08);
+}
+
+:host ::ng-deep .dark .cr-navbar:not(.hidden)::after {
+  background: rgba(255, 255, 255, 0.08);
+}html.dark :host {
+  display: block;
+  font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+:host ::ng-deep .dark {
+  --bg-primary: #0a0e27;
+  --bg-secondary: #1a1f3a;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --border-color: rgba(255, 255, 255, 0.08);
+}
+
+:host ::ng-deep .dark body,
+:host ::ng-deep .dark {
+  background-color: #0a0e27;
+  color: #ffffff;
+}
+/* NAVBAR (completo, fijo arriba) */
+:host {
+  display: block;
+}
+
+/* ==================== NAVBAR ==================== */
+.cr-navbar {
+  background: var(--cr-background);
+  color: var(--cr-text);
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 18px;
+  background: #ffffff;
+  /* Eliminar border-bottom y usar solo box-shadow */
+  border-bottom: none;
+  box-shadow: 0 1px 0 0 rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  /* Transición suave */
+  transition: 
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+  will-change: transform;
+}
+
+.cr-navbar.hidden {
+  transform: translateY(-100%);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+html.dark .cr-navbar {
+  background: var(--bg-secondary, #1a1f3a);
+  color: var(--text-primary, #ffffff);
+}
+
+:host ::ng-deep .dark .cr-navbar {
+  background: #1a1f3a;
+  /* Usar box-shadow en lugar de border */
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+:host ::ng-deep .dark .cr-navbar.hidden {
+  box-shadow: none;
+}
+
+.cr-navbar__left {
+  display: flex;
+  align-items: center;
+  min-width: 160px;
+}
+
+.cr-logo {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 8px 10px;
+  transition: opacity 0.2s ease;
+}
+
+.cr-logo:hover {
+  opacity: 0.8;
+}
+
+.cr-logo__icon {
+  display: block;
+  width: 46px;
+  height: 46px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.cr-logo__text {
+  font-weight: 700;
+  color: #0b3b36;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  transition: color 0.3s ease;
+}
+
+:host ::ng-deep .dark .cr-logo__text {
+  color: #ffffff;
+}
+
+/* ==================== BÚSQUEDA CON DROPDOWN ==================== */
+.cr-navbar__center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  max-width: 740px;
+  margin: 0 auto;
+}
+
+.cr-search-container {
+  position: relative;
+  width: 100%;
+}
+
+.cr-search {
+  width: 100%;
+  max-width: calc(100% - 40px);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #f2f4f6;
+  padding: 6px 12px;
+  border-radius: 22px;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.cr-search:hover {
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.1);
+}
+
+:host ::ng-deep .dark .cr-search {
+  background: #272d48;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+:host ::ng-deep .dark .cr-search:hover {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.cr-search__icon {
+  flex: 0 0 18px;
+  transition: color 0.3s ease;
+}
+
+:host ::ng-deep .dark .cr-search__icon svg {
+  stroke: #999999;
+}
+
+.cr-search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 16px;
+  color: #2b2f35;
+  transition: color 0.3s ease;
+}
+
+:host ::ng-deep .dark .cr-search input {
+  color: #ffffff;
+}
+
+.cr-search input::placeholder {
+  color: #6b6f76;
+  transition: color 0.3s ease;
+}
+
+:host ::ng-deep .dark .cr-search input::placeholder {
+  color: #888888;
+}
+
+/* Spinner de búsqueda */
+.cr-search__spinner {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #0b3b36;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+:host ::ng-deep .dark .spinner-small {
+  border-color: #4a5568;
+  border-top-color: #667eea;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dropdown de resultados */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: dropdownSlide 0.2s ease;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:host ::ng-deep .dark .search-dropdown {
+  background: #272d48;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.search-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 999;
+}
+
+.search-loading,
+.search-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #718096;
+}
+
+:host ::ng-deep .dark .search-loading,
+:host ::ng-deep .dark .search-empty {
+  color: #a0aec0;
+}
+
+.search-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.search-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.search-empty p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* Items de resultados */
+.search-results {
+  padding: 0.5rem 0;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.search-result-item:hover {
+  background: #f7fafc;
+}
+
+:host ::ng-deep .dark .search-result-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.search-result-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.search-result-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.search-result-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-result-title {
+  font-weight: 600;
+  color: #1a202c;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .dark .search-result-title {
+  color: #e2e8f0;
+}
+
+.search-result-subtitle {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.125rem;
+}
+
+:host ::ng-deep .dark .search-result-subtitle {
+  color: #a0aec0;
+}
+
+.search-result-arrow {
+  color: #cbd5e0;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+:host ::ng-deep .dark .search-result-arrow {
+  color: #4a5568;
+}
+
+/* ==================== BOTONES ==================== */
+.cr-navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 220px;
+  justify-content: flex-end;
+}
+
+.cr-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cr-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.cr-btn:active {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+:host ::ng-deep .dark .cr-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+:host ::ng-deep .dark .cr-btn:active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.cr-btn:focus {
+  outline: 2px solid rgba(11, 59, 54, 0.12);
+  outline-offset: 2px;
+}
+
+:host ::ng-deep .dark .cr-btn:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.cr-btn--icon svg {
+  transition: stroke 0.3s ease, transform 0.3s ease;
+  stroke: #333333;
+}
+
+:host ::ng-deep .dark .cr-btn--icon svg {
+  stroke: #e5e5e5;
+}
+
+.cr-btn--icon:hover svg {
+  transform: scale(1.1);
+}
+
+.cr-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e02424 0%, #c41e1e 100%);
+  color: #ffffff;
+  min-width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0 5px;
+  box-shadow: 0 2px 8px rgba(224, 36, 36, 0.4);
+  border: 2px solid #ffffff;
+  animation: pulse 2s infinite;
+}
+
+:host ::ng-deep .dark .cr-badge {
+  border-color: #1a1f3a;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(224, 36, 36, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(224, 36, 36, 0.6);
+  }
+}
+
+.cr-btn--avatar {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.cr-btn--avatar:hover {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:host ::ng-deep .dark .cr-btn--avatar:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.cr-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 780px) {
+  .cr-search {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .cr-navbar__left {
+    min-width: 120px;
+  }
+
+  .cr-logo__text {
+    display: none;
+  }
+
+  .cr-navbar__center {
+    max-width: 100%;
+  }
+
+  .search-dropdown {
+    left: 1rem;
+    right: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cr-navbar {
+    padding: 0 12px;
+  }
+
+  .search-dropdown {
+    left: 0;
+    right: 0;
+    border-radius: 12px;
+  }
+
+  .cr-navbar__right {
+    min-width: auto;
+    gap: 4px;
+  }
+}
+
+/* ==================== FIX PARA LINEA VISIBLE ==================== */
+/* Prevenir que elementos sticky muestren contenido fuera del viewport */
+:host {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Asegurar que el navbar no deje rastro visual */
+.cr-navbar::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: transparent;
+  transition: background 0.3s ease;
+}
+
+.cr-navbar:not(.hidden)::after {
+  background: rgba(15, 23, 42, 0.08);
+}
+
+:host ::ng-deep .dark .cr-navbar:not(.hidden)::after {
+  background: rgba(255, 255, 255, 0.08);
+}

@@ -69,8 +69,7 @@
 
             <td class="td-actions">
               <div class="cell-inner actions-inline">
-                <!-- Cambiado: en vez de "Editar" abrimos modal de asignación -->
-                <button class="btn btn-edit" (click)="openAssignModal(queja)">Asignar</button>
+                <button class="btn btn-edit" (click)="openEditModal(queja)">Editar</button>
                 <button class="btn btn-delete" (click)="deleteQueja(queja)">Eliminar</button>
               </div>
             </td>
@@ -86,14 +85,11 @@
     </div>
   </ng-template>
 
-  <!-- Modal: si editingQueja == null -> crear, si editingQueja != null -> asignar -->
+  <!-- Modal Formulario (igual) -->
   <div class="crud-queja-modal" *ngIf="showModal">
     <div class="crud-queja-modal-content">
-      <h3 *ngIf="!editingQueja">{{ 'Nueva Queja' }}</h3>
-      <h3 *ngIf="editingQueja">{{ 'Asignar Queja' }}</h3>
-
-      <!-- CREAR / EDIT FORM (cuando creating a new queja) -->
-      <form *ngIf="!editingQueja" (ngSubmit)="saveQueja()" #quejaForm="ngForm">
+      <h3>{{ editingQueja ? 'Editar Queja' : 'Nueva Queja' }}</h3>
+      <form (ngSubmit)="saveQueja()" #quejaForm="ngForm">
         <div class="form-group">
           <label for="descripcion">Descripción</label>
           <textarea id="descripcion" name="descripcion" [(ngModel)]="quejaData.descripcion" required></textarea>
@@ -114,41 +110,11 @@
           <label for="imagen_url">Imagen (URL)</label>
           <input id="imagen_url" name="imagen_url" [(ngModel)]="quejaData.imagen_url" type="url" />
         </div>
-
         <div class="crud-queja-modal-actions">
           <button type="submit" class="btn-primary">Guardar</button>
           <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
         </div>
       </form>
-
-      <!-- ASSIGN FORM (when editingQueja is set) -->
-      <div *ngIf="editingQueja">
-        <div class="form-group">
-          <label>Queja</label>
-          <div class="small-muted">{{ editingQueja.titulo || editingQueja.descripcion }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="soporteSelect">Asignar a (Soporte)</label>
-          <select id="soporteSelect" class="form-control" [(ngModel)]="selectedSoporteId" name="selectedSoporteId">
-            <option value="">-- Selecciona un usuario de soporte --</option>
-            <option *ngFor="let u of usuariosSoporte" [value]="u.id">{{ u.nombre }} {{ u.apellido }}</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="comentariosAsignacion">Comentarios (opcional)</label>
-          <input id="comentariosAsignacion" type="text" [(ngModel)]="comentariosAsignacion" name="comentariosAsignacion" />
-        </div>
-
-        <div class="crud-queja-modal-actions">
-          <button type="button" class="btn-primary" (click)="onAssignToSupport()" [disabled]="!selectedSoporteId || loading">
-            {{ loading ? 'Asignando...' : 'Asignar' }}
-          </button>
-          <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
-        </div>
-      </div>
-
     </div>
   </div>
 </div>
