@@ -1,125 +1,305 @@
 <div class="clasificacion-container">
   <div class="header-section">
-    <h2>Clasificación de Reportes</h2>
-    <p class="descripcion">Organiza los reportes por categorías para una mejor gestión</p>
+    <div class="header-content">
+      <div class="header-icon">🎯</div>
+      <div>
+        <h2>Clasificación de Reportes por Nivel de Riesgo</h2>
+        <p class="descripcion">Clasifica los reportes asignados según su nivel de urgencia y riesgo para la comunidad</p>
+      </div>
+    </div>
+    <button class="btn-recargar" (click)="recargarQuejas()" [disabled]="loading">
+      <span *ngIf="!loading">🔄 Recargar</span>
+      <span *ngIf="loading">⏳ Cargando...</span>
+    </button>
   </div>
 
   <div class="stats-resumen">
     <div class="stat-item">
       <div class="stat-icon">📊</div>
       <div class="stat-content">
+        <span class="stat-value">{{ totalQuejas }}</span>
         <span class="stat-label">Total de Reportes</span>
-        <span class="stat-value">{{ totalReportes }}</span>
       </div>
     </div>
 
     <div class="stat-item">
-      <div class="stat-icon">✅</div>
+      <div class="stat-icon success">✅</div>
       <div class="stat-content">
-        <span class="stat-label">Categorizados</span>
-        <span class="stat-value">{{ totalReportes - reportesSinCategorizar }}</span>
+        <span class="stat-value">{{ totalQuejas - quejasSinClasificar }}</span>
+        <span class="stat-label">Clasificados</span>
       </div>
     </div>
 
     <div class="stat-item">
-      <div class="stat-icon">⚠️</div>
+      <div class="stat-icon warning">⚠️</div>
       <div class="stat-content">
-        <span class="stat-label">Sin Categorizar</span>
-        <span class="stat-value">{{ reportesSinCategorizar }}</span>
+        <span class="stat-value">{{ quejasSinClasificar }}</span>
+        <span class="stat-label">Sin Clasificar</span>
+      </div>
+    </div>
+
+    <div class="stat-item alert" *ngIf="quejasCriticas > 0">
+      <div class="stat-icon danger">🔴</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ quejasCriticas }}</span>
+        <span class="stat-label">Críticos</span>
       </div>
     </div>
 
     <div class="stat-item">
-      <div class="stat-icon">📈</div>
+      <div class="stat-icon primary">📈</div>
       <div class="stat-content">
+        <span class="stat-value">{{ porcentajeClasificado }}%</span>
         <span class="stat-label">Progreso</span>
-        <span class="stat-value">{{ porcentajeCategorizado }}%</span>
       </div>
     </div>
   </div>
 
-  <div class="barra-progreso">
-    <div class="progreso-fill" [style.width.%]="porcentajeCategorizado"></div>
+  <div class="progress-container">
+    <div class="progress-header">
+      <span>Progreso de clasificación</span>
+      <span class="progress-percentage">{{ porcentajeClasificado }}%</span>
+    </div>
+    <div class="barra-progreso">
+      <div class="progreso-fill" [style.width.%]="porcentajeClasificado">
+        <span class="progress-text" *ngIf="porcentajeClasificado > 10">{{ porcentajeClasificado }}%</span>
+      </div>
+    </div>
   </div>
 
-  <div class="categorias-grid">
+  <div class="section-title">
+    <h3>🏷️ Filtrar por Nivel de Riesgo</h3>
+    <p>Selecciona un nivel para filtrar los reportes</p>
+  </div>
+
+  <div class="niveles-grid">
     <div 
-      *ngFor="let categoria of categorias" 
-      class="categoria-card"
-      [class.selected]="categoriaSeleccionada === categoria.id"
-      (click)="seleccionarCategoria(categoria.id)"
+      *ngFor="let nivel of nivelesRiesgo" 
+      class="nivel-card"
+      [class.selected]="nivelSeleccionado === nivel.id"
+      [class.critical]="nivel.id === 'CRITICO' && nivel.total > 0"
+      [class.has-items]="nivel.total > 0"
+      (click)="seleccionarNivel(nivel.id)"
     >
-      <div class="categoria-header" [style.background]="categoria.color">
-        <span class="categoria-icono">{{ categoria.icono }}</span>
-        <span class="categoria-badge">{{ categoria.total }}</span>
+      <div class="nivel-header" [style.background]="nivel.color">
+        <span class="nivel-icono">{{ nivel.icono }}</span>
+        <span class="nivel-badge">{{ nivel.total }}</span>
       </div>
-      <div class="categoria-body">
-        <h3>{{ categoria.nombre }}</h3>
-        <p>{{ categoria.descripcion }}</p>
+      <div class="nivel-body">
+        <h3>{{ nivel.nombre }}</h3>
+        <p>{{ nivel.descripcion }}</p>
       </div>
     </div>
   </div>
 
-  <div class="reportes-section">
-    <div class="reportes-header">
-      <h3>
-        <span *ngIf="!categoriaSeleccionada">Todos los Reportes</span>
-        <span *ngIf="categoriaSeleccionada">
-          {{ getNombreCategoriaSeleccionada() }}
-        </span>
-        ({{ reportesFiltrados.length }})
-      </h3>
+  <div class="quejas-section">
+    <div class="quejas-header">
+      <div class="header-info">
+        <h3>
+          <span *ngIf="!nivelSeleccionado">📋 Todos los Reportes</span>
+          <span *ngIf="nivelSeleccionado">
+            {{ getNivelIcono(nivelSeleccionado) }} {{ getNombreNivelSeleccionado() }}
+          </span>
+        </h3>
+        <span class="contador">{{ quejasFiltradas.length }} {{ quejasFiltradas.length === 1 ? 'reporte' : 'reportes' }}</span>
+      </div>
       
       <div class="busqueda-container">
+        <span class="search-icon">🔍</span>
         <input 
           type="text" 
-          placeholder="Buscar reportes..." 
+          placeholder="Buscar por título, descripción o ubicación..." 
           [(ngModel)]="busqueda"
           (input)="aplicarBusqueda()"
           class="input-busqueda"
         />
+        <button 
+          *ngIf="busqueda" 
+          class="clear-search" 
+          (click)="busqueda = ''; aplicarBusqueda()"
+        >
+          ✕
+        </button>
       </div>
     </div>
 
-    <div class="reportes-lista" *ngIf="reportesFiltrados.length > 0">
-      <div *ngFor="let reporte of reportesFiltrados" class="reporte-item">
-        <div class="reporte-info">
-          <div class="reporte-encabezado">
-            <h4>{{ reporte.titulo }}</h4>
-            <span 
-              class="categoria-tag"
-              [style.background]="getCategoriaColor(reporte.tipo)"
-            >
-              {{ getCategoriaNombre(reporte.tipo) }}
-            </span>
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando reportes asignados...</p>
+    </div>
+
+    <div class="quejas-lista" *ngIf="!loading && quejasFiltradas.length > 0">
+      <div *ngFor="let queja of quejasFiltradas; let i = index" class="queja-item">
+        <div class="queja-numero">
+          <span>#{{ i + 1 }}</span>
+        </div>
+
+        <div class="queja-imagen" *ngIf="queja.imagen_url">
+          <img [src]="queja.imagen_url" [alt]="queja.titulo" (click)="verImagenCompleta(queja.imagen_url)">
+          <div class="imagen-overlay">
+            <span>🔍 Ver imagen</span>
           </div>
-          <p class="reporte-descripcion">{{ reporte.descripcion }}</p>
-          <div class="reporte-meta">
-            <span>📍 {{ reporte.ubicacion }}</span>
-            <span>📅 {{ reporte.fecha | date:'dd/MM/yyyy' }}</span>
-            <span>👤 {{ reporte.cliente.nombre }}</span>
+        </div>
+
+        <div class="queja-imagen sin-imagen" *ngIf="!queja.imagen_url">
+          <div class="placeholder-imagen">
+            <span>📷</span>
+            <p>Sin imagen</p>
           </div>
         </div>
         
-        <div class="reporte-acciones">
+        <div class="queja-info">
+          <div class="queja-encabezado">
+            <div class="titulo-section">
+              <h4>{{ queja.titulo }}</h4>
+              <div class="badges-row">
+                <span class="votos-badge">
+                  <span class="badge-icon">👍</span>
+                  {{ queja.votes.total }}
+                </span>
+                <span class="categoria-badge">
+                  <span class="badge-icon">📂</span>
+                  {{ queja.categoria.nombre }}
+                </span>
+              </div>
+            </div>
+            <span 
+              class="nivel-tag"
+              [style.background]="getNivelColor(queja.nivel_riesgo)"
+            >
+              {{ getNivelIcono(queja.nivel_riesgo) }} {{ getNivelNombre(queja.nivel_riesgo) }}
+            </span>
+          </div>
+          
+          <p class="queja-descripcion">{{ queja.descripcion }}</p>
+          
+          <div class="queja-meta">
+            <span class="meta-item">
+              <span class="meta-icon">📍</span>
+              <span>{{ queja.ubicacion || 'Sin ubicación' }}</span>
+            </span>
+            <span class="meta-item">
+              <span class="meta-icon">📅</span>
+              <span>{{ queja.fecha_creacion | date:'dd/MM/yyyy, h:mm a' }}</span>
+            </span>
+            <span class="meta-item">
+              <span class="meta-icon">👤</span>
+              <span>{{ queja.usuario.nombre }} {{ queja.usuario.apellido }}</span>
+            </span>
+          </div>
+
+          <div class="queja-footer">
+            <button class="btn-ver-detalle" (click)="verDetalleQueja(queja.id)">
+              👁️ Ver detalles completos
+            </button>
+
+            <div class="queja-estado" *ngIf="queja.estado">
+              <span class="estado-badge">
+                {{ queja.estado.nombre }}
+              </span>
+            </div>
+
+            <div class="queja-clasificacion-info" *ngIf="queja.fecha_clasificacion">
+              <span class="clasificado-badge">
+                ✅ Clasificado el {{ queja.fecha_clasificacion | date:'dd/MM/yyyy' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="queja-acciones">
+          <label class="select-label">Clasificar como:</label>
           <select 
-            class="select-categoria"
-            [value]="reporte.tipo"
-            (change)="asignarCategoria(reporte, $any($event.target).value)"
+            class="select-nivel"
+            [value]="queja.nivel_riesgo || ''"
+            (change)="abrirModalClasificacion(queja, $any($event.target).value)"
+            [disabled]="loading"
           >
-            <option value="">Sin categoría</option>
-            <option *ngFor="let cat of categorias" [value]="cat.id">
-              {{ cat.icono }} {{ cat.nombre }}
-            </option>
+            <option value="">-- Seleccionar nivel --</option>
+            <option value="CRITICO">🔴 Crítico</option>
+            <option value="ALTO">🟠 Alto</option>
+            <option value="MEDIO">🟡 Medio</option>
+            <option value="BAJO">🟢 Bajo</option>
+            <option value="INFORMATIVO">ℹ️ Informativo</option>
           </select>
         </div>
       </div>
     </div>
 
-    <div *ngIf="reportesFiltrados.length === 0" class="sin-resultados">
+    <div *ngIf="!loading && quejasFiltradas.length === 0 && totalQuejas > 0" class="sin-resultados">
       <div class="sin-resultados-icono">🔍</div>
       <h3>No se encontraron reportes</h3>
-      <p>Intenta con otra búsqueda o selecciona una categoría diferente</p>
+      <p>Intenta con otra búsqueda o selecciona un nivel diferente</p>
+      <button class="btn-limpiar" (click)="busqueda = ''; nivelSeleccionado = ''; aplicarBusqueda()">
+        🔄 Limpiar filtros
+      </button>
     </div>
+
+    <div *ngIf="!loading && totalQuejas === 0" class="sin-resultados">
+      <div class="sin-resultados-icono">📭</div>
+      <h3>No tienes reportes asignados</h3>
+      <p>Espera a que un administrador te asigne reportes para clasificar</p>
+      <button class="btn-recargar-inline" (click)="recargarQuejas()">
+        🔄 Verificar nuevos reportes
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header" [style.background]="nivelSeleccionadoObj?.color">
+      <h3>
+        <span class="modal-icon">{{ nivelSeleccionadoObj?.icono }}</span>
+        Confirmar Clasificación
+      </h3>
+      <button class="btn-close" (click)="cerrarModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="queja-preview">
+        <h4>{{ quejaSeleccionada?.titulo }}</h4>
+        <p>{{ quejaSeleccionada?.descripcion }}</p>
+      </div>
+
+      <div class="imagen-preview" *ngIf="quejaSeleccionada?.imagen_url">
+        <img [src]="quejaSeleccionada!.imagen_url" [alt]="quejaSeleccionada!.titulo" (click)="verImagenCompleta(quejaSeleccionada?.imagen_url)">
+        <p class="imagen-hint">Click para ver en tamaño completo</p>
+      </div>
+
+      <div class="nivel-info">
+        <div class="nivel-card-modal" [style.border-color]="nivelSeleccionadoObj?.color">
+          <div class="nivel-icon-big" [style.background]="nivelSeleccionadoObj?.color">
+            {{ nivelSeleccionadoObj?.icono }}
+          </div>
+          <h3>{{ nivelSeleccionadoObj?.nombre }}</h3>
+          <p>{{ nivelSeleccionadoObj?.descripcion }}</p>
+        </div>
+      </div>
+
+      <div class="alerta-clasificacion">
+        <strong>⚠️ Importante:</strong> Esta clasificación determinará la prioridad de atención del reporte.
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-ver-completo" (click)="verDetalleQuejaDesdeModal()">
+        👁️ Ver detalles completos
+      </button>
+      <button class="btn-cancelar" (click)="cerrarModal()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button class="btn-confirmar" (click)="confirmarClasificacion()" [disabled]="loading">
+        <span *ngIf="!loading">✅ Confirmar Clasificación</span>
+        <span *ngIf="loading">⏳ Clasificando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay modal-imagen" *ngIf="mostrarModalImagen" (click)="cerrarModalImagen()">
+  <div class="modal-imagen-container" (click)="$event.stopPropagation()">
+    <button class="btn-close-imagen" (click)="cerrarModalImagen()">✕</button>
+    <img [src]="imagenSeleccionada" alt="Imagen completa">
   </div>
 </div>

@@ -231,6 +231,11 @@ export class SoporteReportComponent implements OnInit {
     return null;
   }
 
+  // ✅ NUEVO - Método para verificar si tiene historial
+  tieneHistorial(): boolean {
+    return !!(this.reporteSeleccionado?.historial?.length);
+  }
+
   getEstadoClase(estado: string): string {
     switch (estado.toLowerCase()) {
       case 'pendiente': return 'estado-pendiente';

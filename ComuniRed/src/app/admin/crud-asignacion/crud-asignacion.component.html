@@ -105,7 +105,6 @@
           </div>
         </div>
 
-        <!-- ✅ BOTÓN ACTUALIZADO -->
         <button class="btn btn-warning" (click)="abrirModalReasignar(asignacion)">
           🔄 Reasignar
         </button>
@@ -134,6 +133,7 @@
             <option value="">Seleccionar queja</option>
             <option *ngFor="let queja of quejasDisponibles" [value]="queja.id">
               {{ queja.titulo }} ({{ queja.votes.total }} votos)
+              <span *ngIf="queja.estaAsignada"> - ✓ Asignada</span>
             </option>
           </select>
         </div>
@@ -168,7 +168,7 @@
     </div>
   </div>
 
-  <!-- ✅ NUEVO - Modal de Reasignación -->
+  <!-- Modal de Reasignación -->
   <div *ngIf="showReasignarModal" class="modal-overlay" (click)="cerrarModalReasignar()">
     <div class="modal-container" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -243,21 +243,40 @@
         </div>
 
         <div *ngIf="quejasDisponibles.length > 0" class="quejas-list">
-          <div *ngFor="let queja of quejasDisponibles" class="queja-item">
+          <div *ngFor="let queja of quejasDisponibles" class="queja-item" 
+               [class.queja-asignada]="queja.estaAsignada">
             <div class="queja-header">
-              <h4>{{ queja.titulo }}</h4>
+              <div class="queja-title-section">
+                <h4>{{ queja.titulo }}</h4>
+                <span *ngIf="queja.estaAsignada" class="badge-asignada">
+                  ✓ {{ obtenerTextoAsignacion(queja) }}
+                </span>
+              </div>
               <span class="votes-badge">{{ queja.votes.total }} votos</span>
             </div>
+            
             <p>{{ queja.descripcion.substring(0, 150) }}...</p>
+            
             <div class="queja-meta">
               <span>👤 {{ queja.usuario.nombre }} {{ queja.usuario.apellido }}</span>
               <span>📂 {{ queja.categoria.nombre }}</span>
               <span>📅 {{ queja.fecha_creacion | date:'short' }}</span>
             </div>
+
+            <div *ngIf="queja.asignaciones && queja.asignaciones.length > 0" class="asignaciones-actuales">
+              <h5>Asignaciones actuales:</h5>
+              <div class="asignacion-mini" *ngFor="let asig of queja.asignaciones">
+                <span class="mini-badge" [ngClass]="getEstadoBadgeClass(asig.estado)">
+                  {{ getEstadoTexto(asig.estado) }}
+                </span>
+                <span class="mini-soporte">{{ obtenerNombreSoporte(asig.soporte_id) }}</span>
+              </div>
+            </div>
+
             <button 
               class="btn btn-primary btn-sm" 
-              (click)="nuevaAsignacion.quejaId = queja.id; cerrarModalQuejas(); abrirModalNuevaAsignacion()">
-              Asignar Esta Queja
+              (click)="nuevaAsignacion.quejaId = queja.id; abrirModalNuevaAsignacion()">
+              {{ queja.estaAsignada ? '➕ Asignar Nuevamente' : 'Asignar Esta Queja' }}
             </button>
           </div>
         </div>

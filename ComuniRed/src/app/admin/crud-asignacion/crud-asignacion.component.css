@@ -502,6 +502,45 @@ textarea.form-control {
   min-height: 80px;
 }
 
+.form-control option:disabled {
+  color: var(--gray-400);
+  font-style: italic;
+}
+
+/* Info asignación actual en modal de reasignación */
+.info-asignacion-actual {
+  background: var(--cr-search);
+  border: 1px solid var(--cr-border);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-asignacion-actual h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: var(--cr-titulo);
+  font-weight: 600;
+}
+
+.info-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.info-item .label {
+  font-weight: 600;
+  color: var(--cr-text);
+  font-size: 0.875rem;
+}
+
+.info-item .value {
+  color: var(--cr-titulo);
+  font-size: 0.875rem;
+}
+
 /* Lista de quejas */
 .quejas-list {
   display: flex;
@@ -522,19 +561,31 @@ textarea.form-control {
   box-shadow: var(--shadow-md);
 }
 
+/* Quejas asignadas */
+.queja-item.queja-asignada {
+  border-left: 4px solid var(--success-color);
+  background: color-mix(in srgb, var(--success-color) 5%, var(--cr-search));
+}
+
 .queja-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 1rem;
   gap: 1rem;
+}
+
+.queja-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
 }
 
 .queja-header h4 {
   margin: 0;
   font-size: 1.1rem;
   color: var(--cr-titulo);
-  flex: 1;
 }
 
 .votes-badge {
@@ -545,6 +596,17 @@ textarea.form-control {
   font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.badge-asignada {
+  background: var(--success-color);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+  width: fit-content;
 }
 
 .queja-meta {
@@ -560,6 +622,49 @@ textarea.form-control {
   display: flex;
   align-items: center;
   gap: 0.3rem;
+}
+
+/* Asignaciones actuales en lista de quejas */
+.asignaciones-actuales {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--cr-background);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--cr-border);
+}
+
+.asignaciones-actuales h5 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--cr-text);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.asignacion-mini {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.mini-badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.mini-soporte {
+  color: var(--cr-text);
+  font-weight: 500;
 }
 
 /* Empty state */
@@ -640,43 +745,8 @@ textarea.form-control {
   .modal-container {
     max-width: 95%;
   }
-}
 
-/* Estilos para el modal de reasignación */
-.info-asignacion-actual {
-  background: var(--cr-search);
-  border: 1px solid var(--cr-border);
-  border-radius: var(--border-radius);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.info-asignacion-actual h4 {
-  margin: 0 0 1rem 0;
-  font-size: 1rem;
-  color: var(--cr-titulo);
-  font-weight: 600;
-}
-
-.info-item {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  align-items: center;
-}
-
-.info-item .label {
-  font-weight: 600;
-  color: var(--cr-text);
-  font-size: 0.875rem;
-}
-
-.info-item .value {
-  color: var(--cr-titulo);
-  font-size: 0.875rem;
-}
-
-.form-control option:disabled {
-  color: var(--gray-400);
-  font-style: italic;
+  .queja-header {
+    flex-direction: column;
+  }
 }

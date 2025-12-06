@@ -2,23 +2,21 @@ import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Queja, Usuario } from './models';
-
+import { Queja } from './queja.service';
 
 export interface Asignacion {
   id: string;
   queja_id: string;
-  queja?: Queja;
+  queja?: Queja;  // Opcional, se llenará manualmente en el componente
   soporte_id: string;
-  soporte?: Usuario;
   asignado_por_id: string;
-  asignado_por?: Usuario;
   estado: string;
   fecha_asignacion: string;
   fecha_actualizacion?: string;
   observacion?: string;
 }
 
+// ❌ ELIMINADA: GET_ASIGNACIONES_CON_QUEJAS_POR_SOPORTE (tu backend no soporta queja anidada)
 
 const GET_ASIGNACIONES_POR_SOPORTE = gql`
   query AsignacionesPorSoporte($soporteId: ID!) {
@@ -129,10 +127,11 @@ const CAMBIAR_ESTADO_ASIGNACION = gql`
   }
 `;
 
-
 @Injectable({ providedIn: 'root' })
 export class AsignacionService {
   constructor(private apollo: Apollo) {}
+
+  // ❌ ELIMINADO: obtenerAsignacionesConQuejasPorSoporte (no soportado por backend)
 
   obtenerAsignacionesPorSoporte(soporteId: string): Observable<Asignacion[]> {
     return this.apollo

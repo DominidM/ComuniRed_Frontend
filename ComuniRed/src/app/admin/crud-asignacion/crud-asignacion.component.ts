@@ -14,6 +14,8 @@ interface QuejaParaAsignar {
   usuario: { nombre: string; apellido: string };
   categoria: { nombre: string };
   fecha_creacion: string;
+  estaAsignada?: boolean;
+  asignaciones?: Asignacion[];
 }
 
 interface UsuarioSoporte {
@@ -39,13 +41,13 @@ export class CrudAsignacionComponent implements OnInit {
   loading = false;
   showModal = false;
   showQuejasModal = false;
-  showReasignarModal = false; // ✅ NUEVO
+  showReasignarModal = false;
   
   filtroEstado: string = 'todos';
   filtroTexto: string = '';
   
   asignacionSeleccionada: Asignacion | null = null;
-  asignacionParaReasignar: Asignacion | null = null; // ✅ NUEVO
+  asignacionParaReasignar: Asignacion | null = null;
   
   nuevaAsignacion = {
     quejaId: '',
@@ -53,7 +55,6 @@ export class CrudAsignacionComponent implements OnInit {
     observacion: ''
   };
 
-  // ✅ NUEVO - Datos de reasignación
   datosReasignacion = {
     nuevoSoporteId: '',
     motivo: ''
@@ -81,6 +82,7 @@ export class CrudAsignacionComponent implements OnInit {
       next: (data) => {
         this.asignaciones = data;
         this.aplicarFiltros();
+        this.verificarQuejasAsignadas();
         this.loading = false;
       },
       error: (err) => {
@@ -96,8 +98,17 @@ export class CrudAsignacionComponent implements OnInit {
 
     this.quejaService.obtenerQuejasAprobadas((currentUser as any).id).subscribe({
       next: (quejas: any[]) => {
-        this.quejasDisponibles = quejas.filter(q => q.votes?.total > 5);
-        console.log('Quejas con +5 votos:', this.quejasDisponibles);
+
+        this.quejasDisponibles = quejas
+          .filter(q => q.votes?.total >= 5)
+          .map(q => ({
+            ...q,
+            estaAsignada: false,
+            asignaciones: []
+          }));
+        
+        this.verificarQuejasAsignadas();
+        console.log('✅ Quejas con +5 votos listas para asignar:', this.quejasDisponibles);
       },
       error: (err) => {
         console.error('Error cargando quejas:', err);
@@ -105,11 +116,46 @@ export class CrudAsignacionComponent implements OnInit {
     });
   }
 
+  verificarQuejasAsignadas(): void {
+    if (this.quejasDisponibles.length === 0 || this.asignaciones.length === 0) {
+      return;
+    }
+
+    this.quejasDisponibles.forEach(queja => {
+      const asignacionesDeQueja = this.asignaciones.filter(a => a.queja_id === queja.id);
+      queja.estaAsignada = asignacionesDeQueja.length > 0;
+      queja.asignaciones = asignacionesDeQueja;
+    });
+
+    console.log('✅ Estado actualizado de quejas:', this.quejasDisponibles);
+  }
+
+  obtenerTextoAsignacion(queja: QuejaParaAsignar): string {
+    if (!queja.estaAsignada || !queja.asignaciones || queja.asignaciones.length === 0) {
+      return '';
+    }
+
+    const asignacionesActivas = queja.asignaciones.filter(a => 
+      a.estado !== 'COMPLETADA' && a.estado !== 'CANCELADA'
+    );
+
+    if (asignacionesActivas.length === 0) {
+      return 'Completada/Cancelada';
+    }
+
+    if (asignacionesActivas.length === 1) {
+      const soporte = this.obtenerNombreSoporte(asignacionesActivas[0].soporte_id);
+      return `Asignada a ${soporte}`;
+    }
+
+    return `${asignacionesActivas.length} asignaciones activas`;
+  }
+
   cargarUsuariosSoporte(): void {
     this.usuarioService.obtenerUsuariosPorRol('68ca68bb0bc4d9ca3267b665').subscribe({
       next: (usuarios: any[]) => {
         this.usuariosSoporte = usuarios;
-        console.log('Usuarios soporte:', this.usuariosSoporte);
+        console.log('✅ Usuarios de soporte cargados:', this.usuariosSoporte);
       },
       error: (err) => {
         console.error('Error cargando soportes:', err);
@@ -148,7 +194,6 @@ export class CrudAsignacionComponent implements OnInit {
     this.showQuejasModal = true;
   }
 
-  // ✅ NUEVO - Abrir modal de reasignación
   abrirModalReasignar(asignacion: Asignacion): void {
     this.asignacionParaReasignar = asignacion;
     this.datosReasignacion = {
@@ -178,13 +223,26 @@ export class CrudAsignacionComponent implements OnInit {
       (currentUser as any).id,
       this.nuevaAsignacion.observacion
     ).subscribe({
-      next: () => {
-        alert('Queja asignada correctamente');
+      next: (nuevaAsignacion) => {
+        console.log('✅ Queja asignada:', nuevaAsignacion);
+        
+        // ✅ Agregar la nueva asignación inmediatamente a la lista
+        this.asignaciones.push(nuevaAsignacion);
+        this.aplicarFiltros();
+        this.verificarQuejasAsignadas();
+        
+        alert('✅ Queja asignada correctamente');
         this.cerrarModal();
-        this.cargarDatos();
+        
+        // ✅ Recargar datos para sincronizar con el servidor
+        setTimeout(() => {
+          this.cargarDatos();
+        }, 500);
+        
+        this.loading = false;
       },
       error: (err) => {
-        console.error('Error asignando queja:', err);
+        console.error('❌ Error asignando queja:', err);
         alert('Error al asignar la queja');
         this.loading = false;
       }
@@ -192,7 +250,7 @@ export class CrudAsignacionComponent implements OnInit {
   }
 
   cambiarEstado(asignacion: Asignacion, nuevoEstado: string): void {
-    if (!confirm(`¿Cambiar el estado a ${nuevoEstado}?`)) {
+    if (!confirm(`¿Cambiar el estado a ${this.getEstadoTexto(nuevoEstado)}?`)) {
       return;
     }
 
@@ -210,18 +268,17 @@ export class CrudAsignacionComponent implements OnInit {
       (currentUser as any).id
     ).subscribe({
       next: () => {
-        alert('Estado actualizado correctamente');
+        alert('✅ Estado actualizado correctamente');
         this.cargarDatos();
       },
       error: (err) => {
-        console.error('Error cambiando estado:', err);
+        console.error('❌ Error cambiando estado:', err);
         alert('Error al cambiar el estado');
         this.loading = false;
       }
     });
   }
 
-  // ✅ MÉTODO ACTUALIZADO - Confirmar reasignación desde el modal
   confirmarReasignacion(): void {
     if (!this.datosReasignacion.nuevoSoporteId) {
       alert('Por favor selecciona un usuario de soporte');
@@ -250,12 +307,12 @@ export class CrudAsignacionComponent implements OnInit {
       motivo
     ).subscribe({
       next: () => {
-        alert('Queja reasignada correctamente');
+        alert('✅ Queja reasignada correctamente');
         this.cerrarModalReasignar();
         this.cargarDatos();
       },
       error: (err) => {
-        console.error('Error reasignando queja:', err);
+        console.error('❌ Error reasignando queja:', err);
         alert('Error al reasignar la queja');
         this.loading = false;
       }
@@ -275,7 +332,6 @@ export class CrudAsignacionComponent implements OnInit {
     this.showQuejasModal = false;
   }
 
-  // ✅ NUEVO - Cerrar modal de reasignación
   cerrarModalReasignar(): void {
     this.showReasignarModal = false;
     this.asignacionParaReasignar = null;
@@ -285,10 +341,9 @@ export class CrudAsignacionComponent implements OnInit {
     };
   }
 
-  // ✅ NUEVO - Obtener nombre del soporte actual
   obtenerNombreSoporte(soporteId: string): string {
     const soporte = this.usuariosSoporte.find(u => u.id === soporteId);
-    return soporte ? `${soporte.nombre} ${soporte.apellido}` : 'No asignado';
+    return soporte ? `${soporte.nombre} ${soporte.apellido}` : 'Cargando...';
   }
 
   getEstadoBadgeClass(estado: string): string {

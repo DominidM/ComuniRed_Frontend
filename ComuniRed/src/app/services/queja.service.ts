@@ -510,6 +510,7 @@ const CAMBIAR_ESTADO_QUEJA = gql`
 `;
 
 
+
 const VOTAR_QUEJA = gql`
   mutation VotarQueja($quejaId: ID!, $usuarioId: ID!, $voto: String!) {
     votarQueja(quejaId: $quejaId, usuarioId: $usuarioId, voto: $voto) {
@@ -531,6 +532,10 @@ const VOTAR_QUEJA = gql`
     }
   }
 `;
+
+
+
+
 
 @Injectable({ providedIn: 'root' })
 export class QuejaService {

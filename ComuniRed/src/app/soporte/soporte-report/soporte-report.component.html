@@ -1,5 +1,5 @@
 <div class="contenedor-soporte">
-  <!-- ESTADÍSTICAS -->
+
   <div class="stats-container">
     <div class="stats-card total">
       <div class="stats-header">
@@ -41,7 +41,6 @@
     </div>
   </div>
 
-  <!-- FILTROS -->
   <div class="filtros">
     <input type="text" placeholder="Buscar reportes..." [(ngModel)]="busqueda" (input)="aplicarFiltro()" />
 
@@ -70,7 +69,6 @@
     </select>
   </div>
 
-  <!-- TARJETAS DE REPORTES -->
   <div class="container-report-card">
     <div *ngFor="let rep of reportesFiltrados" class="reporte-card" [ngClass]="getEstadoClase(rep.estado)">
       <div class="reporte-header">
@@ -130,7 +128,6 @@
   </div>
 </div>
 
-<!-- MODAL IMAGEN COMPLETA -->
 <div class="modal-imagen" *ngIf="imagenSeleccionada" (click)="cerrarImagenCompleta()">
   <div class="modal-contenido-imagen" (click)="$event.stopPropagation()">
     <img [src]="imagenSeleccionada" alt="Imagen completa" class="imagen-completa">
@@ -138,7 +135,6 @@
   </div>
 </div>
 
-<!-- MODAL DETALLES -->
 <div class="modal" *ngIf="mostrarDetalles && reporteSeleccionado" (click)="cerrarDesdeFondo($event)">
   <div class="modal-contenido" (click)="$event.stopPropagation()">
     <button class="btn-cerrar-x" (click)="cerrarDetalles()">✖</button>
@@ -162,9 +158,9 @@
     <div class="seccion">
       <h4><i class="bi bi-person-fill"></i> Información del Cliente</h4>
       <p><strong>Nombre:</strong> {{ reporteSeleccionado.cliente.nombre }}</p>
-      <p *ngIf="reporteSeleccionado?.cliente?.telefono"><strong>Teléfono:</strong> {{ reporteSeleccionado.cliente.telefono }}</p>
-      <p *ngIf="reporteSeleccionado?.cliente?.email"><strong>Email:</strong> {{ reporteSeleccionado.cliente.email }}</p>
-      <p *ngIf="reporteSeleccionado?.cliente?.direccion"><strong>Dirección:</strong> {{ reporteSeleccionado.cliente.direccion }}</p>
+      <p *ngIf="reporteSeleccionado.cliente.telefono"><strong>Teléfono:</strong> {{ reporteSeleccionado.cliente.telefono }}</p>
+      <p *ngIf="reporteSeleccionado.cliente.email"><strong>Email:</strong> {{ reporteSeleccionado.cliente.email }}</p>
+      <p *ngIf="reporteSeleccionado.cliente.direccion"><strong>Dirección:</strong> {{ reporteSeleccionado.cliente.direccion }}</p>
     </div>
 
     <div class="seccion">
@@ -204,7 +200,7 @@
       </select>
     </div>
 
-    <div class="seccion historial" *ngIf="reporteSeleccionado?.historial?.length">
+    <div class="seccion historial" *ngIf="tieneHistorial()">
       <h4><i class="bi bi-clock-history"></i> Historial</h4>
       <ul>
         <li *ngFor="let h of reporteSeleccionado.historial">
@@ -218,7 +214,6 @@
       <button class="btn-enviar-mensaje" (click)="abrirEnvioMensaje()">✉️ Enviar Mensaje</button>
     </div>
 
-    <!-- FORMULARIO ENVIAR MENSAJE -->
     <div class="enviar-mensaje-contenedor" *ngIf="mostrarEnvioMensaje">
       <textarea [(ngModel)]="mensaje" placeholder="Escribe tu mensaje aquí..."></textarea>
       <div class="acciones">
