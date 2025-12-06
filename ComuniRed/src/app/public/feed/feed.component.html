@@ -216,7 +216,7 @@
 
         <div class="post-info">
           <div class="post-title-row">
-            <div>
+            <div class="post-author-section">
               <div class="post-author clickable" (click)="verPerfilUsuario(post.usuario)">
                 {{ getAuthorName(post) }}
               </div>
@@ -254,6 +254,13 @@
                 <button class="menu-item" (click)="toggleBookmark(post); post.showMenu = false">
                   {{ getBookmarkEmoji(post) }} {{ getBookmarkText(post) }}
                 </button>
+                <button 
+                  *ngIf="hasHistorial(post)" 
+                  class="menu-item" 
+                  (click)="openHistorialModal(post); post.showMenu = false"
+                >
+                  📜 Ver Historial
+                </button>
               </div>
             </div>
           </div>
@@ -261,9 +268,19 @@
           <h3 class="post-heading">{{ getTitle(post) }}</h3>
           <p class="post-text">{{ getDescription(post) }}</p>
 
+          <!-- Tags con Estado y Riesgo -->
           <div class="post-tags">
             <span class="tag category-tag">{{ getCategoryName(post) }}</span>
-            <span *ngIf="post.estado?.nombre" class="tag status-tag">{{ post.estado?.nombre }}</span>
+            
+            <!-- Badge de Estado -->
+            <span *ngIf="post.estado" [class]="getEstadoBadgeClass(getEstadoClave(post))">
+              {{ getEstadoTexto(post) }}
+            </span>
+
+            <!-- Badge de Nivel de Riesgo -->
+            <span *ngIf="hasRiesgo(post)" [class]="getRiesgoBadgeClass(getNivelRiesgo(post))">
+              {{ getRiesgoIcon(getNivelRiesgo(post)) }} {{ getRiesgoTexto(getNivelRiesgo(post)) }}
+            </span>
           </div>
         </div>
       </div>
@@ -281,21 +298,46 @@
         </ng-template>
       </div>
 
-      <!-- Votos -->
-      <div *ngIf="hasVotes(post)" class="vote-section">
-        <div class="vote-question">
-          ¿Estás de acuerdo con este reporte?
-          <span class="vote-count">{{ getTotalVotes(post) }} votos</span>
+      <!-- Sección de Votación (SOLO si está en votación) -->
+      <div *ngIf="isQuejaEnVotacion(post) && hasVotes(post)" class="vote-section">
+        <div class="vote-header">
+          <div class="vote-question">
+            ¿Estás de acuerdo con este reporte?
+          </div>
+          <div class="vote-count-info">
+            <span class="vote-count">{{ getTotalVotes(post) }}/5 votos</span>
+          </div>
         </div>
 
+        <!-- Barra de progreso -->
+        <div class="vote-progress-container">
+          <div class="vote-progress-bar">
+            <div 
+              class="vote-progress-fill" 
+              [style.width.%]="getVotingProgress(post)"
+              [class.complete]="getTotalVotes(post) >= 5"
+            ></div>
+          </div>
+          <span *ngIf="needsMoreVotes(post)" class="votes-needed-text">
+            Faltan {{ getVotesNeeded(post) }} votos para aprobar
+          </span>
+          <span *ngIf="getTotalVotes(post) >= 5" class="votes-complete-text">
+            ✅ Votos requeridos alcanzados
+          </span>
+        </div>
+
+        <!-- Botones de votación -->
         <div class="vote-buttons">
           <button
             class="vote-btn accept"
             [class.voted]="post.userVote === 'YES'"
             [disabled]="!canVote(post)"
             (click)="vote(post, 'accept')"
+            [title]="canVote(post) ? 'Votar a favor' : 'Ya votaste'"
           >
-            ✅ Sí ({{ getYesVotes(post) }})
+            <span class="vote-icon">✅</span>
+            <span class="vote-label">Sí</span>
+            <span class="vote-count-badge">{{ getYesVotes(post) }}</span>
           </button>
 
           <button
@@ -303,9 +345,34 @@
             [class.voted]="post.userVote === 'NO'"
             [disabled]="!canVote(post)"
             (click)="vote(post, 'reject')"
+            [title]="canVote(post) ? 'Votar en contra' : 'Ya votaste'"
           >
-            ❌ No ({{ getNoVotes(post) }})
+            <span class="vote-icon">❌</span>
+            <span class="vote-label">No</span>
+            <span class="vote-count-badge">{{ getNoVotes(post) }}</span>
           </button>
+        </div>
+
+        <!-- Mensaje si ya votó -->
+        <div *ngIf="!canVote(post) && post.userVote" class="vote-thanks">
+          <i class="bi bi-check-circle-fill"></i>
+          Gracias por tu voto
+        </div>
+      </div>
+
+      <!-- Información de estado (si NO está en votación) -->
+      <div *ngIf="!isQuejaEnVotacion(post)" class="status-info-section">
+        <div class="status-info-item" *ngIf="isQuejaEnProceso(post)">
+          <i class="bi bi-hourglass-split"></i>
+          <span>Este reporte está siendo atendido</span>
+        </div>
+        <div class="status-info-item success" *ngIf="isQuejaResuelta(post)">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Este reporte ha sido resuelto</span>
+        </div>
+        <div class="status-info-item" *ngIf="isQuejaPendiente(post)">
+          <i class="bi bi-clock-fill"></i>
+          <span>Reporte aprobado - En espera de asignación</span>
         </div>
       </div>
 
@@ -390,6 +457,15 @@
           <button class="action-btn" (click)="sharePost(post)">
             <span class="action-emoji">📤</span>
             <span class="action-text">Compartir</span>
+          </button>
+
+          <button 
+            *ngIf="hasHistorial(post)" 
+            class="action-btn" 
+            (click)="openHistorialModal(post)"
+          >
+            <span class="action-emoji">📜</span>
+            <span class="action-text">Historial</span>
           </button>
         </div>
       </div>
@@ -477,11 +553,7 @@
       <div class="no-posts-inner">
         <div class="no-posts-icon">🔍</div>
         <h3>No se encontraron reportes</h3>
-        <p *ngIf="searchTerm || selectedCategory">Intenta cambiar los filtros o términos de búsqueda</p>
-        <p *ngIf="!searchTerm && !selectedCategory">Sé el primero en reportar un problema</p>
-        <button *ngIf="searchTerm || selectedCategory" class="btn-primary" (click)="clearFilters()">
-          Limpiar filtros
-        </button>
+        <p>Sé el primero en reportar un problema</p>
       </div>
     </div>
   </ng-template>
@@ -594,6 +666,64 @@
         <button class="btn-send-modal" (click)="addCommentModal()" [disabled]="!newCommentText.trim()">
           <i class="bi bi-send-fill"></i>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE HISTORIAL -->
+  <div *ngIf="showHistorialModal" class="modal-overlay" (click)="closeHistorialModal()">
+    <div class="modal-historial" (click)="$event.stopPropagation()">
+      <div class="modal-header-historial">
+        <h3><i class="bi bi-clock-history"></i> Historial del Reporte</h3>
+        <button class="modal-close-btn" (click)="closeHistorialModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body-historial">
+        <div *ngIf="selectedQuejaHistorial" class="historial-report-info">
+          <h4>{{ selectedQuejaHistorial.titulo }}</h4>
+          <div class="historial-badges">
+            <span [class]="getEstadoBadgeClass(getEstadoClave(selectedQuejaHistorial))">
+              {{ getEstadoTexto(selectedQuejaHistorial) }}
+            </span>
+            <span *ngIf="hasRiesgo(selectedQuejaHistorial)" 
+                  [class]="getRiesgoBadgeClass(getNivelRiesgo(selectedQuejaHistorial))">
+              {{ getRiesgoIcon(getNivelRiesgo(selectedQuejaHistorial)) }} 
+              {{ getRiesgoTexto(getNivelRiesgo(selectedQuejaHistorial)) }}
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="loadingHistorial" class="historial-loading">
+          <div class="spinner-small"></div>
+          <p>Cargando historial...</p>
+        </div>
+
+        <div *ngIf="!loadingHistorial && historialEventos.length > 0" class="timeline">
+          <div *ngFor="let evento of historialEventos" class="timeline-item">
+            <div class="timeline-marker" [class]="'marker-' + getEventoColor(evento.tipo_evento)">
+              <span class="timeline-icon">{{ getEventoIcono(evento.tipo_evento) }}</span>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <span class="timeline-title">{{ getEventoTexto(evento.tipo_evento) }}</span>
+                <span class="timeline-date">{{ formatearFechaEvento(evento.fecha_evento) }}</span>
+              </div>
+              <p class="timeline-description">{{ evento.descripcion }}</p>
+              <div *ngIf="evento.estado_anterior && evento.estado_nuevo" class="timeline-states">
+                <span class="state-change">
+                  {{ evento.estado_anterior }} → {{ evento.estado_nuevo }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!loadingHistorial && historialEventos.length === 0" class="no-historial">
+          <i class="bi bi-inbox"></i>
+          <p>No hay eventos registrados</p>
+        </div>
       </div>
     </div>
   </div>

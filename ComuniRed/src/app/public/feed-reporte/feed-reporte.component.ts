@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { QuejaService, Queja, Usuario } from '../../services/queja.service';
 import { ReaccionService } from '../../services/reaccion.service';
 import { ComentarioService } from '../../services/comentario.service';
+import { CategoriaService, Categoria } from '../../services/categoria.service';
 import { UsuarioService } from '../../services/usuario.service';
 
 @Component({
@@ -15,16 +16,25 @@ import { UsuarioService } from '../../services/usuario.service';
   styleUrls: ['./feed-reporte.component.css']
 })
 export class FeedReporteComponent implements OnInit {
+  Math = Math;
+  
   quejaId: string = '';
   queja: Queja | null = null;
+  posts: Queja[] = [];
+  filteredPosts: Queja[] = [];
   loading = false;
   error: string = '';
   
   user: { id?: string; name: string; avatarUrl: string } | null = null;
   
+  categorias: Categoria[] = [];
+  selectedCategory = '';
+  sortBy: 'recent' | 'popular' | 'votes' = 'recent';
+  
   showReactionMenu: { [postId: string]: boolean } = {};
   showCommentsModal = false;
   showCommentsInline = false;
+  showCommentMenuModal: { [commentId: string]: boolean } = {};
   
   newCommentText = '';
   newCommentInline = '';
@@ -38,12 +48,17 @@ export class FeedReporteComponent implements OnInit {
   showEditModal = false;
   editingQueja: Queja | null = null;
 
+  currentPage = 1;
+  reportsPerPage = 10;
+  totalReports = 0;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private quejaService: QuejaService,
     private reaccionService: ReaccionService,
     private comentarioService: ComentarioService,
+    private categoriaService: CategoriaService,
     private usuarioService: UsuarioService
   ) {}
 
@@ -54,11 +69,14 @@ export class FeedReporteComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUser();
+    this.loadCategorias();
     
     this.route.params.subscribe(params => {
       this.quejaId = params['id'];
       if (this.quejaId) {
         this.cargarQueja();
+      } else {
+        this.cargarReportes();
       }
     });
   }
@@ -77,6 +95,18 @@ export class FeedReporteComponent implements OnInit {
     }
   }
 
+  loadCategorias(): void {
+    this.categoriaService.obtenerCategorias(0, 100).subscribe({
+      next: (page) => {
+        this.categorias = page.content.filter(c => c.activo);
+      },
+      error: (err) => {
+        console.error('Error cargando categorías', err);
+        this.categorias = [];
+      }
+    });
+  }
+
   cargarQueja(): void {
     if (!this.user?.id) return;
     
@@ -91,17 +121,192 @@ export class FeedReporteComponent implements OnInit {
           comments: Array.isArray(queja.comments) ? [...queja.comments] : []
         };
         this.loading = false;
-        console.log('✅ Queja cargada:', this.queja);
       },
       error: (err) => {
-        console.error('❌ Error cargando queja:', err);
+        console.error('Error cargando queja:', err);
         this.error = 'No se pudo cargar el reporte';
         this.loading = false;
       }
     });
   }
 
-  // ==================== REACCIONES ====================
+  cargarReportes(): void {
+    if (!this.user?.id) return;
+    
+    this.loading = true;
+    this.quejaService.obtenerQuejas(this.user.id).subscribe({
+      next: (quejas) => {
+        this.posts = JSON.parse(JSON.stringify(quejas)).map((q: any) => {
+          const reactions = {
+            total: q.reactions?.total || 0,
+            userReaction: q.reactions?.userReaction || undefined,
+            counts: {
+              like: q.reactions?.counts?.['like'] || 0,
+              love: q.reactions?.counts?.['love'] || 0,
+              wow: q.reactions?.counts?.['wow'] || 0,
+              helpful: q.reactions?.counts?.['helpful'] || 0,
+              dislike: q.reactions?.counts?.['dislike'] || 0,
+              report: q.reactions?.counts?.['report'] || 0
+            }
+          };
+
+          const votes = {
+            yes: q.votes?.yes || 0,
+            no: q.votes?.no || 0,
+            total: q.votes?.total || 0
+          };
+
+          return {
+            ...q,
+            reactions,
+            votes,
+            showComments: false,
+            showMenu: false,
+            comments: q.comments || [],
+            commentsCount: q.commentsCount || 0
+          };
+        });
+        
+        this.applyFilters();
+        this.loading = false;
+      },
+      error: (err: any) => {
+        console.error('Error cargando quejas:', err);
+        this.loading = false;
+        this.showToastMessage('Error al cargar reportes');
+      }
+    });
+  }
+
+  applyFilters(): void {
+    let filtered = [...this.posts];
+
+    if (this.selectedCategory) {
+      filtered = filtered.filter(p => p.categoria?.id === this.selectedCategory);
+    }
+
+    filtered = this.sortPosts(filtered);
+
+    this.filteredPosts = filtered;
+    this.currentPage = 1;
+  }
+
+  sortPosts(posts: Queja[]): Queja[] {
+    switch (this.sortBy) {
+      case 'recent':
+        return posts.sort((a, b) => 
+          new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime()
+        );
+      case 'popular':
+        return posts.sort((a, b) => 
+          (b.reactions?.total || 0) - (a.reactions?.total || 0)
+        );
+      case 'votes':
+        return posts.sort((a, b) => 
+          this.getTotalVotes(b) - this.getTotalVotes(a)
+        );
+      default:
+        return posts;
+    }
+  }
+
+  onCategoryFilterChange(): void {
+    this.applyFilters();
+  }
+
+  onSortChange(): void {
+    this.applyFilters();
+  }
+
+  clearFilters(): void {
+    this.selectedCategory = '';
+    this.sortBy = 'recent';
+    this.applyFilters();
+  }
+
+  isQuejaEnVotacion(post: Queja): boolean {
+    return post.estado?.clave === 'votacion';
+  }
+
+  hasVotes(post: Queja): boolean {
+    return !!(post.votes && typeof post.votes.yes === 'number' && typeof post.votes.no === 'number');
+  }
+
+  canVote(post: Queja): boolean {
+    return !post.userVote && this.isQuejaEnVotacion(post);
+  }
+
+  getTotalVotes(post: Queja): number {
+    return (post.votes?.yes || 0) + (post.votes?.no || 0);
+  }
+
+  getYesVotes(post: Queja): number {
+    return post.votes?.yes || 0;
+  }
+
+  getNoVotes(post: Queja): number {
+    return post.votes?.no || 0;
+  }
+
+  getVotingProgress(post: Queja): number {
+    const total = this.getTotalVotes(post);
+    return Math.min((total / 5) * 100, 100);
+  }
+
+  needsMoreVotes(post: Queja): boolean {
+    return this.getTotalVotes(post) < 5;
+  }
+
+  getVotesNeeded(post: Queja): number {
+    return Math.max(0, 5 - this.getTotalVotes(post));
+  }
+
+  vote(post: Queja, voteType: 'accept' | 'reject'): void {
+    if (!this.user?.id || !this.canVote(post)) {
+      return;
+    }
+
+    const voteValue = voteType === 'accept' ? 'YES' : 'NO';
+    
+    const previousVotes = { ...post.votes };
+    const previousUserVote = post.userVote;
+
+    if (voteType === 'accept') {
+      post.votes.yes = (post.votes.yes || 0) + 1;
+    } else {
+      post.votes.no = (post.votes.no || 0) + 1;
+    }
+    post.votes.total = (post.votes.yes || 0) + (post.votes.no || 0);
+    post.userVote = voteValue;
+
+    this.quejaService.votarQueja(post.id, this.user.id, voteValue).subscribe({
+      next: (updatedQueja) => {
+        post.votes = updatedQueja.votes;
+        post.userVote = updatedQueja.userVote;
+        post.canVote = updatedQueja.canVote;
+        this.showToastMessage('Voto registrado exitosamente');
+      },
+      error: (err: any) => {
+        console.error('Error al votar:', err);
+        post.votes = previousVotes;
+        post.userVote = previousUserVote;
+        this.showToastMessage('Error al registrar el voto');
+      }
+    });
+  }
+
+  isQuejaEnProceso(post: Queja): boolean {
+    return post.estado?.clave === 'en_proceso';
+  }
+
+  isQuejaResuelta(post: Queja): boolean {
+    return post.estado?.clave === 'resuelto' || post.estado?.clave === 'resuelta';
+  }
+
+  isQuejaPendiente(post: Queja): boolean {
+    return post.estado?.clave === 'pendiente' || post.estado?.clave === 'aprobada';
+  }
+
   closeAllReactionMenus(): void {
     this.showReactionMenu = {};
   }
@@ -146,6 +351,7 @@ export class FeedReporteComponent implements OnInit {
     this.reaccionService.toggleReaccion(post.id, type, this.user.id).subscribe({
       next: (updated) => {
         post.reactions = updated;
+        this.applyFilters();
       },
       error: (err: any) => {
         console.error('Error al reaccionar', err);
@@ -158,18 +364,6 @@ export class FeedReporteComponent implements OnInit {
     return post.reactions?.counts?.[type] ?? 0;
   }
 
-  getReactionIcon(type: string): string {
-    const icons: { [key: string]: string } = {
-      'like': '❤️',
-      'love': '😍',
-      'wow': '😮',
-      'helpful': '👍',
-      'dislike': '👎'
-    };
-    return icons[type] || '👍';
-  }
-
-  // ==================== COMENTARIOS INLINE ====================
   toggleCommentsInline(): void {
     this.showCommentsInline = !this.showCommentsInline;
   }
@@ -252,7 +446,6 @@ export class FeedReporteComponent implements OnInit {
     return (this.queja?.comments || []).length > 3;
   }
 
-  // ==================== MODAL COMENTARIOS ====================
   openCommentsModal(): void {
     if (!this.queja) return;
     this.showCommentsModal = true;
@@ -396,7 +589,6 @@ export class FeedReporteComponent implements OnInit {
     return this.queja?.commentsCount || (this.queja?.comments || []).length;
   }
 
-  // ==================== EDITAR/ELIMINAR REPORTE ====================
   canEditQueja(): boolean {
     return this.queja?.usuario?.id === this.user?.id;
   }
@@ -465,9 +657,70 @@ export class FeedReporteComponent implements OnInit {
     });
   }
 
-  // ==================== UTILIDADES ====================
+  getPaginatedPosts(): Queja[] {
+    const posts = this.displayedPosts;
+    this.totalReports = posts.length;
+    const startIndex = (this.currentPage - 1) * this.reportsPerPage;
+    const endIndex = startIndex + this.reportsPerPage;
+    return posts.slice(startIndex, endIndex);
+  }
+
+  getTotalPages(): number {
+    return Math.ceil(this.totalReports / this.reportsPerPage);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.getTotalPages()) {
+      this.currentPage = page;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.getTotalPages()) {
+      this.currentPage++;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const totalPages = this.getTotalPages();
+    const pages: number[] = [];
+    
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (this.currentPage <= 4) {
+        for (let i = 1; i <= 5; i++) pages.push(i);
+        pages.push(-1);
+        pages.push(totalPages);
+      } else if (this.currentPage >= totalPages - 3) {
+        pages.push(1);
+        pages.push(-1);
+        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push(-1);
+        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) pages.push(i);
+        pages.push(-1);
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  }
+
   volver(): void {
-    this.router.navigate(['/public/profile']);
+    this.router.navigate(['/public/feed']);
   }
 
   verPerfilUsuario(usuario: Usuario): void {
@@ -535,6 +788,14 @@ export class FeedReporteComponent implements OnInit {
     return estadoMap[estado] || 'estado-pendiente';
   }
 
+  getCategoryName(post: Queja): string {
+    return post.categoria?.nombre || 'Sin categoría';
+  }
+
+  get displayedPosts(): Queja[] {
+    return this.selectedCategory ? this.filteredPosts : this.posts;
+  }
+
   showToastMessage(message: string): void {
     this.toastMessage = message;
     this.showToast = true;
@@ -543,5 +804,9 @@ export class FeedReporteComponent implements OnInit {
 
   trackByComment(index: number, comment: any): string {
     return comment.id;
+  }
+
+  trackByPostId(index: number, post: Queja): string {
+    return post.id;
   }
 }

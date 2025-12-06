@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable, map } from 'rxjs';
 
+
 export interface Queja {
   id: string;
   titulo: string;
@@ -10,6 +11,9 @@ export interface Queja {
   imagen_url?: string;
   fecha_creacion: string;
   fecha_actualizacion?: string;
+  nivel_riesgo?: string;
+  fecha_clasificacion?: string;
+  clasificado_por_id?: string;
   usuario: Usuario;
   categoria: Categoria;
   estado?: EstadoQueja;
@@ -30,6 +34,13 @@ export interface Usuario {
   nombre: string;
   apellido: string;
   foto_perfil?: string;
+  email?: string;
+  rol?: Rol;
+}
+
+export interface Rol {
+  id: string;
+  nombre: string;
 }
 
 export interface Categoria {
@@ -42,6 +53,7 @@ export interface EstadoQueja {
   id: string;
   clave: string;
   nombre: string;
+  descripcion?: string;
 }
 
 export interface VotesData {
@@ -78,27 +90,80 @@ export interface Evidencia {
   fecha_subida?: string;
 }
 
+export interface HistorialEvento {
+  id: string;
+  queja_id: string;
+  tipo_evento: string;
+  estado_anterior?: string;
+  estado_nuevo?: string;
+  descripcion: string;
+  fecha_evento: string;
+  usuario_id: string;
+}
+
+
 const OBTENER_QUEJAS = gql`
   query ObtenerQuejas($usuarioActualId: ID!) {
     obtenerQuejas(usuarioActualId: $usuarioActualId) {
-      id titulo descripcion ubicacion imagen_url fecha_creacion
-      usuario { id nombre apellido foto_perfil }
-      categoria { id nombre }
-      estado { id nombre }
-      evidence { id url tipo }
-      votes { yes no total }
+      id
+      titulo
+      descripcion
+      ubicacion
+      imagen_url
+      fecha_creacion
+      nivel_riesgo
+      fecha_clasificacion
+      usuario {
+        id
+        nombre
+        apellido
+        foto_perfil
+      }
+      categoria {
+        id
+        nombre
+      }
+      estado {
+        id
+        clave
+        nombre
+      }
+      evidence {
+        id
+        url
+        tipo
+      }
+      votes {
+        yes
+        no
+        total
+      }
       reactions {
         total
         userReaction
         counts {
-          like love wow helpful dislike report
+          like
+          love
+          wow
+          helpful
+          dislike
+          report
         }
       }
       comments {
-        id texto fecha_creacion
-        author { id nombre apellido foto_perfil }
+        id
+        texto
+        fecha_creacion
+        author {
+          id
+          nombre
+          apellido
+          foto_perfil
+        }
       }
-      commentsCount canVote userVote
+      commentsCount
+      canVote
+      userVote
     }
   }
 `;
@@ -106,39 +171,15 @@ const OBTENER_QUEJAS = gql`
 const OBTENER_QUEJA_POR_ID = gql`
   query ObtenerQuejaPorId($id: ID!, $usuarioActualId: ID!) {
     obtenerQuejaPorId(id: $id, usuarioActualId: $usuarioActualId) {
-      id titulo descripcion ubicacion imagen_url fecha_creacion
-      usuario { id nombre apellido foto_perfil }
-      categoria { id nombre descripcion }
-      estado { id nombre }
-      evidence { id url tipo }
-      votes { yes no total }
-      reactions {
-        total
-        userReaction
-        counts {
-          like love wow helpful dislike report
-        }
-      }
-      comments {
-        id texto fecha_creacion
-        author { id nombre apellido foto_perfil }
-      }
-      commentsCount canVote userVote
-    }
-  }
-`;
-
-// ✅ Nueva query para obtener quejas por usuario
-const QUEJAS_POR_USUARIO = gql`
-  query QuejasPorUsuario($usuarioId: ID!, $usuarioActualId: ID!) {
-    quejasPorUsuario(usuarioId: $usuarioId, usuarioActualId: $usuarioActualId) {
       id
       titulo
       descripcion
       ubicacion
       imagen_url
       fecha_creacion
-      fecha_actualizacion
+      nivel_riesgo
+      fecha_clasificacion
+      clasificado_por_id
       usuario {
         id
         nombre
@@ -152,6 +193,76 @@ const QUEJAS_POR_USUARIO = gql`
       }
       estado {
         id
+        clave
+        nombre
+      }
+      evidence {
+        id
+        url
+        tipo
+        fecha_subida
+      }
+      votes {
+        yes
+        no
+        total
+      }
+      reactions {
+        total
+        userReaction
+        counts {
+          like
+          love
+          wow
+          helpful
+          dislike
+          report
+        }
+      }
+      comments {
+        id
+        texto
+        fecha_creacion
+        fecha_modificacion
+        author {
+          id
+          nombre
+          apellido
+          foto_perfil
+        }
+      }
+      commentsCount
+      canVote
+      userVote
+    }
+  }
+`;
+
+const QUEJAS_POR_USUARIO = gql`
+  query QuejasPorUsuario($usuarioId: ID!, $usuarioActualId: ID!) {
+    quejasPorUsuario(usuarioId: $usuarioId, usuarioActualId: $usuarioActualId) {
+      id
+      titulo
+      descripcion
+      ubicacion
+      imagen_url
+      fecha_creacion
+      fecha_actualizacion
+      nivel_riesgo
+      usuario {
+        id
+        nombre
+        apellido
+        foto_perfil
+      }
+      categoria {
+        id
+        nombre
+        descripcion
+      }
+      estado {
+        id
+        clave
         nombre
       }
       evidence {
@@ -183,11 +294,55 @@ const QUEJAS_POR_USUARIO = gql`
   }
 `;
 
-/*
-  CREAR_QUEJA: sin imagen_url en variables, porque tu schema backend actual
-  no acepta ese argumento (por eso daba UnknownArgument).
-  Haremos CREATE sin imagen, y luego UPDATE con imagen_url.
-*/
+const QUEJAS_APROBADAS = gql`
+  query QuejasAprobadas($usuarioActualId: ID!) {
+    quejasAprobadas(usuarioActualId: $usuarioActualId) {
+      id
+      titulo
+      descripcion
+      ubicacion
+      imagen_url
+      fecha_creacion
+      nivel_riesgo
+      usuario {
+        id
+        nombre
+        apellido
+        foto_perfil
+      }
+      categoria {
+        id
+        nombre
+      }
+      estado {
+        id
+        clave
+        nombre
+      }
+      votes {
+        yes
+        no
+        total
+      }
+    }
+  }
+`;
+
+const HISTORIAL_POR_QUEJA = gql`
+  query HistorialPorQueja($quejaId: ID!) {
+    historialPorQueja(quejaId: $quejaId) {
+      id
+      queja_id
+      tipo_evento
+      estado_anterior
+      estado_nuevo
+      descripcion
+      fecha_evento
+      usuario_id
+    }
+  }
+`;
+
 const CREAR_QUEJA = gql`
   mutation CrearQueja(
     $titulo: String!
@@ -203,15 +358,28 @@ const CREAR_QUEJA = gql`
       ubicacion: $ubicacion
       usuarioId: $usuarioId
     ) {
-      id titulo descripcion ubicacion imagen_url
-      usuario { id nombre apellido }
-      categoria { id nombre }
+      id
+      titulo
+      descripcion
+      ubicacion
+      imagen_url
+      usuario {
+        id
+        nombre
+        apellido
+      }
+      categoria {
+        id
+        nombre
+      }
+      estado {
+        id
+        nombre
+      }
     }
   }
 `;
 
-/* ACTUALIZAR_QUEJA ya acepta imagen_url (según tu schema actual),
-   lo usaremos inmediatamente después de crear la queja. */
 const ACTUALIZAR_QUEJA = gql`
   mutation ActualizarQueja(
     $id: ID!
@@ -231,10 +399,25 @@ const ACTUALIZAR_QUEJA = gql`
       ubicacion: $ubicacion
       imagen_url: $imagen_url
     ) {
-      id titulo descripcion ubicacion imagen_url
-      usuario { id nombre apellido }
-      categoria { id nombre }
-      estado { id nombre }
+      id
+      titulo
+      descripcion
+      ubicacion
+      imagen_url
+      usuario {
+        id
+        nombre
+        apellido
+      }
+      categoria {
+        id
+        nombre
+      }
+      estado {
+        id
+        clave
+        nombre
+      }
     }
   }
 `;
@@ -244,6 +427,57 @@ const ELIMINAR_QUEJA = gql`
     eliminarQueja(id: $id)
   }
 `;
+
+const CLASIFICAR_RIESGO = gql`
+  mutation ClasificarRiesgo(
+    $quejaId: ID!
+    $soporteId: ID!
+    $nivelRiesgo: String!
+    $observacion: String
+  ) {
+    clasificarRiesgo(
+      quejaId: $quejaId
+      soporteId: $soporteId
+      nivelRiesgo: $nivelRiesgo
+      observacion: $observacion
+    ) {
+      id
+      titulo
+      nivel_riesgo
+      fecha_clasificacion
+      clasificado_por_id
+      estado {
+        clave
+        nombre
+      }
+    }
+  }
+`;
+
+const CAMBIAR_ESTADO_QUEJA = gql`
+  mutation CambiarEstadoQueja(
+    $quejaId: ID!
+    $usuarioId: ID!
+    $nuevoEstado: String!
+    $observacion: String
+  ) {
+    cambiarEstadoQueja(
+      quejaId: $quejaId
+      usuarioId: $usuarioId
+      nuevoEstado: $nuevoEstado
+      observacion: $observacion
+    ) {
+      id
+      titulo
+      estado {
+        clave
+        nombre
+      }
+    }
+  }
+`;
+
+
 
 @Injectable({ providedIn: 'root' })
 export class QuejaService {
@@ -257,10 +491,7 @@ export class QuejaService {
         fetchPolicy: 'network-only'
       })
       .valueChanges.pipe(
-        map(result => {
-          console.log('📥 Quejas recibidas:', result.data.obtenerQuejas);
-          return result.data.obtenerQuejas;
-        })
+        map(result => result.data.obtenerQuejas)
       );
   }
 
@@ -272,14 +503,10 @@ export class QuejaService {
         fetchPolicy: 'network-only'
       })
       .valueChanges.pipe(
-        map(result => {
-          console.log('📥 Queja recibida:', result.data.obtenerQuejaPorId);
-          return result.data.obtenerQuejaPorId;
-        })
+        map(result => result.data.obtenerQuejaPorId)
       );
   }
 
-  // ✅ Nuevo método: Obtener quejas por usuario
   quejasPorUsuario(usuarioId: string, usuarioActualId: string): Observable<Queja[]> {
     return this.apollo
       .watchQuery<{ quejasPorUsuario: Queja[] }>({
@@ -288,10 +515,19 @@ export class QuejaService {
         fetchPolicy: 'network-only'
       })
       .valueChanges.pipe(
-        map(result => {
-          console.log('📥 Quejas del usuario recibidas:', result.data.quejasPorUsuario);
-          return result.data.quejasPorUsuario;
-        })
+        map(result => result.data.quejasPorUsuario)
+      );
+  }
+
+  obtenerQuejasAprobadas(usuarioActualId: string): Observable<Queja[]> {
+    return this.apollo
+      .watchQuery<{ quejasAprobadas: Queja[] }>({
+        query: QUEJAS_APROBADAS,
+        variables: { usuarioActualId },
+        fetchPolicy: 'network-only'
+      })
+      .valueChanges.pipe(
+        map(result => result.data.quejasAprobadas)
       );
   }
 
@@ -301,27 +537,15 @@ export class QuejaService {
     formData.append('upload_preset', 'ml_default');
     formData.append('folder', 'quejas');
 
-    try {
-      const response = await fetch(
-        'https://api.cloudinary.com/v1_1/da4wxtjwu/image/upload',
-        {
-          method: 'POST',
-          body: formData
-        }
-      );
+    const response = await fetch(
+      'https://api.cloudinary.com/v1_1/da4wxtjwu/image/upload',
+      { method: 'POST', body: formData }
+    );
 
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error.message);
-      }
-      
-      console.log('✅ Imagen subida a Cloudinary:', data.secure_url);
-      return data.secure_url;
-    } catch (error) {
-      console.error('❌ Error subiendo imagen a Cloudinary:', error);
-      throw error;
-    }
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    
+    return data.secure_url;
   }
 
   crearQueja(
@@ -332,23 +556,11 @@ export class QuejaService {
     ubicacion?: string,
     imagen?: File
   ): Observable<Queja> {
-    // Si hay imagen: subimos primero, luego:
-    // 1) creamos la queja (CREATE sin imagen_url)
-    // 2) hacemos UPDATE para añadir imagen_url (porque el backend no acepta crearCon imagen_url)
     if (imagen) {
       return new Observable<Queja>(observer => {
-        console.log('📤 Subiendo imagen a Cloudinary...');
         this.subirImagenCloudinary(imagen)
           .then(imagenUrl => {
-            console.log('✅ Imagen subida:', imagenUrl);
-            console.log('📤 Creando queja (sin imagen) ...');
-
-            const createVars: any = {
-              titulo,
-              descripcion,
-              categoriaId,
-              usuarioId
-            };
+            const createVars: any = { titulo, descripcion, categoriaId, usuarioId };
             if (ubicacion) createVars.ubicacion = ubicacion;
 
             return this.apollo.mutate<{ crearQueja: Queja }>({
@@ -358,14 +570,9 @@ export class QuejaService {
               .then(result => {
                 const queja = result?.data?.crearQueja;
                 if (!queja) throw new Error('No se pudo crear la queja');
-                // Ahora actualizamos con la imagen_url
-                console.log('✅ Queja creada (id=' + queja.id + '), actualizando imagen_url ...');
                 return this.apollo.mutate<{ actualizarQueja: Queja }>({
                   mutation: ACTUALIZAR_QUEJA,
-                  variables: {
-                    id: queja.id,
-                    imagen_url: imagenUrl
-                  },
+                  variables: { id: queja.id, imagen_url: imagenUrl },
                   refetchQueries: [
                     { query: OBTENER_QUEJAS, variables: { usuarioActualId: usuarioId } }
                   ]
@@ -374,29 +581,16 @@ export class QuejaService {
           })
           .then(result => {
             const quejaFinal = result?.data?.actualizarQueja;
-            if (!quejaFinal) throw new Error('No se pudo actualizar la imagen en la queja');
-            console.log('✅ Queja creada y actualizada con imagen:', quejaFinal);
+            if (!quejaFinal) throw new Error('No se pudo actualizar la imagen');
             observer.next(quejaFinal);
             observer.complete();
           })
-          .catch(error => {
-            console.error('❌ Error en crearQueja con imagen:', error);
-            observer.error(error);
-          });
+          .catch(error => observer.error(error));
       });
     }
 
-    // Sin imagen: crear directamente (imagen_url = null)
-    const variables: any = {
-      titulo,
-      descripcion,
-      categoriaId,
-      usuarioId,
-      imagen_url: null
-    };
+    const variables: any = { titulo, descripcion, categoriaId, usuarioId };
     if (ubicacion) variables.ubicacion = ubicacion;
-
-    console.log('📤 Creando queja sin imagen');
 
     return this.apollo
       .mutate<{ crearQueja: Queja }>({
@@ -406,12 +600,7 @@ export class QuejaService {
           { query: OBTENER_QUEJAS, variables: { usuarioActualId: usuarioId } }
         ]
       })
-      .pipe(
-        map(result => {
-          console.log('✅ Queja creada:', result.data!.crearQueja);
-          return result.data!.crearQueja;
-        })
-      );
+      .pipe(map(result => result.data!.crearQueja));
   }
 
   actualizarQueja(
@@ -445,4 +634,80 @@ export class QuejaService {
       })
       .pipe(map(result => result.data?.eliminarQueja ?? false));
   }
+
+  clasificarRiesgo(
+    quejaId: string,
+    soporteId: string,
+    nivelRiesgo: string,
+    observacion?: string
+  ): Observable<Queja> {
+    return this.apollo
+      .mutate<{ clasificarRiesgo: Queja }>({
+        mutation: CLASIFICAR_RIESGO,
+        variables: { quejaId, soporteId, nivelRiesgo, observacion }
+      })
+      .pipe(map(result => result.data!.clasificarRiesgo));
+  }
+
+  cambiarEstadoQueja(
+    quejaId: string,
+    usuarioId: string,
+    nuevoEstado: string,
+    observacion?: string
+  ): Observable<Queja> {
+    return this.apollo
+      .mutate<{ cambiarEstadoQueja: Queja }>({
+        mutation: CAMBIAR_ESTADO_QUEJA,
+        variables: { quejaId, usuarioId, nuevoEstado, observacion }
+      })
+      .pipe(map(result => result.data!.cambiarEstadoQueja));
+  }
+
+  obtenerHistorialPorQueja(quejaId: string): Observable<HistorialEvento[]> {
+    return this.apollo
+      .watchQuery<{ historialPorQueja: HistorialEvento[] }>({
+        query: HISTORIAL_POR_QUEJA,
+        variables: { quejaId },
+        fetchPolicy: 'network-only'
+      })
+      .valueChanges.pipe(
+        map(result => result.data.historialPorQueja)
+      );
+  }
+
+  votarQueja(quejaId: string, usuarioId: string, voto: string): Observable<Queja> {
+  const mutation = `
+    mutation {
+      votarQueja(
+        quejaId: "${quejaId}"
+        usuarioId: "${usuarioId}"
+        voto: ${voto}
+      ) {
+        id
+        titulo
+        descripcion
+        votes {
+          yes
+          no
+          total
+        }
+        userVote
+        canVote
+        estado {
+          id
+          nombre
+          clave
+        }
+      }
+    }
+  `;
+
+  return this.apollo.mutate<{ votarQueja: Queja }>({
+    mutation: gql`${mutation}`
+  }).pipe(
+    map(result => result.data?.votarQueja as Queja)
+  );
+}
+
+
 }
