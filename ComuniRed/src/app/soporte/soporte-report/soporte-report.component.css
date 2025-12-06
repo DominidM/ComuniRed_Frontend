@@ -485,8 +485,8 @@
 }
 
 .btn-cancelar {
-  background-color: #ccc;
-  color: #333;
+  background-color: var(--cr-background-content);
+  color: var(--cr-text);
   border: none;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;

@@ -113,7 +113,7 @@
   font-size: 1em;
   opacity: 0.85;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #e0e7ff 0%, #f3f4ff 100%);
+  background: var(--cr-search);
   border-radius: 6px;
   padding: 2px;
 }

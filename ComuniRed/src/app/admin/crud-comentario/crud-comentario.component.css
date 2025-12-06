@@ -33,15 +33,14 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #5f5cf6 0%, #8b96fa 100%);
-  color: #ffffff;
+  background: linear-gradient(var(--cr-background));
+  color: var(--cr-text);
   border: none;
   border-radius: 10px;
   font-size: 0.95em;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(95, 92, 246, 0.25);
-  transition: all 0.3s ease;
 }
 
 .btn-nuevo-comentario:hover {
@@ -114,12 +113,11 @@
 
 /* Card de comentario */
 .comentario-card {
-  background: #ffffff;
+  background: var(--cr-background);
   border: 1px solid var(--cr-border);
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
 }
 
 .comentario-card:hover {
@@ -199,12 +197,11 @@
 
 .btn-accion {
   padding: 6px 12px;
-  background: #f0f4f8;
-  border: none;
+  background: var(--cr-background-content);
+  border: var(--cr-border);
   border-radius: 8px;
   font-size: 0.85em;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .btn-accion:hover {
@@ -305,6 +302,7 @@
 }
 
 .modal-header {
+  background: var(--cr-background);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -334,6 +332,7 @@
 }
 
 .modal-body {
+  background: var(--cr-background);
   padding: 24px;
 }
 
@@ -376,6 +375,7 @@
 }
 
 .modal-footer {
+  background: var(--cr-background);
   display: flex;
   gap: 12px;
   justify-content: flex-end;
@@ -396,8 +396,8 @@
 }
 
 .btn-cancelar {
-  background: #f0f4f8;
-  color: #6b7280;
+  background: var(--cr-background-content);
+  color: var(--cr-text);
 }
 
 .btn-cancelar:hover {
@@ -405,8 +405,8 @@
 }
 
 .btn-guardar {
-  background: linear-gradient(135deg, #5f5cf6 0%, #8b96fa 100%);
-  color: #ffffff;
+  background: linear-gradient(var(--cr-background-content));
+  color: var(--cr-text);
   box-shadow: 0 2px 8px rgba(95, 92, 246, 0.2);
 }
 
