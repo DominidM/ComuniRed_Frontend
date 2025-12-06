@@ -438,8 +438,8 @@ small {
 }
 
 .btn-cancelar {
-  background: #fff;
-  color: #374151;
+  background: var(--cr-background-content);
+  color: var(--cr-text);
   border: 1px solid #d1d5db;
 }
 

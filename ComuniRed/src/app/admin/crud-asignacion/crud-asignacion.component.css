@@ -1,24 +1,14 @@
 :root {
+  /* Solo las variables específicas del CRUD que NO están en styles.css global */
   --primary-color: #2563eb;
   --primary-hover: #1d4ed8;
   --success-color: #059669;
   --success-hover: #047857;
   --danger-color: #dc2626;
   --danger-hover: #b91c1c;
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
   --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
   --border-radius: 8px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 * {
@@ -46,6 +36,7 @@
   box-shadow: none;
   border-radius: 0;
 }
+
 .crud-asignacion-header h2 {
   margin: 0;
   font-size: 1.875rem;
@@ -70,8 +61,8 @@
   align-items: center;
   flex: 1 1 0;
   max-width: 400px;
-  background: rgb(255, 255, 255);
-  border: 1px solid var(--gray-200);
+  background: var(--cr-search);
+  border: 1px solid var(--cr-border);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
   padding: 0.3rem 0.7rem;
@@ -83,10 +74,11 @@
   outline: none;
   background: transparent;
   font-size: 1rem;
-  color: var(--gray-900);
+  color: var(--cr-text);
   width: 100%;
   padding: 0.5rem 0.5rem 0.5rem 0;
 }
+
 .crud-asignacion-search-btn {
   background: transparent;
   border: none;
@@ -103,21 +95,20 @@
 }
 
 .crud-asignacion-search-btn svg {
-  stroke: rgb(0, 0, 0);
+  stroke: var(--cr-text);
   width: 20px;
   height: 20px;
 }
 
 .crud-asignacion-search-btn:hover {
-  background: var(--gray-100);
-  box-shadow: 0 1px 4px rgba(255, 255, 255, 0.07);
+  background: var(--cr-search);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
 
 .crud-asignacion-search-btn:hover svg {
   stroke: var(--primary-color);
 }
 
-/* Mostrar por página y total */
 .crud-asignacion-show-select {
   display: flex;
   align-items: center;
@@ -128,20 +119,20 @@
 }
 
 .crud-asignacion-show-select label {
-  color: var(--gray-700);
+  color: var(--cr-text);
 }
 
 .crud-asignacion-show-select select {
   padding: 0.35rem 1.2rem 0.35rem 0.5rem;
   border-radius: var(--border-radius);
-  border: 1px solid var(--gray-300);
-  background: #fff;
+  border: 1px solid var(--cr-border);
+  background: var(--cr-background-content);
+  color: var(--cr-text);
   font-size: 1rem;
-  color: var(--gray-900);
   font-weight: 500;
 }
 
-/* --- Resto de tu CSS original --- */
+/* --- Botón Primario --- */
 .btn-primary {
   background: var(--cr-background);
   border: 1.5px solid var(--cr-border);
@@ -163,15 +154,9 @@
   background: var(--success-color);
   color: rgb(65, 161, 73);
   box-shadow: 0 4px 8px rgba(5, 150, 104, 0.678);
-  transform: translateY(-1px) scale(1.03);
 }
 
-.btn-primary:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 3px rgba(40, 182, 137, 0.705);
-}
-
+/* --- TABLA --- */
 .crud-asignacion-table {
   width: 100%;
   border-collapse: separate;
@@ -188,14 +173,14 @@
 .crud-asignacion-table th {
   padding: 1rem 1.5rem;
   text-align: left;
-  background: var(--gray-50);
-  color: var(--gray-700);
+  background: #000000;
+  color: #ffffff;
   font-weight: 600;
   font-size: 0.875rem;
   text-transform: none;
   letter-spacing: normal;
-  border-bottom: 1px solid var(--gray-200);
-  border-right: 1px solid var(--gray-200);
+  border-bottom: 1px solid #444444;
+  border-right: 1px solid #222222;
 }
 
 .crud-asignacion-table th:last-child {
@@ -204,42 +189,40 @@
 
 .crud-asignacion-table td {
   padding: 1rem 1.5rem;
-  color: var(--gray-900);
+  color: var(--cr-text);
   font-size: 0.875rem;
   font-weight: 400;
-  border-bottom: 1px solid var(--gray-100);
-  border-right: 1px solid var(--gray-100);
-  background: white;
+  border-bottom: 1px solid var(--cr-border);
+  border-right: 1px solid var(--cr-border);
+  background: var(--cr-background-content);
 }
 
 .crud-asignacion-table td:last-child {
   border-right: none;
 }
 
-/* Filas alternadas (zebra striping) */
 .crud-asignacion-table tbody tr:nth-child(even) td {
-  background: var(--gray-50);
+  background: var(--cr-search);
 }
 
 .crud-asignacion-table tbody tr:nth-child(odd) td {
-  background: rgba(235, 234, 234, 0.63);
+  background: var(--cr-background-content);
 }
 
 .crud-asignacion-table tr:hover td {
-  background: #e0f2fe !important;
-  transform: none;
+  background: color-mix(in srgb, var(--primary-color) 10%, var(--cr-background-content)) !important;
 }
 
 .crud-asignacion-table tr:last-child td {
   border-bottom: none;
 }
 
-/* Ocultar columna ID */
 .crud-asignacion-table th:first-child,
 .crud-asignacion-table td:first-child {
   display: none;
 }
 
+/* --- Botones de Acción --- */
 .action-buttons {
   display: flex;
   gap: 0.5rem;
@@ -267,48 +250,19 @@
 .btn-edit {
   background: var(--success-color);
   color: rgb(76, 85, 218);
-  transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(5, 150, 105, 0.25);
 }
 
-.btn-edit:hover {
-  background: rgb(82, 92, 185);
-  border-color: var(--success-color);
-  color: var(--success-color);
-}
-
-.btn-edit:active {
-  transform: translateY(0);
-  background: var(--success-hover);
-}
-
-.btn-delete {
-  background: var(--danger-color);
-  color: rgb(167, 38, 38);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.25);
-}
-
-.btn-delete:hover {
-  background: rgb(202, 44, 44);
-  border-color: var(--danger-color);
-  color: var(--danger-color);
-}
-
-.btn-delete:active {
-  transform: translateY(0);
-  background: var(--danger-hover);
-}
-
+/* --- Modal y Formularios --- */
 .crud-asignacion-empty {
   padding: 3rem 2rem;
   text-align: center;
-  color: var(--gray-500);
+  color: var(--cr-text);
   font-size: 1rem;
-  background: white;
+  background: var(--cr-background-content);
   border-radius: var(--border-radius);
   margin: 0 2rem;
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--cr-border);
   box-shadow: var(--shadow-sm);
 }
 
@@ -323,44 +277,22 @@
   align-items: center;
   justify-content: center;
   z-index: 999;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 .crud-asignacion-modal-content {
-  background: rgb(248, 248, 248);
-  border: 1px solid var(--gray-200);
+  background: var(--cr-background-content);
+  border: 1px solid var(--cr-border);
   padding: 2rem;
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   width: 550px;
   max-width: 90vw;
-  animation: slideUp 0.2s ease;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(16px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
 
 .crud-asignacion-modal-content h3 {
   margin: 0 0 1.5rem 0;
   font-size: 1.25rem;
-  color: var(--gray-900);
+  color: var(--cr-titulo);
   font-weight: 600;
   text-align: left;
   display: flex;
@@ -376,7 +308,7 @@
   display: block;
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: var(--gray-700);
+  color: var(--cr-text);
   font-size: 0.875rem;
 }
 
@@ -386,29 +318,11 @@
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: var(--border-radius);
-  border: 1px solid var(--gray-300);
+  border: 1px solid var(--cr-border);
   font-size: 0.875rem;
-  background: rgb(224, 224, 224);
-  color: var(--gray-900);
+  background: var(--cr-search);
+  color: var(--cr-text);
   font-weight: 400;
-}
-
-.form-group textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: var(--gray-400);
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .crud-asignacion-modal-actions {
@@ -418,125 +332,11 @@
   gap: 0.75rem;
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--gray-200);
-}
-
-.btn-cancel {
-  background: rgba(226, 9, 9, 0.801);
-  color: var(--gray-700);
-  border: 1px solid var(--gray-300);
-  border-radius: var(--border-radius);
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  font-weight: 500;
-  text-transform: none;
-  letter-spacing: normal;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-cancel:hover {
-  background: var(--gray-50);
-  border-color: var(--gray-400);
-  transform: none;
-}
-
-/* Priority badges */
-.priority-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-align: center;
-  display: inline-block;
-}
-
-.priority-high {
-  background-color: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #ef4444;
-}
-
-.priority-medium {
-  background-color: #fef3c7;
-  color: #92400e;
-  border: 1px solid #f59e0b;
-}
-
-.priority-low {
-  background-color: #d1fae5;
-  color: #065f46;
-  border: 1px solid #10b981;
-}
-
-/* Status badges */
-.status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-align: center;
-  display: inline-block;
-}
-
-.status-pending {
-  background-color: #fef3c7;
-  color: #92400e;
-  border: 1px solid #f59e0b;
-}
-
-.status-processing {
-  background-color: #dbeafe;
-  color: #1e40af;
-  border: 1px solid #3b82f6;
-}
-
-.status-completed {
-  background-color: #d1fae5;
-  color: #065f46;
-  border: 1px solid #10b981;
-}
-
-/* Overdue styling */
-.overdue {
-  color: #dc2626 !important;
-  font-weight: 600;
-}
-
-.overdue-label {
-  font-size: 0.625rem;
-  color: #dc2626;
-  font-weight: 600;
-  margin-top: 0.125rem;
-}
-
-/* PAGINACIÓN CENTRADA */
-.crud-asignacion-pagination-row {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 1.5rem 0 0 0;
-  padding: 0.75rem 2rem 0.5rem 2rem;
-  gap: 1rem;
-}
-
-.crud-asignacion-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  background: transparent;
-  border-radius: 0 0 var(--border-radius) var(--border-radius);
-  font-size: 1rem;
-  box-shadow: none;
+  border-top: 1px solid var(--cr-border);
 }
 
 .crud-asignacion-pagination-info {
-  color: var(--gray-900);
+  color: var(--cr-text);
   font-size: 1rem;
   font-weight: bold;
   text-align: center;
@@ -545,30 +345,21 @@
 .crud-asignacion-pagination-btn {
   background: transparent;
   border: none;
-  color: var(--gray-900);
+  color: var(--cr-text);
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   padding: 0.5rem 1rem;
 }
 
-.crud-asignacion-pagination-btn:disabled {
-  color: var(--gray-400);
-  cursor: not-allowed;
-}
-
-.crud-asignacion-pagination-btn b {
-  font-weight: bold;
-}
-
 .crud-asignacion-pagination-count {
   text-align: center;
-  color: var(--gray-700);
+  color: var(--cr-text);
   font-size: 1rem;
   font-weight: 500;
 }
 
-/* Mejoras responsivas */
+/* --- Responsivo --- */
 @media (max-width: 768px) {
   .crud-asignacion-header {
     flex-direction: column;
@@ -577,59 +368,8 @@
     padding: 1.5rem 1rem 1rem 1rem;
   }
 
-  .crud-asignacion-header h2 {
-    font-size: 1.5rem;
-  }
-
   .crud-asignacion-table {
     margin: 0 1rem;
     max-width: calc(100% - 2rem);
-  }
-
-  .crud-asignacion-table th,
-  .crud-asignacion-table td {
-    padding: 0.75rem;
-    font-size: 0.75rem;
-  }
-
-  .btn-edit,
-  .btn-delete {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.625rem;
-  }
-
-  .crud-asignacion-empty {
-    margin: 0 1rem;
-    padding: 2rem 1rem;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-    gap: 0.25rem;
-    width: 100%;
-  }
-
-  .btn-edit,
-  .btn-delete {
-    width: 100%;
-    justify-content: center;
-  }
-
-  /* Responsivo controles superiores */
-  .crud-asignacion-controls-row {
-    flex-direction: column;
-    gap: 1rem;
-    margin: 0 0.5rem 1rem 0.5rem;
-    align-items: stretch;
-  }
-  .crud-asignacion-search-box {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
-    max-width: 100%;
-  }
-  .crud-asignacion-show-select {
-    margin-left: 0;
-    margin-top: 0.5rem;
-    justify-content: flex-end;
   }
 }

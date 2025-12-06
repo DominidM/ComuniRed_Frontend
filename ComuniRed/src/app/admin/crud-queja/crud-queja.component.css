@@ -336,7 +336,7 @@
 }
 
 .crud-queja-modal-content {
-  background: rgb(248, 248, 248);
+  background: var(--cr-background-content);
   border: 1px solid var(--gray-200);
   padding: 2rem;
   border-radius: var(--border-radius);

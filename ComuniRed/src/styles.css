@@ -10,318 +10,228 @@ html {
   --shadow-strong: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-html.dark {
-  --bg-primary: #18191A;
-  --bg-secondary: #242526;
-  --text-primary: #E4E6EB;
-  --text-secondary: #B0B3B8;
-  --border-color: #5f6061;
-
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.45);
-  --shadow-medium: 0 2px 6px rgba(0, 0, 0, 0.55);
-  --shadow-strong: 0 4px 12px rgba(0, 0, 0, 0.65);
-}
-
-html, body, app-root {
-  background-color: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
-  transition: background 0.25s ease, color 0.25s ease;
-}
-
-.cr-navbar {
-  background: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
-  border-bottom: 1px solid var(--border-color) !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  height: 72px !important;
-  z-index: 10000 !important;
-}
-
-html.dark .cr-navbar {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.55) !important;
-}
-
-.cr-logo__text {
-  color: var(--text-primary) !important;
-}
-
-.cr-search {
-  background: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  box-shadow: inset 0 0 0 1px var(--border-color) !important;
-  border-radius: 6px;
-}
-
-.cr-search input {
-  background: transparent !important;
-  color: var(--text-primary) !important;
-  border: none !important;
-}
-
-.cr-search input::placeholder {
-  color: var(--text-secondary) !important;
-}
-
-input, textarea, select {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  border: 1px solid var(--border-color) !important;
-  box-shadow: var(--shadow-soft) inset !important;
-  border-radius: 6px;
-}
-
-::placeholder {
-  color: var(--text-secondary) !important;
-}
-
-svg, i {
-  stroke: var(--text-primary) !important;
-  color: var(--text-primary) !important;
-}
-
-.card,
-.box,
-.panel,
-.container,
-.section,
-.widget,
-.sidebar,
-.content,
-.feed,
-.report-card,
-.trends-card,
-.suggestions-card,
-.right-panel,
-.left-panel,
-.nav-section,
-.post-box,
-.search-box {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-color) !important;
-  box-shadow: var(--shadow-medium) !important;
-  border-radius: 8px;
-}
-
-
-button,
-.cr-btn,
-.btn,
-.action-btn,
-.icon-btn {
-  transition: box-shadow 0.25s ease;
-  box-shadow: var(--shadow-soft) !important;
-}
-
-button:hover,
-.cr-btn:hover,
-.btn:hover,
-.action-btn:hover,
-.icon-btn:hover {
-  box-shadow: var(--shadow-strong) !important;
-}
-
-.cr-badge {
-  border: 2px solid var(--bg-primary) !important;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-primary) !important;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #505577 !important;
-  border-radius: 4px;
-}
-
-/* Fuerza que TODOS los elementos hereden correctamente */
-html.dark * {
-  background-color: transparent !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-color) !important;
-}
-
-html.dark div[class*="container"],
-html.dark div[class*="content"],
-html.dark div[class*="wrapper"],
-html.dark div[class*="panel"],
-html.dark div[class*="box"],
-html.dark div[class*="card"] {
-  background-color: var(--bg-secondary) !important;
-}
-
-html.dark input,
-html.dark textarea,
-html.dark select {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-}
-
-html.dark ::placeholder {
-  color: var(--text-secondary) !important;
-}
-
-html.dark svg,
-html.dark i {
-  stroke: var(--text-primary) !important;
-  fill: var(--text-primary) !important;
-  color: var(--text-primary) !important;
-}
-
-html.dark .mat-card,
-html.dark .mat-menu-panel,
-html.dark .mat-dialog-container,
-html.dark .dropdown-menu,
-html.dark .modal-content,
-html.dark .tooltip,
-html.dark .popover,
-html.dark .p-card,
-html.dark .p-panel,
-html.dark .p-dialog,
-html.dark .offcanvas,
-html.dark .accordion,
-html.dark .list-group {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-}
-
-/* ==================== LAYOUT FIX ==================== */
-
+/* ===== VARIABLES GLOBALES ===== */
 :root {
+  --cr-primary: #5f5cf6;
+  --cr-background: #ffffff;
+  --cr-text: #1f2937;
+  --cr-surface: #f8fafc;
+  --cr-background-content: #ffffff;
+  --cr-border: #e5e7eb;
+  --cr-search: #f9fafb;
+  --cr-titulo: #0f1724;
   --cr-navbar-height: 72px;
   --cr-sidebar-width: 240px;
 }
 
-@media (max-width: 780px) {
+/* Tema oscuro */
+.dark-theme {
+  --cr-primary: #5f5cf6;
+  --cr-background: #161717;
+  --cr-text: #e6eef8;
+  --cr-surface: #0b1220;
+  --cr-background-content: #272829;
+  --cr-border: #3a3a3a;
+  --cr-search: #333334;
+  --cr-titulo: #e4e6eb;
+}
+
+/* ===== ESTILOS GLOBALES BASE ===== */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--cr-background);
+  color: var(--cr-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 250ms ease, color 250ms ease;
+}
+
+app-root {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== NAVBAR (GLOBAL) ===== */
+.cr-navbar {
+  background: var(--cr-background);
+  color: var(--cr-text);
+  border-bottom: 1px solid var(--cr-border);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--cr-navbar-height);
+  z-index: 10000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.dark-theme .cr-navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cr-logo__text {
+  color: var(--cr-text);
+}
+
+/* ===== SEARCH / INPUT ===== */
+.cr-search {
+  background: var(--cr-search);
+  color: var(--cr-text);
+  border-radius: 6px;
+  border: 1px solid var(--cr-border);
+}
+
+.cr-search input {
+  background: transparent;
+  color: var(--cr-text);
+  border: none;
+}
+
+.cr-search input::placeholder {
+  color: color-mix(in srgb, var(--cr-text) 50%, transparent 50%);
+}
+
+input, textarea, select {
+  background-color: var(--cr-search);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
+  border-radius: 6px;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--cr-primary);
+  box-shadow: 0 0 0 3px rgba(95, 92, 246, 0.1);
+}
+
+::placeholder {
+  color: color-mix(in srgb, var(--cr-text) 50%, transparent 50%);
+}
+
+/* ===== ICONOS / SVG ===== */
+svg, i {
+  color: var(--cr-text);
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+/* ===== CARDS / CONTENEDORES ===== */
+.card, .box, .panel, .container, .section, .widget,
+.sidebar, .content, .feed, .report-card, .trends-card,
+.suggestions-card, .right-panel, .left-panel, .nav-section,
+.post-box, .search-box {
+  background-color: var(--cr-background);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== BOTONES ===== */
+button, .btn, .action-btn, .icon-btn, [role="button"] {
+  background: var(--cr-surface);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+button:hover, .btn:hover, .action-btn:hover, .icon-btn:hover {
+  background: color-mix(in srgb, var(--cr-primary), var(--cr-background) 85%);
+  border-color: var(--cr-primary);
+  color: var(--cr-primary);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cr-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cr-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--cr-border), var(--cr-text) 30%);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cr-border) transparent;
+}
+
+/* ===== LAYOUT (NAVBAR + SIDEBAR) ===== */
+app-feed, app-home, app-tendencias, app-reels, app-perfil,
+app-sugerencias, app-mensajes, app-configuracion, app-ayuda,
+.main-content, .feed-container, .content-wrapper,
+.page-content, .app-content, .layout-content {
+  margin-left: var(--cr-sidebar-width);
+  margin-top: var(--cr-navbar-height);
+  width: calc(100% - var(--cr-sidebar-width));
+  min-height: calc(100vh - var(--cr-navbar-height));
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+/* Páginas fullscreen (login, register, etc) */
+app-login, app-register, app-landing, .fullscreen-page, .auth-page {
+  margin-left: 0;
+  margin-top: 0;
+  width: 100%;
+  padding: 0;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
   :root {
     --cr-navbar-height: 56px;
     --cr-sidebar-width: 60px;
   }
-}
-
-/* ✅ CONTENIDO PRINCIPAL: margin-left para sidebar, margin-top para navbar */
-app-feed,
-app-home,
-app-tendencias,
-app-reels,
-app-perfil,
-app-sugerencias,
-app-mensajes,
-app-configuracion,
-app-ayuda,
-.main-content,
-.feed-container,
-.content-wrapper,
-.page-content,
-.app-content,
-.layout-content {
-  margin-left: var(--cr-sidebar-width) !important;
-  margin-top: var(--cr-navbar-height) !important;
-  width: calc(100% - var(--cr-sidebar-width)) !important;
-  min-height: calc(100vh - var(--cr-navbar-height)) !important;
-  padding: 30px !important;
-  box-sizing: border-box !important;
-}
-
-/* Mobile: menos padding */
-@media (max-width: 768px) {
-  app-feed,
-  app-home,
-  app-tendencias,
-  app-reels,
-  app-perfil,
-  app-sugerencias,
-  app-mensajes,
-  app-configuracion,
-  app-ayuda {
-    padding: 16px !important;
+  
+  app-feed, app-home, .main-content, .app-content {
+    padding: 16px;
   }
 }
 
-/* Compatibilidad con safe-area (notch en móviles) */
+/* Safe Area (notch) */
 @supports(padding: env(safe-area-inset-top)) {
-  app-feed,
-  app-home,
-  .main-content,
-  .app-content,
-  .page-content {
-    margin-top: calc(var(--cr-navbar-height) + env(safe-area-inset-top)) !important;
+  app-feed, app-home, .main-content {
+    margin-top: calc(var(--cr-navbar-height) + env(safe-area-inset-top));
   }
 }
 
-/* Páginas sin layout (login, register, etc) */
-app-login,
-app-register,
-app-landing,
-.fullscreen-page,
-.auth-page {
-  margin-left: 0 !important;
-  margin-top: 0 !important;
-  width: 100% !important;
-  padding: 0 !important;
-}
-
-/* ==================== END ==================== */
-
-/* src/app/public/public.component.css
-   Versión actualizada: feed con scroll independiente + eliminación de rail/linea azul visible
-   Mantengo la mayoría de tus reglas originales y solo ajusté lo necesario.
-*/
-
-/* ==================== CONTENEDOR PRINCIPAL ==================== */
+/* ===== FEED / CONTENIDO PRINCIPAL ===== */
 .feed-container {
-  box-sizing: border-box; /* seguro para padding/borders */
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem 1rem;
-  background: #fff;
-  min-height: calc(100vh - var(--cr-navbar-height, 72px)); /* evita scroll global si tienes navbar */
-  border: 1px solid #e2e8f0;
+  background: var(--cr-background);
   border-radius: 8px;
-}
-
-/* ==================== FEED AREA (CON SCROLL INDEPENDIENTE) ==================== */
-/* Mantener scroll funcional pero evitar pista/rail visible */
-.feed-area {
-  flex: 1;
-  height: 100%;
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  padding: 25px 24px ; /* Evita el gran espacio a la derecha (antes 233px) */
-  background-color: #eae9eef5;
   box-sizing: border-box;
 }
 
-/* WebKit (Chrome, Edge, Safari) - ocultar track visual y estilizar thumb fino */
-.feed-area::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-.feed-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-.feed-area::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.12);
-  border-radius: 10px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-
-/* Firefox */
 .feed-area {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(15,23,42,0.12) transparent;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--cr-background-content);
 }
 
-/* ==================== TOAST / LOADER / COMPONENTES (sin cambios funcionales) ==================== */
+/* ===== TOASTS / MODALES / LOADER (SIN CAMBIOS) ===== */
 .toast-notification {
   position: fixed;
   top: 20px;
@@ -333,117 +243,120 @@ app-landing,
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 10000;
   animation: slideIn 0.3s ease;
-  font-weight: 500;
 }
-@keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
 
 .loading-overlay {
   position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
-  display:flex; align-items:center; justify-content:center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 9999;
 }
-.spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; width:50px; height:50px; animation: spin 1s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
 
-.card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 1.5rem; }
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
 
-/* ==================== CREAR REPORTE / MODALES / POSTS / ETC ==================== */
-/* Conservo todas tus reglas originales para estas secciones sin cambios (mantuve el orden) */
-.create-card { padding: 1.5rem; }
-.create-top { display:flex; gap:1rem; align-items:center; }
-.create-avatar { flex-shrink:0; }
-.user-avatar { width: 48px; height:48px; border-radius:50%; object-fit:cover; }
-.create-input { flex:1; padding:1rem 1.5rem; background:#f7fafc; border:2px solid #e2e8f0; border-radius:24px; text-align:left; color:#a0aec0; font-size:1rem; cursor:pointer; transition:all .2s ease; }
-.create-input:hover { background:#edf2f7; border-color:#cbd5e0; }
-.create-sep { height:1px; background:#e2e8f0; margin:1rem 0; }
-.create-actions { display:flex; gap:.75rem; }
-.create-action { flex:1; padding:.75rem; background:white; border:2px solid #e2e8f0; border-radius:12px; display:flex; align-items:center; justify-content:center; gap:.5rem; cursor:pointer; font-weight:600; color:#4a5568; transition:all .2s ease; }
-.create-action:hover { background:#f7fafc; border-color:#667eea; color:#667eea; }
-.create-icon { font-size:1.25rem; }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
 /* Modal */
-.modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:9999; animation:fadeInOverlay .3s ease; }
-@keyframes fadeInOverlay { from { opacity:0 } to { opacity:1 } }
-.modal-container { background:white; width:90%; max-width:600px; max-height:90vh; border-radius:16px; display:flex; flex-direction:column; animation:slideUp .3s ease; }
-@keyframes slideUp { from { transform: translateY(50px); opacity:0 } to { transform: translateY(0); opacity:1 } }
-.modal-header { display:flex; justify-content:space-between; align-items:center; padding:1.5rem; border-bottom:1px solid #e2e8f0; }
-.modal-title { margin:0; font-size:1.25rem; font-weight:700; color:#1a202c; }
-.modal-close { background:transparent; border:none; font-size:1.5rem; color:#718096; cursor:pointer; padding:.5rem; border-radius:50%; transition:background .2s ease; }
-.modal-close:hover { background:#f7fafc; }
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
 
-/* Mantengo modal-body, forms, posts, comments y demás tal como los tenías - copia directa */
-.modal-body { flex:1; overflow-y:auto; padding:1.5rem; }
-.modal-user { display:flex; align-items:center; gap:.75rem; margin-bottom:1.5rem; }
-.modal-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; }
-.modal-username { font-weight:700; color:#1a202c; }
-.create-form { display:flex; flex-direction:column; gap:1.25rem; }
-.form-group { display:flex; flex-direction:column; gap:.5rem; }
-.form-label { font-weight:600; color:#1a202c; font-size:.875rem; }
-.form-input, .form-textarea, .form-select { width:100%; padding:.75rem 1rem; border:2px solid #e2e8f0; border-radius:12px; font-size:1rem; outline:none; transition:border-color .2s ease; }
-.form-input:focus, .form-textarea:focus, .form-select:focus { border-color:#667eea; }
-.form-textarea { resize: vertical; min-height:100px; }
-.upload-area { border:2px dashed #cbd5e0; border-radius:12px; padding:2rem; text-align:center; cursor:pointer; transition:all .2s ease; }
-.upload-area:hover { border-color:#667eea; background:#f7fafc; }
-.upload-placeholder { display:flex; flex-direction:column; align-items:center; gap:.5rem; }
-.upload-icon { font-size:3rem; }
-.upload-text { color:#718096; font-weight:600; }
-.image-preview { position:relative; display:inline-block; }
-.image-preview img { max-width:100%; max-height:300px; border-radius:12px; object-fit:contain; }
-.remove-image { position:absolute; top:.5rem; right:.5rem; width:32px; height:32px; background:rgba(0,0,0,0.7); color:white; border:none; border-radius:50%; cursor:pointer; font-size:1.25rem; display:flex; align-items:center; justify-content:center; transition:all .2s ease; }
-.remove-image:hover { background:rgba(0,0,0,0.9); transform:scale(1.1); }
-.modal-footer { display:flex; justify-content:flex-end; gap:1rem; padding:1.5rem; border-top:1px solid #e2e8f0; }
+.modal-container {
+  background: var(--cr-background);
+  color: var(--cr-text);
+  border-radius: 16px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
 
-/* Post card / votes / reactions / comments / pagination ... kept same structure */
-/* (I left all original selectors and rules intact to avoid regressions) */
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--cr-border);
+}
 
-/* ==================== Defensive: remove stray divider/gutter that drew the blue line ====== */
-/* These selectors cover common splitter/gutter/divider names used by layouts.
-   They only hide presentation elements — if your app intentionally uses a resizer,
-   remove the selector(s) you need instead of this block. */
-.splitter,
-.gutter,
-.col-divider,
-.panel-divider,
-.resize-handle,
-.resizer,
-.divider,
-.left-gutter,
-.right-gutter {
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--cr-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+/* ===== POSTS / COMMENTS / CREAR REPORTE ===== */
+.create-card {
+  background: var(--cr-background);
+  border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.create-input {
+  background: var(--cr-search);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
+  border-radius: 24px;
+  padding: 1rem 1.5rem;
+}
+
+.create-input:focus {
+  border-color: var(--cr-primary);
+}
+
+.create-action {
+  background: var(--cr-surface);
+  border: 1px solid var(--cr-border);
+  color: var(--cr-text);
+  border-radius: 12px;
+  padding: 0.75rem;
+  transition: all 200ms ease;
+}
+
+.create-action:hover {
+  background: color-mix(in srgb, var(--cr-primary), var(--cr-background) 85%);
+  border-color: var(--cr-primary);
+  color: var(--cr-primary);
+}
+
+/* ===== DEFENSIVA: OCULTAR DIVIDERS/GUTTERS ===== */
+.splitter, .gutter, .col-divider, .panel-divider,
+.resize-handle, .resizer, .divider, .left-gutter, .right-gutter {
   display: none !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* also hide pseudo-elements that might render a vertical rule */
-.feed-area::before,
-.feed-area::after,
-.left-column::before,
-.left-column::after,
-.right-column::before,
-.right-column::after {
-  display: none !important;
-  content: none !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* ==================== Optional: completely hide visual scrollbar (still scrollable) === */
-/* Uncomment if you want no visible scrollbar at all for feed-area */
-/*
-.feed-area {
-  scrollbar-width: none;         /! Firefox !/
-  -ms-overflow-style: none;      /! IE/Edge legacy !/
-}
-.feed-area::-webkit-scrollbar { width: 0; height: 0; display: none; }
-*/
-
-/* ==================== Responsive tweaks (as in original) ==================== */
-@media (max-width: 768px) {
-  .feed-container { padding: 1rem 0.5rem; }
-  .modal-container { width: 95%; max-height: 95vh; }
-  .feed-area { padding: 16px; }
 }

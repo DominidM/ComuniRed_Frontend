@@ -33,7 +33,7 @@
 }
 .card{ background: var(--card-bg); border-radius: var(--radius); padding: 12px; border:1px solid var(--border); box-shadow: var(--shadow); }
 .metric-card{ display:flex; align-items:center; gap:12px; position:relative; }
-.metric-icon{ width:36px; height:36px; background:#f8fafc; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; color:#0369a1; }
+.metric-icon{ width:36px; height:36px; background: transparent; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; color:#0369a1; border: 1px solid var(--cr-border)}
 .metric-body{ flex:1; }
 .metric-label{ color:var(--muted); font-size:12px; margin-bottom:4px; }
 .metric-value{ font-size:18px; font-weight:700; color:var(--cr-titulo); }

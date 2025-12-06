@@ -33,8 +33,8 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #5f5cf6 0%, #8b96fa 100%);
-  color: #ffffff;
+  background: linear-gradient(var(--cr-background));
+  color: var(--cr-text);
   border: none;
   border-radius: 10px;
   font-size: 0.95em;
@@ -181,6 +181,8 @@
 
 /* Contenido de la card */
 .evidencia-contenido {
+  background: var(--cr-background);
+  border: var(--cr-border);
   padding: 16px;
   flex: 1;
   display: flex;
@@ -318,7 +320,7 @@
   align-items: center;
   padding: 24px;
   border-bottom: 1px solid var(--cr-border);
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4ff 100%);
+  background: linear-gradient(var(--cr-background));
 }
 
 .modal-header h2 {
@@ -343,6 +345,7 @@
 }
 
 .modal-body {
+  background: var(--cr-background);
   padding: 24px;
 }
 
@@ -410,7 +413,7 @@
   justify-content: flex-end;
   padding: 24px;
   border-top: 1px solid var(--cr-border);
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4ff 100%);
+  background: linear-gradient(var(--cr-background));
 }
 
 .btn-cancelar,
@@ -426,8 +429,8 @@
 }
 
 .btn-cancelar {
-  background: #f0f4f8;
-  color: #6b7280;
+  background: var(--cr-background-content);
+  color: var(--cr-text);
 }
 
 .btn-cancelar:hover {
@@ -435,7 +438,7 @@
 }
 
 .btn-guardar {
-  background: linear-gradient(135deg, #5f5cf6 0%, #8b96fa 100%);
+  background: linear-gradient(var(--cr-background-content));
   color: #ffffff;
   box-shadow: 0 2px 8px rgba(95, 92, 246, 0.2);
 }

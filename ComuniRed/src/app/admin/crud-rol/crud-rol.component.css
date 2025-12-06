@@ -1,3 +1,4 @@
+/* --- Variables globales específicas del CRUD (colocar al inicio del archivo) --- */
 :root {
   --primary-color: #2563eb;
   --primary-hover: #1d4ed8;
@@ -19,11 +20,31 @@
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* 🟢 CRÍTICO: Variables para el MODO OSCURO (Estilo Asignaciones/Reacciones) */
+  --cr-titulo: #ffffff;
+  /* Título y texto principal claro */
+  --cr-text: #cccccc;
+  /* Texto de celdas de tabla */
+  --cr-background: #111827;
+  /* Fondo más oscuro (Root y Filas Pares) */
+  --cr-background-content: #1f2937;
+  /* Fondo intermedio (Filas Impares y Modal/Controles) */
+  --cr-border: #374151;
+  /* Borde general */
+  --cr-search: #1f2937;
+  /* Fondo de la caja de búsqueda */
 }
+
+/* ...existing code... */
 
 * {
   box-sizing: border-box;
 }
+
+/* ==================================================================== */
+/* --- ESTRUCTURA GENERAL Y CONTROLES (Roles) --- */
+/* ==================================================================== */
 
 .crud-rol-root {
   padding: 0;
@@ -32,6 +53,8 @@
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color: var(--cr-titulo);
+  background: var(--cr-background-content);
+  /* Fondo principal oscuro */
 }
 
 .crud-rol-header {
@@ -40,16 +63,19 @@
   justify-content: space-between;
   margin-bottom: 2rem;
   padding: 2rem 2rem 1.5rem 2rem;
-  background: var(--cr-background-content);
+  background: transparent;
+  /* Fondo transparente para dejar ver el root */
   border: none;
   box-shadow: none;
   border-radius: 0;
 }
+
 .crud-rol-header h2 {
   margin: 0;
   font-size: 1.875rem;
   font-weight: 700;
-  color: var(--gray-900);
+  color: var(--cr-titulo);
+  /* Título principal blanco */
   letter-spacing: -0.025em;
   line-height: 1.25;
 }
@@ -82,12 +108,14 @@
   outline: none;
   background: transparent;
   font-size: 1rem;
-  color: var(--gray-900);
+  color: var(--cr-titulo);
+  /* Texto de input claro */
   width: 100%;
   padding: 0.5rem 0.5rem 0.5rem 0;
 }
+
 .crud-rol-search-btn {
-  background: transparent;               
+  background: transparent;
   border: none;
   padding: 0.5rem;
   cursor: pointer;
@@ -102,17 +130,17 @@
 }
 
 .crud-rol-search-btn svg {
-  stroke: var(rgb(0, 0, 0));          /* Azul siempre visible */
+  stroke: var(--cr-text);
   width: 20px;
   height: 20px;
 }
 
 .crud-rol-search-btn:hover {
-  background: var(--gray-100);
-  box-shadow: 0 1px 4px rgba(255, 255, 255, 0.07);
+  background: var(--gray-800);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
 
-.crud-usuario-search-btn:hover svg {
+.crud-rol-search-btn:hover svg {
   stroke: var(--primary-color);
 }
 
@@ -127,20 +155,22 @@
 }
 
 .crud-rol-show-select label {
-  color: var(--gray-700);
+  color: var(--cr-text);
+  /* Texto label claro */
 }
 
 .crud-rol-show-select select {
   padding: 0.35rem 1.2rem 0.35rem 0.5rem;
   border-radius: var(--border-radius);
   border: 1px solid var(--cr-border);
-  background: var(--cr-background);
+  background: var(--cr-search);
   font-size: 1rem;
-  color: var(--gray-900);
+  color: var(--cr-titulo);
+  /* Texto select claro */
   font-weight: 500;
 }
 
-/* --- Resto de tu CSS original --- */
+/* --- Botones principales (Nuevo Rol) --- */
 .btn-primary {
   background: var(--cr-background);
   border: 1.5px solid var(--cr-border);
@@ -160,7 +190,7 @@
 
 .btn-primary:hover {
   background: var(--success-color);
-  color: rgb(65, 161, 73);
+  color: white;
   box-shadow: 0 4px 8px rgba(5, 150, 104, 0.678);
   transform: translateY(-1px) scale(1.03);
 }
@@ -168,15 +198,19 @@
 .btn-primary:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
-  box-shadow: 0 0 0 3px rgba(40, 182, 137, 0.705);
+  box-shadow: 0 0 0 3px rgba(40, 182, 137, 0.3);
 }
+
+/* ==================================================================== */
+/* --- TABLA (Roles) - ESTILO ASIGNACIONES --- */
+/* ==================================================================== */
 
 .crud-rol-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   background: var(--cr-background);
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--cr-border);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
@@ -187,14 +221,16 @@
 .crud-rol-table th {
   padding: 1rem 1.5rem;
   text-align: left;
-  background: var(--gray-50);
-  color: var(--gray-700);
+  /* Encabezado Negro Sólido */
+  background: #000000;
+  color: #ffffff;
   font-weight: 600;
   font-size: 0.875rem;
   text-transform: none;
   letter-spacing: normal;
-  border-bottom: 1px solid var(--gray-200);
-  border-right: 1px solid var(--gray-200);
+  border-bottom: 1px solid #444444;
+  /* Borde oscuro */
+  border-right: 1px solid #222222;
 }
 
 .crud-rol-table th:last-child {
@@ -203,29 +239,34 @@
 
 .crud-rol-table td {
   padding: 1rem 1.5rem;
-  color: var(--gray-900);
+  color: var(--cr-text);
+  /* Texto de celda claro */
   font-size: 0.875rem;
   font-weight: 400;
-  border-bottom: 1px solid var(--gray-100);
-  border-right: 1px solid var(--gray-100);
-  background: white;
+  border-bottom: 1px solid var(--cr-border);
+  border-right: 1px solid var(--cr-border);
+  background: var(--cr-background-content);
+  /* Fondo base de celdas (gris intermedio) */
 }
 
 .crud-rol-table td:last-child {
   border-right: none;
 }
 
-/* Filas alternadas (zebra striping) */
+/* Filas alternadas (zebra striping) - CRÍTICO */
 .crud-rol-table tbody tr:nth-child(even) td {
-  background: var(--gray-50);
+  background: var(--cr-background);
+  /* #111827 (El fondo más oscuro) */
 }
 
 .crud-rol-table tbody tr:nth-child(odd) td {
-  background: rgba(235, 234, 234, 0.63);
+  background: var(--cr-background-content);
+  /* #1f2937 (El gris oscuro intermedio) */
 }
 
 .crud-rol-table tr:hover td {
-  background: #e0f2fe !important;
+  /* Color hover basado en primary-color */
+  background: color-mix(in srgb, var(--primary-color) 15%, var(--cr-background-content)) !important;
   transform: none;
 }
 
@@ -239,6 +280,7 @@
   display: none;
 }
 
+/* --- Botones de Acción (Editar/Eliminar) --- */
 .action-buttons {
   display: flex;
   gap: 0.5rem;
@@ -261,37 +303,39 @@
   box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
+  background: transparent;
+  /* Fondo transparente para botones de acción */
 }
 
 .btn-edit {
-  background: var(--success-color);
-  color: rgb(76, 85, 218);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(5, 150, 105, 0.25);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.25);
 }
 
 .btn-edit:hover {
-  background: rgb(82, 92, 185);
-  border-color: var(--success-color);
-  color: var(--success-color);
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
 }
 
 .btn-edit:active {
   transform: translateY(0);
-  background: var(--success-hover);
+  background: var(--primary-hover);
 }
 
 .btn-delete {
-  background: var(--danger-color);
-  color: rgb(167, 38, 38);
+  color: var(--danger-color);
+  border-color: var(--danger-color);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(220, 38, 38, 0.25);
 }
 
 .btn-delete:hover {
-  background: rgb(202, 44, 44);
+  background: var(--danger-color);
   border-color: var(--danger-color);
-  color: var(--danger-color);
+  color: white;
 }
 
 .btn-delete:active {
@@ -302,14 +346,18 @@
 .crud-rol-empty {
   padding: 3rem 2rem;
   text-align: center;
-  color: var(--gray-500);
+  color: var(--cr-text);
   font-size: 1rem;
-  background: rgb(153, 153, 153);
+  background: var(--cr-background-content);
   border-radius: var(--border-radius);
   margin: 0 2rem;
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--cr-border);
   box-shadow: var(--shadow-sm);
 }
+
+/* ==================================================================== */
+/* --- MODAL (Roles) --- */
+/* ==================================================================== */
 
 .crud-rol-modal {
   position: fixed;
@@ -317,37 +365,53 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  z-index: 999;
-  animation: fadeIn 0.2s ease;
+  z-index: 10050;
+  animation: fadeIn 0.3s ease;
+  padding: 2rem;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
 }
 
 .crud-rol-modal-content {
-  background: rgb(248, 248, 248);
-  border: 1px solid var(--gray-200);
+  background: var(--cr-background-content);
+  border: 1px solid var(--cr-border);
   padding: 2rem;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-lg);
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   width: 400px;
   max-width: 90vw;
-  animation: slideUp 0.2s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUpFloat 0.3s ease;
+  margin-top: 2rem;
+  position: relative;
+  z-index: 10060;
 }
 
-@keyframes slideUp {
+@keyframes slideUpFloat {
   from {
-    transform: translateY(16px);
+    transform: translateY(30px) scale(0.95);
     opacity: 0;
   }
+
   to {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     opacity: 1;
   }
 }
@@ -355,12 +419,15 @@
 .crud-rol-modal-content h3 {
   margin: 0 0 1.5rem 0;
   font-size: 1.25rem;
-  color: var(--gray-900);
+  color: var(--cr-titulo);
+  /* Título del modal claro */
   font-weight: 600;
   text-align: left;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--cr-border);
 }
 
 .form-group {
@@ -369,9 +436,10 @@
 
 .form-group label {
   display: block;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 0.5rem;
-  color: var(--gray-700);
+  color: var(--cr-text);
+  /* Label claro */
   font-size: 0.875rem;
 }
 
@@ -379,21 +447,23 @@
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: var(--border-radius);
-  border: 1px solid var(--gray-300);
+  border: 2px solid var(--cr-border);
   font-size: 0.875rem;
-  background: rgb(224, 224, 224);
-  color: var(--gray-900);
+  background: var(--cr-search);
+  color: var(--cr-titulo);
+  /* Texto del input claro */
   font-weight: 400;
 }
 
 .form-group input::placeholder {
-  color: var(--gray-400);
+  color: var(--gray-500);
 }
 
 .form-group input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  transform: translateY(-1px);
 }
 
 .crud-rol-modal-actions {
@@ -403,18 +473,19 @@
   gap: 0.75rem;
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--gray-200);
+  border-top: 1px solid var(--cr-border);
 }
 
 .btn-cancel {
-  background: rgba(226, 9, 9, 0.801);
-  color: var(--gray-700);
-  border: 1px solid var(--gray-300);
+  /* Botón Cancelar */
+  background: var(--cr-background);
+  color: var(--danger-color);
+  border: 2px solid var(--danger-color);
   border-radius: var(--border-radius);
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: none;
   letter-spacing: normal;
   display: inline-flex;
@@ -423,9 +494,36 @@
 }
 
 .btn-cancel:hover {
-  background: var(--gray-50);
-  border-color: var(--gray-400);
+  background: var(--danger-color);
+  color: white;
+  border-color: var(--danger-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+.btn-primary[type="submit"] {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  /* El botón submit debe ser verde (success) */
+  background: var(--success-color);
+  border-color: var(--success-color);
+  color: white;
+  box-shadow: 0 4px 8px rgba(5, 150, 105, 0.25);
+}
+
+.btn-primary[type="submit"]:hover {
+  background: var(--success-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+}
+
+.btn-primary[type="submit"]:disabled {
+  cursor: not-allowed;
   transform: none;
+  background: var(--gray-700);
+  border-color: var(--gray-700);
+  box-shadow: none;
 }
 
 /* Remover animaciones innecesarias */
@@ -434,7 +532,88 @@
   opacity: 1;
 }
 
-/* Mejoras responsivas */
+/* ==================================================================== */
+/* --- PAGINACIÓN (Roles) --- */
+/* ==================================================================== */
+
+.crud-rol-pagination-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem 0 1rem 0;
+  padding: 1rem 2rem;
+  gap: 1rem;
+  background: var(--cr-background-content);
+  /* Fondo de la paginación oscuro */
+  border-top: 1px solid var(--cr-border);
+}
+
+.crud-rol-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: transparent;
+  font-size: 1rem;
+  box-shadow: none;
+}
+
+.crud-rol-pagination-info {
+  color: var(--cr-titulo);
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background: var(--gray-800);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--cr-border);
+}
+
+.crud-rol-pagination-btn {
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.crud-rol-pagination-btn:hover:not(:disabled) {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.crud-rol-pagination-btn:disabled {
+  color: var(--gray-600);
+  border-color: var(--gray-700);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.crud-rol-pagination-count {
+  text-align: center;
+  color: var(--cr-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--gray-800);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--cr-border);
+}
+
+/* ==================================================================== */
+/* --- RESPONSIVO (Roles) --- */
+/* ==================================================================== */
+
 @media (max-width: 768px) {
   .crud-rol-header {
     flex-direction: column;
@@ -442,39 +621,39 @@
     align-items: flex-start;
     padding: 1.5rem 1rem 1rem 1rem;
   }
-  
+
   .crud-rol-header h2 {
     font-size: 1.5rem;
   }
-  
+
   .crud-rol-table {
     margin: 0 1rem;
     max-width: calc(100% - 2rem);
   }
-  
+
   .crud-rol-table th,
   .crud-rol-table td {
-    padding: 0.75rem;
+    padding: 0.75rem 0.5rem;
     font-size: 0.75rem;
   }
-  
+
   .btn-edit,
   .btn-delete {
     padding: 0.375rem 0.75rem;
     font-size: 0.625rem;
   }
-  
+
   .crud-rol-empty {
     margin: 0 1rem;
     padding: 2rem 1rem;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     gap: 0.25rem;
     width: 100%;
   }
-  
+
   .btn-edit,
   .btn-delete {
     width: 100%;
@@ -488,80 +667,64 @@
     margin: 0 0.5rem 1rem 0.5rem;
     align-items: stretch;
   }
+
   .crud-rol-search-box {
     margin-right: 0;
     margin-bottom: 0.5rem;
     max-width: 100%;
   }
+
   .crud-rol-show-select {
     margin-left: 0;
     margin-top: 0.5rem;
     justify-content: flex-end;
   }
-}
 
-/* PAGINACIÓN CENTRADA */
-.crud-rol-pagination-row {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 1.5rem 0 0 0;
-  padding: 0.75rem 2rem 0.5rem 2rem;
-  gap: 1rem;
-}
-
-.crud-rol-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  background: transparent;
-  border-radius: 0 0 var(--border-radius) var(--border-radius);
-  font-size: 1rem;
-  box-shadow: none;
-}
-
-.crud-rol-pagination-info {
-  color: var(--gray-900);
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-}
-
-.crud-rol-pagination-btn {
-  background: transparent;
-  border: none;
-  color: var(--gray-900);
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-}
-
-.crud-rol-pagination-btn:disabled {
-  color: var(--gray-400);
-  cursor: not-allowed;
-}
-
-.crud-rol-pagination-btn b {
-  font-weight: bold;
-}
-
-.crud-rol-pagination-count {
-  text-align: center;
-  color: var(--gray-700);
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-@media (max-width: 900px) {
+  /* Responsivo Paginación */
   .crud-rol-pagination-row {
-    padding: 0.75rem 0.5rem 0.5rem 0.5rem;
-    gap: 0.5rem;
+    padding: 1rem 0.5rem;
+    gap: 0.75rem;
   }
-  .crud-rol-pagination-count {
-    font-size: 0.95rem;
+
+  .crud-rol-pagination {
+    gap: 1rem;
+  }
+
+  .crud-rol-pagination-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+  }
+
+  .crud-rol-pagination-count,
+  .crud-rol-pagination-info {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+  }
+
+  /* Responsivo Modal */
+  .crud-rol-modal {
+    padding: 1rem;
+  }
+
+  .crud-rol-modal-content {
+    width: 100%;
+    padding: 1.5rem;
+    margin-top: 0;
+    border-radius: var(--border-radius);
+  }
+
+  .crud-rol-modal-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .crud-rol-modal-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn-cancel,
+  .btn-primary[type="submit"] {
+    width: 100%;
+    justify-content: center;
   }
 }

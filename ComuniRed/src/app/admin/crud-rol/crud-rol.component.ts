@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RolService, Rol, RolPage } from '../../services/rol.service';
@@ -10,7 +10,8 @@ import { RolService, Rol, RolPage } from '../../services/rol.service';
   templateUrl: './crud-rol.component.html',
   styleUrls: ['./crud-rol.component.css'],
 })
-export class CrudRolComponent {
+export class CrudRolComponent implements AfterViewChecked {
+  @ViewChild('modal') modalRef!: ElementRef;
   roles: Rol[] = [];
   allRoles: Rol[] = []; 
   showModal = false;
@@ -23,7 +24,7 @@ export class CrudRolComponent {
   pageSizes = [5, 10, 20, 50];
   searchText: string = '';
 
-  constructor(private rolService: RolService) {}
+  constructor(private renderer: Renderer2, private rolService: RolService) {}
 
   ngOnInit() {
     this.loadRoles();
@@ -33,7 +34,6 @@ export class CrudRolComponent {
     console.log('trackBy - index:', index, 'rol:', rol, 'rol.id:', rol.id);
     return rol.id || index; // Fallback al index si no hay ID
   }
-
 
   loadRoles() {
     console.log('=== DEBUG LOADROLES ===');
@@ -109,8 +109,6 @@ export class CrudRolComponent {
     }
   }
 
-// En tu crud-rol.component.ts, modifica el método deleteRol:
-
   deleteRol(rol: Rol) {
     console.log('=== DEBUG DELETEROL ===');
     console.log('1. Objeto rol recibido:', rol);
@@ -156,8 +154,6 @@ export class CrudRolComponent {
     }
   }
 
-
-
   closeModal() {
     this.showModal = false;
     this.editingRol = null;
@@ -173,6 +169,12 @@ export class CrudRolComponent {
         r => r.nombre.toLowerCase().includes(lowerSearch) || 
              (r.descripcion?.toLowerCase().includes(lowerSearch))
       );
+    }
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.showModal && this.modalRef && this.modalRef.nativeElement.parentNode !== document.body) {
+      this.renderer.appendChild(document.body, this.modalRef.nativeElement);
     }
   }
 }
