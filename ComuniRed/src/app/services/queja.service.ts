@@ -501,12 +501,14 @@ const CAMBIAR_ESTADO_QUEJA = gql`
       id
       titulo
       estado {
+        id
         clave
         nombre
       }
     }
   }
 `;
+
 
 const VOTAR_QUEJA = gql`
   mutation VotarQueja($quejaId: ID!, $usuarioId: ID!, $voto: String!) {
