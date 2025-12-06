@@ -1,35 +1,36 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, map } from 'rxjs';
 import { Queja, Usuario } from './models';
 
-
+// Unified Asignacion type using string ids (matches GraphQL / backend)
 export interface Asignacion {
-  id: number;
-  queja_id: number;
+  id: string;
+  quejaId?: string;
   queja?: Queja;
-  soporte_id: number;
+  soporteId?: string;
   soporte?: Usuario;
-  fecha_asignacion: string;
-  atendida: boolean;
+  fechaAsignacion?: string;
+  fechaActualizacion?: string;
+  atendida?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AsignacionService {
   constructor(private apollo: Apollo) {}
 
+  // existing methods (kept for compatibility)
   getAll(): Observable<Asignacion[]> {
     return this.apollo.query<{ asignaciones: Asignacion[] }>({
       query: gql`
         query {
           asignaciones {
             id
-            queja_id
+            quejaId
             queja { id descripcion }
-            soporte_id
-            soporte { id nombre }
-            fecha_asignacion
+            soporteId
+            soporte { id nombre apellido }
+            fechaAsignacion
             atendida
           }
         }
@@ -43,11 +44,11 @@ export class AsignacionService {
         mutation($input: AsignacionInput!) {
           createAsignacion(input: $input) {
             id
-            queja_id
+            quejaId
             queja { id descripcion }
-            soporte_id
-            soporte { id nombre }
-            fecha_asignacion
+            soporteId
+            soporte { id nombre apellido }
+            fechaAsignacion
             atendida
           }
         }
@@ -56,17 +57,17 @@ export class AsignacionService {
     }).pipe(map(result => result.data!.createAsignacion));
   }
 
-  update(id: number, asignacion: Partial<Asignacion>): Observable<Asignacion> {
+  update(id: string, asignacion: Partial<Asignacion>): Observable<Asignacion> {
     return this.apollo.mutate<{ updateAsignacion: Asignacion }>({
       mutation: gql`
         mutation($id: ID!, $input: AsignacionInput!) {
           updateAsignacion(id: $id, input: $input) {
             id
-            queja_id
+            quejaId
             queja { id descripcion }
-            soporte_id
-            soporte { id nombre }
-            fecha_asignacion
+            soporteId
+            soporte { id nombre apellido }
+            fechaAsignacion
             atendida
           }
         }
@@ -75,7 +76,7 @@ export class AsignacionService {
     }).pipe(map(result => result.data!.updateAsignacion));
   }
 
-  delete(id: number): Observable<boolean> {
+  delete(id: string): Observable<boolean> {
     return this.apollo.mutate<{ deleteAsignacion: boolean }>({
       mutation: gql`
         mutation($id: ID!) {
@@ -83,6 +84,52 @@ export class AsignacionService {
         }
       `,
       variables: { id }
-    }).pipe(map(result => result.data!.deleteAsignacion));
+    }).pipe(map(result => !!result.data?.deleteAsignacion));
+  }
+
+  // New: mutation that your component calls: asignarQueja(...)
+  asignarQueja(quejaId: string, soporteId: string, asignadoPor: string, comentarios?: string): Observable<Asignacion> {
+    const ASIGNAR_QUEJA = gql`
+      mutation AsignarQueja($quejaId: ID!, $soporteId: ID!, $asignadoPor: ID!, $comentarios: String) {
+        asignarQueja(quejaId: $quejaId, soporteId: $soporteId, asignadoPor: $asignadoPor, comentarios: $comentarios) {
+          id
+          quejaId
+          queja { id descripcion }
+          soporteId
+          soporte { id nombre apellido }
+          fechaAsignacion
+          fechaActualizacion
+          atendida
+        }
+      }
+    `;
+
+    return this.apollo.mutate<{ asignarQueja: Asignacion }>({
+      mutation: ASIGNAR_QUEJA,
+      variables: { quejaId, soporteId, asignadoPor, comentarios }
+    }).pipe(map(r => r.data!.asignarQueja));
+  }
+
+  // New: query to get assignments for a queja
+  obtenerAsignacionesPorQueja(quejaId: string): Observable<Asignacion[]> {
+    const ASIG_POR_QUEJA = gql`
+      query AsignacionesPorQueja($quejaId: ID!) {
+        asignacionesPorQueja(quejaId: $quejaId) {
+          id
+          quejaId
+          queja { id descripcion }
+          soporteId
+          soporte { id nombre apellido }
+          fechaAsignacion
+          fechaActualizacion
+          atendida
+        }
+      }
+    `;
+    return this.apollo.watchQuery<{ asignacionesPorQueja: Asignacion[] }>({
+      query: ASIG_POR_QUEJA,
+      variables: { quejaId },
+      fetchPolicy: 'network-only'
+    }).valueChanges.pipe(map(r => r.data.asignacionesPorQueja));
   }
 }
