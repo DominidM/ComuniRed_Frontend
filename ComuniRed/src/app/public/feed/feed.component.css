@@ -236,7 +236,6 @@
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
-  transition: background 0.2s ease;
 }
 
 .modal-close:hover {
@@ -295,7 +294,6 @@
   border-radius: 12px;
   font-size: 1rem;
   outline: none;
-  transition: border-color 0.2s ease;
 }
 
 .form-input:focus,
@@ -315,7 +313,6 @@
   padding: 2rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .upload-area:hover {
@@ -366,7 +363,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
 }
 
 .remove-image:hover {
@@ -388,7 +384,6 @@
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .btn-cancel {
@@ -422,7 +417,6 @@
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin-bottom: 1.5rem;
-  transition: transform 0.3s ease;
 }
 
 .post-card:hover {
@@ -452,7 +446,6 @@
 
 .avatar.clickable {
   cursor: pointer;
-  transition: transform 0.2s ease;
 }
 
 .avatar.clickable:hover {
@@ -480,7 +473,6 @@
 .post-author.clickable {
   color: var(--cr-text);
   cursor: pointer;
-  transition: color 0.2s ease;
 }
 
 .post-author.clickable:hover {
@@ -511,7 +503,6 @@
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
-  transition: background 0.2s ease;
   color: #718096;
   font-size: 1.5rem;
 }
@@ -539,7 +530,6 @@
   background: white;
   text-align: left;
   cursor: pointer;
-  transition: background 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -659,7 +649,7 @@
   align-items: center;
   margin-bottom: 1rem;
   font-weight: 600;
-  color: #1a202c;
+  color: var(--cr-text);
 }
 
 .vote-count {
@@ -676,12 +666,11 @@
 .vote-btn {
   flex: 1;
   padding: 0.75rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--cr-border);
   border-radius: 12px;
-  background: white;
+  background: var(--cr-background);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .vote-btn.accept {
@@ -689,7 +678,7 @@
 }
 
 .vote-btn.accept:hover:not(:disabled) {
-  background: #f0fff4;
+  background: var(--cr-background);
   border-color: #48bb78;
 }
 
@@ -704,7 +693,7 @@
 }
 
 .vote-btn.reject:hover:not(:disabled) {
-  background: #fff5f5;
+  background: var(--cr-background);
   border-color: #f56565;
 }
 
@@ -737,7 +726,6 @@
   border: 2px solid transparent;
   border-radius: 20px;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-weight: 600;
   color: #4a5568;
 }
@@ -793,11 +781,10 @@
   cursor: pointer;
   font-weight: 600;
   color: #4a5568;
-  transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background: #f7fafc;
+  background: var(--cr-background-content);
   color: #667eea;
 }
 
@@ -857,7 +844,6 @@
 
 .comment-avatar.clickable {
   cursor: pointer;
-  transition: transform 0.2s ease;
 }
 
 .comment-avatar.clickable:hover {
@@ -872,7 +858,6 @@
 
 .comment-author.clickable {
   cursor: pointer;
-  transition: color 0.2s ease;
 }
 
 .comment-author.clickable:hover {
@@ -900,7 +885,6 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.875rem;
-  transition: all 0.2s ease;
 }
 
 .comment-action-btn:hover {
@@ -945,7 +929,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
   font-size: 1rem;
 }
 
@@ -983,7 +966,6 @@
   border-radius: 20px;
   font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.2s ease;
   background: #f7fafc;
 }
 
@@ -1003,7 +985,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
   flex-shrink: 0;
   font-size: 1.25rem;
 }
@@ -1069,7 +1050,6 @@
   cursor: pointer;
   font-weight: 600;
   color: #4a5568;
-  transition: all 0.2s ease;
 }
 
 .pagination-btn:hover:not(:disabled) {
@@ -1098,7 +1078,6 @@
   cursor: pointer;
   font-weight: 600;
   color: #4a5568;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;

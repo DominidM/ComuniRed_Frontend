@@ -2,8 +2,8 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: 2rem 2rem;
-  background: #fff;
-  color: #000;
+  background: var(--cr-background);
+  color: var(--cr-text);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -12,21 +12,20 @@
 .tabs-section {
   display: flex;
   gap: 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--cr-border);
   padding: 0 24px;
   margin-bottom: 24px;
 }
 
 .tab-btn {
   background: transparent;
-  border: none;
+  border: var(--cr-border);
   border-bottom: 3px solid transparent;
   padding: 16px 20px;
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #666;
-  transition: all 0.3s ease;
+  color: var(--cr-text);
   position: relative;
 }
 
@@ -95,7 +94,6 @@
   object-fit: cover;
   border: 3px solid #000;
   background: #f0f0f0;
-  transition: all 0.3s ease;
 }
 
 .avatar-lg:hover {
@@ -233,17 +231,17 @@
 .form-group label {
   font-weight: 600;
   font-size: 0.95rem;
-  color: #000;
+  color: var(--cr-text);
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--cr-border);
   border-radius: 6px;
-  background: #f9f9f9;
-  color: #000;
+  background: var(--cr-search);
+  color: var(--cr-text);
   font-size: 0.95rem;
   font-family: inherit;
   transition: all 0.3s ease;
@@ -258,7 +256,7 @@
 .form-group textarea:focus {
   outline: none;
   border-color: #000;
-  background: #fff;
+  background: var(--cr-search);
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -289,8 +287,8 @@
 }
 
 .btn-cancel {
-  background: transparent;
-  color: #000;
+  background: var(--cr-background);
+  color: var(--cr-text);
   border: 1px solid #000;
   padding: 10px 24px;
   border-radius: 6px;
@@ -301,11 +299,10 @@
 }
 
 .btn-cancel:hover:not(:disabled) {
-  background: #f0f0f0;
+  background: var(--cr-background);
 }
 
 .btn-cancel:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
 }
 

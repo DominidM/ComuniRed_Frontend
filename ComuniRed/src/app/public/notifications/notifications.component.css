@@ -1,5 +1,5 @@
 .notifications-container {
-  background: #fff;
+  background: var(--cr-background);
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   padding: 15px 20px;
@@ -11,8 +11,8 @@
 .notifications-container h2 {
   margin-bottom: 10px;
   font-size: 1.3rem;
-  color: #333;
-  border-bottom: 1px solid #eee;
+  color: var(--cr-text);
+  border-bottom: 1px solid var(--cr-border);
   padding-bottom: 8px;
 }
 
@@ -22,12 +22,11 @@
   gap: 10px;
   padding: 12px;
   border-radius: 8px;
-  transition: background 0.2s ease;
   cursor: pointer;
 }
 
 .notification-card:hover {
-  background: #f3f6f8;
+  background: var(--cr-background-content);
 }
 
 .notification-icon img {
@@ -43,7 +42,7 @@
 
 .notification-text {
   font-size: 0.95rem;
-  color: #333;
+  color: var(--cr-text);
   margin: 0;
 }
 

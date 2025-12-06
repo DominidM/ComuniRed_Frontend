@@ -1,5 +1,5 @@
 .settings-container {
-  max-width: 850px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 10px;
 }
@@ -13,13 +13,13 @@
 .settings-tabs {
   display: flex;
   gap: 15px;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid var(--cr-border);
   margin-bottom: 20px;
 }
 
 .settings-tabs button {
-  background: none;
-  border: none;
+  background: var(--cr-background-content);
+  border: var(--cr-border);
   padding: 10px 15px;
   font-size: 1rem;
   cursor: pointer;
@@ -38,6 +38,6 @@
 
 .settings-content {
   padding: 15px;
-  background: #fafafa;
+  background: var(--cr-background-content);
   border-radius: 8px;
 }
