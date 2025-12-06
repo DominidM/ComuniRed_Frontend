@@ -47,17 +47,7 @@
     <div class="video-frame-shadow" aria-hidden="true"></div>
   </div>
 
-  <!-- Progress Indicator (sobre el video, estilo dots tipo TikTok) -->
-  <div class="progress-dots" role="tablist" aria-hidden="false">
-    <span
-      class="dot"
-      *ngFor="let reel of reels; let i = index"
-      [class.active]="i === currentIndex"
-      (click)="currentIndex = i; resetVideo(); $event.stopPropagation()"
-      role="button"
-      [attr.aria-label]="'Ir al reel ' + (i + 1)"
-    ></span>
-  </div>
+
 
   <!-- Info overlay abajo (autor / título) -->
   <div class="info-overlay" aria-hidden="true">
