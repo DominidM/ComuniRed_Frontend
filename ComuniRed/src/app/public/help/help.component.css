@@ -11,7 +11,7 @@
 
 .help-container {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--cr-background-content);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -71,7 +71,7 @@
   gap: 10px;
   max-width: 500px;
   margin: 0 auto;
-  background: white;
+  background: var(--cr-search);
   border-radius: 25px;
   padding: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -79,13 +79,12 @@
 
 .search-input {
   flex: 1;
-  border: none;
-  background: transparent;
+  border: var(--cr-border);
+  background: var(--cr-search);
   padding: 12px 20px;
   font-size: 1rem;
   outline: none;
   color: var(--text-primary);
-  transition: all 0.3s ease;
 }
 
 .search-input::placeholder {
@@ -93,7 +92,7 @@
 }
 
 .search-input:focus {
-  color: var(--text-primary);
+  color: var(--cr-text);
 }
 
 .search-button {
@@ -115,6 +114,7 @@
 
 /* Categories Section */
 .categories-section {
+  background: var(--cr-background-content);
   padding: 60px 20px;
   max-width: 1200px;
   margin: 0 auto;
@@ -135,18 +135,17 @@
 }
 
 .category-card {
-  background: white;
-  border: 2px solid var(--border-color);
+  background: var(--cr-background);
+  border: 2px solid var(--cr-border);
   border-radius: 12px;
   padding: 30px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  animation: fadeIn 0.5s ease-out;
 }
 
 .category-card:hover {
-  border-color: var(--primary-color);
+  border-color: var(--cr-background-content);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   transform: translateY(-8px);
 }
@@ -163,6 +162,7 @@
 }
 
 .category-card h3 {
+  color: var(--cr-text);
   font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 10px;
@@ -180,9 +180,9 @@
 }
 
 .view-more-btn {
-  background: transparent;
+  background: var(--cr-background-content);
   border: 2px solid var(--primary-color);
-  color: var(--primary-color);
+  color: var(--cr-text);
   padding: 10px 20px;
   border-radius: 20px;
   cursor: pointer;
@@ -208,7 +208,7 @@
 
 /* FAQ Section */
 .faq-section {
-  background: var(--secondary-color);
+  background: var(--cr-background-content);
   padding: 60px 20px;
 }
 
@@ -222,7 +222,7 @@
   font-weight: 700;
   margin-bottom: 40px;
   text-align: center;
-  color: var(--text-primary);
+  color: var(--cr-text);
 }
 
 .faq-list {
@@ -241,22 +241,21 @@
 
 .faq-question {
   width: 100%;
-  background: white;
-  border: none;
+  background: var(--cr-background);
+  border: var(--cr-border);
   padding: 20px;
   text-align: left;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--cr-text);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.3s ease;
 }
 
 .faq-question:hover {
-  background: #fafafa;
+  background: var(--cr-background-content);
 }
 
 .faq-question.expanded {
@@ -272,10 +271,10 @@
 
 .faq-answer {
   padding: 20px;
-  background: white;
-  color: var(--text-secondary);
+  background: var(--cr-background);
+  color: var(--cr-text);
   line-height: 1.6;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--cr-border);
   animation: slideDown 0.3s ease;
 }
 
@@ -319,10 +318,11 @@
 /* Contact Section */
 .contact-section {
   padding: 60px 20px;
-  background: white;
+  background: var(--cr-background-content);
 }
 
 .contact-container {
+  color: var(--cr-text);
   max-width: 600px;
   margin: 0 auto;
 }
@@ -332,7 +332,7 @@
   font-weight: 700;
   margin-bottom: 10px;
   text-align: center;
-  color: var(--text-primary);
+  color: var(--cr-text);
 }
 
 .contact-section > p {
@@ -356,18 +356,17 @@
 .form-group label {
   font-weight: 600;
   margin-bottom: 8px;
-  color: var(--text-primary);
+  color: var(--cr-text);
   font-size: 0.95rem;
 }
 
 .form-group input,
 .form-group textarea {
   padding: 12px 15px;
-  border: 2px solid var(--border-color);
+  border: 2px solid var(--cr-border);
   border-radius: 8px;
   font-size: 1rem;
   font-family: inherit;
-  transition: all 0.3s ease;
 }
 
 .form-group input:focus,
@@ -397,7 +396,7 @@
 
 /* Support Info Section */
 .support-info-section {
-  background: var(--secondary-color);
+  background: var(--cr-background-content);
   padding: 60px 20px;
 }
 
@@ -411,7 +410,7 @@
   font-weight: 700;
   margin-bottom: 40px;
   text-align: center;
-  color: var(--text-primary);
+  color: var(--cr-text);
 }
 
 .support-info-grid {
@@ -421,7 +420,7 @@
 }
 
 .support-info-card {
-  background: white;
+  background: var(--cr-background);
   padding: 30px;
   border-radius: 12px;
   text-align: center;
@@ -436,6 +435,7 @@
 }
 
 .info-icon {
+  color: var(--cr-text);
   font-size: 2.5rem;
   margin-bottom: 15px;
 }
@@ -444,11 +444,11 @@
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 10px;
-  color: var(--text-primary);
+  color: var(--cr-text);
 }
 
 .support-info-card p {
-  color: var(--text-secondary);
+  color: var(--cr-text);
   margin: 5px 0;
   font-size: 0.95rem;
 }

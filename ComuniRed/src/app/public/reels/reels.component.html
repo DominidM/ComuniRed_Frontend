@@ -1,5 +1,4 @@
 <div class="reels-container">
-  <!-- Video Container (columna centrada tipo TikTok) -->
   <div class="video-wrapper" (click)="togglePlayPause()">
 
     <video
@@ -13,59 +12,75 @@
       (error)="onVideoError($event)"
       [muted]="isMuted"
     >
-      <source src="" type="video/mp4" />
+      <source [src]="currentReel?.videoUrl || ''" type="video/mp4" />
       Tu navegador no soporta el elemento <code>video</code>.
     </video>
 
-    <!-- Play/Pause Overlay -->
     <div class="play-pause-overlay" *ngIf="!isPlaying">
-      <div class="play-icon">
-        <svg width="80" height="80" viewBox="0 0 24 24" fill="white">
+      <div class="play-icon" aria-hidden="true">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="white" aria-hidden="true">
           <path d="M8 5v14l11-7z"/>
         </svg>
       </div>
     </div>
 
-    <!-- Actions (estilo TikTok): dentro del área del vídeo, columna a la derecha -->
-    <div class="actions-overlay">
-      <button class="action-circle" (click)="toggleMute(); $event.stopPropagation()" aria-label="Silenciar/activar sonido">
-        <svg *ngIf="!isMuted" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg>
-        <svg *ngIf="isMuted" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M16 7l-1.41 1.41L18.17 12l-3.58 3.59L16 17l4-4-4-4z"/></svg>
+    <div class="actions-overlay" aria-hidden="true">
+      <button class="action-circle" (click)="toggleMute(); $event.stopPropagation()" aria-label="Silenciar/activar sonido" type="button">
+        <svg *ngIf="!isMuted" width="20" height="20" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg>
+        <svg *ngIf="isMuted" width="20" height="20" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M16 7l-1.41 1.41L18.17 12l-3.58 3.59L16 17l4-4-4-4z"/></svg>
       </button>
 
-      <button class="action-circle" (click)="likeReel(); $event.stopPropagation()" aria-label="Me gusta">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        <span class="action-badge">{{ formatNumber(currentReel.likes) }}</span>
+      <button class="action-circle" (click)="likeReel(); $event.stopPropagation()" aria-label="Me gusta" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span class="action-badge">{{ formatNumber(currentReel?.likes || 0) }}</span>
       </button>
-
-      <!-- placeholder para otras acciones si deseas -->
-      <!-- example: share -->
-      <!-- <button class="action-circle" aria-label="Compartir"><svg>...</svg></button> -->
     </div>
 
-    <!-- small subtle frame shadow -->
+    <div class="navigation-overlay" aria-hidden="true">
+      <button
+        class="nav-button nav-button--up"
+        (click)="previousReel(); $event.stopPropagation()"
+        [disabled]="isFirstReel"
+        aria-label="Video anterior"
+        type="button"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+          <path d="M7 14l5-5 5 5z"/>
+        </svg>
+      </button>
+
+      <button
+        class="nav-button nav-button--down"
+        (click)="nextReel(); $event.stopPropagation()"
+        [disabled]="isLastReel"
+        aria-label="Video siguiente"
+        type="button"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+          <path d="M7 10l5 5 5-5z"/>
+        </svg>
+      </button>
+    </div>
+
     <div class="video-frame-shadow" aria-hidden="true"></div>
   </div>
 
-
-
-  <!-- Info overlay abajo (autor / título) -->
   <div class="info-overlay" aria-hidden="true">
     <div class="author-info">
       <div class="author-avatar">
         <img
-          [src]="currentReel.avatarUrl || 'assets/images/default-avatar.png'"
-          alt="{{ currentReel.author }} avatar"
+          [src]="currentReel?.avatarUrl || 'assets/images/default-avatar.png'"
+          [alt]="(currentReel?.author || 'Autor') + ' avatar'"
           (error)="onAvatarError($event)"
           loading="lazy"
           decoding="async"
         />
       </div>
       <div class="author-details">
-        <h3 class="author-name">{{ currentReel.author }}</h3>
-        <p class="video-title">{{ currentReel.title }}</p>
+        <h3 class="author-name">{{ currentReel?.author }}</h3>
+        <p class="video-title">{{ currentReel?.title }}</p>
       </div>
     </div>
-    <p class="video-description">{{ currentReel.description }}</p>
+    <p class="video-description">{{ currentReel?.description }}</p>
   </div>
 </div>

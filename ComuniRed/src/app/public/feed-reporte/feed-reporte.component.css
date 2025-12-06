@@ -3,7 +3,7 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  background: #fff;
+  background: var(--cr-background-content);
   min-height: 100vh;
 }
 
@@ -78,13 +78,12 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: white;
-  border: 2px solid #e2e8f0;
+  background: var(--cr-background);
+  border: 2px solid var(--cr-border);
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--cr-text);
 }
 
 .filter-button:hover {
@@ -135,6 +134,7 @@
 }
 
 .post-header {
+  background: var(--cr-background);
   display: flex;
   gap: 1rem;
   padding: 1.5rem;
@@ -174,13 +174,12 @@
 
 .post-author {
   font-weight: 700;
-  color: #1a202c;
+  color: var(--cr-text);
   font-size: 1rem;
 }
 
 .post-author.clickable {
   cursor: pointer;
-  transition: color 0.2s ease;
 }
 
 .post-author.clickable:hover {
@@ -292,13 +291,13 @@
 .post-heading {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--cr-text);
   margin: 0.5rem 0;
   line-height: 1.4;
 }
 
 .post-text {
-  color: #4a5568;
+  color: var(--cr-text);
   line-height: 1.6;
   margin: 0.5rem 0 1rem;
 }
@@ -351,7 +350,7 @@
   max-height: 500px;
   text-align: center;
   padding: 1rem 0;
-  background: #f7fafc;
+  background: var(--cr-background);
 }
 
 .post-image {
@@ -369,8 +368,8 @@
   display: flex;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: white;
+  border-bottom: 1px solid var(--cr-border);
+  background: var(--cr-background);
 }
 
 .reaction-picker-container {
@@ -382,18 +381,17 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: transparent;
+  background: var(--cr-background-content);
   border: 2px solid transparent;
   border-radius: 20px;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--cr-text);
 }
 
 .reaction-btn:hover {
-  background: #f7fafc;
-  border-color: #e2e8f0;
+  background: var(--cr-background-content);
+  border-color: var(--cr-text);
 }
 
 .reaction-btn.active {
@@ -415,7 +413,7 @@
   position: absolute;
   bottom: 100%;
   left: 0;
-  background: white;
+  background: var(--cr-background-content);
   border-radius: 50px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   padding: 0.5rem;
@@ -452,7 +450,7 @@
 }
 
 .reaction-option:hover {
-  background: #f7fafc;
+  background: var(--cr-background-content);
   transform: scale(1.1);
 }
 
@@ -481,8 +479,8 @@
   display: flex;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: white;
+  border-bottom: 1px solid var(--cr-border);
+  background: var(--cr-background);
 }
 
 .left-actions,
@@ -501,12 +499,12 @@
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--cr-text);
   transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background: #f7fafc;
+  background: var(--cr-background-content);
   color: #667eea;
 }
 
@@ -521,8 +519,8 @@
 /* ==================== COMENTARIOS INLINE (Preview 3) ==================== */
 .comments-section {
   padding: 1rem 1.5rem;
-  background: white;
-  border-top: 1px solid #e2e8f0;
+  background: var(--cr-background);
+  border-top: 1px solid var(--cr-border);
 }
 
 .comments-list-preview {
@@ -560,6 +558,7 @@
 }
 
 .comment-avatar-preview.clickable {
+  color: var(--cr-text);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -584,7 +583,7 @@
 .comment-author-preview {
   font-weight: 700;
   font-size: 0.875rem;
-  color: #1a202c;
+  color: var(--cr-text);
 }
 
 .comment-author-preview.clickable {
@@ -603,7 +602,7 @@
 
 .comment-text-preview {
   margin: 0.25rem 0 0;
-  color: #4a5568;
+  color: var(--cr-text);
   font-size: 0.875rem;
   line-height: 1.5;
   word-wrap: break-word;
@@ -748,8 +747,8 @@
 /* ==================== COMENTARIOS COLAPSADOS (Primeros 2) ==================== */
 .comments-collapsed-preview {
   padding: 1rem 1.5rem;
-  background: white;
-  border-top: 1px solid #e2e8f0;
+  background: var(--cr-background);
+  border-top: 1px solid var(--cr-border);
 }
 
 .comment-mini-preview {
@@ -769,12 +768,12 @@
 .comment-mini-content {
   flex: 1;
   font-size: 0.875rem;
-  color: #4a5568;
+  color: var(--cr-text);
 }
 
 .comment-mini-content strong {
   font-weight: 700;
-  color: #1a202c;
+  color: var(--cr-text);
   margin-right: 0.25rem;
 }
 

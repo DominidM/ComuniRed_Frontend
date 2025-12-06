@@ -91,7 +91,7 @@
 }
 
 .sidebar-link:hover:not(.active) {
-  background: #f1f5f9;
+  background: var(--cr-background-content);
 }
 
 .sidebar-link.active {

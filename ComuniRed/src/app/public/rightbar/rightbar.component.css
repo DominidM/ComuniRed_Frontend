@@ -713,10 +713,10 @@ html.dark .rightbar-accessibility-btn[aria-expanded="true"] {
   width: 280px !important;
   max-width: calc(100vw - 40px) !important;
   padding: 16px !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 251, 252, 0.96)) !important;
+  background: linear-gradient(var(--cr-background-content)) !important;
   color: #111111 !important;
   border-radius: 14px !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid var(--cr-background-content) !important;
   box-shadow:
     0 12px 36px rgba(0, 0, 0, 0.15),
     0 4px 12px rgba(0, 0, 0, 0.08),
@@ -779,7 +779,7 @@ html.dark .accessibility-panel::after {
   margin: 0 0 12px 0 !important;
   font-size: 1.1rem !important;
   font-weight: 700 !important;
-  color: #111111 !important;
+  color: var(--cr-text) !important;
   letter-spacing: -0.02em !important;
 }
 
@@ -799,7 +799,7 @@ html.dark .accessibility-panel h3 {
 /* Labels */
 .accessibility-panel label {
   font-size: 0.92rem !important;
-  color: #333333 !important;
+  color: var(--cr-text) !important;
   font-weight: 600 !important;
   flex: 1 !important;
 }
@@ -825,9 +825,9 @@ html.dark .accessibility-panel label {
   height: 36px !important;
   padding: 0 12px !important;
   border-radius: 9px !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  background: rgba(0, 0, 0, 0.04) !important;
-  color: #111111 !important;
+  border: 1px solid var(--cr-border) !important;
+  background: var(--cr-background) !important;
+  color: var(--cr-text) !important;
   font-weight: 600 !important;
   font-size: 0.9rem !important;
   cursor: pointer !important;

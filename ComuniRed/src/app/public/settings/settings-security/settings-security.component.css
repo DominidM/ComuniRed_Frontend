@@ -2,8 +2,8 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: 2rem 2rem;
-  background: #fff;
-  color: #000;
+  background: var(--cr-background);
+  color: var(--cr-text);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -39,7 +39,7 @@
 
 .checkbox-label {
   font-size: 1rem;
-  color: #000;
+  color: var(--cr-text);
   font-weight: 500;
   cursor: pointer;
   display: flex;
@@ -68,41 +68,38 @@
   gap: 12px;
   margin-top: 24px;
   padding-top: 24px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--cr-border);
 }
 
 /* Reutilizamos los estilos de botones */
 .btn-cancel {
-  background: transparent;
-  color: #000;
-  border: 1px solid #000;
+  background: var(--cr-background);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
   padding: 10px 24px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
 }
 
 .btn-cancel:hover:not(:disabled) {
-  background: #f0f0f0;
+  background: var(--cr-background-content);
 }
 
 .btn-cancel:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .btn-save {
   background: #000;
   color: #fff;
-  border: 1px solid #000;
+  border: 1px solid var(--cr-background-content);
   padding: 10px 24px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;

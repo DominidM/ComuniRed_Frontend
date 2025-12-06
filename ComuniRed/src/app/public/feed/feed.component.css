@@ -214,18 +214,19 @@
 }
 
 .modal-header {
+  background: var(--cr-background);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--cr-border);
 }
 
 .modal-title {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--cr-text);
 }
 
 .modal-close {
@@ -244,6 +245,7 @@
 }
 
 .modal-body {
+  background: var(--cr-background);
   flex: 1;
   overflow-y: auto;
   padding: 1.5rem;
@@ -265,7 +267,7 @@
 
 .modal-username {
   font-weight: 700;
-  color: #1a202c;
+  color: var(--cr-text);
 }
 
 .create-form {
@@ -282,7 +284,7 @@
 
 .form-label {
   font-weight: 600;
-  color: #1a202c;
+  color: var(--cr-text);
   font-size: 0.875rem;
 }
 
@@ -291,7 +293,7 @@
 .form-select {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--cr-border);
   border-radius: 12px;
   font-size: 1rem;
   outline: none;
@@ -310,17 +312,16 @@
 }
 
 .upload-area {
-  border: 2px dashed #cbd5e0;
+  border: 2px dashed var(--cr-border);
   border-radius: 12px;
   padding: 2rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .upload-area:hover {
   border-color: #667eea;
-  background: #f7fafc;
+  background: var(--cr-background-content);
 }
 
 .upload-placeholder {
@@ -375,29 +376,31 @@
 }
 
 .modal-footer {
+  background: var(--cr-background);
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
   padding: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--cr-border);
 }
 
 .btn {
   padding: 0.75rem 1.5rem;
-  border: none;
+  border: var(--cr-border);
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .btn-cancel {
-  background: #e2e8f0;
-  color: #4a5568;
+  background: var(--cr-background-content);
+  color: var(--cr-text);
+  border: var(--cr-border);
 }
 
 .btn-cancel:hover {
-  background: #cbd5e0;
+  background: var(--cr-background);
+  border: var(--cr-background-content);
 }
 
 .btn-primary {
@@ -659,7 +662,7 @@
   align-items: center;
   margin-bottom: 1rem;
   font-weight: 600;
-  color: #1a202c;
+  color: var(--cr-text);
 }
 
 .vote-count {
@@ -676,9 +679,9 @@
 .vote-btn {
   flex: 1;
   padding: 0.75rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--cr-border);
   border-radius: 12px;
-  background: white;
+  background: var(--cr-background);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -689,7 +692,7 @@
 }
 
 .vote-btn.accept:hover:not(:disabled) {
-  background: #f0fff4;
+  background: var(--cr-background);
   border-color: #48bb78;
 }
 
@@ -704,7 +707,7 @@
 }
 
 .vote-btn.reject:hover:not(:disabled) {
-  background: #fff5f5;
+  background: var(--cr-background);
   border-color: #f56565;
 }
 
@@ -737,14 +740,13 @@
   border: 2px solid transparent;
   border-radius: 20px;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-weight: 600;
   color: #4a5568;
 }
 
 .reaction-btn:hover {
-  background: #f7fafc;
-  border-color: #e2e8f0;
+  background: var(--cr-background);
+  border-color: var(--cr-border);
 }
 
 .reaction-btn.active {
@@ -758,6 +760,7 @@
 }
 
 .count {
+  color: var(--cr-text);
   font-size: 0.875rem;
 }
 
@@ -797,7 +800,7 @@
 }
 
 .action-btn:hover {
-  background: #f7fafc;
+  background: var(--cr-background);
   color: #667eea;
 }
 
@@ -806,14 +809,15 @@
 }
 
 .action-text {
+  color: var(--cr-text);
   font-size: 0.875rem;
 }
 
 /* ==================== COMENTARIOS ==================== */
 .comments-section {
   padding: 1rem 1.5rem;
-  background: white;
-  border-top: 1px solid #e2e8f0;
+  background: var(--cr-background-content);
+  border-top: 1px solid var(--cr-border);
 }
 
 .comment-wrapper {
@@ -973,23 +977,23 @@
   align-items: center;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--cr-border);
 }
 
 .comment-input-container input {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--cr-border);
   border-radius: 20px;
   font-size: 0.875rem;
   outline: none;
   transition: border-color 0.2s ease;
-  background: #f7fafc;
+  background: var(--cr-search);
 }
 
 .comment-input-container input:focus {
   border-color: #667eea;
-  background: white;
+  background: var(--cr-background);
 }
 
 .btn-send-comment {
@@ -1239,12 +1243,11 @@
 .comment-author-preview {
   font-weight: 700;
   font-size: 0.875rem;
-  color: #1a202c;
+  color: var(--cr-text);
 }
 
 .comment-author-preview.clickable {
   cursor: pointer;
-  transition: color 0.2s ease;
 }
 
 .comment-author-preview.clickable:hover {
@@ -1265,7 +1268,7 @@
 
 .comment-text-preview {
   margin: 0.25rem 0 0;
-  color: #4a5568;
+  color: var(--cr-text);
   font-size: 0.875rem;
   line-height: 1.5;
   word-wrap: break-word;
@@ -1296,7 +1299,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
+  background: var(--cr-background);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 150px;
@@ -1309,19 +1312,18 @@
   width: 100%;
   padding: 0.75rem 1rem;
   border: none;
-  background: white;
+  background: var(--cr-background);
   text-align: left;
   cursor: pointer;
-  transition: background 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #4a5568;
+  color: var(--cr-text);
 }
 
 .comment-menu-item:hover {
-  background: #f7fafc;
+  background: var(--cr-background-content);
 }
 
 .comment-menu-item.danger {
@@ -1329,7 +1331,7 @@
 }
 
 .comment-menu-item.danger:hover {
-  background: #fff5f5;
+  background: var(--cr-background-content);
 }
 
 .view-all-modal-btn {
@@ -1428,7 +1430,7 @@
 }
 
 .modal-close-btn {
-  background: transparent;
+  background: var(--cr-background-content);
   border: none;
   cursor: pointer;
   padding: 0.5rem;
@@ -1442,7 +1444,7 @@
 }
 
 .modal-close-btn:hover {
-  background: #f7fafc;
+  background: var(--cr-background-content);
   color: #1a202c;
 }
 
@@ -1450,7 +1452,7 @@
   flex: 1;
   overflow-y: auto;
   padding: 1rem 1.5rem;
-  background: #f7fafc;
+  background: var(--cr-background);
 }
 
 .report-summary {
@@ -1759,7 +1761,7 @@
   position: absolute;
   bottom: 100%;
   left: 0;
-  background: white;
+  background: var(--cr-background);
   border-radius: 50px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   padding: 0.5rem;
@@ -1796,7 +1798,7 @@
 }
 
 .reaction-option:hover {
-  background: #f7fafc;
+  background: var(--cr-background-content);
   transform: scale(1.1);
 }
 

@@ -1,7 +1,7 @@
 .messages-container-wrapper {
   display: flex;
   height: 800px;
-  max-height: 85vh;
+  max-height: 100vh;
   background: #f5f7fb;
   border-radius: 12px;
   overflow: hidden;
@@ -27,7 +27,7 @@
 .sidebar-header h2 {
   font-size: 20px;
   font-weight: 700;
-  color: #000;
+  color: var(--cr-text);
   margin: 0;
 }
 
@@ -59,18 +59,17 @@
   gap: 10px;
   padding: 10px 16px;
   cursor: pointer;
-  border-bottom: 1px solid #f0f2f5;
-  transition: background 0.2s;
+  border-bottom: 1px solid var(--cr-border);
   position: relative;
 }
 
 .conversation-item:hover {
-  background: #f0f2f5;
+  background: var(--cr-background);
 }
 
 .conversation-item.active {
-  background: #e7f3ff;
-  border-left: 3px solid #020202;
+  background: var(--cr-background);
+  border-left: 3px solid var(--cr-border);
 }
 
 /* 👇 ACTUALIZADO: Borde verde para usuarios en línea */
@@ -140,7 +139,7 @@
 .conversation-name {
   font-size: 14px;
   font-weight: 600;
-  color: #050505;
+  color: var(--cr-text);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -174,7 +173,7 @@
 
 .conversation-preview {
   font-size: 12px;
-  color: #65676b;
+  color: var(--cr-text);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -240,7 +239,7 @@
 .chat-empty h3 {
   font-size: 20px;
   font-weight: 600;
-  color: #050505;
+  color: var(--cr-text);
   margin: 0 0 10px 0;
 }
 
@@ -263,8 +262,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 18px;
-  border-bottom: 1px solid #e4e6eb;
-  background: white;
+  border-bottom: 1px solid var(--cr-border);
+  background: var(--cr-background-content);
   border-radius: 0 12px 0 0;
 }
 
@@ -273,7 +272,6 @@
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  transition: opacity 0.2s;
 }
 
 .chat-header-user:hover {
@@ -290,7 +288,7 @@
 .chat-user-info h3 {
   font-size: 14px;
   font-weight: 600;
-  color: #050505;
+  color: var(--cr-text);
   margin: 0 0 3px 0;
 }
 
@@ -300,8 +298,6 @@
   color: #65676b;
   display: flex;
   align-items: center;
-  gap: 4px;
-  transition: color 0.3s;
 }
 
 .chat-user-status.online {
@@ -351,8 +347,9 @@
 .messages-container {
   flex: 1;
   overflow-y: auto;
-  background: #f5f7fb;
+  background: var(--cr-background-content);
   padding: 16px;
+  margin-right: 135px;
 }
 
 .loading-messages {
@@ -404,14 +401,14 @@
 }
 
 .message-mine .message-bubble {
-  background: #000000;
-  color: white;
+  background: #0084ff;
+  color: var(--cr-text);
   border-bottom-right-radius: 4px;
 }
 
 .message-other .message-bubble {
-  background: #e4e6eb;
-  color: #050505;
+  background:#0084ff;
+  color: var(--cr-text);
   border-bottom-left-radius: 4px;
 }
 
@@ -455,9 +452,10 @@
   align-items: center;
   gap: 10px;
   padding: 12px 18px;
-  background: white;
-  border-top: 1px solid #e4e6eb;
+  background: var(--cr-background-content);
+  border-top: 1px solid var(--cr-border);
   border-radius: 0 0 12px 0;
+  margin-right: 135px;
 }
 
 .chat-blocked-warning {
@@ -481,16 +479,15 @@
 .chat-input {
   flex: 1;
   padding: 9px 14px;
-  border: none;
-  background: #f0f2f5;
+  border: var(--cr-border);
+  background: var(--cr-search);
   border-radius: 18px;
   font-size: 13px;
   outline: none;
-  transition: all 0.2s;
 }
 
 .chat-input:focus {
-  background: #e4e6eb;
+  background: var(--cr-background);
 }
 
 .chat-input::placeholder {
