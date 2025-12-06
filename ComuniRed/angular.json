@@ -26,8 +26,8 @@
               "src/assets"
             ],
             "styles": [
-              "node_modules/leaflet/dist/leaflet.css",
-              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
+              "leaflet/dist/leaflet.css",
+              "bootstrap-icons/font/bootstrap-icons.css",
               "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.css"
             ],

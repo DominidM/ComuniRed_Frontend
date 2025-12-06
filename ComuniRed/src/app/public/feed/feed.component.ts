@@ -9,6 +9,7 @@ import { ComentarioService } from '../../services/comentario.service';
 import { CategoriaService, Categoria } from '../../services/categoria.service';
 import { UsuarioService } from '../../services/usuario.service';
 
+
 @Component({
   selector: 'app-feed',
   standalone: true,
@@ -52,7 +53,6 @@ export class FeedComponent implements OnInit {
   page = 0;
   hasMore = true;
 
-  // ✅ PROPIEDADES PARA COMENTARIOS Y REACCIONES
   showReactionMenu: { [postId: string]: boolean } = {};
   showCommentsInline: { [postId: string]: boolean } = {};
   showCommentMenuModal: { [commentId: string]: boolean } = {};
@@ -60,7 +60,6 @@ export class FeedComponent implements OnInit {
   reportsPerPage = 10;
   totalReports = 0;
 
-  // ✅ PROPIEDADES PARA MODAL DE COMENTARIOS
   showCommentsModal = false;
   selectedReporteForComments: Queja | null = null;
   newCommentText = '';
@@ -74,12 +73,12 @@ export class FeedComponent implements OnInit {
     private router: Router
   ) {}
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
+  @HostListener('document:click')
+  onDocumentClick(): void {
     this.closeAllReactionMenus();
   }
 
-  @HostListener('window:scroll', ['$event'])
+  @HostListener('window:scroll')
   onScroll(): void {
     const scrollPosition = window.pageYOffset + window.innerHeight;
     const pageHeight = document.documentElement.scrollHeight;
@@ -254,7 +253,6 @@ export class FeedComponent implements OnInit {
     this.applyFilters();
   }
 
-  // ==================== REACCIONES ====================
   closeAllReactionMenus(): void {
     this.showReactionMenu = {};
   }
@@ -324,7 +322,6 @@ export class FeedComponent implements OnInit {
     return post.reactions?.counts?.[type] ?? 0;
   }
 
-  // ==================== VOTOS ====================
   vote(post: Queja, choice: 'accept' | 'reject'): void {
     if (!this.canVote(post) || !this.user?.id) return;
 
@@ -361,7 +358,6 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  // ==================== COMENTARIOS INLINE ====================
   toggleComments(post: Queja): void {
     post.showComments = !post.showComments;
   }
@@ -478,7 +474,6 @@ export class FeedComponent implements OnInit {
     return (post.comments || []).length > 3;
   }
 
-  // ==================== MODAL DE COMENTARIOS ====================
   openCommentsModal(reporte: Queja): void {
     this.selectedReporteForComments = JSON.parse(JSON.stringify(reporte));
     this.showCommentsModal = true;
@@ -637,7 +632,6 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  // ==================== EDITAR/ELIMINAR REPORTE ====================
   canEditQueja(post: Queja): boolean {
     return post.usuario?.id === this.user?.id;
   }
@@ -704,7 +698,6 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  // ==================== CREAR REPORTE ====================
   openCreateReport(): void {
     this.showCreateModal = true;
     this.resetQuejaForm();
@@ -808,7 +801,6 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  // ==================== OTRAS ACCIONES ====================
   toggleBookmark(post: Queja): void {
     (post as any).meta = (post as any).meta || {};
     (post as any).meta.saved = !((post as any).meta.saved);
@@ -844,7 +836,6 @@ export class FeedComponent implements OnInit {
     this.showToastMessage('JSON descargado');
   }
 
-  // ==================== PAGINACIÓN ====================
   getPaginatedPosts(): Queja[] {
     const posts = this.displayedPosts;
     this.totalReports = posts.length;
@@ -907,7 +898,6 @@ export class FeedComponent implements OnInit {
     return pages;
   }
 
-  // ==================== UTILIDADES ====================
   verPerfilUsuario(usuario: Usuario): void {
     if (!usuario?.id) return;
     
