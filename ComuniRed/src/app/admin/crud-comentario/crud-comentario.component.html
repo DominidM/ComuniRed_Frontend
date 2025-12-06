@@ -31,8 +31,13 @@
     </div>
   </div>
 
+  <!-- Indicador de carga -->
+  <div *ngIf="cargando" class="comentarios-cargando">
+    <p>⏳ Cargando comentarios...</p>
+  </div>
+
   <!-- Lista de Comentarios -->
-  <div class="comentarios-lista">
+  <div class="comentarios-lista" *ngIf="!cargando">
     <div *ngIf="comentariosFiltrados.length === 0" class="comentarios-vacio">
       <p>No hay comentarios que coincidan con los filtros</p>
     </div>
@@ -40,29 +45,36 @@
     <div *ngFor="let comentario of comentariosFiltrados" class="comentario-card">
       <div class="comentario-header">
         <div class="comentario-usuario">
-          <span class="comentario-avatar">{{ comentario.avatar }}</span>
+          <span class="comentario-avatar">
+            {{ comentario.author.foto_perfil || '👤' }}
+          </span>
           <div>
-            <h3 class="comentario-nombre">{{ comentario.usuario }}</h3>
-            <span class="comentario-fecha">{{ comentario.fecha | date:'short' }}</span>
+            <h3 class="comentario-nombre">
+              {{ comentario.author.nombre }} {{ comentario.author.apellido }}
+            </h3>
+            <span class="comentario-fecha">
+              {{ comentario.fecha_creacion | date:'short' }}
+            </span>
           </div>
         </div>
         <div class="comentario-acciones">
-          <span [class]="'estado-badge estado-' + comentario.estado.toLowerCase().replace(' ', '-')">
-            {{ comentario.estado }}
+          <span [class]="'estado-badge estado-' + (comentario.estadoQueja || 'pendiente').toLowerCase().replace(' ', '-')">
+            {{ comentario.estadoQueja || 'Pendiente' }}
           </span>
           <button class="btn-accion" (click)="verDetalles(comentario)">👁️ Ver</button>
+          <button class="btn-accion" (click)="editarComentario(comentario)">✏️ Editar</button>
           <button class="btn-accion btn-eliminar" (click)="eliminarComentario(comentario.id)">🗑️</button>
         </div>
       </div>
 
       <div class="comentario-contenido">
-        <h4 class="comentario-titulo-contenido">{{ comentario.titulo }}</h4>
-        <p class="comentario-descripcion">{{ comentario.descripcion }}</p>
+        <h4 class="comentario-titulo-contenido">{{ comentario.tituloQueja || 'Sin título' }}</h4>
+        <p class="comentario-descripcion">{{ comentario.texto }}</p>
       </div>
 
       <div class="comentario-footer">
-        <span class="comentario-categoria">{{ comentario.categoria }}</span>
-        <span class="comentario-likes">❤️ {{ comentario.likes }}</span>
+        <span class="comentario-categoria">{{ comentario.categoriaQueja || 'Sin categoría' }}</span>
+        <span class="comentario-likes">❤️ {{ comentario.likes || 0 }}</span>
       </div>
     </div>
   </div>
@@ -77,51 +89,24 @@
 
       <div class="modal-body">
         <div class="form-group">
-          <label>Nombre del usuario</label>
+          <label>ID de la Queja/Reporte *</label>
           <input
             type="text"
             class="form-input"
-            [(ngModel)]="formularioComentario.usuario"
-            placeholder="Nombre"
+            [(ngModel)]="formularioComentario.quejaId"
+            placeholder="Ingresa el ID del reporte"
           />
+          <small>Nota: Debes conocer el ID del reporte al que deseas comentar</small>
         </div>
 
         <div class="form-group">
-          <label>Avatar (emoji)</label>
-          <input
-            type="text"
-            class="form-input"
-            [(ngModel)]="formularioComentario.avatar"
-            placeholder="👤"
-            maxlength="2"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Título</label>
-          <input
-            type="text"
-            class="form-input"
-            [(ngModel)]="formularioComentario.titulo"
-            placeholder="Título del problema"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Descripción</label>
+          <label>Comentario *</label>
           <textarea
             class="form-textarea"
-            [(ngModel)]="formularioComentario.descripcion"
-            placeholder="Describe el problema en detalle"
+            [(ngModel)]="formularioComentario.texto"
+            placeholder="Escribe tu comentario aquí..."
             rows="4"
           ></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Categoría</label>
-          <select class="form-select" [(ngModel)]="formularioComentario.categoria">
-            <option *ngFor="let categoria of categorias">{{ categoria }}</option>
-          </select>
         </div>
       </div>
 
@@ -142,44 +127,55 @@
 
       <div class="modal-body">
         <div class="detalles-usuario">
-          <span class="detalles-avatar">{{ comentarioSeleccionado.avatar }}</span>
+          <span class="detalles-avatar">
+            {{ comentarioSeleccionado.author.foto_perfil || '👤' }}
+          </span>
           <div>
-            <h3>{{ comentarioSeleccionado.usuario }}</h3>
-            <p>{{ comentarioSeleccionado.fecha | date:'full' }}</p>
+            <h3>
+              {{ comentarioSeleccionado.author.nombre }} 
+              {{ comentarioSeleccionado.author.apellido }}
+            </h3>
+            <p>{{ comentarioSeleccionado.fecha_creacion | date:'full' }}</p>
+            <p *ngIf="comentarioSeleccionado.fecha_modificacion" class="texto-modificado">
+              Modificado: {{ comentarioSeleccionado.fecha_modificacion | date:'short' }}
+            </p>
           </div>
         </div>
 
         <div class="detalles-seccion">
-          <h4>Título</h4>
-          <p>{{ comentarioSeleccionado.titulo }}</p>
+          <h4>Reporte relacionado</h4>
+          <p>{{ comentarioSeleccionado.tituloQueja || 'Sin título' }}</p>
         </div>
 
         <div class="detalles-seccion">
-          <h4>Descripción</h4>
-          <p>{{ comentarioSeleccionado.descripcion }}</p>
+          <h4>Comentario</h4>
+          <p>{{ comentarioSeleccionado.texto }}</p>
         </div>
 
         <div class="detalles-grid">
           <div>
             <strong>Categoría:</strong>
-            <p>{{ comentarioSeleccionado.categoria }}</p>
+            <p>{{ comentarioSeleccionado.categoriaQueja || 'Sin categoría' }}</p>
           </div>
           <div>
-            <strong>Estado actual:</strong>
-            <select class="detalles-select" [(ngModel)]="comentarioSeleccionado.estado" (change)="cambiarEstado(comentarioSeleccionado!.estado)">
-              <option *ngFor="let estado of estados">{{ estado }}</option>
-            </select>
+            <strong>Estado del reporte:</strong>
+            <p>{{ comentarioSeleccionado.estadoQueja || 'Pendiente' }}</p>
           </div>
           <div>
             <strong>Likes:</strong>
-            <p>{{ comentarioSeleccionado.likes }}</p>
+            <p>{{ comentarioSeleccionado.likes || 0 }}</p>
+          </div>
+          <div>
+            <strong>ID Comentario:</strong>
+            <p>{{ comentarioSeleccionado.id }}</p>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
         <button class="btn-cancelar" (click)="cerrarDetalles()">Cerrar</button>
-        <button class="btn-eliminar-modal" (click)="eliminarComentario(comentarioSeleccionado!.id)">Eliminar</button>
+        <button class="btn-accion" (click)="editarComentario(comentarioSeleccionado); cerrarDetalles()">✏️ Editar</button>
+        <button class="btn-eliminar-modal" (click)="eliminarComentario(comentarioSeleccionado.id)">Eliminar</button>
       </div>
     </div>
   </div>

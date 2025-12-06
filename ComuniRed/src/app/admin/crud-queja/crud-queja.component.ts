@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Apollo, gql } from 'apollo-angular';
 import { QuejaService } from '../../services/queja.service';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
-import { EstadosQuejaService } from '../../services/estado-queja.service'; // CORRECCIÓN: nombre exportado
+import { EstadosQuejaService } from '../../services/estado-queja.service';
+import { AsignacionService } from '../../services/asignacion.service'; // nuevo
 
 interface Queja {
   id: string;
@@ -36,11 +37,16 @@ interface EstadoQueja {
 export class CrudQuejaComponent implements OnInit {
   quejas: Queja[] = [];
   usuarios: Usuario[] = [];
+  usuariosSoporte: Usuario[] = []; // lista filtrada de soportes
   estados: EstadoQueja[] = [];
   showModal = false;
   editingQueja: Queja | null = null;
   quejaData: Partial<Queja> = {};
   loading = false;
+
+  // assignment form state
+  selectedSoporteId?: string;
+  comentariosAsignacion?: string;
 
   private ACTUALIZAR_QUEJA = gql`
     mutation ActualizarQueja($id: ID!, $imagen_url: String) {
@@ -51,11 +57,15 @@ export class CrudQuejaComponent implements OnInit {
     }
   `;
 
+  // id del rol "soporte" (ajusta si cambia)
+  private readonly SOPORTE_ROLE_ID = '68ca68bb0bc4d9ca3267b665';
+
   constructor(
     private apollo: Apollo,
     private quejaService: QuejaService,
     private usuarioService: UsuarioService,
-    private estadosQuejaService: EstadosQuejaService // CORRECCIÓN: usa el servicio exportado
+    private estadosQuejaService: EstadosQuejaService,
+    private asignacionService: AsignacionService
   ) {}
 
   ngOnInit(): void {
@@ -80,7 +90,8 @@ export class CrudQuejaComponent implements OnInit {
           estado_nombre: q.estado?.nombre || '',
           imagen_url: q.imagen_url || '',
           categoria_id: q.categoria?.id || '',
-          categoria_nombre: q.categoria?.nombre || ''
+          categoria_nombre: q.categoria?.nombre || '',
+          ubicacion: q.ubicacion || ''
         }));
         this.loading = false;
       },
@@ -93,23 +104,26 @@ export class CrudQuejaComponent implements OnInit {
   }
 
   loadUsuarios(): void {
-    // usuarioService.obtenerUsuarios devuelve paginado; si tienes obtenerTodosLosUsuarios úsalo
     if (this.usuarioService && typeof (this.usuarioService as any).obtenerTodosLosUsuarios === 'function') {
       (this.usuarioService as any).obtenerTodosLosUsuarios().subscribe({
-        next: (users: any) => this.usuarios = users,
+        next: (users: any) => {
+          this.usuarios = users;
+          this.usuariosSoporte = users.filter((u: any) => u.rol_id === this.SOPORTE_ROLE_ID);
+        },
         error: (err: any) => {
           console.error('Error cargando usuarios, fallback vacío', err);
           this.usuarios = [];
+          this.usuariosSoporte = [];
         }
       });
     } else {
       this.usuarios = [];
+      this.usuariosSoporte = [];
     }
   }
 
   loadEstados(): void {
     if (this.estadosQuejaService && typeof (this.estadosQuejaService as any).obtenerEstadosQueja === 'function') {
-      // llamar con page,size (0,100) y mapear
       (this.estadosQuejaService as any).obtenerEstadosQueja(0, 100).subscribe({
         next: (page: any) => {
           this.estados = (page?.content || []).map((e: any) => ({ id: e.id, nombre: e.nombre }));
@@ -128,20 +142,30 @@ export class CrudQuejaComponent implements OnInit {
     this.editingQueja = null;
     this.quejaData = {};
     this.showModal = true;
+    // reset assignment fields
+    this.selectedSoporteId = undefined;
+    this.comentariosAsignacion = undefined;
   }
 
-  openEditModal(queja: Queja): void {
+  // Ahora abrimos modal en modo "asignación"
+  openAssignModal(queja: Queja): void {
     this.editingQueja = { ...queja };
     this.quejaData = { ...queja };
     this.showModal = true;
+    // preselect first soporte if available
+    this.selectedSoporteId = this.usuariosSoporte.length ? this.usuariosSoporte[0].id : undefined;
+    this.comentariosAsignacion = undefined;
   }
 
   closeModal(): void {
     this.showModal = false;
     this.editingQueja = null;
     this.quejaData = {};
+    this.selectedSoporteId = undefined;
+    this.comentariosAsignacion = undefined;
   }
 
+  // Crear/actualizar queja (modo creación)
   saveQueja(): void {
     if (!this.quejaData.descripcion || !this.quejaData.usuario_id || !this.quejaData.estado_id) {
       alert('Completa descripción, usuario y estado');
@@ -161,13 +185,7 @@ export class CrudQuejaComponent implements OnInit {
         '' // usuarioActualId para refetch si aplica
       ).subscribe({
         next: (updated) => {
-          if (this.quejaData.imagen_url) {
-            this.updateImagenUrl(updated.id, this.quejaData.imagen_url as string)
-              .then(() => this.finalizeSave())
-              .catch((err) => { console.error(err); this.finalizeSave(); });
-          } else {
-            this.finalizeSave();
-          }
+          this.finalizeSave();
         },
         error: (err) => {
           console.error('Error actualizando queja:', err);
@@ -175,7 +193,6 @@ export class CrudQuejaComponent implements OnInit {
         }
       });
     } else {
-      const imagenUrl = this.quejaData.imagen_url ? this.quejaData.imagen_url : undefined;
       this.quejaService.crearQueja(
         this.quejaData.titulo || '',
         this.quejaData.descripcion,
@@ -185,13 +202,7 @@ export class CrudQuejaComponent implements OnInit {
         undefined
       ).subscribe({
         next: (created) => {
-          if (imagenUrl) {
-            this.updateImagenUrl(created.id, imagenUrl)
-              .then(() => this.finalizeSave())
-              .catch((err) => { console.error(err); this.finalizeSave(); });
-          } else {
-            this.finalizeSave();
-          }
+          this.finalizeSave();
         },
         error: (err) => {
           console.error('Error creando queja:', err);
@@ -220,6 +231,31 @@ export class CrudQuejaComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  // Assign flow
+  onAssignToSupport(): void {
+    if (!this.editingQueja || !this.selectedSoporteId) return;
+    this.loading = true;
+    // obtain current user id from usuarioService (if available)
+    const currentUser = (this.usuarioService as any).getUser ? (this.usuarioService as any).getUser() : null;
+    const asignadoPor = currentUser?.id || 'system';
+
+    this.asignacionService.asignarQueja(this.editingQueja.id, this.selectedSoporteId, asignadoPor, this.comentariosAsignacion)
+      .subscribe({
+        next: (a) => {
+          // refresh list and close
+          this.loadQuejas();
+          this.closeModal();
+          this.loading = false;
+          alert('Queja asignada correctamente');
+        },
+        error: (err) => {
+          console.error('Error asignando queja:', err);
+          this.loading = false;
+          alert('Error al asignar la queja');
+        }
+      });
   }
 
   private updateImagenUrl(id: string, imagenUrl: string): Promise<any> {

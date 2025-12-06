@@ -24,6 +24,7 @@ const AGREGAR_COMENTARIO = gql`
   mutation AgregarComentario($quejaId: ID!, $usuarioId: ID!, $texto: String!) {
     agregarComentario(quejaId: $quejaId, usuarioId: $usuarioId, texto: $texto) {
       id
+      queja_id
       texto
       fecha_creacion
       fecha_modificacion
@@ -41,6 +42,7 @@ const EDITAR_COMENTARIO = gql`
   mutation EditarComentario($id: ID!, $usuarioId: ID!, $texto: String!) {
     editarComentario(id: $id, usuarioId: $usuarioId, texto: $texto) {
       id
+      queja_id
       texto
       fecha_creacion
       fecha_modificacion
@@ -64,6 +66,7 @@ const BUSCAR_COMENTARIO = gql`
   query BuscarComentario($id: ID!) {
     buscarComentario(id: $id) {
       id
+      queja_id
       texto
       fecha_creacion
       fecha_modificacion
@@ -81,6 +84,7 @@ const BUSCAR_COMENTARIOS_POR_TEXTO = gql`
   query BuscarComentariosPorTexto($texto: String!, $usuarioId: ID!) {
     buscarComentariosPorTexto(texto: $texto, usuarioId: $usuarioId) {
       id
+      queja_id
       texto
       fecha_creacion
       fecha_modificacion
@@ -94,7 +98,6 @@ const BUSCAR_COMENTARIOS_POR_TEXTO = gql`
   }
 `;
 
-// ✅ Query para obtener comentarios por usuario
 const BUSCAR_COMENTARIOS_POR_USUARIO = gql`
   query BuscarComentariosPorUsuario($usuarioId: ID!) {
     buscarComentariosPorUsuario(usuarioId: $usuarioId) {
@@ -113,7 +116,6 @@ const BUSCAR_COMENTARIOS_POR_USUARIO = gql`
   }
 `;
 
-// ✅ Query para obtener un reporte por ID
 const OBTENER_QUEJA_POR_ID = gql`
   query ObtenerQuejaPorId($id: ID!, $usuarioActualId: ID!) {
     obtenerQuejaPorId(id: $id, usuarioActualId: $usuarioActualId) {
@@ -203,37 +205,40 @@ export class ComentarioService {
       .pipe(map(result => result.data?.buscarComentariosPorTexto ?? []));
   }
 
-  // ✅ Método para contar comentarios de un usuario
-  contarComentariosPorUsuario(usuarioId: string): Observable<number> {
+  buscarComentariosPorUsuario(usuarioId: string): Observable<Comentario[]> {
+    console.log('🔍 Buscando comentarios para usuario:', usuarioId)
+    
     return this.apollo
       .query<{ buscarComentariosPorUsuario: Comentario[] }>({
         query: BUSCAR_COMENTARIOS_POR_USUARIO,
         variables: { usuarioId },
-        fetchPolicy: 'network-only' // ✅ Siempre traer datos frescos
+        fetchPolicy: 'network-only'
       })
       .pipe(
         map(result => {
-          const comentarios = result.data?.buscarComentariosPorUsuario ?? [];
-          return comentarios.length;
+          const comentarios = result.data?.buscarComentariosPorUsuario ?? []
+          console.log('✅ Comentarios encontrados:', comentarios.length)
+          console.log('📋 Datos:', comentarios)
+          return comentarios
         }),
         catchError(error => {
-          console.error('Error contando comentarios:', error);
-          return of(0);
+          console.error('❌ Error buscando comentarios por usuario:', error)
+          console.error('📝 Error completo:', JSON.stringify(error, null, 2))
+          return of([]);
         })
       );
   }
 
-  // ✅ Método para obtener reportes donde el usuario comentó (CON DATOS REALES)
+  contarComentariosPorUsuario(usuarioId: string): Observable<number> {
+    return this.buscarComentariosPorUsuario(usuarioId).pipe(
+      map(comentarios => comentarios.length)
+    );
+  }
+
   obtenerReportesComentados(usuarioId: string, page: number = 0, size: number = 10): Observable<any[]> {
-    return this.apollo
-      .query<{ buscarComentariosPorUsuario: Comentario[] }>({
-        query: BUSCAR_COMENTARIOS_POR_USUARIO,
-        variables: { usuarioId },
-        fetchPolicy: 'network-only' // ✅ Siempre traer datos frescos
-      })
+    return this.buscarComentariosPorUsuario(usuarioId)
       .pipe(
-        map(result => {
-          const comentarios = result.data?.buscarComentariosPorUsuario ?? [];
+        map(comentarios => {
           // Obtener IDs únicos de reportes (queja_id)
           const reporteIds = [...new Set(comentarios.map(c => c.queja_id))];
           return reporteIds.slice(page * size, (page + 1) * size);
@@ -243,7 +248,7 @@ export class ComentarioService {
             return of([]);
           }
           
-          // ✅ Obtener los reportes reales por sus IDs
+          // Obtener los reportes reales por sus IDs
           const reporteQueries = reporteIds.map(id => 
             this.apollo.query<{ obtenerQuejaPorId: any }>({
               query: OBTENER_QUEJA_POR_ID,
