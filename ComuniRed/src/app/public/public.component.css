@@ -70,7 +70,7 @@ mat-sidenav-content {
   overflow-y: auto !important;
   overflow-x: hidden;
   padding: 66px 233px;
-  background-color: #eae9eef5;
+  background-color: var(--cr-background-content);
 }
 
 .feed-area::-webkit-scrollbar {
@@ -92,7 +92,6 @@ app-rightbar {
   width: var(--rightbar-width);
   height: 100%;
   overflow-y: auto;
-  padding-left: 12px;
 }
 
 app-rightbar::-webkit-scrollbar {
