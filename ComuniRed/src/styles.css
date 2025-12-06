@@ -115,7 +115,7 @@ input:focus, textarea:focus, select:focus {
 
 /* ===== ICONOS / SVG ===== */
 svg, i {
-  color: var(--cr-background);
+  color: #080808(--cr-background);
 }
 
 /* ===== CARDS / CONTENEDORES ===== */
