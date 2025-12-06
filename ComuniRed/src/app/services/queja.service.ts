@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable, map, switchMap } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 export interface Queja {
   id: string;
@@ -183,6 +183,11 @@ const QUEJAS_POR_USUARIO = gql`
   }
 `;
 
+/*
+  CREAR_QUEJA: sin imagen_url en variables, porque tu schema backend actual
+  no acepta ese argumento (por eso daba UnknownArgument).
+  Haremos CREATE sin imagen, y luego UPDATE con imagen_url.
+*/
 const CREAR_QUEJA = gql`
   mutation CrearQueja(
     $titulo: String!
@@ -205,6 +210,8 @@ const CREAR_QUEJA = gql`
   }
 `;
 
+/* ACTUALIZAR_QUEJA ya acepta imagen_url (según tu schema actual),
+   lo usaremos inmediatamente después de crear la queja. */
 const ACTUALIZAR_QUEJA = gql`
   mutation ActualizarQueja(
     $id: ID!
@@ -325,76 +332,68 @@ export class QuejaService {
     ubicacion?: string,
     imagen?: File
   ): Observable<Queja> {
+    // Si hay imagen: subimos primero, luego:
+    // 1) creamos la queja (CREATE sin imagen_url)
+    // 2) hacemos UPDATE para añadir imagen_url (porque el backend no acepta crearCon imagen_url)
     if (imagen) {
       return new Observable<Queja>(observer => {
         console.log('📤 Subiendo imagen a Cloudinary...');
-        
         this.subirImagenCloudinary(imagen)
           .then(imagenUrl => {
             console.log('✅ Imagen subida:', imagenUrl);
-            console.log('📤 Creando queja con GraphQL...');
-            
-            const variables: any = {
+            console.log('📤 Creando queja (sin imagen) ...');
+
+            const createVars: any = {
               titulo,
               descripcion,
               categoriaId,
               usuarioId
             };
+            if (ubicacion) createVars.ubicacion = ubicacion;
 
-            if (ubicacion) variables.ubicacion = ubicacion;
-
-            return this.apollo
-              .mutate<{ crearQueja: Queja }>({
-                mutation: CREAR_QUEJA,
-                variables
-              })
-              .toPromise()
+            return this.apollo.mutate<{ crearQueja: Queja }>({
+              mutation: CREAR_QUEJA,
+              variables: createVars
+            }).toPromise()
               .then(result => {
                 const queja = result?.data?.crearQueja;
-                if (!queja) {
-                  throw new Error('No se pudo crear la queja');
-                }
-                
-                console.log('✅ Queja creada, actualizando con URL de imagen...');
-                
-                return this.apollo
-                  .mutate<{ actualizarQueja: Queja }>({
-                    mutation: ACTUALIZAR_QUEJA,
-                    variables: {
-                      id: queja.id,
-                      imagen_url: imagenUrl
-                    },
-                    refetchQueries: [
-                      { query: OBTENER_QUEJAS, variables: { usuarioActualId: usuarioId } }
-                    ]
-                  })
-                  .toPromise();
+                if (!queja) throw new Error('No se pudo crear la queja');
+                // Ahora actualizamos con la imagen_url
+                console.log('✅ Queja creada (id=' + queja.id + '), actualizando imagen_url ...');
+                return this.apollo.mutate<{ actualizarQueja: Queja }>({
+                  mutation: ACTUALIZAR_QUEJA,
+                  variables: {
+                    id: queja.id,
+                    imagen_url: imagenUrl
+                  },
+                  refetchQueries: [
+                    { query: OBTENER_QUEJAS, variables: { usuarioActualId: usuarioId } }
+                  ]
+                }).toPromise();
               });
           })
           .then(result => {
             const quejaFinal = result?.data?.actualizarQueja;
-            if (!quejaFinal) {
-              throw new Error('No se pudo actualizar la imagen');
-            }
-            
-            console.log('✅ Queja creada con imagen:', quejaFinal);
+            if (!quejaFinal) throw new Error('No se pudo actualizar la imagen en la queja');
+            console.log('✅ Queja creada y actualizada con imagen:', quejaFinal);
             observer.next(quejaFinal);
             observer.complete();
           })
           .catch(error => {
-            console.error('❌ Error:', error);
+            console.error('❌ Error en crearQueja con imagen:', error);
             observer.error(error);
           });
       });
     }
 
+    // Sin imagen: crear directamente (imagen_url = null)
     const variables: any = {
       titulo,
       descripcion,
       categoriaId,
-      usuarioId
+      usuarioId,
+      imagen_url: null
     };
-
     if (ubicacion) variables.ubicacion = ubicacion;
 
     console.log('📤 Creando queja sin imagen');

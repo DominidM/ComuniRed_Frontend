@@ -5,38 +5,78 @@
   </div>
 
   <div *ngIf="quejas && quejas.length > 0; else noQuejas">
-    <table class="crud-queja-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Descripción</th>
-          <th>Fecha</th>
-          <th>Usuario</th>
-          <th>Estado</th>
-          <th>Imagen</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let queja of quejas">
-          <td>{{ queja.id }}</td>
-          <td>{{ queja.descripcion }}</td>
-          <td>{{ queja.fecha_creacion | date:'short' }}</td>
-          <td>{{ queja.usuario_nombre }}</td>
-          <td>{{ queja.estado_nombre }}</td>
-          <td>
-            <a *ngIf="queja.imagen_url" [href]="queja.imagen_url" target="_blank">
-              <img [src]="queja.imagen_url" alt="Imagen" class="queja-img-thumb"/>
-            </a>
-            <span *ngIf="!queja.imagen_url">Sin imagen</span>
-          </td>
-          <td>
-            <button class="btn-edit" (click)="openEditModal(queja)">Editar</button>
-            <button class="btn-delete" (click)="deleteQueja(queja)">Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table class="crud-queja-table">
+        <colgroup>
+          <col style="width: 40%;">  <!-- descripcion -->
+          <col style="width: 15%;">  <!-- fecha -->
+          <col style="width: 15%;">  <!-- usuario -->
+          <col style="width: 10%;">  <!-- estado -->
+          <col style="width: 15%;">  <!-- imagen -->
+          <col style="width: 5%;">   <!-- acciones -->
+        </colgroup>
+
+        <thead>
+          <tr>
+            <th>Descripción</th>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Estado</th>
+            <th>Imagen</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let queja of quejas" class="row-item">
+            <td class="td-desc">
+              <div class="cell-inner">
+                <div class="desc-title">{{ queja.titulo || '' }}</div>
+                <div class="desc-text">{{ queja.descripcion }}</div>
+              </div>
+            </td>
+
+            <td class="td-meta">
+              <div class="cell-inner">
+                <div class="meta">{{ queja.fecha_creacion | date:'short' }}</div>
+              </div>
+            </td>
+
+            <td class="td-meta">
+              <div class="cell-inner">
+                <div class="meta">{{ queja.usuario_nombre }}</div>
+              </div>
+            </td>
+
+            <td class="td-meta">
+              <div class="cell-inner">
+                <span class="status-badge small">{{ queja.estado_nombre || '—' }}</span>
+              </div>
+            </td>
+
+            <td class="td-image">
+              <div class="cell-inner image-wrap">
+                <ng-container *ngIf="queja.imagen_url; else noImage">
+                  <a [href]="queja.imagen_url" target="_blank" rel="noreferrer">
+                    <img [src]="queja.imagen_url" alt="Imagen" class="thumb" />
+                  </a>
+                </ng-container>
+                <ng-template #noImage>
+                  <span class="small-muted">Sin imagen</span>
+                </ng-template>
+              </div>
+            </td>
+
+            <td class="td-actions">
+              <div class="cell-inner actions-inline">
+                <button class="btn btn-edit" (click)="openEditModal(queja)">Editar</button>
+                <button class="btn btn-delete" (click)="deleteQueja(queja)">Eliminar</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <ng-template #noQuejas>
@@ -45,7 +85,7 @@
     </div>
   </ng-template>
 
-  <!-- Modal Formulario -->
+  <!-- Modal Formulario (igual) -->
   <div class="crud-queja-modal" *ngIf="showModal">
     <div class="crud-queja-modal-content">
       <h3>{{ editingQueja ? 'Editar Queja' : 'Nueva Queja' }}</h3>
