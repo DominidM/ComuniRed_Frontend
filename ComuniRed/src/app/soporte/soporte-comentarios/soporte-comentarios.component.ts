@@ -239,4 +239,20 @@ export class SoporteComentarioComponent implements OnInit {
   abrirImagenGrande(url: string): void {
     window.open(url, '_blank');
   }
+
+
+  onImageError(event: Event): void {
+  const target = event.target as HTMLImageElement;
+  if (target) {
+    target.src = 'assets/img/default-avatar.png';
+  }
 }
+
+onImageLoadError(event: Event): void {
+  const target = event.target as HTMLElement;
+  if (target) {
+    target.style.display = 'none';
+  }
+}
+}
+
