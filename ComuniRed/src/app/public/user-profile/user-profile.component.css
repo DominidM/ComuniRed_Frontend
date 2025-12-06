@@ -1,9 +1,10 @@
 .settings-container {
-  max-width: 100%;
+  max-width: 80%;
   margin: 0;
   padding: 0;
-  background: #f8f9fa;
+  background: var(--cr-background-content);
   min-height: calc(100vh - 60px);
+  margin-left: 100px;
 }
 
 .profile-header {
@@ -49,7 +50,7 @@
   align-items: flex-start;
   gap: 24px;
   padding: 0 30px 30px 30px;
-  background: white;
+  background: var(--cr-background);
   border-radius: 0 0 12px 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   position: relative;
@@ -98,7 +99,7 @@
 .user-name {
   font-size: 24px;
   font-weight: 700;
-  color: #000000;
+  color: var(--cr-text);
   margin: 0;
 }
 
@@ -121,10 +122,10 @@
   display: flex;
   gap: 0;
   align-items: center;
-  background: white;
+  background: var(--cr-background-content);
   border-radius: 8px;
   padding: 0;
-  border: 1px solid #dbdbdb;
+  border: 1px solid var(--cr-border);
   overflow: hidden;
 }
 
@@ -136,7 +137,6 @@
   background: transparent;
   border: none;
   padding: 12px 24px;
-  transition: background 0.2s;
   cursor: default;
 }
 
@@ -145,13 +145,13 @@
 }
 
 .stat-clickable:hover {
-  background: #f9fafb;
+  background: var(--cr-background);
 }
 
 .stat-number {
   font-size: 18px;
   font-weight: 700;
-  color: #000;
+  color: var(--cr-text);
   line-height: 1;
 }
 
@@ -212,9 +212,9 @@
 }
 
 .btn-message {
-  background: #f3f4f6;
-  color: #000;
-  border: 1px solid #d1d5db;
+  background: var(--cr-background-content);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
 }
 
 .btn-message:hover {
@@ -231,12 +231,12 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--cr-background);
   padding: 16px;
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--cr-border);
   transition: all 0.2s ease;
 }
 
@@ -248,7 +248,7 @@
 .stat-card .stat-number {
   font-size: 24px;
   font-weight: 700;
-  color: #000;
+  color: var(--cr-text);
   margin-bottom: 4px;
 }
 
@@ -259,7 +259,7 @@
 }
 
 .tabs-section {
-  background: white;
+  background: var(--cr-background);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin: 0 20px;
@@ -267,8 +267,8 @@
 
 .tabs-header {
   display: flex;
-  border-bottom: 1px solid #e5e7eb;
-  background: #fafafa;
+  border-bottom: 1px solid var(--cr-border);
+  background: var(--cr-background);
 }
 
 .tab-btn {
@@ -278,19 +278,19 @@
   border: none;
   font-size: 13px;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--cr-text);
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
 }
 
 .tab-btn:hover {
-  color: #000;
-  background: #f3f4f6;
+  color: var(--cr-text);
+  background: var(--cr-background-content);
 }
 
 .tab-btn.active {
-  color: #000;
+  color: var(--cr-text);
 }
 
 .tab-btn.active::after {

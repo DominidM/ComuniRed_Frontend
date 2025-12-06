@@ -10,7 +10,7 @@ interface Reel {
   comments: number;
   shares: number;
   description: string;
-  avatarUrl?: string; // <- nuevo
+  avatarUrl?: string;
 }
 
 @Component({
@@ -70,14 +70,23 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     else if (event.key === ' ') { event.preventDefault(); this.togglePlayPause(); }
   }
 
+  // --- GETTERS CLAVE PARA EL HTML ---
   get currentReel(): Reel { return this.reels[this.currentIndex]; }
+
+  get isFirstReel(): boolean {
+    return this.currentIndex === 0;
+  }
+
+  get isLastReel(): boolean {
+    return this.currentIndex === this.reels.length - 1;
+  }
+  // ------------------------------------
 
   private initVideo() {
     if (!this.videoPlayer) return;
     this.hasError = false;
     this.isLoading = true;
     this.setVideoSource(this.currentReel.videoUrl);
-    // reproducción controlada por tryPlayRespectingPreference()
   }
 
   private setVideoSource(url: string) {
@@ -158,10 +167,10 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     this.userInteracted = true;
     this.isMuted = !this.isMuted;
     video.muted = this.isMuted;
-    try { localStorage.setItem('reelsMuted', String(this.isMuted)); } catch {}
+    try { localStorage.setItem('reelsMuted', String(this.isMuted)); } catch { }
   }
 
-  // fullscreen toggle
+  // fullscreen toggle (no usado en HTML actual, pero buena práctica)
   toggleFullscreen() {
     const container = this.videoPlayer.nativeElement.parentElement as HTMLElement;
     if (!container) return;

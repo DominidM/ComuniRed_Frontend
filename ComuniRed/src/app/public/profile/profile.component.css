@@ -355,14 +355,13 @@
   gap: 1rem;
   padding: 1rem;
   border-radius: 12px;
-  background: var(--bg-secondary);
+  background: var(--cr-background-content);
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--cr-border);
 }
 
 .activity-item:hover {
-  background: var(--bg-primary);
+  background: var(--cr-background-content);
   transform: translateX(4px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -389,7 +388,7 @@
   margin: 0 0 0.5rem 0;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--cr-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

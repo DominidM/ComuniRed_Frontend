@@ -2,8 +2,8 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: 2rem 2rem;
-  background: #fff;
-  color: #000;
+  background: var(--cr-background);
+  color: var(--cr-text);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -85,22 +85,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--cr-border);
   border-radius: 6px;
-  background: #f9f9f9;
-  transition: all 0.3s ease;
+  background: var(--cr-background-content);
 }
 
 .notification-item:hover {
-  background: #fff;
-  border-color: #d0d0d0;
+  background: var(--cr-background);
+  border-color: var(--cr-border);
 }
 
 .notification-info h3 {
   font-size: 0.95rem;
   font-weight: 600;
   margin: 0 0 4px 0;
-  color: #000;
+  color: var(--cr-text);
 }
 
 .notification-info p {

@@ -62,6 +62,8 @@ import { SoporteReportComponent } from './soporte/soporte-report/soporte-report.
 import { SoporteClasificacionComponent } from './soporte/soporte-clasificacion/soporte-clasificacion.component';
 import { SoporteValidacionComponent } from './soporte/soporte-validacion/soporte-validacion.component';
 import { SoporteSeguimientoComponent } from './soporte/soporte-seguimiento/soporte-seguimiento.component';
+import { SoporteComentarioComponent as SoporteComentariosComponent } from './soporte/soporte-comentarios/soporte-comentarios.component';
+
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -155,6 +157,7 @@ export const routes: Routes = [
       { path: 'clasificacion', component: SoporteClasificacionComponent},
       { path: 'validacion', component: SoporteValidacionComponent},
       { path: 'seguimiento', component: SoporteSeguimientoComponent},
+      { path: 'comentarios', component: SoporteComentariosComponent},
       { path: 'perfil', component: SoporteProfileComponent},
       { path: '', redirectTo: 'reporte-editar', pathMatch: 'full' }
     ]

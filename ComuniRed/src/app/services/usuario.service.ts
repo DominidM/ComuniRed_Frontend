@@ -255,6 +255,14 @@ export class UsuarioService {
     );
   }
 
+    obtenerUsuariosPorRol(rolId: string): Observable<Usuario[]> {
+    return this.obtenerUsuarios(0, 100).pipe(
+      map((page: UsuarioPage) => 
+        page.content.filter((usuario: Usuario) => usuario.rol_id === rolId)
+      )
+    );
+  }
+
   obtenerPerfilPublico(usuarioId: string): Observable<Usuario> {
     return this.apollo.query<{ obtenerUsuarioPorId: Usuario }>({
       query: OBTENER_PERFIL_PUBLICO,

@@ -61,10 +61,11 @@ const EDITAR_COMENTARIO = gql`
 `;
 
 const ELIMINAR_COMENTARIO = gql`
-  mutation EliminarComentario($id: ID!, $usuarioId: ID!) {
-    eliminarComentario(id: $id, usuarioId: $usuarioId)
+  mutation EliminarComentario($comentarioId: ID!, $usuarioId: ID!, $razon: String!) {
+    eliminarComentario(comentarioId: $comentarioId, usuarioId: $usuarioId, razon: $razon)
   }
 `;
+
 
 const BUSCAR_COMENTARIO = gql`
   query BuscarComentario($id: ID!) {
@@ -149,6 +150,37 @@ const OBTENER_QUEJA_POR_ID = gql`
 `;
 
 
+const APROBAR_COMENTARIO = gql`
+  mutation AprobarComentario($comentarioId: ID!, $soporteId: ID!) {
+    aprobarComentario(comentarioId: $comentarioId, soporteId: $soporteId) {
+      id
+      texto
+      fecha_creacion
+      author {
+        id
+        nombre
+        apellido
+      }
+    }
+  }
+`;
+
+const RECHAZAR_COMENTARIO = gql`
+  mutation RechazarComentario($comentarioId: ID!, $soporteId: ID!, $razon: String!) {
+    rechazarComentario(comentarioId: $comentarioId, soporteId: $soporteId, razon: $razon) {
+      id
+      texto
+      fecha_creacion
+      author {
+        id
+        nombre
+        apellido
+      }
+    }
+  }
+`;
+
+
 @Injectable({ providedIn: 'root' })
 export class ComentarioService {
   constructor(private apollo: Apollo) {}
@@ -171,14 +203,19 @@ export class ComentarioService {
       .pipe(map(result => result.data!.editarComentario));
   }
 
-  eliminarComentario(id: string, usuarioId: string): Observable<boolean> {
+  eliminarComentario(id: string, usuarioId: string, razon: string = 'Eliminado por moderación'): Observable<boolean> {
     return this.apollo
       .mutate<{ eliminarComentario: boolean }>({
         mutation: ELIMINAR_COMENTARIO,
-        variables: { id, usuarioId }
+        variables: { 
+          comentarioId: id,  // ✅ Asegúrate que coincida con el schema
+          usuarioId, 
+          razon 
+        }
       })
       .pipe(map(result => result.data?.eliminarComentario ?? false));
   }
+
 
   buscarComentario(id: string): Observable<Comentario | null> {
     return this.apollo
@@ -260,4 +297,56 @@ export class ComentarioService {
     
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   }
+
+  obtenerTodosLosComentarios(): Observable<any[]> {
+    return this.apollo
+      .watchQuery<{ obtenerTodosLosComentarios: any[] }>({
+        query: gql`
+          query ObtenerTodosLosComentarios {
+            obtenerTodosLosComentarios {
+              id
+              texto
+              fecha_creacion
+              queja_id
+              author {
+                id
+                nombre
+                apellido
+                foto_perfil
+              }
+              queja {
+                id
+                titulo
+                descripcion
+                imagen_url
+              }
+            }
+          }
+        `,
+        fetchPolicy: 'network-only'
+      })
+      .valueChanges.pipe(
+        map(result => result.data.obtenerTodosLosComentarios)
+      );
+  }
+
+
+  aprobarComentario(comentarioId: string, soporteId: string): Observable<any> {
+    return this.apollo
+      .mutate({
+        mutation: APROBAR_COMENTARIO,
+        variables: { comentarioId, soporteId }
+      })
+      .pipe(map(result => result.data));
+  }
+
+  rechazarComentario(comentarioId: string, soporteId: string, razon: string): Observable<any> {
+    return this.apollo
+      .mutate({
+        mutation: RECHAZAR_COMENTARIO,
+        variables: { comentarioId, soporteId, razon }
+      })
+      .pipe(map(result => result.data));
+  }
+
 }
