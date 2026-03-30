@@ -1,7 +1,0 @@
-{
-  "buildCommand": "cd ComuniRed && npm install && npm run build",
-  "outputDirectory": "ComuniRed/dist/comuni-red",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
