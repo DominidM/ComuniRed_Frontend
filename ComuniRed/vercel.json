@@ -1,5 +1,5 @@
 {
-  "outputDirectory": "ComuniRed/dist/comuni-red/browser",
+  "outputDirectory": "ComuniRed/dist/comuni-red",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
