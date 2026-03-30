@@ -225,7 +225,7 @@ export class UsuarioService {
       variables: { page, size },
       fetchPolicy: 'network-only',
       errorPolicy: 'all'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.obtenerUsuarios || {
         content: [],
         totalElements: 0,
@@ -240,7 +240,7 @@ export class UsuarioService {
     return this.apollo.watchQuery<{ obtenerTodosLosUsuarios: Usuario[] }>({
       query: OBTENER_TODOS_LOS_USUARIOS,
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.obtenerTodosLosUsuarios || [])
     );
   }
@@ -250,7 +250,7 @@ export class UsuarioService {
       query: OBTENER_USUARIO_POR_ID,
       variables: { id },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data.obtenerUsuarioPorId)
     );
   }
@@ -278,7 +278,7 @@ export class UsuarioService {
       query: CONTAR_USUARIOS_POR_ROL,
       variables: { rol_id: rolId },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data.contarUsuariosPorRol)
     );
   }

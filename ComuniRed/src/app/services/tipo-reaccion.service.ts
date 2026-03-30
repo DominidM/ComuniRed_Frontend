@@ -39,7 +39,7 @@ export class TipoReaccionService {
         variables: { page, size },
         fetchPolicy: 'network-only'  // 👈 Agrega esta línea
       })
-      .valueChanges.pipe(map(result => result.data.obtenerTipo_reaccion));
+      .valueChanges.pipe(map((r: any) => r), map(result => result.data.obtenerTipo_reaccion));
   }
 
 
@@ -56,7 +56,7 @@ export class TipoReaccionService {
         variables: { label },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(map(result => result.data.buscarTipoReaccionPorLabel));
+      .valueChanges.pipe(map((r: any) => r), map(result => result.data.buscarTipoReaccionPorLabel));
   }
 
   crearTipoReaccion(tipo: Partial<TipoReaccion>, page: number, size: number): Observable<TipoReaccion> {

@@ -548,7 +548,7 @@ export class QuejaService {
         variables: { usuarioActualId },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => result.data.obtenerQuejas)
       );
   }
@@ -560,7 +560,7 @@ export class QuejaService {
         variables: { id, usuarioActualId },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => result.data.obtenerQuejaPorId)
       );
   }
@@ -572,7 +572,7 @@ export class QuejaService {
         variables: { usuarioId, usuarioActualId },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => result.data.quejasPorUsuario)
       );
   }
@@ -584,7 +584,7 @@ export class QuejaService {
         variables: { usuarioActualId },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => result.data.quejasAprobadas)
       );
   }
@@ -728,7 +728,7 @@ export class QuejaService {
         variables: { quejaId },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => result.data.historialPorQueja)
       );
   }

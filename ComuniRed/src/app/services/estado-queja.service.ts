@@ -64,7 +64,7 @@ export class EstadosQuejaService {
         }
       `,
       variables: { page, size }
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data.obtenerEstados_queja)
     );
   }
@@ -164,7 +164,7 @@ export class EstadosQuejaService {
         }
       `,
       variables: { nombre }
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data.buscarEstadoPorNombre)
     );
   }

@@ -44,7 +44,7 @@ export class CategoriaService {
         }
       `,
       variables: { page, size }
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data.obtenerCategorias)
     );
   }
@@ -62,7 +62,7 @@ export class CategoriaService {
         }
       `,
       variables: { nombre }
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data.buscarCategoriaPorNombre)
     );
   }

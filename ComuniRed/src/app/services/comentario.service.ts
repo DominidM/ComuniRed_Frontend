@@ -325,7 +325,7 @@ export class ComentarioService {
         `,
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => result.data.obtenerTodosLosComentarios)
       );
   }
