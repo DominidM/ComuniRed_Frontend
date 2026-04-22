@@ -1,4 +1,11 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  HostListener,
+  ChangeDetectorRef,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -8,18 +15,21 @@ import { ReaccionService } from '../../services/reaccion.service';
 import { ComentarioService } from '../../services/comentario.service';
 import { CategoriaService, Categoria } from '../../services/categoria.service';
 import { UsuarioService } from '../../services/usuario.service';
-import { HistorialEventoService, HistorialEvento } from '../../services/historial-evento.service';
+import {
+  HistorialEventoService,
+  HistorialEvento,
+} from '../../services/historial-evento.service';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
   imports: [CommonModule, HttpClientModule, FormsModule],
   templateUrl: './feed.component.html',
-  styleUrls: ['./feed.component.css']
+  styleUrls: ['./feed.component.css'],
 })
-export class FeedComponent implements OnInit {
+export class FeedComponent implements OnInit, OnDestroy {
   Math = Math;
-  
+
   user: { id?: string; name: string; avatarUrl: string } | null = null;
   posts: Queja[] = [];
   filteredPosts: Queja[] = [];
@@ -29,7 +39,7 @@ export class FeedComponent implements OnInit {
   selectedCategory = '';
   selectedStatus = '';
   sortBy: 'recent' | 'popular' | 'votes' = 'recent';
-  
+
   showCreateModal = false;
   newQueja = {
     titulo: '',
@@ -37,7 +47,7 @@ export class FeedComponent implements OnInit {
     categoriaId: '',
     ubicacion: '',
     imagenFile: null as File | null,
-    imagenPreview: null as string | null
+    imagenPreview: null as string | null,
   };
 
   showEditModal = false;
@@ -49,15 +59,15 @@ export class FeedComponent implements OnInit {
   toastMessage = '';
   showToast = false;
 
-  page = 0;
-  hasMore = true;
-
   showReactionMenu: { [postId: string]: boolean } = {};
   showCommentsInline: { [postId: string]: boolean } = {};
   showCommentMenuModal: { [commentId: string]: boolean } = {};
-  currentPage = 1;
-  reportsPerPage = 10;
-  totalReports = 0;
+
+  page = 0;
+  pageSize = 5;
+  allLoaded = false;
+  loadingMore = false;
+  skeletonItems = [1, 2, 3];
 
   showCommentsModal = false;
   selectedReporteForComments: Queja | null = null;
@@ -68,6 +78,10 @@ export class FeedComponent implements OnInit {
   historialEventos: HistorialEvento[] = [];
   loadingHistorial = false;
 
+  // Infinite scroll - referencia al contenedor con scroll
+  private scrollContainer: HTMLElement | null = null;
+  private boundOnScroll: () => void;
+
   constructor(
     private quejaService: QuejaService,
     private reaccionService: ReaccionService,
@@ -75,52 +89,84 @@ export class FeedComponent implements OnInit {
     private categoriaService: CategoriaService,
     private usuarioService: UsuarioService,
     private historialService: HistorialEventoService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private el: ElementRef,
+  ) {
+    this.boundOnScroll = this.onContainerScroll.bind(this);
+  }
 
   @HostListener('document:click')
   onDocumentClick(): void {
     this.closeAllReactionMenus();
   }
 
-  @HostListener('window:scroll')
-  onScroll(): void {
-    const scrollPosition = window.pageYOffset + window.innerHeight;
-    const pageHeight = document.documentElement.scrollHeight;
-
-    if (scrollPosition >= pageHeight - 100 && !this.loading && this.hasMore) {
-      this.loadMorePosts();
-    }
-  }
-
   ngOnInit(): void {
     this.loadUser();
     this.loadCategorias();
-    this.loadPosts();
+
+    // Busca el contenedor con scroll (.feed-area) después de que el DOM esté listo
+    setTimeout(() => {
+      this.scrollContainer = this.el.nativeElement.closest('.feed-area');
+      if (this.scrollContainer) {
+        this.scrollContainer.addEventListener('scroll', this.boundOnScroll);
+      } else {
+        // Fallback: escucha window si no encuentra feed-area
+        window.addEventListener('scroll', this.boundOnScroll);
+      }
+    }, 0);
   }
 
-  loadMorePosts(): void {
-    console.log('Cargando más posts...');
+  ngOnDestroy(): void {
+    if (this.scrollContainer) {
+      this.scrollContainer.removeEventListener('scroll', this.boundOnScroll);
+    } else {
+      window.removeEventListener('scroll', this.boundOnScroll);
+    }
+  }
+
+  onContainerScroll(): void {
+    if (this.loadingMore || this.allLoaded) return;
+
+    if (this.scrollContainer) {
+      const { scrollTop, scrollHeight, clientHeight } = this.scrollContainer;
+      if (scrollHeight - scrollTop <= clientHeight + 400) {
+        this.loadPosts();
+      }
+    } else {
+      // Fallback para window
+      const scrolled = window.innerHeight + window.scrollY;
+      const total = document.body.offsetHeight;
+      if (scrolled >= total - 400) {
+        this.loadPosts();
+      }
+    }
   }
 
   loadUser(): void {
     const u = this.usuarioService.getUser();
     if (u) {
       const avatar = (u as any).foto_perfil || 'assets/img/default-avatar.png';
-      this.user = { 
-        id: (u as any).id || undefined, 
-        name: `${(u as any).nombre || ''} ${(u as any).apellido || ''}`.trim() || 'Usuario', 
-        avatarUrl: avatar 
+      this.user = {
+        id: (u as any).id || (u as any)._id || undefined,
+        name:
+          `${(u as any).nombre || ''} ${(u as any).apellido || ''}`.trim() ||
+          'Usuario',
+        avatarUrl: avatar,
       };
     } else {
-      this.user = { name: 'Usuario', avatarUrl: 'assets/img/default-avatar.png' };
+      this.user = {
+        name: 'Usuario',
+        avatarUrl: 'assets/img/default-avatar.png',
+      };
     }
+    this.loadPosts();
   }
 
   loadCategorias(): void {
     this.categoriaService.obtenerCategorias(0, 100).subscribe({
       next: (page) => {
-        this.categorias = page.content.filter(c => c.activo);
+        this.categorias = page.content.filter((c) => c.activo);
       },
       error: (err) => {
         console.error('Error cargando categorías', err);
@@ -130,109 +176,119 @@ export class FeedComponent implements OnInit {
           { id: '68f5c40c77c9f1339092c6f7', nombre: 'Agua y Saneamiento', descripcion: '', activo: true },
           { id: '68f5c40c77c9f1339092c6f3', nombre: 'Limpieza', descripcion: '', activo: true },
           { id: '68f5c40c77c9f1339092c6f4', nombre: 'Seguridad', descripcion: '', activo: true },
-          { id: '68f5c40c77c9f1339092c6f6', nombre: 'Señalización', descripcion: '', activo: true }
+          { id: '68f5c40c77c9f1339092c6f6', nombre: 'Señalización', descripcion: '', activo: true },
         ];
-      }
+      },
     });
   }
 
-  loadPosts(): void {
-    if (!this.user?.id) return;
-    
-    this.loading = true;
-    this.quejaService.obtenerQuejas(this.user.id).subscribe({
-      next: (quejas) => {
-        this.posts = JSON.parse(JSON.stringify(quejas)).map((q: any) => {
-          const reactions = {
-            total: q.reactions?.total || 0,
-            userReaction: q.reactions?.userReaction || undefined,
-            counts: {
-              like: q.reactions?.counts?.['like'] || 0,
-              love: q.reactions?.counts?.['love'] || 0,
-              wow: q.reactions?.counts?.['wow'] || 0,
-              helpful: q.reactions?.counts?.['helpful'] || 0,
-              dislike: q.reactions?.counts?.['dislike'] || 0,
-              report: q.reactions?.counts?.['report'] || 0
-            }
-          };
+  loadPosts(reset = false): void {
+    if (reset) {
+      this.page = 0;
+      this.posts = [];
+      this.allLoaded = false;
+      this.loadingMore = false;
+    }
 
-          const votes = {
-            yes: q.votes?.yes || 0,
-            no: q.votes?.no || 0,
-            total: q.votes?.total || 0
-          };
+    if (this.allLoaded || this.loadingMore) return;
 
-          return {
+    this.loadingMore = true;
+    const userId = this.user?.id || '';
+
+    this.quejaService
+      .obtenerQuejasPaginadas(userId, this.page, this.pageSize)
+      .subscribe({
+        next: (pageData) => {
+          if (!pageData) {
+            this.loadingMore = false;
+            return;
+          }
+
+          const newPosts = pageData.content.map((q: any) => ({
             ...q,
-            reactions,
-            votes,
+            reactions: {
+              total: q.reactions?.total || 0,
+              userReaction: q.reactions?.userReaction || undefined,
+              counts: {
+                like: q.reactions?.counts?.like || 0,
+                love: q.reactions?.counts?.love || 0,
+                wow: q.reactions?.counts?.wow || 0,
+                helpful: q.reactions?.counts?.helpful || 0,
+                dislike: q.reactions?.counts?.dislike || 0,
+                report: q.reactions?.counts?.report || 0,
+              },
+            },
+            votes: {
+              yes: q.votes?.yes || 0,
+              no: q.votes?.no || 0,
+              total: q.votes?.total || 0,
+            },
             showComments: false,
             showMenu: false,
-            comments: q.comments || [],
-            commentsCount: q.commentsCount || 0
-          };
-        });
-        
-        this.applyFilters();
-        this.loading = false;
-      },
-      error: (err: any) => {
-        console.error('Error cargando quejas:', err);
-        this.loading = false;
-        this.showToastMessage('Error al cargar reportes');
-      }
-    });
+            comments: [],
+            commentsCount: q.commentsCount || 0,
+          }));
+
+          this.posts = [...this.posts, ...newPosts];
+          this.filteredPosts = [...this.posts];
+          this.allLoaded = pageData.last === true || newPosts.length === 0;
+          this.page++;
+          this.loadingMore = false;
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          console.error('Error cargando quejas:', err);
+          this.loadingMore = false;
+          this.showToastMessage('Error al cargar reportes');
+        },
+      });
   }
 
   refreshPosts(): void {
     this.showToastMessage('Actualizando...');
-    this.currentPage = 1;
-    this.loadPosts();
+    this.loadPosts(true);
   }
 
   applyFilters(): void {
     let filtered = [...this.posts];
 
     if (this.selectedCategory) {
-      filtered = filtered.filter(p => p.categoria?.id === this.selectedCategory);
+      filtered = filtered.filter(
+        (p) => p.categoria?.id === this.selectedCategory,
+      );
     }
-
     if (this.selectedStatus) {
-      filtered = filtered.filter(p => p.estado?.id === this.selectedStatus);
+      filtered = filtered.filter((p) => p.estado?.id === this.selectedStatus);
     }
 
     filtered = this.sortPosts(filtered);
-
     this.filteredPosts = filtered;
-    this.currentPage = 1;
+    this.cdr.detectChanges();
   }
 
   sortPosts(posts: Queja[]): Queja[] {
     switch (this.sortBy) {
       case 'recent':
-        return posts.sort((a, b) => 
-          new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime()
+        return posts.sort(
+          (a, b) =>
+            new Date(b.fecha_creacion).getTime() -
+            new Date(a.fecha_creacion).getTime(),
         );
       case 'popular':
-        return posts.sort((a, b) => 
-          (b.reactions?.total || 0) - (a.reactions?.total || 0)
+        return posts.sort(
+          (a, b) => (b.reactions?.total || 0) - (a.reactions?.total || 0),
         );
       case 'votes':
-        return posts.sort((a, b) => 
-          this.getTotalVotes(b) - this.getTotalVotes(a)
+        return posts.sort(
+          (a, b) => this.getTotalVotes(b) - this.getTotalVotes(a),
         );
       default:
         return posts;
     }
   }
 
-  onCategoryFilterChange(): void {
-    this.applyFilters();
-  }
-
-  onSortChange(): void {
-    this.applyFilters();
-  }
+  onCategoryFilterChange(): void { this.applyFilters(); }
+  onSortChange(): void { this.applyFilters(); }
 
   clearFilters(): void {
     this.selectedCategory = '';
@@ -241,13 +297,19 @@ export class FeedComponent implements OnInit {
     this.applyFilters();
   }
 
+  get displayedPosts(): Queja[] {
+    return this.selectedCategory || this.selectedStatus
+      ? this.filteredPosts
+      : this.posts;
+  }
+
   closeAllReactionMenus(): void {
     this.showReactionMenu = {};
   }
 
   toggleReactionMenu(postId: string, event: Event): void {
     event.stopPropagation();
-    Object.keys(this.showReactionMenu).forEach(key => {
+    Object.keys(this.showReactionMenu).forEach((key) => {
       if (key !== postId) this.showReactionMenu[key] = false;
     });
     this.showReactionMenu[postId] = !this.showReactionMenu[postId];
@@ -262,46 +324,41 @@ export class FeedComponent implements OnInit {
   toggleReaction(post: Queja, type: string): void {
     if (!this.user?.id) return;
 
-    const previousReactions = { ...post.reactions, counts: { ...post.reactions.counts } };
+    const previousReactions = {
+      ...post.reactions,
+      counts: { ...post.reactions.counts },
+    };
     const previousUserReaction = post.reactions.userReaction;
 
     if (previousUserReaction === type) {
-      const currentCount = post.reactions.counts[type] ?? 0;
-      post.reactions.counts[type] = Math.max(0, currentCount - 1);
+      post.reactions.counts[type] = Math.max(0, (post.reactions.counts[type] ?? 0) - 1);
       post.reactions.userReaction = undefined;
     } else {
       if (previousUserReaction) {
-        const prevCount = post.reactions.counts[previousUserReaction] ?? 0;
-        post.reactions.counts[previousUserReaction] = Math.max(0, prevCount - 1);
+        post.reactions.counts[previousUserReaction] = Math.max(
+          0, (post.reactions.counts[previousUserReaction] ?? 0) - 1,
+        );
       }
-      const currentCount = post.reactions.counts[type] ?? 0;
-      post.reactions.counts[type] = currentCount + 1;
+      post.reactions.counts[type] = (post.reactions.counts[type] ?? 0) + 1;
       post.reactions.userReaction = type;
     }
-    
-    const total = Object.values(post.reactions.counts)
-      .reduce((sum: number, val) => sum + (val ?? 0), 0);
-    post.reactions.total = total;
+
+    post.reactions.total = Object.values(post.reactions.counts).reduce(
+      (sum: number, val) => sum + (val ?? 0), 0,
+    );
 
     this.reaccionService.toggleReaccion(post.id, type, this.user.id).subscribe({
-      next: (updated) => {
-        post.reactions = updated;
-        this.applyFilters();
-      },
+      next: (updated) => { post.reactions = updated; },
       error: (err) => {
         console.error('Error al reaccionar', err);
         post.reactions = previousReactions;
-      }
+      },
     });
   }
 
   getReactionIcon(type: string): string {
     const icons: { [key: string]: string } = {
-      'like': '❤️',
-      'love': '😍',
-      'wow': '😮',
-      'helpful': '👍',
-      'dislike': '👎'
+      like: '❤️', love: '😍', wow: '😮', helpful: '👍', dislike: '👎',
     };
     return icons[type] || '👍';
   }
@@ -315,12 +372,9 @@ export class FeedComponent implements OnInit {
 
     const previousVotes = { ...post.votes };
     const previousCanVote = post.canVote;
-    
-    if (choice === 'accept') {
-      post.votes.yes++;
-    } else {
-      post.votes.no++;
-    }
+
+    if (choice === 'accept') post.votes.yes++;
+    else post.votes.no++;
     post.votes.total = post.votes.yes + post.votes.no;
     post.canVote = false;
 
@@ -328,13 +382,16 @@ export class FeedComponent implements OnInit {
       next: () => {
         this.quejaService.obtenerQuejaPorId(post.id, this.user!.id!).subscribe({
           next: (updated) => {
-            const index = this.posts.findIndex(p => p.id === post.id);
+            const index = this.posts.findIndex((p) => p.id === post.id);
             if (index !== -1) {
-              this.posts[index] = { ...updated, showComments: post.showComments };
-              this.applyFilters();
+              this.posts[index] = {
+                ...updated,
+                showComments: post.showComments,
+                comments: post.comments,
+              };
             }
             this.showToastMessage('Voto registrado');
-          }
+          },
         });
       },
       error: (err) => {
@@ -342,12 +399,18 @@ export class FeedComponent implements OnInit {
         post.votes = previousVotes;
         post.canVote = previousCanVote;
         this.showToastMessage('Error al votar');
-      }
+      },
     });
   }
 
   toggleComments(post: Queja): void {
     post.showComments = !post.showComments;
+
+    if (post.showComments && post.comments.length === 0 && post.commentsCount > 0) {
+      this.quejaService.obtenerQuejaPorId(post.id, this.user?.id || '').subscribe({
+        next: (updated) => { post.comments = updated.comments || []; },
+      });
+    }
   }
 
   addComment(post: Queja, text: string): void {
@@ -361,9 +424,9 @@ export class FeedComponent implements OnInit {
         id: this.user.id,
         nombre: this.user.name.split(' ')[0] || 'Usuario',
         apellido: this.user.name.split(' ')[1] || '',
-        foto_perfil: this.user.avatarUrl
+        foto_perfil: this.user.avatarUrl,
       },
-      fecha_creacion: new Date().toISOString()
+      fecha_creacion: new Date().toISOString(),
     };
 
     post.comments.push(tempComment as any);
@@ -372,18 +435,16 @@ export class FeedComponent implements OnInit {
 
     this.comentarioService.agregarComentario(post.id, this.user.id, text.trim()).subscribe({
       next: (newComment) => {
-        const commentIndex = post.comments.findIndex(c => c.id === tempComment.id);
-        if (commentIndex !== -1) {
-          post.comments[commentIndex] = newComment;
-        }
+        const idx = post.comments.findIndex((c) => c.id === tempComment.id);
+        if (idx !== -1) post.comments[idx] = newComment;
         this.showToastMessage('Comentario agregado');
       },
       error: (err: any) => {
         console.error('Error al comentar', err);
-        post.comments = post.comments.filter(c => c.id !== tempComment.id);
+        post.comments = post.comments.filter((c) => c.id !== tempComment.id);
         post.commentsCount = post.comments.length;
         this.showToastMessage('Error al agregar comentario');
-      }
+      },
     });
   }
 
@@ -395,19 +456,13 @@ export class FeedComponent implements OnInit {
   saveEditComment(post: Queja): void {
     if (!this.editingCommentId || !this.editingCommentText.trim() || !this.user?.id) return;
 
-    const commentIndex = post.comments.findIndex(c => c.id === this.editingCommentId);
-    if (commentIndex !== -1) {
-      const previousText = post.comments[commentIndex].texto;
-      
-      post.comments[commentIndex] = {
-        ...post.comments[commentIndex],
-        texto: this.editingCommentText.trim()
-      };
-      
+    const idx = post.comments.findIndex((c) => c.id === this.editingCommentId);
+    if (idx !== -1) {
+      const previousText = post.comments[idx].texto;
+      post.comments[idx] = { ...post.comments[idx], texto: this.editingCommentText.trim() };
+
       this.comentarioService.actualizarComentario(
-        this.editingCommentId,
-        this.user.id,
-        this.editingCommentText.trim()
+        this.editingCommentId, this.user.id, this.editingCommentText.trim(),
       ).subscribe({
         next: () => {
           this.showToastMessage('Comentario actualizado');
@@ -415,13 +470,10 @@ export class FeedComponent implements OnInit {
         },
         error: (err: any) => {
           console.error('Error al actualizar comentario', err);
-          post.comments[commentIndex] = {
-            ...post.comments[commentIndex],
-            texto: previousText
-          };
+          post.comments[idx] = { ...post.comments[idx], texto: previousText };
           this.showToastMessage('Error al actualizar comentario');
           this.cancelEditComment();
-        }
+        },
       });
     }
   }
@@ -436,14 +488,14 @@ export class FeedComponent implements OnInit {
 
     this.comentarioService.eliminarComentario(commentId, this.user.id).subscribe({
       next: () => {
-        post.comments = post.comments.filter(c => c.id !== commentId);
+        post.comments = post.comments.filter((c) => c.id !== commentId);
         post.commentsCount = post.comments.length;
         this.showToastMessage('Comentario eliminado');
       },
       error: (err: any) => {
         console.error('Error al eliminar comentario', err);
         this.showToastMessage('Error al eliminar comentario');
-      }
+      },
     });
   }
 
@@ -487,44 +539,43 @@ export class FeedComponent implements OnInit {
         id: this.user.id,
         nombre: this.user.name.split(' ')[0] || 'Usuario',
         apellido: this.user.name.split(' ')[1] || '',
-        foto_perfil: this.user.avatarUrl
+        foto_perfil: this.user.avatarUrl,
       },
-      fecha_creacion: new Date().toISOString()
+      fecha_creacion: new Date().toISOString(),
     };
 
     if (!Array.isArray(this.selectedReporteForComments.comments)) {
       this.selectedReporteForComments.comments = [];
     }
 
-    this.selectedReporteForComments.comments = [...this.selectedReporteForComments.comments, tempComment as any];
+    this.selectedReporteForComments.comments = [
+      ...this.selectedReporteForComments.comments, tempComment as any,
+    ];
     this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
 
-    const quejaIndex = this.posts.findIndex(q => q.id === this.selectedReporteForComments!.id);
+    const quejaIndex = this.posts.findIndex((q) => q.id === this.selectedReporteForComments!.id);
     if (quejaIndex !== -1) {
       this.posts[quejaIndex] = {
         ...this.posts[quejaIndex],
         comments: [...this.selectedReporteForComments.comments],
-        commentsCount: this.selectedReporteForComments.commentsCount
+        commentsCount: this.selectedReporteForComments.commentsCount,
       };
-      this.applyFilters();
     }
 
     const commentText = this.newCommentText.trim();
     this.newCommentText = '';
 
     this.comentarioService.agregarComentario(
-      this.selectedReporteForComments.id, 
-      this.user.id, 
-      commentText
+      this.selectedReporteForComments.id, this.user.id, commentText,
     ).subscribe({
       next: (newComment) => {
         if (this.selectedReporteForComments) {
-          const commentIndex = this.selectedReporteForComments.comments.findIndex(c => c.id === tempComment.id);
-          if (commentIndex !== -1) {
+          const idx = this.selectedReporteForComments.comments.findIndex((c) => c.id === tempComment.id);
+          if (idx !== -1) {
             this.selectedReporteForComments.comments = [
-              ...this.selectedReporteForComments.comments.slice(0, commentIndex),
+              ...this.selectedReporteForComments.comments.slice(0, idx),
               newComment,
-              ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
+              ...this.selectedReporteForComments.comments.slice(idx + 1),
             ];
           }
         }
@@ -533,44 +584,46 @@ export class FeedComponent implements OnInit {
       error: (err: any) => {
         console.error('Error al comentar', err);
         if (this.selectedReporteForComments) {
-          this.selectedReporteForComments.comments = this.selectedReporteForComments.comments.filter(c => c.id !== tempComment.id);
-          this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
+          this.selectedReporteForComments.comments =
+            this.selectedReporteForComments.comments.filter((c) => c.id !== tempComment.id);
+          this.selectedReporteForComments.commentsCount =
+            this.selectedReporteForComments.comments.length;
         }
         this.showToastMessage('Error al agregar comentario');
-      }
+      },
     });
   }
 
   saveEditCommentModal(): void {
-    if (!this.editingCommentId || !this.editingCommentText.trim() || !this.selectedReporteForComments || !this.user?.id) return;
+    if (!this.editingCommentId || !this.editingCommentText.trim() ||
+        !this.selectedReporteForComments || !this.user?.id) return;
 
-    const commentIndex = this.selectedReporteForComments.comments.findIndex(c => c.id === this.editingCommentId);
-    if (commentIndex !== -1) {
-      const previousText = this.selectedReporteForComments.comments[commentIndex].texto;
+    const idx = this.selectedReporteForComments.comments.findIndex(
+      (c) => c.id === this.editingCommentId,
+    );
+    if (idx !== -1) {
+      const previousText = this.selectedReporteForComments.comments[idx].texto;
 
       this.selectedReporteForComments.comments = [
-        ...this.selectedReporteForComments.comments.slice(0, commentIndex),
+        ...this.selectedReporteForComments.comments.slice(0, idx),
         {
-          ...this.selectedReporteForComments.comments[commentIndex],
+          ...this.selectedReporteForComments.comments[idx],
           texto: this.editingCommentText.trim(),
-          fecha_modificacion: new Date().toISOString()
+          fecha_modificacion: new Date().toISOString(),
         } as any,
-        ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
+        ...this.selectedReporteForComments.comments.slice(idx + 1),
       ];
 
-      const postIndex = this.posts.findIndex(p => p.id === this.selectedReporteForComments!.id);
+      const postIndex = this.posts.findIndex((p) => p.id === this.selectedReporteForComments!.id);
       if (postIndex !== -1) {
         this.posts[postIndex] = {
           ...this.posts[postIndex],
-          comments: [...this.selectedReporteForComments.comments]
+          comments: [...this.selectedReporteForComments.comments],
         };
-        this.applyFilters();
       }
 
       this.comentarioService.actualizarComentario(
-        this.editingCommentId,
-        this.user.id,
-        this.editingCommentText.trim()
+        this.editingCommentId, this.user.id, this.editingCommentText.trim(),
       ).subscribe({
         next: () => {
           this.showToastMessage('Comentario actualizado');
@@ -580,16 +633,13 @@ export class FeedComponent implements OnInit {
           console.error('Error al actualizar comentario', err);
           if (this.selectedReporteForComments) {
             this.selectedReporteForComments.comments = [
-              ...this.selectedReporteForComments.comments.slice(0, commentIndex),
-              {
-                ...this.selectedReporteForComments.comments[commentIndex],
-                texto: previousText
-              },
-              ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
+              ...this.selectedReporteForComments.comments.slice(0, idx),
+              { ...this.selectedReporteForComments.comments[idx], texto: previousText },
+              ...this.selectedReporteForComments.comments.slice(idx + 1),
             ];
           }
           this.showToastMessage('Error al actualizar comentario');
-        }
+        },
       });
     }
   }
@@ -600,17 +650,18 @@ export class FeedComponent implements OnInit {
     this.comentarioService.eliminarComentario(comment.id, this.user.id).subscribe({
       next: () => {
         if (this.selectedReporteForComments) {
-          this.selectedReporteForComments.comments = this.selectedReporteForComments.comments.filter(c => c.id !== comment.id);
-          this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
+          this.selectedReporteForComments.comments =
+            this.selectedReporteForComments.comments.filter((c) => c.id !== comment.id);
+          this.selectedReporteForComments.commentsCount =
+            this.selectedReporteForComments.comments.length;
 
-          const postIndex = this.posts.findIndex(p => p.id === this.selectedReporteForComments!.id);
+          const postIndex = this.posts.findIndex((p) => p.id === this.selectedReporteForComments!.id);
           if (postIndex !== -1) {
             this.posts[postIndex] = {
               ...this.posts[postIndex],
               comments: [...this.selectedReporteForComments.comments],
-              commentsCount: this.selectedReporteForComments.commentsCount
+              commentsCount: this.selectedReporteForComments.commentsCount,
             };
-            this.applyFilters();
           }
         }
         this.showToastMessage('Comentario eliminado');
@@ -618,7 +669,7 @@ export class FeedComponent implements OnInit {
       error: (err: any) => {
         console.error('Error al eliminar comentario', err);
         this.showToastMessage('Error al eliminar comentario');
-      }
+      },
     });
   }
 
@@ -638,7 +689,6 @@ export class FeedComponent implements OnInit {
 
   saveEditQueja(): void {
     if (!this.editingQueja || !this.user?.id) return;
-
     this.loading = true;
 
     this.quejaService.actualizarQueja(
@@ -648,13 +698,16 @@ export class FeedComponent implements OnInit {
       this.editingQueja.categoria?.id,
       this.editingQueja.estado?.id,
       this.editingQueja.ubicacion,
-      this.user.id
+      this.user.id,
     ).subscribe({
       next: (updated) => {
-        const index = this.posts.findIndex(p => p.id === updated.id);
+        const index = this.posts.findIndex((p) => p.id === updated.id);
         if (index !== -1) {
-          this.posts[index] = { ...updated, showComments: this.posts[index].showComments };
-          this.applyFilters();
+          this.posts[index] = {
+            ...updated,
+            showComments: this.posts[index].showComments,
+            comments: this.posts[index].comments,
+          };
         }
         this.closeEditModal();
         this.loading = false;
@@ -664,19 +717,17 @@ export class FeedComponent implements OnInit {
         console.error('Error al actualizar queja', err);
         this.loading = false;
         this.showToastMessage('Error al actualizar reporte');
-      }
+      },
     });
   }
 
   deleteQueja(post: Queja): void {
     if (!this.user?.id || !confirm('¿Eliminar este reporte permanentemente?')) return;
-
     this.loading = true;
 
     this.quejaService.eliminarQueja(post.id, this.user.id).subscribe({
       next: () => {
-        this.posts = this.posts.filter(p => p.id !== post.id);
-        this.applyFilters();
+        this.posts = this.posts.filter((p) => p.id !== post.id);
         this.loading = false;
         this.showToastMessage('Reporte eliminado');
       },
@@ -684,7 +735,7 @@ export class FeedComponent implements OnInit {
         console.error('Error al eliminar queja', err);
         this.loading = false;
         this.showToastMessage('Error al eliminar reporte');
-      }
+      },
     });
   }
 
@@ -696,7 +747,9 @@ export class FeedComponent implements OnInit {
   openCreateReportWithMedia(): void {
     this.showCreateModal = true;
     this.resetQuejaForm();
-    setTimeout(() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click(), 100);
+    setTimeout(
+      () => document.querySelector<HTMLInputElement>('input[type="file"]')?.click(), 100,
+    );
   }
 
   openCreateReportWithLocation(): void {
@@ -712,12 +765,8 @@ export class FeedComponent implements OnInit {
 
   resetQuejaForm(): void {
     this.newQueja = {
-      titulo: '',
-      descripcion: '',
-      categoriaId: '',
-      ubicacion: '',
-      imagenFile: null,
-      imagenPreview: null
+      titulo: '', descripcion: '', categoriaId: '', ubicacion: '',
+      imagenFile: null, imagenPreview: null,
     };
   }
 
@@ -725,23 +774,11 @@ export class FeedComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      
-      if (file.size > 5 * 1024 * 1024) {
-        this.showToastMessage('La imagen no debe superar 5MB');
-        return;
-      }
-
-      if (!file.type.startsWith('image/')) {
-        this.showToastMessage('Solo se permiten imágenes');
-        return;
-      }
-
+      if (file.size > 5 * 1024 * 1024) { this.showToastMessage('La imagen no debe superar 5MB'); return; }
+      if (!file.type.startsWith('image/')) { this.showToastMessage('Solo se permiten imágenes'); return; }
       this.newQueja.imagenFile = file;
-
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.newQueja.imagenPreview = e.target.result;
-      };
+      reader.onload = (e: any) => { this.newQueja.imagenPreview = e.target.result; };
       reader.readAsDataURL(file);
     }
   }
@@ -753,11 +790,7 @@ export class FeedComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    return !!(
-      this.newQueja.titulo.trim() &&
-      this.newQueja.descripcion.trim() &&
-      this.newQueja.categoriaId
-    );
+    return !!(this.newQueja.titulo.trim() && this.newQueja.descripcion.trim() && this.newQueja.categoriaId);
   }
 
   submitQueja(): void {
@@ -765,19 +798,14 @@ export class FeedComponent implements OnInit {
       this.showToastMessage('Por favor completa todos los campos requeridos');
       return;
     }
-
     this.loading = true;
 
     this.quejaService.crearQueja(
-      this.newQueja.titulo,
-      this.newQueja.descripcion,
-      this.newQueja.categoriaId,
-      this.user.id,
-      this.newQueja.ubicacion || undefined,
-      this.newQueja.imagenFile || undefined
+      this.newQueja.titulo, this.newQueja.descripcion, this.newQueja.categoriaId,
+      this.user.id, this.newQueja.ubicacion || undefined, this.newQueja.imagenFile || undefined,
     ).subscribe({
-      next: (nuevaQueja) => {
-        this.loadPosts();
+      next: () => {
+        this.loadPosts(true);
         this.closeCreateModal();
         this.loading = false;
         this.showToastMessage('¡Reporte publicado exitosamente!');
@@ -786,122 +814,38 @@ export class FeedComponent implements OnInit {
         console.error('Error al crear queja', err);
         this.loading = false;
         this.showToastMessage('Error al publicar el reporte');
-      }
+      },
     });
   }
 
   toggleBookmark(post: Queja): void {
     (post as any).meta = (post as any).meta || {};
-    (post as any).meta.saved = !((post as any).meta.saved);
+    (post as any).meta.saved = !(post as any).meta.saved;
     this.showToastMessage((post as any).meta.saved ? 'Guardado' : 'Eliminado de guardados');
   }
 
   sharePost(post: Queja): void {
     const url = `${location.origin}/quejas/${post.id}`;
     if (navigator.share) {
-      navigator.share({ 
-        title: post.titulo, 
-        text: post.descripcion, 
-        url 
-      }).catch(console.error);
+      navigator.share({ title: post.titulo, text: post.descripcion, url }).catch(console.error);
     } else {
-      navigator.clipboard.writeText(url).then(() => {
-        this.showToastMessage('Enlace copiado al portapapeles');
-      }).catch(() => this.showToastMessage('No se pudo compartir'));
+      navigator.clipboard.writeText(url)
+        .then(() => this.showToastMessage('Enlace copiado al portapapeles'))
+        .catch(() => this.showToastMessage('No se pudo compartir'));
     }
-  }
-
-  downloadPostJson(post: Queja): void {
-    const data = JSON.stringify(post, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `queja-${post.id}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    this.showToastMessage('JSON descargado');
-  }
-
-  getPaginatedPosts(): Queja[] {
-    const posts = this.displayedPosts;
-    this.totalReports = posts.length;
-    const startIndex = (this.currentPage - 1) * this.reportsPerPage;
-    const endIndex = startIndex + this.reportsPerPage;
-    return posts.slice(startIndex, endIndex);
-  }
-
-  getTotalPages(): number {
-    return Math.ceil(this.totalReports / this.reportsPerPage);
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.getTotalPages()) {
-      this.currentPage = page;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.getTotalPages()) {
-      this.currentPage++;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  prevPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  getPageNumbers(): number[] {
-    const totalPages = this.getTotalPages();
-    const pages: number[] = [];
-    
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(totalPages);
-      } else if (this.currentPage >= totalPages - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(totalPages);
-      }
-    }
-    
-    return pages;
   }
 
   verPerfilUsuario(usuario: Usuario): void {
     if (!usuario?.id) return;
-    
-    if (usuario.id === this.user?.id) {
-      this.router.navigate(['/public/profile']);
-    } else {
-      this.router.navigate(['/public/user-profile', usuario.id]);
-    }
+    if (usuario.id === this.user?.id) this.router.navigate(['/public/profile']);
+    else this.router.navigate(['/public/user-profile', usuario.id]);
   }
 
   openHistorialModal(queja: Queja): void {
     this.selectedQuejaHistorial = queja;
     this.showHistorialModal = true;
     this.loadingHistorial = true;
-    
+
     this.historialService.obtenerHistorialPorQueja(queja.id).subscribe({
       next: (eventos) => {
         this.historialEventos = this.historialService.ordenarPorFecha(eventos, false);
@@ -911,7 +855,7 @@ export class FeedComponent implements OnInit {
         console.error('Error cargando historial:', err);
         this.loadingHistorial = false;
         this.showToastMessage('Error al cargar historial');
-      }
+      },
     });
   }
 
@@ -921,236 +865,94 @@ export class FeedComponent implements OnInit {
     this.historialEventos = [];
   }
 
-  getEventoIcono(tipo: string): string {
-    return this.historialService.obtenerIconoPorTipo(tipo);
-  }
-
-  getEventoTexto(tipo: string): string {
-    return this.historialService.obtenerTextoTipo(tipo);
-  }
-
-  getEventoColor(tipo: string): string {
-    return this.historialService.obtenerColorPorTipo(tipo);
-  }
-
-  formatearFechaEvento(fecha: string): string {
-    return this.historialService.formatearFechaRelativa(fecha);
-  }
-
-  hasHistorial(post: Queja): boolean {
-    return post.fecha_clasificacion != null || post.nivel_riesgo != null;
-  }
-
-  hasRiesgo(post: Queja): boolean {
-    return !!post.nivel_riesgo;
-  }
-
-  getNivelRiesgo(post: Queja): string {
-    return post.nivel_riesgo || '';
-  }
+  getEventoIcono(tipo: string): string { return this.historialService.obtenerIconoPorTipo(tipo); }
+  getEventoTexto(tipo: string): string { return this.historialService.obtenerTextoTipo(tipo); }
+  getEventoColor(tipo: string): string { return this.historialService.obtenerColorPorTipo(tipo); }
+  formatearFechaEvento(fecha: string): string { return this.historialService.formatearFechaRelativa(fecha); }
+  hasHistorial(post: Queja): boolean { return post.fecha_clasificacion != null || post.nivel_riesgo != null; }
+  hasRiesgo(post: Queja): boolean { return !!post.nivel_riesgo; }
+  getNivelRiesgo(post: Queja): string { return post.nivel_riesgo || ''; }
 
   getRiesgoBadgeClass(nivel: string): string {
     switch (nivel?.toUpperCase()) {
-      case 'BAJO':
-        return 'badge bg-success';
-      case 'MEDIO':
-        return 'badge bg-warning';
-      case 'ALTO':
-        return 'badge bg-orange';
-      case 'CRITICO':
-        return 'badge bg-danger';
-      default:
-        return 'badge bg-secondary';
+      case 'BAJO': return 'badge bg-success';
+      case 'MEDIO': return 'badge bg-warning';
+      case 'ALTO': return 'badge bg-orange';
+      case 'CRITICO': return 'badge bg-danger';
+      default: return 'badge bg-secondary';
     }
   }
 
   getRiesgoTexto(nivel: string): string {
     switch (nivel?.toUpperCase()) {
-      case 'BAJO':
-        return 'Riesgo Bajo';
-      case 'MEDIO':
-        return 'Riesgo Medio';
-      case 'ALTO':
-        return 'Riesgo Alto';
-      case 'CRITICO':
-        return '⚠️ Crítico';
-      default:
-        return nivel;
+      case 'BAJO': return 'Riesgo Bajo';
+      case 'MEDIO': return 'Riesgo Medio';
+      case 'ALTO': return 'Riesgo Alto';
+      case 'CRITICO': return '⚠️ Crítico';
+      default: return nivel;
     }
   }
 
   getRiesgoIcon(nivel: string): string {
     switch (nivel?.toUpperCase()) {
-      case 'BAJO':
-        return '🟢';
-      case 'MEDIO':
-        return '🟡';
-      case 'ALTO':
-        return '🟠';
-      case 'CRITICO':
-        return '🔴';
-      default:
-        return '⚪';
+      case 'BAJO': return '🟢';
+      case 'MEDIO': return '🟡';
+      case 'ALTO': return '🟠';
+      case 'CRITICO': return '🔴';
+      default: return '⚪';
     }
   }
 
-  getEstadoTexto(post: Queja): string {
-    return post.estado?.nombre || 'Sin estado';
-  }
-
-  getEstadoClave(post: Queja): string {
-    return post.estado?.clave || '';
-  }
+  getEstadoTexto(post: Queja): string { return post.estado?.nombre || 'Sin estado'; }
+  getEstadoClave(post: Queja): string { return post.estado?.clave || ''; }
 
   getEstadoBadgeClass(clave: string): string {
     switch (clave?.toLowerCase()) {
-      case 'nulo':
-        return 'badge bg-secondary';
-      case 'votacion':
-        return 'badge bg-primary';
-      case 'pendiente':
-        return 'badge bg-warning';
-      case 'aprobada':
-        return 'badge bg-success';
-      case 'asignada':
-        return 'badge bg-info';
-      case 'clasificada':
-        return 'badge bg-purple';
-      case 'en_proceso':
-        return 'badge bg-info';
-      case 'observado':
-        return 'badge bg-warning';
-      case 'resuelto':
-        return 'badge bg-success';
-      case 'cancelado':
-        return 'badge bg-danger';
-      default:
-        return 'badge bg-secondary';
+      case 'nulo': return 'badge bg-secondary';
+      case 'votacion': return 'badge bg-primary';
+      case 'pendiente': return 'badge bg-warning';
+      case 'aprobada': return 'badge bg-success';
+      case 'asignada': return 'badge bg-info';
+      case 'clasificada': return 'badge bg-purple';
+      case 'en_proceso': return 'badge bg-info';
+      case 'observado': return 'badge bg-warning';
+      case 'resuelto': return 'badge bg-success';
+      case 'cancelado': return 'badge bg-danger';
+      default: return 'badge bg-secondary';
     }
   }
 
-  isQuejaResuelta(post: Queja): boolean {
-    return post.estado?.clave === 'resuelto';
-  }
-
-  isQuejaEnProceso(post: Queja): boolean {
-    return post.estado?.clave === 'en_proceso' || post.estado?.clave === 'asignada';
-  }
-
-  isQuejaPendiente(post: Queja): boolean {
-    return post.estado?.clave === 'pendiente' || post.estado?.clave === 'aprobada';
-  }
-
-  isQuejaAsignada(post: Queja): boolean {
-    return post.estado?.clave === 'asignada' || post.estado?.clave === 'en_proceso';
-  }
-
-  isQuejaEnVotacion(post: Queja): boolean {
-    return post.estado?.clave === 'votacion';
-  }
-
-  getFechaClasificacion(post: Queja): string {
-    if (!post.fecha_clasificacion) return '';
-    return this.formatDate(post.fecha_clasificacion);
-  }
-
-  hasClasificacion(post: Queja): boolean {
-    return !!post.nivel_riesgo && !!post.fecha_clasificacion;
-  }
-
-  getVotingProgress(post: Queja): number {
-    const total = post.votes.total;
-    const minVotes = 5;
-    return Math.min((total / minVotes) * 100, 100);
-  }
-
-  needsMoreVotes(post: Queja): boolean {
-    return post.votes.total < 5 && this.isQuejaEnVotacion(post);
-  }
-
-  getVotesNeeded(post: Queja): number {
-    return Math.max(5 - post.votes.total, 0);
-  }
-
-  getAvatarUrl(post: Queja): string {
-    return post.usuario?.foto_perfil || 'assets/img/default-avatar.png';
-  }
-
-  getAuthorName(post: Queja): string {
-    return `${post.usuario.nombre} ${post.usuario.apellido}`.trim() || 'Usuario';
-  }
-
-  getPostDate(post: Queja): string {
-    return this.formatDate(post.fecha_creacion);
-  }
-
-  getLocation(post: Queja): string {
-    return post.ubicacion || '';
-  }
-
-  hasLocation(post: Queja): boolean {
-    return !!post.ubicacion;
-  }
-
-  getTitle(post: Queja): string {
-    return post.titulo;
-  }
-
-  getDescription(post: Queja): string {
-    return post.descripcion;
-  }
-
-  getCategoryName(post: Queja): string {
-    return post.categoria?.nombre || 'Sin categoría';
-  }
-
-  hasEvidence(post: Queja): boolean {
-    return post.evidence && post.evidence.length > 0;
-  }
-
-  getFirstEvidenceUrl(post: Queja): string {
-    return post.evidence?.[0]?.url || post.imagen_url || '';
-  }
-
-  hasVotes(post: Queja): boolean {
-    return !!post.votes;
-  }
-
-  getYesVotes(post: Queja): number {
-    return post.votes?.yes || 0;
-  }
-
-  getNoVotes(post: Queja): number {
-    return post.votes?.no || 0;
-  }
-
-  getTotalVotes(post: Queja): number {
-    return (post.votes?.yes || 0) + (post.votes?.no || 0);
-  }
-
-  canVote(post: Queja): boolean {
-    return post.canVote && !post.userVote && this.isQuejaEnVotacion(post);
-  }
-
-  getLikeEmoji(post: Queja): string {
-    return post.reactions?.userReaction === 'like' ? '❤️' : '🤍';
-  }
-
-  getBookmarkEmoji(post: Queja): string {
-    return (post as any).meta?.saved ? '🔖' : '📑';
-  }
-
-  getShowComments(post: Queja): boolean {
-    return !!post.showComments;
-  }
-
-  getCommentAuthor(comment: any): string {
-    return `${comment.author?.nombre || ''} ${comment.author?.apellido || ''}`.trim() || 'Usuario';
-  }
-
-  getCommentText(comment: any): string {
-    return comment.texto || '';
-  }
+  isQuejaResuelta(post: Queja): boolean { return post.estado?.clave === 'resuelto'; }
+  isQuejaEnProceso(post: Queja): boolean { return post.estado?.clave === 'en_proceso' || post.estado?.clave === 'asignada'; }
+  isQuejaPendiente(post: Queja): boolean { return post.estado?.clave === 'pendiente' || post.estado?.clave === 'aprobada'; }
+  isQuejaAsignada(post: Queja): boolean { return post.estado?.clave === 'asignada' || post.estado?.clave === 'en_proceso'; }
+  isQuejaEnVotacion(post: Queja): boolean { return post.estado?.clave === 'votacion'; }
+  getFechaClasificacion(post: Queja): string { return post.fecha_clasificacion ? this.formatDate(post.fecha_clasificacion) : ''; }
+  hasClasificacion(post: Queja): boolean { return !!post.nivel_riesgo && !!post.fecha_clasificacion; }
+  getVotingProgress(post: Queja): number { return Math.min((post.votes.total / 5) * 100, 100); }
+  needsMoreVotes(post: Queja): boolean { return post.votes.total < 5 && this.isQuejaEnVotacion(post); }
+  getVotesNeeded(post: Queja): number { return Math.max(5 - post.votes.total, 0); }
+  getAvatarUrl(post: Queja): string { return post.usuario?.foto_perfil || 'assets/img/default-avatar.png'; }
+  getAuthorName(post: Queja): string { return `${post.usuario.nombre} ${post.usuario.apellido}`.trim() || 'Usuario'; }
+  getPostDate(post: Queja): string { return this.formatDate(post.fecha_creacion); }
+  getLocation(post: Queja): string { return post.ubicacion || ''; }
+  hasLocation(post: Queja): boolean { return !!post.ubicacion; }
+  getTitle(post: Queja): string { return post.titulo; }
+  getDescription(post: Queja): string { return post.descripcion; }
+  getCategoryName(post: Queja): string { return post.categoria?.nombre || 'Sin categoría'; }
+  hasEvidence(post: Queja): boolean { return post.evidence && post.evidence.length > 0; }
+  getFirstEvidenceUrl(post: Queja): string { return post.evidence?.[0]?.url || post.imagen_url || ''; }
+  hasVotes(post: Queja): boolean { return !!post.votes; }
+  getYesVotes(post: Queja): number { return post.votes?.yes || 0; }
+  getNoVotes(post: Queja): number { return post.votes?.no || 0; }
+  getTotalVotes(post: Queja): number { return (post.votes?.yes || 0) + (post.votes?.no || 0); }
+  canVote(post: Queja): boolean { return post.canVote && !post.userVote && this.isQuejaEnVotacion(post); }
+  getLikeEmoji(post: Queja): string { return post.reactions?.userReaction === 'like' ? '❤️' : '🤍'; }
+  getBookmarkEmoji(post: Queja): string { return (post as any).meta?.saved ? '🔖' : '📑'; }
+  getShowComments(post: Queja): boolean { return !!post.showComments; }
+  getCommentAuthor(comment: any): string { return `${comment.author?.nombre || ''} ${comment.author?.apellido || ''}`.trim() || 'Usuario'; }
+  getCommentText(comment: any): string { return comment.texto || ''; }
+  getBookmarkText(post: Queja): string { return (post as any).meta?.saved ? 'Quitar de guardados' : 'Guardar'; }
 
   formatDate(dateString: string): string {
     if (!dateString) return '';
@@ -1167,39 +969,20 @@ export class FeedComponent implements OnInit {
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
     if (diffInSeconds < 60) return 'justo ahora';
     if (diffInSeconds < 3600) return `hace ${Math.floor(diffInSeconds / 60)} min`;
     if (diffInSeconds < 86400) return `hace ${Math.floor(diffInSeconds / 3600)}h`;
     if (diffInSeconds < 172800) return 'hace 1 día';
     if (diffInSeconds < 604800) return `hace ${Math.floor(diffInSeconds / 86400)} días`;
-    
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
   }
 
-  trackByPostId(index: number, post: Queja): string {
-    return post.id;
-  }
-
-  trackByComment(index: number, comment: any): string {
-    return comment.id;
-  }
-
-  get displayedPosts(): Queja[] {
-    return this.selectedCategory || this.selectedStatus 
-      ? this.filteredPosts 
-      : this.posts;
-  }
-
-  getBookmarkText(post: Queja): string {
-    return (post as any).meta?.saved ? 'Quitar de guardados' : 'Guardar';
-  }
+  trackByPostId(index: number, post: Queja): string { return post.id; }
+  trackByComment(index: number, comment: any): string { return comment.id; }
 
   showToastMessage(message: string): void {
     this.toastMessage = message;
     this.showToast = true;
-    setTimeout(() => {
-      this.showToast = false;
-    }, 3000);
+    setTimeout(() => { this.showToast = false; }, 3000);
   }
 }

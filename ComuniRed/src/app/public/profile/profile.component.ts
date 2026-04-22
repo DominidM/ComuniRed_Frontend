@@ -5,7 +5,7 @@ import { UsuarioService, Usuario } from '../../services/usuario.service';
 import { SeguimientoService, Seguimiento } from '../../services/seguimiento.service';
 import { QuejaService } from '../../services/queja.service';
 import { ComentarioService } from '../../services/comentario.service';
-import { ReaccionService } from '../../services/reaccion.service'; // ✅
+import { ReaccionService } from '../../services/reaccion.service';
 
 @Component({
   selector: 'app-profile',

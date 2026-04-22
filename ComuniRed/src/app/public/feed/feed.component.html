@@ -1,11 +1,11 @@
-  <div class="feed-container">
+<div class="feed-container">
     
     <!-- Toast Notification -->
     <div *ngIf="showToast" class="toast-notification">
       {{ toastMessage }}
     </div>
 
-    <!-- Loading Overlay -->
+    <!-- Loading Overlay (solo para acciones como crear/editar) -->
     <div *ngIf="loading" class="loading-overlay">
       <div class="spinner"></div>
     </div>
@@ -205,13 +205,13 @@
     </div>
 
     <!-- Posts -->
-    <ng-container *ngIf="displayedPosts.length > 0; else emptyState">
-      <div *ngFor="let post of getPaginatedPosts(); trackBy: trackByPostId" class="post-card">
+    <ng-container *ngIf="displayedPosts.length > 0 || loadingMore; else emptyState">
+      <div *ngFor="let post of displayedPosts; trackBy: trackByPostId" class="post-card">
         
         <!-- Header del Post -->
         <div class="post-header">
           <div class="avatar-container" (click)="verPerfilUsuario(post.usuario)">
-            <img [src]="getAvatarUrl(post)" [alt]="getAuthorName(post)" class="avatar clickable" />
+            <img [src]="getAvatarUrl(post)" [alt]="getAuthorName(post)" class="avatar clickable" loading="lazy" />
           </div>
 
           <div class="post-info">
@@ -288,7 +288,7 @@
         <!-- Imagen -->
         <div class="post-image-wrapper">
           <ng-container *ngIf="hasEvidence(post) || post.imagen_url; else imagePlaceholder">
-            <img [src]="getFirstEvidenceUrl(post)" [alt]="getTitle(post)" class="post-image" />
+            <img [src]="getFirstEvidenceUrl(post)" [alt]="getTitle(post)" class="post-image" loading="lazy" />
           </ng-container>
           
           <ng-template #imagePlaceholder>
@@ -479,6 +479,7 @@
               <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
                   [alt]="getCommentAuthor(comment)" 
                   class="comment-avatar-preview clickable"
+                  loading="lazy"
                   (click)="verPerfilUsuario(comment.author)" />
               
               <div class="comment-content-preview">
@@ -547,6 +548,29 @@
       </div>
     </ng-container>
 
+    <!-- ✅ SKELETON LOADER - se muestra mientras carga más posts -->
+    <ng-container *ngIf="loadingMore">
+      <div class="post-card skeleton-card" *ngFor="let i of skeletonItems">
+        <div class="skeleton-header">
+          <div class="skeleton skeleton-avatar"></div>
+          <div class="skeleton-lines">
+            <div class="skeleton skeleton-line-short"></div>
+            <div class="skeleton skeleton-line-tiny"></div>
+          </div>
+        </div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-image"></div>
+        <div class="skeleton skeleton-line-medium"></div>
+      </div>
+    </ng-container>
+
+    <!-- ✅ FIN DEL FEED -->
+    <div *ngIf="allLoaded && displayedPosts.length > 0" class="end-of-feed">
+      <i class="bi bi-check-circle"></i>
+      Has visto todos los reportes
+    </div>
+
     <!-- Estado vacío -->
     <ng-template #emptyState>
       <div class="no-posts">
@@ -586,6 +610,7 @@
                   <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'" 
                       [alt]="getCommentAuthor(comment)" 
                       class="comment-avatar-modal clickable"
+                      loading="lazy"
                       (click)="verPerfilUsuario(comment.author)" />
                   
                   <div class="comment-content-modal">
@@ -726,40 +751,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Paginación -->
-    <div *ngIf="getTotalPages() > 1" class="pagination-container">
-      <button class="pagination-btn" 
-              [disabled]="currentPage === 1" 
-              (click)="prevPage()">
-        <i class="bi bi-chevron-left"></i>
-        Anterior
-      </button>
-
-      <div class="pagination-numbers">
-        <button *ngFor="let page of getPageNumbers()" 
-                class="pagination-number" 
-                [class.active]="page === currentPage"
-                [class.ellipsis]="page === -1"
-                [disabled]="page === -1"
-                (click)="page !== -1 && goToPage(page)">
-          {{ page === -1 ? '...' : page }}
-        </button>
-      </div>
-
-      <button class="pagination-btn" 
-              [disabled]="currentPage === getTotalPages()" 
-              (click)="nextPage()">
-        Siguiente
-        <i class="bi bi-chevron-right"></i>
-      </button>
-    </div>
-
-    <div *ngIf="getTotalPages() > 1" class="pagination-info">
-      Mostrando {{ (currentPage - 1) * reportsPerPage + 1 }} - 
-      {{ Math.min(currentPage * reportsPerPage, totalReports) }} 
-      de {{ totalReports }} reportes
     </div>
 
   </div>

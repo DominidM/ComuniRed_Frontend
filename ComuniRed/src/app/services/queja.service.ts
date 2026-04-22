@@ -100,7 +100,85 @@ export interface HistorialEvento {
   usuario_id: string;
 }
 
-// ✅ Query principal con TODOS los campos necesarios
+export interface QuejasPage {
+  content: Queja[];
+  totalElements: number;
+  totalPages: number;
+  last: boolean;       
+  first: boolean;      
+  number: number;     
+  size: number;         
+}
+
+const OBTENER_QUEJAS_PAGINADAS = gql`
+  query ObtenerQuejasPaginadas(
+    $usuarioActualId: ID!
+    $page: Int!
+    $size: Int!
+  ) {
+    obtenerQuejasPaginadas(
+      usuarioActualId: $usuarioActualId
+      page: $page
+      size: $size
+    ) {
+      content {
+        id
+        titulo
+        descripcion
+        ubicacion
+        imagen_url
+        fecha_creacion
+        nivel_riesgo
+        fecha_clasificacion
+        usuario {
+          id
+          nombre
+          apellido
+          foto_perfil
+        }
+        categoria {
+          id
+          nombre
+        }
+        estado {
+          id
+          clave
+          nombre
+        }
+        evidence {
+          id
+          url
+          tipo
+        }
+        votes {
+          yes
+          no
+          total
+        }
+        reactions {
+          total
+          userReaction
+          counts {
+            like
+            love
+            wow
+            helpful
+            dislike
+            report
+          }
+        }
+        commentsCount
+        canVote
+        userVote
+      }
+      totalElements
+      totalPages
+      number
+      last
+    }
+  }
+`;
+
 const OBTENER_QUEJAS = gql`
   query ObtenerQuejas($usuarioActualId: ID!) {
     obtenerQuejas(usuarioActualId: $usuarioActualId) {
@@ -235,7 +313,6 @@ const OBTENER_QUEJA_POR_ID = gql`
     }
   }
 `;
-
 
 const QUEJAS_POR_USUARIO = gql`
   query QuejasPorUsuario($usuarioId: ID!, $usuarioActualId: ID!) {
@@ -509,8 +586,6 @@ const CAMBIAR_ESTADO_QUEJA = gql`
   }
 `;
 
-
-
 const VOTAR_QUEJA = gql`
   mutation VotarQueja($quejaId: ID!, $usuarioId: ID!, $voto: String!) {
     votarQueja(quejaId: $quejaId, usuarioId: $usuarioId, voto: $voto) {
@@ -533,23 +608,39 @@ const VOTAR_QUEJA = gql`
   }
 `;
 
-
-
-
-
 @Injectable({ providedIn: 'root' })
 export class QuejaService {
   constructor(private apollo: Apollo) {}
+
+  obtenerQuejasPaginadas(
+    usuarioActualId: string,
+    page: number,
+    size: number = 10,
+  ): Observable<QuejasPage> {
+    return this.apollo
+      .query<any>({                         
+        query: OBTENER_QUEJAS_PAGINADAS,
+        variables: { usuarioActualId, page, size },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(
+        map((result) => result.data?.obtenerQuejasPaginadas as QuejasPage),
+      );
+  }
+ 
 
   obtenerQuejas(usuarioActualId: string): Observable<Queja[]> {
     return this.apollo
       .watchQuery<{ obtenerQuejas: Queja[] }>({
         query: OBTENER_QUEJAS,
         variables: { usuarioActualId },
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(map((r: any) => r), 
-        map(result => result.data.obtenerQuejas)
+      .valueChanges.pipe(
+        map((result) => {
+          if (!result.data || !result.data.obtenerQuejas) return [];
+          return result.data.obtenerQuejas as Queja[];
+        }),
       );
   }
 
@@ -558,22 +649,25 @@ export class QuejaService {
       .watchQuery<{ obtenerQuejaPorId: Queja }>({
         query: OBTENER_QUEJA_POR_ID,
         variables: { id, usuarioActualId },
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(map((r: any) => r), 
-        map(result => result.data.obtenerQuejaPorId)
+      .valueChanges.pipe(
+        map((result) => result.data?.obtenerQuejaPorId as Queja),
       );
   }
 
-  quejasPorUsuario(usuarioId: string, usuarioActualId: string): Observable<Queja[]> {
+  quejasPorUsuario(
+    usuarioId: string,
+    usuarioActualId: string,
+  ): Observable<Queja[]> {
     return this.apollo
       .watchQuery<{ quejasPorUsuario: Queja[] }>({
         query: QUEJAS_POR_USUARIO,
         variables: { usuarioId, usuarioActualId },
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(map((r: any) => r), 
-        map(result => result.data.quejasPorUsuario)
+      .valueChanges.pipe(
+        map((result) => (result.data?.quejasPorUsuario ?? []) as Queja[]),
       );
   }
 
@@ -582,10 +676,10 @@ export class QuejaService {
       .watchQuery<{ quejasAprobadas: Queja[] }>({
         query: QUEJAS_APROBADAS,
         variables: { usuarioActualId },
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(map((r: any) => r), 
-        map(result => result.data.quejasAprobadas)
+      .valueChanges.pipe(
+        map((result) => (result.data?.quejasAprobadas ?? []) as Queja[]),
       );
   }
 
@@ -597,12 +691,11 @@ export class QuejaService {
 
     const response = await fetch(
       'https://api.cloudinary.com/v1_1/da4wxtjwu/image/upload',
-      { method: 'POST', body: formData }
+      { method: 'POST', body: formData },
     );
 
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-    
     return data.secure_url;
   }
 
@@ -612,38 +705,44 @@ export class QuejaService {
     categoriaId: string,
     usuarioId: string,
     ubicacion?: string,
-    imagen?: File
+    imagen?: File,
   ): Observable<Queja> {
     if (imagen) {
-      return new Observable<Queja>(observer => {
+      return new Observable<Queja>((observer) => {
         this.subirImagenCloudinary(imagen)
-          .then(imagenUrl => {
-            const createVars: any = { titulo, descripcion, categoriaId, usuarioId };
+          .then((imagenUrl) => {
+            const createVars: any = {
+              titulo,
+              descripcion,
+              categoriaId,
+              usuarioId,
+            };
             if (ubicacion) createVars.ubicacion = ubicacion;
 
-            return this.apollo.mutate<{ crearQueja: Queja }>({
-              mutation: CREAR_QUEJA,
-              variables: createVars
-            }).toPromise()
-              .then(result => {
+            return this.apollo
+              .mutate<{ crearQueja: Queja }>({
+                mutation: CREAR_QUEJA,
+                variables: createVars,
+              })
+              .toPromise()
+              .then((result) => {
                 const queja = result?.data?.crearQueja;
                 if (!queja) throw new Error('No se pudo crear la queja');
-                return this.apollo.mutate<{ actualizarQueja: Queja }>({
-                  mutation: ACTUALIZAR_QUEJA,
-                  variables: { id: queja.id, imagen_url: imagenUrl },
-                  refetchQueries: [
-                    { query: OBTENER_QUEJAS, variables: { usuarioActualId: usuarioId } }
-                  ]
-                }).toPromise();
+                return this.apollo
+                  .mutate<{ actualizarQueja: Queja }>({
+                    mutation: ACTUALIZAR_QUEJA,
+                    variables: { id: queja.id, imagen_url: imagenUrl },
+                  })
+                  .toPromise();
               });
           })
-          .then(result => {
+          .then((result) => {
             const quejaFinal = result?.data?.actualizarQueja;
             if (!quejaFinal) throw new Error('No se pudo actualizar la imagen');
             observer.next(quejaFinal);
             observer.complete();
           })
-          .catch(error => observer.error(error));
+          .catch((error) => observer.error(error));
       });
     }
 
@@ -651,14 +750,8 @@ export class QuejaService {
     if (ubicacion) variables.ubicacion = ubicacion;
 
     return this.apollo
-      .mutate<{ crearQueja: Queja }>({
-        mutation: CREAR_QUEJA,
-        variables,
-        refetchQueries: [
-          { query: OBTENER_QUEJAS, variables: { usuarioActualId: usuarioId } }
-        ]
-      })
-      .pipe(map(result => result.data!.crearQueja));
+      .mutate<{ crearQueja: Queja }>({ mutation: CREAR_QUEJA, variables })
+      .pipe(map((result) => result.data!.crearQueja as Queja));
   }
 
   actualizarQueja(
@@ -668,17 +761,21 @@ export class QuejaService {
     categoriaId?: string,
     estadoId?: string,
     ubicacion?: string,
-    usuarioActualId?: string
+    usuarioActualId?: string,
   ): Observable<Queja> {
     return this.apollo
       .mutate<{ actualizarQueja: Queja }>({
         mutation: ACTUALIZAR_QUEJA,
-        variables: { id, titulo, descripcion, categoriaId, estadoId, ubicacion },
-        refetchQueries: usuarioActualId ? [
-          { query: OBTENER_QUEJAS, variables: { usuarioActualId } }
-        ] : []
+        variables: {
+          id,
+          titulo,
+          descripcion,
+          categoriaId,
+          estadoId,
+          ubicacion,
+        },
       })
-      .pipe(map(result => result.data!.actualizarQueja));
+      .pipe(map((result) => result.data!.actualizarQueja as Queja));
   }
 
   eliminarQueja(id: string, usuarioActualId?: string): Observable<boolean> {
@@ -686,39 +783,36 @@ export class QuejaService {
       .mutate<{ eliminarQueja: boolean }>({
         mutation: ELIMINAR_QUEJA,
         variables: { id },
-        refetchQueries: usuarioActualId ? [
-          { query: OBTENER_QUEJAS, variables: { usuarioActualId } }
-        ] : []
       })
-      .pipe(map(result => result.data?.eliminarQueja ?? false));
+      .pipe(map((result) => result.data?.eliminarQueja ?? false));
   }
 
   clasificarRiesgo(
     quejaId: string,
     soporteId: string,
     nivelRiesgo: string,
-    observacion?: string
+    observacion?: string,
   ): Observable<Queja> {
     return this.apollo
       .mutate<{ clasificarRiesgo: Queja }>({
         mutation: CLASIFICAR_RIESGO,
-        variables: { quejaId, soporteId, nivelRiesgo, observacion }
+        variables: { quejaId, soporteId, nivelRiesgo, observacion },
       })
-      .pipe(map(result => result.data!.clasificarRiesgo));
+      .pipe(map((result) => result.data!.clasificarRiesgo as Queja));
   }
 
   cambiarEstadoQueja(
     quejaId: string,
     usuarioId: string,
     nuevoEstado: string,
-    observacion?: string
+    observacion?: string,
   ): Observable<Queja> {
     return this.apollo
       .mutate<{ cambiarEstadoQueja: Queja }>({
         mutation: CAMBIAR_ESTADO_QUEJA,
-        variables: { quejaId, usuarioId, nuevoEstado, observacion }
+        variables: { quejaId, usuarioId, nuevoEstado, observacion },
       })
-      .pipe(map(result => result.data!.cambiarEstadoQueja));
+      .pipe(map((result) => result.data!.cambiarEstadoQueja as Queja));
   }
 
   obtenerHistorialPorQueja(quejaId: string): Observable<HistorialEvento[]> {
@@ -726,22 +820,26 @@ export class QuejaService {
       .watchQuery<{ historialPorQueja: HistorialEvento[] }>({
         query: HISTORIAL_POR_QUEJA,
         variables: { quejaId },
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(map((r: any) => r), 
-        map(result => result.data.historialPorQueja)
+      .valueChanges.pipe(
+        map(
+          (result) =>
+            (result.data?.historialPorQueja ?? []) as HistorialEvento[],
+        ),
       );
   }
 
-  votarQueja(quejaId: string, usuarioId: string, voto: string): Observable<Queja> {
+  votarQueja(
+    quejaId: string,
+    usuarioId: string,
+    voto: string,
+  ): Observable<Queja> {
     return this.apollo
       .mutate<{ votarQueja: Queja }>({
         mutation: VOTAR_QUEJA,
         variables: { quejaId, usuarioId, voto },
-        refetchQueries: [
-          { query: OBTENER_QUEJAS, variables: { usuarioActualId: usuarioId } }
-        ]
       })
-      .pipe(map(result => result.data!.votarQueja));
+      .pipe(map((result) => result.data!.votarQueja as Queja));
   }
 }

@@ -66,11 +66,20 @@ mat-sidenav-content {
 /* ==================== FEED AREA (CON SCROLL INDEPENDIENTE) ==================== */
 .feed-area {
   flex: 1;
+  min-width: 0;
   height: 100%;
   overflow-y: auto !important;
   overflow-x: hidden;
-  padding: 66px 233px;
+  padding: 0;          /* ← saca todo el padding del padre */
   background-color: var(--cr-background-content);
+  box-sizing: border-box;
+}
+
+/* Y en cada componente hijo, limitar el ancho: */
+.settings-container,
+.trending-container {
+  max-width: 680px;
+  margin: 0 auto;
 }
 
 .feed-area::-webkit-scrollbar {

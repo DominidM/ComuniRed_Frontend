@@ -1,10 +1,9 @@
 .suggestions-container {
-  max-width: 700px;
-  margin: 9px auto;
-  padding: 0rem;
-  background: var(--cr-background-content);
-  min-height: 80vh;
-  border-radius: 12px;
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 90px 400px 40px 270px;  /* ← top/right/bottom/left */
+  box-sizing: border-box;
 }
 
 /* ========================================

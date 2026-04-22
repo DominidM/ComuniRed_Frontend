@@ -1,10 +1,21 @@
-/* ==================== CONTENEDOR PRINCIPAL ==================== */
 .trending-container {
-  max-width: 1000px;
+  max-width: 860px;
+  width: 100%;
   margin: 0 auto;
-  padding: 3rem;
-  background: var(--cr-background-content);
-  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 90px 33px 40px 0px;  /* ← top/right/bottom/left */
+}
+
+.trending-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--cr-background);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  margin-top: 0;   /* ← asegura que no haya margen colapsado */
 }
 
 /* ==================== TOAST NOTIFICATION ==================== */
@@ -66,18 +77,6 @@
   color: white;
   margin-top: 1rem;
   font-size: 1.1rem;
-}
-
-/* ==================== HEADER ==================== */
-.trending-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: var(--cr-background);
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
 }
 
 .header-icon {

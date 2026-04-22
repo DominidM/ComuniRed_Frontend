@@ -1,10 +1,9 @@
 .messages-container-wrapper {
-  display: flex;
-  height: 800px;
-  max-height: 100vh;
-  background: #f5f7fb;
-  border-radius: 12px;
-  overflow: hidden;
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 90px 400px 40px 270px;  /* ← top/right/bottom/left */
+  box-sizing: border-box;
 }
 
 .conversations-sidebar {

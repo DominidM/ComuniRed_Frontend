@@ -21,6 +21,7 @@
   box-sizing: border-box;
 }
 
+
 /* Column video: limitar ancho en desktop para evitar barras negras grandes */
 .video-wrapper {
   position: relative;
