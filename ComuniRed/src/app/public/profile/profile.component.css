@@ -2,7 +2,7 @@
   max-width: 100%;
   width: 100%;
   margin: 0 auto;
-  padding: 90px 400px 40px 270px;  /* ← top/right/bottom/left */
+  padding: 90px 380px 40px 300px;  /* ← top/right/bottom/left */
   box-sizing: border-box;
 }
 
@@ -957,4 +957,317 @@
     padding: 20px;
     max-height: 300px;
   }
+}
+
+/* ============================================================
+   Profile Header — Video Banner + Picker
+   Añadir al profile.component.css (reemplaza .profile-header y .header-background)
+   ============================================================ */
+
+/* ── Header wrapper ─────────────────────────────────────────── */
+.profile-header {
+  position: relative;
+  margin-bottom: 0;
+}
+
+/* ── Banner con video ───────────────────────────────────────── */
+.header-background {
+  position: relative;
+  height: 200px;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  background: #0f1011;
+}
+
+.banner-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 300ms ease;
+}
+
+.header-background.editing .banner-video {
+  filter: brightness(0.5) blur(1px);
+}
+
+/* Gradiente sobre el video para legibilidad */
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.08) 0%,
+    rgba(0,0,0,0.0) 40%,
+    rgba(0,0,0,0.55) 100%
+  );
+  pointer-events: none;
+}
+
+/* Meta info */
+.header-meta {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+
+.header-date {
+  font-size: 11px;
+  color: rgba(255,255,255,0.8);
+  font-weight: 400;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.header-role {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 11px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+
+.btn-change-banner:hover {
+  background: rgba(37,99,235,0.7);
+  border-color: rgba(96,165,250,0.4);
+}
+
+.btn-change-banner.active {
+  background: rgba(239,68,68,0.6);
+  border-color: rgba(239,68,68,0.3);
+}
+
+.btn-change-banner i {
+  font-size: 14px;
+}
+
+/* ── Picker de videos ───────────────────────────────────────── */
+.banner-picker {
+  background: var(--cr-background-content, #fff);
+  border: 1px solid var(--cr-border, rgba(0,0,0,0.08));
+  border-top: none;
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 350ms ease, padding 350ms ease;
+}
+
+html.dark .banner-picker {
+  background: #1a1b1e;
+  border-color: rgba(255,255,255,0.06);
+}
+
+.banner-picker.open {
+  max-height: 260px;
+  padding: 16px 20px 20px;
+  overflow-x: auto;
+}
+
+.picker-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin: 0 0 12px 0;
+}
+
+.picker-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: nowrap;
+  padding-bottom: 4px;
+}
+
+/* Item de video en el picker */
+.picker-item {
+  position: relative;
+  width: 140px;
+  height: 82px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  background: #111;
+  transition: border-color 150ms ease, transform 150ms ease;
+  padding: 0;
+}
+
+.picker-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(37,99,235,0.5);
+}
+
+.picker-item.selected {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+}
+
+.picker-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.picker-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 55%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 6px 8px;
+}
+
+.picker-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.picker-check {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  font-size: 16px;
+  color: #3b82f6;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+/* Botón subir (deshabilitado por ahora) */
+.picker-upload {
+  border: 2px dashed rgba(0,0,0,0.15);
+  background: transparent;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+html.dark .picker-upload {
+  border-color: rgba(255,255,255,0.1);
+}
+
+.picker-upload-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  height: 100%;
+  color: #6b7280;
+}
+
+.picker-upload-inner i {
+  font-size: 22px;
+}
+
+.picker-upload-inner span {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.picker-upload-inner small {
+  font-size: 0.65rem;
+  opacity: 0.7;
+}
+
+/* ── Profile info (no cambia, solo ajuste top border radius) ── */
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 30px 28px 30px;
+  background: var(--cr-background, #f8f9fb);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  position: relative;
+  margin-top: -50px; /* pull up over banner */
+  border: 1px solid var(--cr-border, rgba(0,0,0,0.06));
+  border-top: none;
+}
+
+html.dark .profile-info {
+  background: #17181a;
+  border-color: rgba(255,255,255,0.05);
+}
+
+/* Scrollbar horizontal picker */
+.banner-picker.open::-webkit-scrollbar { height: 3px; }
+.banner-picker.open::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+html.dark .banner-picker.open::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08);
+}
+
+.banner-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  position: absolute;
+  bottom: 55px;   /* dentro del banner */
+  right: 16px;
+  z-index: 10;
+}
+
+.btn-mute-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.btn-change-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  height: 34px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.btn-mute-banner:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+.btn-mute-banner.active {
+  background: rgba(255, 59, 48, 0.7);
+}
+
+.btn-change-banner:hover {
+  background: rgba(0, 0, 0, 0.8);
 }

@@ -56,18 +56,31 @@ export interface EstadoRelacion {
   solicitudEnviada: boolean;
 }
 
-
-
 const OBTENER_USUARIOS = gql`
   query ObtenerUsuarios($page: Int!, $size: Int!) {
     obtenerUsuarios(page: $page, size: $size) {
       content {
-        id foto_perfil nombre apellido dni numero_telefono
-        sexo distrito codigo_postal direccion email rol_id
-        fecha_nacimiento fecha_registro
-        ultimaActividad estaEnLinea
+        id
+        foto_perfil
+        nombre
+        apellido
+        dni
+        numero_telefono
+        sexo
+        distrito
+        codigo_postal
+        direccion
+        email
+        rol_id
+        fecha_nacimiento
+        fecha_registro
+        ultimaActividad
+        estaEnLinea
       }
-      totalElements totalPages number size
+      totalElements
+      totalPages
+      number
+      size
     }
   }
 `;
@@ -75,10 +88,22 @@ const OBTENER_USUARIOS = gql`
 const OBTENER_TODOS_LOS_USUARIOS = gql`
   query ObtenerTodosLosUsuarios {
     obtenerTodosLosUsuarios {
-      id foto_perfil nombre apellido dni numero_telefono
-      sexo distrito codigo_postal direccion email rol_id
-      fecha_nacimiento fecha_registro
-      ultimaActividad estaEnLinea
+      id
+      foto_perfil
+      nombre
+      apellido
+      dni
+      numero_telefono
+      sexo
+      distrito
+      codigo_postal
+      direccion
+      email
+      rol_id
+      fecha_nacimiento
+      fecha_registro
+      ultimaActividad
+      estaEnLinea
     }
   }
 `;
@@ -86,10 +111,22 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
 const OBTENER_USUARIO_POR_ID = gql`
   query ObtenerUsuarioPorId($id: ID!) {
     obtenerUsuarioPorId(id: $id) {
-      id foto_perfil nombre apellido dni numero_telefono
-      sexo distrito codigo_postal direccion email rol_id
-      fecha_nacimiento fecha_registro
-      ultimaActividad estaEnLinea
+      id
+      foto_perfil
+      nombre
+      apellido
+      dni
+      numero_telefono
+      sexo
+      distrito
+      codigo_postal
+      direccion
+      email
+      rol_id
+      fecha_nacimiento
+      fecha_registro
+      ultimaActividad
+      estaEnLinea
     }
   }
 `;
@@ -97,9 +134,15 @@ const OBTENER_USUARIO_POR_ID = gql`
 const OBTENER_PERFIL_PUBLICO = gql`
   query ObtenerPerfilPublico($id: ID!) {
     obtenerUsuarioPorId(id: $id) {
-      id foto_perfil nombre apellido distrito
-      fecha_registro fecha_nacimiento
-      ultimaActividad estaEnLinea
+      id
+      foto_perfil
+      nombre
+      apellido
+      distrito
+      fecha_registro
+      fecha_nacimiento
+      ultimaActividad
+      estaEnLinea
     }
   }
 `;
@@ -112,9 +155,15 @@ const CONTAR_USUARIOS_POR_ROL = gql`
 
 const ESTADO_SEGUIMIENTO = gql`
   query EstadoSeguimiento($usuarioActualId: ID!, $otroUsuarioId: ID!) {
-    estadoSeguimiento(usuarioActualId: $usuarioActualId, otroUsuarioId: $otroUsuarioId) {
-      estaSiguiendo teSigue seguimientoMutuo
-      solicitudPendiente solicitudEnviada
+    estadoSeguimiento(
+      usuarioActualId: $usuarioActualId
+      otroUsuarioId: $otroUsuarioId
+    ) {
+      estaSiguiendo
+      teSigue
+      seguimientoMutuo
+      solicitudPendiente
+      solicitudEnviada
     }
   }
 `;
@@ -131,14 +180,25 @@ const CONTAR_SEGUIDOS = gql`
   }
 `;
 
-
 const CREAR_USUARIO = gql`
   mutation CrearUsuario($usuario: UsuarioInput!) {
     crearUsuario(usuario: $usuario) {
-      id foto_perfil nombre apellido dni numero_telefono
-      sexo distrito codigo_postal direccion email rol_id
-      fecha_nacimiento fecha_registro
-      ultimaActividad estaEnLinea
+      id
+      foto_perfil
+      nombre
+      apellido
+      dni
+      numero_telefono
+      sexo
+      distrito
+      codigo_postal
+      direccion
+      email
+      rol_id
+      fecha_nacimiento
+      fecha_registro
+      ultimaActividad
+      estaEnLinea
     }
   }
 `;
@@ -146,10 +206,22 @@ const CREAR_USUARIO = gql`
 const ACTUALIZAR_USUARIO = gql`
   mutation ActualizarUsuario($id: ID!, $usuario: UsuarioInput!) {
     actualizarUsuario(id: $id, usuario: $usuario) {
-      id foto_perfil nombre apellido dni numero_telefono
-      sexo distrito codigo_postal direccion email rol_id
-      fecha_nacimiento fecha_registro
-      ultimaActividad estaEnLinea
+      id
+      foto_perfil
+      nombre
+      apellido
+      dni
+      numero_telefono
+      sexo
+      distrito
+      codigo_postal
+      direccion
+      email
+      rol_id
+      fecha_nacimiento
+      fecha_registro
+      ultimaActividad
+      estaEnLinea
     }
   }
 `;
@@ -171,8 +243,15 @@ const LOGIN = gql`
     login(email: $email, password: $password) {
       token
       usuario {
-        id foto_perfil nombre apellido email rol_id fecha_registro
-        ultimaActividad estaEnLinea
+        id
+        foto_perfil
+        nombre
+        apellido
+        email
+        rol_id
+        fecha_registro
+        ultimaActividad
+        estaEnLinea
       }
     }
   }
@@ -191,8 +270,16 @@ const VERIFICAR_CODIGO_RECUPERACION = gql`
 `;
 
 const CAMBIAR_PASSWORD_CON_CODIGO = gql`
-  mutation CambiarPasswordConCodigo($email: String!, $codigo: String!, $nuevaPassword: String!) {
-    cambiarPasswordConCodigo(email: $email, codigo: $codigo, nuevaPassword: $nuevaPassword)
+  mutation CambiarPasswordConCodigo(
+    $email: String!
+    $codigo: String!
+    $nuevaPassword: String!
+  ) {
+    cambiarPasswordConCodigo(
+      email: $email
+      codigo: $codigo
+      nuevaPassword: $nuevaPassword
+    )
   }
 `;
 
@@ -205,12 +292,12 @@ export const TOKEN_KEY = 'comunired_token';
 export const USER_KEY = 'comunired_user';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsuarioService {
   private userCountSubject = new BehaviorSubject<number>(0);
   private usuarioSubject = new BehaviorSubject<Usuario | null>(this.getUser());
-  
+
   public usuario$ = this.usuarioSubject.asObservable();
   public userCount$ = this.userCountSubject.asObservable();
 
@@ -218,81 +305,90 @@ export class UsuarioService {
     this.refreshUserCount();
   }
 
-
   obtenerUsuarios(page: number, size: number): Observable<UsuarioPage> {
-    return this.apollo.watchQuery<{ obtenerUsuarios: UsuarioPage }>({
-      query: OBTENER_USUARIOS,
-      variables: { page, size },
-      fetchPolicy: 'network-only',
-      errorPolicy: 'all'
-    }).valueChanges.pipe(map((r: any) => r), 
-      map(result => result.data?.obtenerUsuarios || {
-        content: [],
-        totalElements: 0,
-        totalPages: 0,
-        number: page,
-        size: size
-      } as UsuarioPage)
-    );
+    return this.apollo
+      .watchQuery<{ obtenerUsuarios: UsuarioPage }>({
+        query: OBTENER_USUARIOS,
+        variables: { page, size },
+        fetchPolicy: 'network-only',
+        errorPolicy: 'all',
+      })
+      .valueChanges.pipe(
+        map((r: any) => r),
+        map(
+          (result) =>
+            result.data?.obtenerUsuarios ||
+            ({
+              content: [],
+              totalElements: 0,
+              totalPages: 0,
+              number: page,
+              size: size,
+            } as UsuarioPage),
+        ),
+      );
   }
 
   obtenerTodosLosUsuarios(): Observable<Usuario[]> {
-    return this.apollo.watchQuery<{ obtenerTodosLosUsuarios: Usuario[] }>({
-      query: OBTENER_TODOS_LOS_USUARIOS,
-      fetchPolicy: 'network-only'
-    }).valueChanges.pipe(map((r: any) => r), 
-      map(result => result.data?.obtenerTodosLosUsuarios || [])
-    );
+    return this.apollo
+      .watchQuery<{ obtenerTodosLosUsuarios: Usuario[] }>({
+        query: OBTENER_TODOS_LOS_USUARIOS,
+        fetchPolicy: 'network-only',
+      })
+      .valueChanges.pipe(
+        map((r: any) => r),
+        map((result) => result.data?.obtenerTodosLosUsuarios || []),
+      );
   }
 
   obtenerUsuarioPorId(id: string): Observable<Usuario> {
-    return this.apollo.watchQuery<{ obtenerUsuarioPorId: Usuario }>({
-      query: OBTENER_USUARIO_POR_ID,
-      variables: { id },
-      fetchPolicy: 'network-only'
-    }).valueChanges.pipe(map((r: any) => r), 
-      map(result => result.data.obtenerUsuarioPorId)
-    );
+    return this.apollo
+      .query<{ obtenerUsuarioPorId: Usuario }>({
+        query: OBTENER_USUARIO_POR_ID,
+        variables: { id },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((result) => result.data?.obtenerUsuarioPorId));
   }
 
-    obtenerUsuariosPorRol(rolId: string): Observable<Usuario[]> {
+  obtenerUsuariosPorRol(rolId: string): Observable<Usuario[]> {
     return this.obtenerUsuarios(0, 100).pipe(
-      map((page: UsuarioPage) => 
-        page.content.filter((usuario: Usuario) => usuario.rol_id === rolId)
-      )
+      map((page: UsuarioPage) =>
+        page.content.filter((usuario: Usuario) => usuario.rol_id === rolId),
+      ),
     );
   }
 
   obtenerPerfilPublico(usuarioId: string): Observable<Usuario> {
-    return this.apollo.query<{ obtenerUsuarioPorId: Usuario }>({
-      query: OBTENER_PERFIL_PUBLICO,
-      variables: { id: usuarioId },
-      fetchPolicy: 'network-only'
-    }).pipe(
-      map(result => result.data.obtenerUsuarioPorId)
-    );
+    return this.apollo
+      .query<{ obtenerUsuarioPorId: Usuario }>({
+        query: OBTENER_PERFIL_PUBLICO,
+        variables: { id: usuarioId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((result) => result.data.obtenerUsuarioPorId));
   }
 
   contarUsuariosPorRol(rolId: string): Observable<number> {
-    return this.apollo.watchQuery<{ contarUsuariosPorRol: number }>({
-      query: CONTAR_USUARIOS_POR_ROL,
-      variables: { rol_id: rolId },
-      fetchPolicy: 'network-only'
-    }).valueChanges.pipe(map((r: any) => r), 
-      map(result => result.data.contarUsuariosPorRol)
-    );
+    return this.apollo
+      .watchQuery<{ contarUsuariosPorRol: number }>({
+        query: CONTAR_USUARIOS_POR_ROL,
+        variables: { rol_id: rolId },
+        fetchPolicy: 'network-only',
+      })
+      .valueChanges.pipe(
+        map((r: any) => r),
+        map((result) => result.data.contarUsuariosPorRol),
+      );
   }
-
 
   estaEnLinea(usuario: Usuario): boolean {
     return usuario?.estaEnLinea ?? false;
   }
 
-
   obtenerTextoEstado(usuario: Usuario): string {
     return this.estaEnLinea(usuario) ? 'En línea' : 'Desconectado';
   }
-
 
   obtenerUltimaActividad(usuario: Usuario): string {
     if (!usuario?.ultimaActividad) {
@@ -306,119 +402,129 @@ export class UsuarioService {
 
     if (minutos < 1) return 'Justo ahora';
     if (minutos < 60) return `Hace ${minutos} min`;
-    
+
     const horas = Math.floor(minutos / 60);
     if (horas < 24) return `Hace ${horas}h`;
-    
+
     const dias = Math.floor(horas / 24);
     return `Hace ${dias}d`;
   }
 
-
-
-  obtenerEstadoSeguimiento(usuarioActualId: string, otroUsuarioId: string): Observable<EstadoRelacion> {
-    return this.apollo.query<{ estadoSeguimiento: EstadoRelacion }>({
-      query: ESTADO_SEGUIMIENTO,
-      variables: { usuarioActualId, otroUsuarioId },
-      fetchPolicy: 'network-only'
-    }).pipe(
-      map(result => result.data?.estadoSeguimiento || {
-        estaSiguiendo: false,
-        teSigue: false,
-        seguimientoMutuo: false,
-        solicitudPendiente: false,
-        solicitudEnviada: false
+  obtenerEstadoSeguimiento(
+    usuarioActualId: string,
+    otroUsuarioId: string,
+  ): Observable<EstadoRelacion> {
+    return this.apollo
+      .query<{ estadoSeguimiento: EstadoRelacion }>({
+        query: ESTADO_SEGUIMIENTO,
+        variables: { usuarioActualId, otroUsuarioId },
+        fetchPolicy: 'network-only',
       })
-    );
+      .pipe(
+        map(
+          (result) =>
+            result.data?.estadoSeguimiento || {
+              estaSiguiendo: false,
+              teSigue: false,
+              seguimientoMutuo: false,
+              solicitudPendiente: false,
+              solicitudEnviada: false,
+            },
+        ),
+      );
   }
 
   contarSeguidores(usuarioId: string): Observable<number> {
-    return this.apollo.query<{ contarSeguidores: number }>({
-      query: CONTAR_SEGUIDORES,
-      variables: { usuarioId },
-      fetchPolicy: 'network-only'
-    }).pipe(
-      map(result => result.data?.contarSeguidores || 0)
-    );
+    return this.apollo
+      .query<{ contarSeguidores: number }>({
+        query: CONTAR_SEGUIDORES,
+        variables: { usuarioId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((result) => result.data?.contarSeguidores || 0));
   }
 
   contarSeguidos(usuarioId: string): Observable<number> {
-    return this.apollo.query<{ contarSeguidos: number }>({
-      query: CONTAR_SEGUIDOS,
-      variables: { usuarioId },
-      fetchPolicy: 'network-only'
-    }).pipe(
-      map(result => result.data?.contarSeguidos || 0)
-    );
+    return this.apollo
+      .query<{ contarSeguidos: number }>({
+        query: CONTAR_SEGUIDOS,
+        variables: { usuarioId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((result) => result.data?.contarSeguidos || 0));
   }
 
-
-
   crearUsuario(usuario: UsuarioInput): Observable<Usuario> {
-    return this.apollo.mutate<{ crearUsuario: Usuario }>({
-      mutation: CREAR_USUARIO,
-      variables: { usuario },
-      refetchQueries: [
-        { query: OBTENER_USUARIOS, variables: { page: 0, size: 10 } },
-        { query: OBTENER_TODOS_LOS_USUARIOS }
-      ]
-    }).pipe(
-      tap(() => this.refreshUserCount()),
-      map(result => result.data!.crearUsuario)
-    );
+    return this.apollo
+      .mutate<{ crearUsuario: Usuario }>({
+        mutation: CREAR_USUARIO,
+        variables: { usuario },
+        refetchQueries: [
+          { query: OBTENER_USUARIOS, variables: { page: 0, size: 10 } },
+          { query: OBTENER_TODOS_LOS_USUARIOS },
+        ],
+      })
+      .pipe(
+        tap(() => this.refreshUserCount()),
+        map((result) => result.data!.crearUsuario),
+      );
   }
 
   actualizarUsuario(id: string, usuario: UsuarioInput): Observable<Usuario> {
-    return this.apollo.mutate<{ actualizarUsuario: Usuario }>({
-      mutation: ACTUALIZAR_USUARIO,
-      variables: { id, usuario },
-      refetchQueries: [
-        { query: OBTENER_USUARIOS, variables: { page: 0, size: 10 } },
-        { query: OBTENER_TODOS_LOS_USUARIOS }
-      ]
-    }).pipe(
-      tap(() => this.refreshUserCount()),
-      map(result => result.data!.actualizarUsuario)
-    );
+    return this.apollo
+      .mutate<{ actualizarUsuario: Usuario }>({
+        mutation: ACTUALIZAR_USUARIO,
+        variables: { id, usuario },
+        refetchQueries: [
+          { query: OBTENER_USUARIOS, variables: { page: 0, size: 10 } },
+          { query: OBTENER_TODOS_LOS_USUARIOS },
+        ],
+      })
+      .pipe(
+        tap(() => this.refreshUserCount()),
+        map((result) => result.data!.actualizarUsuario),
+      );
   }
 
   eliminarUsuario(id: string): Observable<boolean> {
-    return this.apollo.mutate<{ eliminarUsuario: boolean }>({
-      mutation: ELIMINAR_USUARIO,
-      variables: { id },
-      refetchQueries: [
-        { query: OBTENER_USUARIOS, variables: { page: 0, size: 10 } },
-        { query: OBTENER_TODOS_LOS_USUARIOS }
-      ]
-    }).pipe(
-      tap(() => this.refreshUserCount()),
-      map(result => result.data!.eliminarUsuario)
-    );
+    return this.apollo
+      .mutate<{ eliminarUsuario: boolean }>({
+        mutation: ELIMINAR_USUARIO,
+        variables: { id },
+        refetchQueries: [
+          { query: OBTENER_USUARIOS, variables: { page: 0, size: 10 } },
+          { query: OBTENER_TODOS_LOS_USUARIOS },
+        ],
+      })
+      .pipe(
+        tap(() => this.refreshUserCount()),
+        map((result) => result.data!.eliminarUsuario),
+      );
   }
 
-
-
   login(email: string, password: string) {
-    return this.apollo.mutate<{ login: { token?: string; usuario?: Usuario } }>({
-      mutation: LOGIN,
-      variables: { email, password }
-    }).pipe(
-      map(result => {
-        const payload = result.data?.login;
-        return {
-          token: payload?.token,
-          usuario: payload?.usuario ?? null
-        };
+    return this.apollo
+      .mutate<{ login: { token?: string; usuario?: Usuario } }>({
+        mutation: LOGIN,
+        variables: { email, password },
       })
-    );
+      .pipe(
+        map((result) => {
+          const payload = result.data?.login;
+          return {
+            token: payload?.token,
+            usuario: payload?.usuario ?? null,
+          };
+        }),
+      );
   }
 
   loginAndStore(email: string, password: string) {
     return this.login(email, password).pipe(
-      tap(res => {
+      tap((res) => {
         if (res?.token) this.saveToken(res.token);
         if (res?.usuario) this.saveUser(res.usuario);
-      })
+      }),
     );
   }
 
@@ -464,7 +570,8 @@ export class UsuarioService {
     } catch (e) {}
 
     try {
-      const client: any = (this.apollo as any).client || (this.apollo as any).getClient?.();
+      const client: any =
+        (this.apollo as any).client || (this.apollo as any).getClient?.();
       if (client) {
         client.clearStore?.();
         client.resetStore?.();
@@ -487,7 +594,7 @@ export class UsuarioService {
 
   refreshUserCount(): void {
     this.obtenerUsuarios(0, 1)
-      .pipe(map(page => page?.totalElements ?? 0))
+      .pipe(map((page) => page?.totalElements ?? 0))
       .subscribe({
         next: (count: number) => {
           this.userCountSubject.next(count);
@@ -495,51 +602,54 @@ export class UsuarioService {
         },
         error: (err) => {
           console.warn('No se pudo refrescar el contador de usuarios:', err);
-        }
+        },
       });
   }
 
-
-
   solicitarCodigoRecuperacion(email: string): Observable<boolean> {
-    return this.apollo.mutate<{ solicitarCodigoRecuperacion: boolean }>({
-      mutation: SOLICITAR_CODIGO_RECUPERACION,
-      variables: { email }
-    }).pipe(
-      map(result => result.data?.solicitarCodigoRecuperacion ?? false)
-    );
+    return this.apollo
+      .mutate<{ solicitarCodigoRecuperacion: boolean }>({
+        mutation: SOLICITAR_CODIGO_RECUPERACION,
+        variables: { email },
+      })
+      .pipe(map((result) => result.data?.solicitarCodigoRecuperacion ?? false));
   }
 
-  verificarCodigoRecuperacion(email: string, codigo: string): Observable<boolean> {
-    return this.apollo.mutate<{ verificarCodigoRecuperacion: boolean }>({
-      mutation: VERIFICAR_CODIGO_RECUPERACION,
-      variables: { email, codigo }
-    }).pipe(
-      map(result => result.data?.verificarCodigoRecuperacion ?? false)
-    );
+  verificarCodigoRecuperacion(
+    email: string,
+    codigo: string,
+  ): Observable<boolean> {
+    return this.apollo
+      .mutate<{ verificarCodigoRecuperacion: boolean }>({
+        mutation: VERIFICAR_CODIGO_RECUPERACION,
+        variables: { email, codigo },
+      })
+      .pipe(map((result) => result.data?.verificarCodigoRecuperacion ?? false));
   }
 
-  cambiarPasswordConCodigo(email: string, codigo: string, nuevaPassword: string): Observable<boolean> {
-    return this.apollo.mutate<{ cambiarPasswordConCodigo: boolean }>({
-      mutation: CAMBIAR_PASSWORD_CON_CODIGO,
-      variables: { email, codigo, nuevaPassword }
-    }).pipe(
-      map(result => result.data?.cambiarPasswordConCodigo ?? false)
-    );
+  cambiarPasswordConCodigo(
+    email: string,
+    codigo: string,
+    nuevaPassword: string,
+  ): Observable<boolean> {
+    return this.apollo
+      .mutate<{ cambiarPasswordConCodigo: boolean }>({
+        mutation: CAMBIAR_PASSWORD_CON_CODIGO,
+        variables: { email, codigo, nuevaPassword },
+      })
+      .pipe(map((result) => result.data?.cambiarPasswordConCodigo ?? false));
   }
-
-
 
   eliminarFotoPerfil(usuarioId: string): Observable<boolean> {
-    return this.apollo.mutate<{ eliminarFotoPerfil: boolean }>({
-      mutation: ELIMINAR_FOTO_PERFIL,
-      variables: { usuarioId },
-      refetchQueries: [
-        { query: OBTENER_USUARIO_POR_ID, variables: { id: usuarioId } }
-      ]
-    }).pipe(
-      map(result => result.data?.eliminarFotoPerfil ?? false)
-    );
+    return this.apollo
+      .mutate<{ eliminarFotoPerfil: boolean }>({
+        mutation: ELIMINAR_FOTO_PERFIL,
+        variables: { usuarioId },
+        refetchQueries: [
+          { query: OBTENER_USUARIO_POR_ID, variables: { id: usuarioId } },
+        ],
+      })
+      .pipe(map((result) => result.data?.eliminarFotoPerfil ?? false));
   }
 
   async subirFotoCloudinary(archivo: File): Promise<string> {
@@ -553,16 +663,16 @@ export class UsuarioService {
         'https://api.cloudinary.com/v1_1/da4wxtjwu/image/upload',
         {
           method: 'POST',
-          body: formData
-        }
+          body: formData,
+        },
       );
 
       const data = await response.json();
-      
+
       if (data.error) {
         throw new Error(data.error.message);
       }
-      
+
       return data.secure_url;
     } catch (error) {
       console.error('Error subiendo imagen a Cloudinary:', error);
@@ -570,7 +680,10 @@ export class UsuarioService {
     }
   }
 
-  async actualizarFotoPerfil(usuarioId: string, archivo: File): Promise<Usuario | undefined> {
+  async actualizarFotoPerfil(
+    usuarioId: string,
+    archivo: File,
+  ): Promise<Usuario | undefined> {
     try {
       const url = await this.subirFotoCloudinary(archivo);
       const usuario = await this.obtenerUsuarioPorId(usuarioId).toPromise();
@@ -581,7 +694,7 @@ export class UsuarioService {
 
       return this.actualizarUsuario(usuarioId, {
         ...usuario,
-        foto_perfil: url
+        foto_perfil: url,
       }).toPromise();
     } catch (error) {
       console.error('Error actualizando foto de perfil:', error);
@@ -604,7 +717,7 @@ export class UsuarioService {
 
     return foto_perfil.replace(
       '/upload/',
-      `/upload/w_${width},h_${width},c_fill,g_face,q_auto,f_auto/`
+      `/upload/w_${width},h_${width},c_fill,g_face,q_auto,f_auto/`,
     );
   }
 
@@ -614,29 +727,29 @@ export class UsuarioService {
 
   calcularEdad(fechaNacimiento: string): number | null {
     if (!fechaNacimiento) return null;
-    
+
     const hoy = new Date();
     const nacimiento = new Date(fechaNacimiento);
     let edad = hoy.getFullYear() - nacimiento.getFullYear();
     const mes = hoy.getMonth() - nacimiento.getMonth();
-    
+
     if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
       edad--;
     }
-    
+
     return edad;
   }
 
   formatearFechaRegistro(fechaRegistro: string): string {
     if (!fechaRegistro) return 'Sin fecha';
-    
+
     const fecha = new Date(fechaRegistro);
     return fecha.toLocaleDateString('es-PE', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 }

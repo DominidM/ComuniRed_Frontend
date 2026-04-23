@@ -12,11 +12,7 @@
       (error)="onVideoError($event)"
       [muted]="isMuted"
     >
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
-    <source [src]="currentReel.videoUrl || ''" type="video/mp4" />
+      <source [src]="currentReel.videoUrl || ''" type="video/mp4" />
       Tu navegador no soporta el elemento <code>video</code>.
     </video>
 
@@ -29,16 +25,52 @@
     </div>
 
     <div class="actions-overlay">
-      <button class="action-circle" (click)="toggleMute(); $event.stopPropagation()" aria-label="Silenciar/activar sonido">
-        <svg *ngIf="!isMuted" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg>
-        <svg *ngIf="isMuted" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M16 7l-1.41 1.41L18.17 12l-3.58 3.59L16 17l4-4-4-4z"/></svg>
+      <button
+        class="action-circle"
+        (click)="toggleMute(); $event.stopPropagation()"
+        aria-label="Silenciar/activar sonido"
+      >
+        <svg
+          *ngIf="!isMuted"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="white"
+        >
+          <path d="M3 9v6h4l5 5V4L7 9H3z" />
+        </svg>
+        <svg
+          *ngIf="isMuted"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="white"
+        >
+          <path d="M16 7l-1.41 1.41L18.17 12l-3.58 3.59L16 17l4-4-4-4z" />
+        </svg>
       </button>
 
-      <button class="action-circle" (click)="likeReel(); $event.stopPropagation()" aria-label="Me gusta" type="button">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-      
-        <span class="action-badge">{{ formatNumber(currentReel.likes || 0) }}</span>
+      <button
+        class="action-circle"
+        (click)="likeReel(); $event.stopPropagation()"
+        aria-label="Me gusta"
+        type="button"
+      >
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="white"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+          />
+        </svg>
 
+        <span class="action-badge">{{
+          formatNumber(currentReel.likes || 0)
+        }}</span>
       </button>
     </div>
 
@@ -50,8 +82,14 @@
         aria-label="Video anterior"
         type="button"
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="white" aria-hidden="true">
-          <path d="M7 14l5-5 5 5z"/>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="white"
+          aria-hidden="true"
+        >
+          <path d="M7 14l5-5 5 5z" />
         </svg>
       </button>
 
@@ -62,10 +100,15 @@
         aria-label="Video siguiente"
         type="button"
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="white" aria-hidden="true">
-          <path d="M7 10l5 5 5-5z"/>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="white"
+          aria-hidden="true"
+        >
+          <path d="M7 10l5 5 5-5z" />
         </svg>
->>>>>>> Stashed changes
       </button>
     </div>
 

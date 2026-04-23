@@ -1,215 +1,372 @@
-<div class="seguimiento-container">
-  <div class="header-section">
-    <h2>Seguimiento de Reportes</h2>
-    <p class="descripcion">Monitorea el progreso y estado de todos los reportes</p>
-  </div>
+<div class="soporte-wrap">
 
-  <div class="stats-resumen">
-    <div class="stat-item total">
-      <div class="stat-icon">📊</div>
-      <div class="stat-content">
-        <span class="stat-label">Total</span>
-        <span class="stat-value">{{ totalReportes }}</span>
-      </div>
+  <!-- ── HEADER ── -->
+  <div class="soporte-header">
+    <div class="header-left">
+      <h1 class="header-title">Bandeja de Soporte</h1>
+      <p class="header-sub">Gestiona y resuelve los reportes de la comunidad</p>
     </div>
-
-    <div class="stat-item pendiente">
-      <div class="stat-icon">⏳</div>
-      <div class="stat-content">
-        <span class="stat-label">Pendientes</span>
-        <span class="stat-value">{{ reportesPendientes }}</span>
-      </div>
-    </div>
-
-    <div class="stat-item proceso">
-      <div class="stat-icon">⚙️</div>
-      <div class="stat-content">
-        <span class="stat-label">En Proceso</span>
-        <span class="stat-value">{{ reportesEnProceso }}</span>
-      </div>
-    </div>
-
-    <div class="stat-item resuelto">
-      <div class="stat-icon">✅</div>
-      <div class="stat-content">
-        <span class="stat-label">Resueltos</span>
-        <span class="stat-value">{{ reportesResueltos }}</span>
+    <div class="header-right">
+      <div class="agente-chip">
+        <img [src]="agente?.foto_perfil || 'assets/img/default-avatar.png'" class="agente-avatar" />
+        <div>
+          <span class="agente-nombre">{{ agente?.nombre }} {{ agente?.apellido }}</span>
+          <span class="agente-rol">Soporte</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="filtros-section">
-    <div class="filtros-container">
-      <input 
-        type="text" 
-        placeholder="Buscar reportes..." 
-        [(ngModel)]="filtros.busqueda"
-        (input)="aplicarFiltros()"
-        class="input-busqueda"
-      />
-
-      <select 
-        [(ngModel)]="filtros.estado" 
-        (change)="aplicarFiltros()"
-        class="select-filtro"
-      >
-        <option value="">Todos los estados</option>
-        <option value="pendiente">⏳ Pendiente</option>
-        <option value="en progreso">⚙️ En Proceso</option>
-        <option value="resuelto">✅ Resuelto</option>
-      </select>
-
-      <select 
-        [(ngModel)]="filtros.ordenPor" 
-        (change)="ordenarReportes()"
-        class="select-filtro"
-      >
-        <option value="fecha">Ordenar por Fecha</option>
-        <option value="prioridad">Ordenar por Prioridad</option>
-        <option value="estado">Ordenar por Estado</option>
-      </select>
+  <!-- ── STATS ── -->
+  <div class="stats-row">
+    <div class="stat-card" [class.active]="vistaActual === 'pendientes'" (click)="setVista('pendientes')">
+      <div class="stat-icon s-yellow">⏳</div>
+      <div class="stat-info">
+        <span class="stat-num">{{ counts.pendientes }}</span>
+        <span class="stat-lbl">Sin asignar</span>
+      </div>
+    </div>
+    <div class="stat-card" [class.active]="vistaActual === 'mis'" (click)="setVista('mis')">
+      <div class="stat-icon s-blue">📋</div>
+      <div class="stat-info">
+        <span class="stat-num">{{ counts.mis }}</span>
+        <span class="stat-lbl">Mis reportes</span>
+      </div>
+    </div>
+    <div class="stat-card" [class.active]="vistaActual === 'todos'" (click)="setVista('todos')">
+      <div class="stat-icon s-gray">📊</div>
+      <div class="stat-info">
+        <span class="stat-num">{{ counts.todos }}</span>
+        <span class="stat-lbl">Total</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon s-green">✅</div>
+      <div class="stat-info">
+        <span class="stat-num">{{ counts.resueltos }}</span>
+        <span class="stat-lbl">Resueltos</span>
+      </div>
     </div>
   </div>
 
-  <div class="reportes-tabla">
-    <div *ngIf="reportesFiltrados.length === 0" class="sin-resultados">
-      <div class="sin-resultados-icono">📭</div>
-      <h3>No se encontraron reportes</h3>
-      <p>Intenta ajustar los filtros de busqueda</p>
+  <!-- ── TABS ── -->
+  <div class="tabs-bar">
+    <button class="tab-btn" [class.activo]="vistaActual === 'pendientes'" (click)="setVista('pendientes')">
+      <span>⏳</span> Sin asignar
+      <span class="tab-badge" *ngIf="counts.pendientes > 0">{{ counts.pendientes }}</span>
+    </button>
+    <button class="tab-btn" [class.activo]="vistaActual === 'mis'" (click)="setVista('mis')">
+      <span>👤</span> Mis reportes
+      <span class="tab-badge mis" *ngIf="counts.mis > 0">{{ counts.mis }}</span>
+    </button>
+    <button class="tab-btn" [class.activo]="vistaActual === 'todos'" (click)="setVista('todos')">
+      <span>📊</span> Todos
+    </button>
+  </div>
+
+  <!-- ── FILTROS ── -->
+  <div class="filtros-bar">
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Buscar por título, ubicación..." 
+             [(ngModel)]="filtro.busqueda" (input)="aplicarFiltros()" class="search-inp" />
+    </div>
+    <select [(ngModel)]="filtro.estado" (change)="aplicarFiltros()" class="sel-filtro" *ngIf="vistaActual === 'todos'">
+      <option value="">Todos los estados</option>
+      <option value="PENDIENTE">⏳ Pendiente</option>
+      <option value="ASIGNADA">👤 Asignada</option>
+      <option value="OBSERVADO">👁 Observado</option>
+      <option value="EN_PROCESO">⚙️ En Proceso</option>
+      <option value="RESUELTO">✅ Resuelto</option>
+      <option value="CANCELADO">❌ Cancelado</option>
+    </select>
+    <select [(ngModel)]="filtro.categoria" (change)="aplicarFiltros()" class="sel-filtro">
+      <option value="">Todas las categorías</option>
+      <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</option>
+    </select>
+    <select [(ngModel)]="filtro.riesgo" (change)="aplicarFiltros()" class="sel-filtro">
+      <option value="">Cualquier riesgo</option>
+      <option value="CRITICO">🔴 Crítico</option>
+      <option value="ALTO">🟠 Alto</option>
+      <option value="MEDIO">🟡 Medio</option>
+      <option value="BAJO">🟢 Bajo</option>
+    </select>
+    <button class="btn-refresh" (click)="cargarQuejas()" title="Actualizar">
+      <i class="bi bi-arrow-clockwise"></i>
+    </button>
+  </div>
+
+  <!-- ── LOADING ── -->
+  <div class="loading-state" *ngIf="cargando">
+    <div class="spinner-soporte"></div>
+    <span>Cargando reportes...</span>
+  </div>
+
+  <!-- ── EMPTY ── -->
+  <div class="empty-state" *ngIf="!cargando && quejasFiltradas.length === 0">
+    <div class="empty-icon">📭</div>
+    <h3>No hay reportes aquí</h3>
+    <p *ngIf="vistaActual === 'pendientes'">No hay reportes pendientes sin asignar</p>
+    <p *ngIf="vistaActual === 'mis'">No tienes reportes asignados actualmente</p>
+    <p *ngIf="vistaActual === 'todos'">No se encontraron reportes con esos filtros</p>
+  </div>
+
+  <!-- ── LISTA DE REPORTES ── -->
+  <div class="reportes-lista" *ngIf="!cargando && quejasFiltradas.length > 0">
+    <div 
+      *ngFor="let queja of quejasFiltradas" 
+      class="reporte-card"
+      [class.urgente]="queja.nivel_riesgo === 'CRITICO'"
+      (click)="abrirDetalle(queja)"
+    >
+      <!-- Indicador de riesgo lateral -->
+      <div class="riesgo-bar" [class]="'riesgo-' + (queja.nivel_riesgo || 'none')?.toLowerCase()"></div>
+
+      <div class="card-body">
+        <!-- Fila superior -->
+        <div class="card-top">
+          <div class="card-autor">
+            <img [src]="queja.usuario?.foto_perfil || 'assets/img/default-avatar.png'" class="card-avatar" />
+            <div>
+              <span class="card-nombre">{{ queja.usuario?.nombre }} {{ queja.usuario?.apellido }}</span>
+              <span class="card-fecha">{{ formatFecha(queja.fecha_creacion) }}</span>
+            </div>
+          </div>
+          <div class="card-badges">
+            <span class="badge-estado" [class]="'est-' + getEstadoClave(queja)">
+              {{ queja.estado?.nombre || 'Sin estado' }}
+            </span>
+            <span class="badge-riesgo" *ngIf="queja.nivel_riesgo" [class]="'risk-' + queja.nivel_riesgo?.toLowerCase()">
+              {{ getRiesgoIcon(queja.nivel_riesgo) }} {{ queja.nivel_riesgo }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Contenido -->
+        <h4 class="card-titulo">{{ queja.titulo }}</h4>
+        <p class="card-desc">{{ queja.descripcion }}</p>
+
+        <!-- Meta info -->
+        <div class="card-meta">
+          <span class="meta-item" *ngIf="queja.ubicacion">
+            <i class="bi bi-geo-alt-fill"></i> {{ queja.ubicacion }}
+          </span>
+          <span class="meta-item">
+            <i class="bi bi-tag-fill"></i> {{ queja.categoria?.nombre }}
+          </span>
+          <span class="meta-item">
+            <i class="bi bi-chat-left-text"></i> {{ queja.commentsCount || 0 }} comentarios
+          </span>
+          <span class="meta-item" *ngIf="queja.votes">
+            <i class="bi bi-hand-thumbs-up"></i> {{ queja.votes.yes }} votos
+          </span>
+        </div>
+
+        <!-- Acciones rápidas -->
+        <div class="card-acciones" (click)="$event.stopPropagation()">
+          <!-- Si está PENDIENTE sin asignar -->
+          <button 
+            *ngIf="getEstadoClave(queja) === 'pendiente'" 
+            class="btn-accion tomar"
+            (click)="tomarReporte(queja)"
+            [disabled]="procesando[queja.id]"
+          >
+            <i class="bi bi-hand-index-thumb"></i> Tomar reporte
+          </button>
+
+          <!-- Si está ASIGNADA o EN_PROCESO -->
+          <ng-container *ngIf="['asignada','en_proceso','observado'].includes(getEstadoClave(queja)) && esDeEsteAgente(queja)">
+            <button class="btn-accion proceso" (click)="cambiarEstado(queja, 'EN_PROCESO')" 
+                    *ngIf="getEstadoClave(queja) !== 'en_proceso'"
+                    [disabled]="procesando[queja.id]">
+              <i class="bi bi-gear"></i> En proceso
+            </button>
+            <button class="btn-accion observar" (click)="abrirObservacion(queja)"
+                    [disabled]="procesando[queja.id]">
+              <i class="bi bi-eye"></i> Observar
+            </button>
+            <button class="btn-accion resolver" (click)="cambiarEstado(queja, 'RESUELTO')"
+                    [disabled]="procesando[queja.id]">
+              <i class="bi bi-check-circle"></i> Resolver
+            </button>
+            <button class="btn-accion cancelar" (click)="abrirCancelar(queja)"
+                    [disabled]="procesando[queja.id]">
+              <i class="bi bi-x-circle"></i> Cancelar
+            </button>
+          </ng-container>
+
+          <button class="btn-accion historial" (click)="abrirHistorial(queja)">
+            <i class="bi bi-clock-history"></i> Historial
+          </button>
+        </div>
+      </div>
+
+      <!-- Imagen miniatura -->
+      <div class="card-img" *ngIf="queja.imagen_url || (queja.evidence && queja.evidence.length > 0)">
+        <img [src]="queja.imagen_url || queja.evidence[0]?.url" alt="Evidencia" />
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     MODAL DETALLE / GESTIÓN
+══════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="modalDetalle" (click)="cerrarDetalle()">
+  <div class="modal-detalle" (click)="$event.stopPropagation()">
+    
+    <div class="modal-detalle-header">
+      <div class="modal-titulo-row">
+        <h2>{{ quejaSeleccionada?.titulo }}</h2>
+        <button class="btn-close-modal" (click)="cerrarDetalle()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-badges">
+        <span class="badge-estado lg" [class]="'est-' + getEstadoClave(quejaSeleccionada!)">
+          {{ quejaSeleccionada?.estado?.nombre }}
+        </span>
+        <span class="badge-riesgo lg" *ngIf="quejaSeleccionada?.nivel_riesgo"
+              [class]="'risk-' + quejaSeleccionada?.nivel_riesgo?.toLowerCase()">
+          {{ getRiesgoIcon(quejaSeleccionada?.nivel_riesgo) }} {{ quejaSeleccionada?.nivel_riesgo }}
+        </span>
+      </div>
     </div>
 
-    <div class="tabla-wrapper" *ngIf="reportesFiltrados.length > 0">
-      <table class="tabla-seguimiento">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Titulo</th>
-            <th>Cliente</th>
-            <th>Estado</th>
-            <th>Prioridad</th>
-            <th>Progreso</th>
-            <th>Dias</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let reporte of reportesFiltrados" class="fila-reporte">
-            <td class="celda-id">#{{ reporte.id }}</td>
-            <td class="celda-titulo">
-              <div class="titulo-wrapper">
-                <strong>{{ reporte.titulo }}</strong>
-                <small>{{ reporte.tipo }}</small>
+    <div class="modal-detalle-body">
+      <div class="detalle-col-main">
+
+        <!-- Info básica -->
+        <div class="detalle-section">
+          <div class="detalle-row">
+            <img [src]="quejaSeleccionada?.usuario?.foto_perfil || 'assets/img/default-avatar.png'" class="detalle-avatar" />
+            <div>
+              <strong>{{ quejaSeleccionada?.usuario?.nombre }} {{ quejaSeleccionada?.usuario?.apellido }}</strong>
+              <span class="detalle-meta">{{ formatFecha(quejaSeleccionada?.fecha_creacion || '') }}</span>
+            </div>
+          </div>
+          <p class="detalle-desc">{{ quejaSeleccionada?.descripcion }}</p>
+          <div class="detalle-tags">
+            <span class="dtag"><i class="bi bi-geo-alt-fill"></i> {{ quejaSeleccionada?.ubicacion || 'Sin ubicación' }}</span>
+            <span class="dtag"><i class="bi bi-tag-fill"></i> {{ quejaSeleccionada?.categoria?.nombre }}</span>
+          </div>
+        </div>
+
+        <!-- Imagen evidencia -->
+        <div class="detalle-section" *ngIf="quejaSeleccionada?.imagen_url || (quejaSeleccionada?.evidence?.length || 0) > 0">
+          <h4 class="section-title">Evidencia</h4>
+          <img [src]="quejaSeleccionada?.imagen_url || quejaSeleccionada?.evidence?.[0]?.url" 
+               class="detalle-img" alt="Evidencia" />
+        </div>
+
+        <!-- Clasificar riesgo -->
+        <div class="detalle-section" *ngIf="esDeEsteAgente(quejaSeleccionada!)">
+          <h4 class="section-title">Clasificar nivel de riesgo</h4>
+          <div class="riesgo-btns">
+            <button *ngFor="let r of niveles" 
+                    class="btn-riesgo"
+                    [class]="'risk-btn-' + r.clave.toLowerCase()"
+                    [class.seleccionado]="quejaSeleccionada?.nivel_riesgo === r.clave"
+                    (click)="clasificarRiesgo(quejaSeleccionada!, r.clave)">
+              {{ r.icon }} {{ r.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Cambiar estado -->
+        <div class="detalle-section" *ngIf="esDeEsteAgente(quejaSeleccionada!)">
+          <h4 class="section-title">Cambiar estado</h4>
+          <div class="estado-btns">
+            <button class="btn-estado observar" (click)="cambiarEstado(quejaSeleccionada!, 'OBSERVADO')">
+              <i class="bi bi-eye"></i> Observado
+            </button>
+            <button class="btn-estado proceso" (click)="cambiarEstado(quejaSeleccionada!, 'EN_PROCESO')">
+              <i class="bi bi-gear"></i> En proceso
+            </button>
+            <button class="btn-estado resolver" (click)="cambiarEstado(quejaSeleccionada!, 'RESUELTO')">
+              <i class="bi bi-check-circle"></i> Resuelto
+            </button>
+            <button class="btn-estado cancelar" (click)="abrirCancelar(quejaSeleccionada!)">
+              <i class="bi bi-x-circle"></i> Cancelar
+            </button>
+          </div>
+        </div>
+
+        <!-- Tomar reporte -->
+        <div class="detalle-section" *ngIf="getEstadoClave(quejaSeleccionada!) === 'pendiente'">
+          <button class="btn-tomar-grande" (click)="tomarReporte(quejaSeleccionada!)">
+            <i class="bi bi-hand-index-thumb"></i> Tomar este reporte
+          </button>
+        </div>
+
+        <!-- Agregar observación -->
+        <div class="detalle-section" *ngIf="esDeEsteAgente(quejaSeleccionada!)">
+          <h4 class="section-title">Agregar observación interna</h4>
+          <textarea 
+            [(ngModel)]="observacionTexto"
+            placeholder="Escribe una observación o nota interna..."
+            class="obs-textarea"
+            rows="3"
+          ></textarea>
+          <button class="btn-obs" (click)="guardarObservacion(quejaSeleccionada!)" 
+                  [disabled]="!observacionTexto.trim()">
+            <i class="bi bi-send"></i> Guardar observación
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Timeline columna derecha -->
+      <div class="detalle-col-timeline">
+        <h4 class="section-title">Historial</h4>
+        <div class="timeline-soporte" *ngIf="historialCargando">
+          <div class="spinner-small-s"></div>
+        </div>
+        <div class="timeline-soporte" *ngIf="!historialCargando">
+          <div class="tl-empty" *ngIf="historialEventos.length === 0">
+            <i class="bi bi-inbox"></i>
+            <p>Sin eventos registrados</p>
+          </div>
+          <div *ngFor="let ev of historialEventos; let last = last" class="tl-item">
+            <div class="tl-marker" [class]="'tl-' + getTipoColor(ev.tipo_evento)">
+              {{ getTipoIcono(ev.tipo_evento) }}
+            </div>
+            <div class="tl-content" [class.tl-last]="last">
+              <span class="tl-titulo">{{ getTipoTexto(ev.tipo_evento) }}</span>
+              <span class="tl-fecha">{{ formatFechaCorta(ev.fecha_evento) }}</span>
+              <p class="tl-desc">{{ ev.descripcion }}</p>
+              <div class="tl-estados" *ngIf="ev.estado_anterior && ev.estado_nuevo">
+                {{ ev.estado_anterior }} → {{ ev.estado_nuevo }}
               </div>
-            </td>
-            <td class="celda-cliente">
-              <div class="cliente-info">
-                <img 
-                  [src]="reporte.cliente.avatar_cliente || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" 
-                  alt="avatar"
-                  class="avatar-mini"
-                />
-                <span>{{ reporte.cliente.nombre }}</span>
-              </div>
-            </td>
-            <td class="celda-estado">
-              <span 
-                class="badge-estado"
-                [style.background]="getEstadoColor(reporte.estado)"
-              >
-                {{ reporte.estado }}
-              </span>
-            </td>
-            <td class="celda-prioridad">
-              <span 
-                class="badge-prioridad"
-                [style.background]="getPrioridadColor(reporte.prioridad)"
-              >
-                {{ reporte.prioridad }}
-              </span>
-            </td>
-            <td class="celda-progreso">
-              <div class="progreso-wrapper">
-                <div class="barra-progreso">
-                  <div 
-                    class="progreso-fill"
-                    [style.width.%]="getProgreso(reporte)"
-                  ></div>
-                </div>
-                <span class="progreso-texto">{{ getProgreso(reporte) }}%</span>
-              </div>
-            </td>
-            <td class="celda-dias">
-              <span class="dias-badge">{{ getDiasTranscurridos(reporte.fecha) }}d</span>
-            </td>
-            <td class="celda-acciones">
-              <button 
-                class="btn-timeline"
-                (click)="verTimeline(reporte)"
-              >
-                📅 Timeline
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ MODAL CANCELAR ══ -->
+<div class="modal-overlay sm" *ngIf="modalCancelar" (click)="modalCancelar = false">
+  <div class="modal-sm" (click)="$event.stopPropagation()">
+    <h3><i class="bi bi-x-circle text-danger"></i> Cancelar reporte</h3>
+    <p>Indica el motivo de cancelación:</p>
+    <textarea [(ngModel)]="motivoCancelacion" placeholder="Ej: Reporte duplicado, información falsa..." 
+              class="obs-textarea" rows="3"></textarea>
+    <div class="modal-sm-footer">
+      <button class="btn-sm-cancel" (click)="modalCancelar = false">Atrás</button>
+      <button class="btn-sm-confirm danger" 
+              (click)="confirmarCancelar()"
+              [disabled]="!motivoCancelacion.trim()">
+        Confirmar cancelación
+      </button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" *ngIf="mostrarTimeline" (click)="cerrarTimeline()">
-  <div class="modal-timeline" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Timeline del Reporte</h3>
-      <button class="btn-cerrar" (click)="cerrarTimeline()">✖</button>
-    </div>
-
-    <div class="modal-body" *ngIf="reporteSeleccionado">
-      <div class="reporte-info-header">
-        <h4>{{ reporteSeleccionado.titulo }}</h4>
-        <div class="info-meta">
-          <span class="meta-item">
-            <strong>Cliente:</strong> {{ reporteSeleccionado.cliente.nombre }}
-          </span>
-          <span class="meta-item">
-            <strong>Fecha:</strong> {{ reporteSeleccionado.fecha | date:'dd/MM/yyyy HH:mm' }}
-          </span>
-          <span class="meta-item">
-            <strong>Estado:</strong> 
-            <span 
-              class="badge-estado"
-              [style.background]="getEstadoColor(reporteSeleccionado.estado)"
-            >
-              {{ reporteSeleccionado.estado }}
-            </span>
-          </span>
-        </div>
-      </div>
-
-      <div class="timeline-container">
-        <div 
-          *ngIf="!reporteSeleccionado.historial || reporteSeleccionado.historial.length === 0"
-          class="sin-historial"
-        >
-          <p>No hay historial disponible para este reporte</p>
-        </div>
-
-        <div 
-          *ngFor="let evento of reporteSeleccionado.historial; let last = last"
-          class="timeline-item"
-          [class.ultimo]="last"
-        >
-          <div class="timeline-marker">
-            <span class="marker-icono">{{ getEstadoIcono(evento.estado || '') }}</span>
-          </div>
-          <div class="timeline-content">
-            <div class="timeline-header">
-              <span class="timeline-estado">{{ evento.estado }}</span>
-              <span class="timeline-fecha">{{ evento.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
-            </div>
-            <p class="timeline-mensaje">{{ evento.mensaje }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- ══ TOAST ══ -->
+<div class="toast-soporte" *ngIf="toast.visible" [class]="'toast-' + toast.tipo">
+  {{ toast.mensaje }}
 </div>

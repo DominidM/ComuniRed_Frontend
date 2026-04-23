@@ -1,36 +1,122 @@
 <div class="settings-container">
-  <!-- ========== PROFILE HEADER ========== -->
+  <!-- ========== PROFILE HEADER con VIDEO BANNER ========== -->
   <div class="profile-header">
-    <div class="header-background">
+    <!-- VIDEO BANNER -->
+    <div class="header-background" [class.editing]="editandoBanner">
+      <!-- Video activo -->
+      <video
+        class="banner-video"
+        [src]="bannerSeleccionado.url"
+        autoplay
+        [muted]="muteoBanner"
+        loop
+        playsinline
+      ></video>
+
+      <!-- Overlay gradiente -->
+      <div class="banner-overlay"></div>
+
+      <!-- Meta info -->
       <div class="header-meta">
         <span class="header-date">
-          Miembro desde el {{ user?.fecha_registro | date: 'd' }} de 
-          {{ user?.fecha_registro | date: 'MMMM' }} de 
-          {{ user?.fecha_registro | date: 'yyyy' }}
+          Miembro desde el {{ user?.fecha_registro | date: "d" }} de
+          {{ user?.fecha_registro | date: "MMMM" }} de
+          {{ user?.fecha_registro | date: "yyyy" }}
         </span>
         <span class="header-role">Usuario</span>
       </div>
+
+      <!-- Botones de control del banner -->
+      <div class="banner-controls">
+        <button
+          class="btn-mute-banner"
+          (click)="toggleMuteoBanner()"
+          [class.active]="!muteoBanner"
+          title="Mutar/Desmutar sonido"
+        >
+          <i
+            class="bi"
+            [class.bi-volume-mute]="muteoBanner"
+            [class.bi-volume-up]="!muteoBanner"
+          ></i>
+        </button>
+
+        <button
+          class="btn-change-banner"
+          (click)="toggleEditBanner()"
+          [class.active]="editandoBanner"
+        >
+          <i
+            class="bi"
+            [class.bi-camera-video]="!editandoBanner"
+            [class.bi-x-lg]="editandoBanner"
+          ></i>
+          {{ editandoBanner ? "Cerrar" : "Cambiar portada" }}
+        </button>
+      </div>
     </div>
-    
+
+    <!-- PICKER DE VIDEOS -->
+    <div class="banner-picker" [class.open]="editandoBanner">
+      <p class="picker-label">Elige una portada</p>
+      <div class="picker-grid">
+        <button
+          *ngFor="let video of bannerOptions"
+          class="picker-item"
+          [class.selected]="bannerSeleccionado.id === video.id"
+          (click)="seleccionarBanner(video)"
+          [attr.title]="video.nombre"
+        >
+          <video
+            [src]="video.url"
+            muted
+            loop
+            autoplay
+            playsinline
+            class="picker-thumb"
+          ></video>
+          <div class="picker-item-overlay">
+            <i
+              *ngIf="bannerSeleccionado.id === video.id"
+              class="bi bi-check-circle-fill picker-check"
+            ></i>
+            <span class="picker-name">{{ video.nombre }}</span>
+          </div>
+        </button>
+
+        <!-- Subir propio — deshabilitado hasta conectar BD -->
+        <button class="picker-item picker-upload" disabled title="Próximamente">
+          <div class="picker-upload-inner">
+            <i class="bi bi-cloud-upload"></i>
+            <span>Subir video</span>
+            <small>Próximamente</small>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- PROFILE INFO -->
     <div class="profile-info">
       <div class="avatar">
-        <img [src]="user?.foto_perfil" alt="Foto de perfil" class="avatar-img" />
+        <img
+          [src]="user?.foto_perfil"
+          alt="Foto de perfil"
+          class="avatar-img"
+        />
       </div>
-    
+
       <div class="profile-content">
         <div class="user-info-section">
           <h1 class="user-name">{{ user?.nombre }} {{ user?.apellido }}</h1>
           <p class="user-email">{{ user?.email }}</p>
         </div>
-        
+
         <div class="stats-row">
           <button class="stat-item stat-clickable" (click)="verSeguidores()">
             <span class="stat-number">{{ seguidoresCount }}</span>
             <span class="stat-label">seguidores</span>
           </button>
-          
           <div class="stat-divider"></div>
-          
           <button class="stat-item stat-clickable" (click)="verSeguidos()">
             <span class="stat-number">{{ seguidosCount }}</span>
             <span class="stat-label">seguidos</span>
@@ -40,6 +126,7 @@
     </div>
   </div>
 
+  <!-- ========== STATS CARDS ========== -->
   <div class="stats-container">
     <div class="stat-card">
       <div class="stat-number">{{ cantidadQuejas }}</div>
@@ -62,36 +149,37 @@
   <!-- ========== TABS SECTION ========== -->
   <div class="tabs-section">
     <div class="tabs-header">
-      <button 
-        class="tab-btn" 
+      <button
+        class="tab-btn"
         [class.active]="currentTab === 'actividad'"
-        (click)="changeTab('actividad')">
+        (click)="changeTab('actividad')"
+      >
         Actividad
       </button>
-      <button 
-        class="tab-btn" 
+      <button
+        class="tab-btn"
         [class.active]="currentTab === 'logros'"
-        (click)="changeTab('logros')">
+        (click)="changeTab('logros')"
+      >
         Logros
       </button>
-      <button 
-        class="tab-btn" 
+      <button
+        class="tab-btn"
         [class.active]="currentTab === 'estadisticas'"
-        (click)="changeTab('estadisticas')">
+        (click)="changeTab('estadisticas')"
+      >
         Estadísticas
       </button>
     </div>
 
     <div class="tab-content">
-      <!-- ========== TAB ACTIVIDAD ========== -->
+      <!-- TAB ACTIVIDAD -->
       <div *ngIf="currentTab === 'actividad'" class="activity-content">
-        <!-- Loading -->
         <div *ngIf="loadingActividad" class="loading-state">
           <div class="spinner"></div>
           <p>Cargando actividad...</p>
         </div>
 
-        <!-- Contenido -->
         <div *ngIf="!loadingActividad" class="activity-grid">
           <!-- Mis Reportes -->
           <div class="activity-section">
@@ -105,17 +193,25 @@
             </div>
 
             <div *ngIf="misQuejas.length > 0" class="activity-list">
-              <div 
-                *ngFor="let queja of misQuejas" 
+              <div
+                *ngFor="let queja of misQuejas"
                 class="activity-item"
-                (click)="verQueja(queja)">
+                (click)="verQueja(queja)"
+              >
                 <div class="activity-icon">📌</div>
                 <div class="activity-info">
                   <h4>{{ queja.titulo }}</h4>
-                  <p>{{ queja.descripcion?.slice(0, 80) }}{{ queja.descripcion?.length > 80 ? '...' : '' }}</p>
+                  <p>
+                    {{ queja.descripcion?.slice(0, 80)
+                    }}{{ queja.descripcion?.length > 80 ? "..." : "" }}
+                  </p>
                   <div class="activity-meta">
-                    <span class="activity-date">{{ queja.fecha_creacion | date:'dd/MM/yyyy' }}</span>
-                    <span class="activity-category" *ngIf="queja.categoria">{{ queja.categoria.nombre }}</span>
+                    <span class="activity-date">{{
+                      queja.fecha_creacion | date: "dd/MM/yyyy"
+                    }}</span>
+                    <span class="activity-category" *ngIf="queja.categoria">{{
+                      queja.categoria.nombre
+                    }}</span>
                   </div>
                 </div>
               </div>
@@ -134,16 +230,22 @@
             </div>
 
             <div *ngIf="quejasComentadas.length > 0" class="activity-list">
-              <div 
-                *ngFor="let queja of quejasComentadas" 
+              <div
+                *ngFor="let queja of quejasComentadas"
                 class="activity-item"
-                (click)="verQueja(queja)">
+                (click)="verQueja(queja)"
+              >
                 <div class="activity-icon">💬</div>
                 <div class="activity-info">
                   <h4>{{ queja.titulo }}</h4>
-                  <p>{{ queja.descripcion?.slice(0, 80) }}{{ queja.descripcion?.length > 80 ? '...' : '' }}</p>
+                  <p>
+                    {{ queja.descripcion?.slice(0, 80)
+                    }}{{ queja.descripcion?.length > 80 ? "..." : "" }}
+                  </p>
                   <div class="activity-meta">
-                    <span class="activity-date">{{ queja.fecha_creacion | date:'dd/MM/yyyy' }}</span>
+                    <span class="activity-date">{{
+                      queja.fecha_creacion | date: "dd/MM/yyyy"
+                    }}</span>
                   </div>
                 </div>
               </div>
@@ -152,11 +254,16 @@
         </div>
       </div>
 
-      <!-- ========== TAB LOGROS ========== -->
+      <!-- TAB LOGROS -->
       <div *ngIf="currentTab === 'logros'" class="logros-content">
         <div class="logros-grid">
           <div class="logro-card" [class.unlocked]="true">
-            <div class="logro-icon" style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);">🎯</div>
+            <div
+              class="logro-icon"
+              style="background: linear-gradient(135deg, #ff6b6b, #ff8787)"
+            >
+              🎯
+            </div>
             <div class="logro-info">
               <h3>Primer Reporte</h3>
               <p>Creaste tu primer reporte</p>
@@ -165,7 +272,12 @@
           </div>
 
           <div class="logro-card" [class.unlocked]="true">
-            <div class="logro-icon" style="background: linear-gradient(135deg, #ffd93d 0%, #ffed4e 100%);">⭐</div>
+            <div
+              class="logro-icon"
+              style="background: linear-gradient(135deg, #ffd93d, #ffed4e)"
+            >
+              ⭐
+            </div>
             <div class="logro-info">
               <h3>Ciudadano Activo</h3>
               <p>Creaste 5 reportes</p>
@@ -174,7 +286,12 @@
           </div>
 
           <div class="logro-card" [class.unlocked]="true">
-            <div class="logro-icon" style="background: linear-gradient(135deg, #ff9f43 0%, #ffb366 100%);">🏆</div>
+            <div
+              class="logro-icon"
+              style="background: linear-gradient(135deg, #ff9f43, #ffb366)"
+            >
+              🏆
+            </div>
             <div class="logro-info">
               <h3>Influencer Cívico</h3>
               <p>Obtuviste 100 reacciones</p>
@@ -183,7 +300,12 @@
           </div>
 
           <div class="logro-card" [class.unlocked]="false">
-            <div class="logro-icon" style="background: linear-gradient(135deg, #d0d0d0 0%, #e0e0e0 100%);">📋</div>
+            <div
+              class="logro-icon"
+              style="background: linear-gradient(135deg, #d0d0d0, #e0e0e0)"
+            >
+              📋
+            </div>
             <div class="logro-info">
               <h3>Problema Resuelto</h3>
               <p>Un reporte tuyo fue resuelto</p>
@@ -193,13 +315,12 @@
         </div>
       </div>
 
-      <!-- ========== TAB ESTADÍSTICAS ========== -->
+      <!-- TAB ESTADÍSTICAS -->
       <div *ngIf="currentTab === 'estadisticas'" class="estadisticas-content">
         <div class="estadisticas-grid">
           <div class="estadistica-section">
             <h3>Impacto de tus Reportes</h3>
             <div class="estadistica-items">
-
               <div class="estadistica-item">
                 <span class="estadistica-label">Total de reacciones</span>
                 <span class="estadistica-value">{{ cantidadReacciones }}</span>
@@ -210,7 +331,7 @@
               </div>
               <div class="estadistica-item">
                 <span class="estadistica-label">Tasa de resolución</span>
-                <span class="estadistica-value" style="color: #10b981;">0%</span>
+                <span class="estadistica-value" style="color: #10b981">0%</span>
               </div>
             </div>
           </div>
@@ -228,7 +349,9 @@
               </div>
               <div class="estadistica-item">
                 <span class="estadistica-label">Racha actual</span>
-                <span class="estadistica-value" style="color: #f97316;">0 días</span>
+                <span class="estadistica-value" style="color: #f97316"
+                  >0 días</span
+                >
               </div>
             </div>
           </div>
@@ -238,7 +361,11 @@
   </div>
 
   <!-- ========== MODAL SEGUIDORES ========== -->
-  <div class="modal-overlay" *ngIf="mostrarModalSeguidores" (click)="cerrarModal()">
+  <div
+    class="modal-overlay"
+    *ngIf="mostrarModalSeguidores"
+    (click)="cerrarModal()"
+  >
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Seguidores ({{ seguidoresCount }})</h2>
@@ -246,30 +373,31 @@
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
-
       <div class="modal-body">
         <div *ngIf="loadingModal" class="modal-loading">
           <p>⏳ Cargando...</p>
         </div>
-
-        <div *ngIf="!loadingModal && listaSeguidores.length === 0" class="modal-empty">
+        <div
+          *ngIf="!loadingModal && listaSeguidores.length === 0"
+          class="modal-empty"
+        >
           <p>No tienes seguidores aún</p>
         </div>
-
-        <div *ngIf="!loadingModal && listaSeguidores.length > 0" class="users-list">
+        <div
+          *ngIf="!loadingModal && listaSeguidores.length > 0"
+          class="users-list"
+        >
           <div *ngFor="let usuario of listaSeguidores" class="user-item">
-            <img 
-              [src]="obtenerFoto(usuario.foto_perfil)" 
+            <img
+              [src]="obtenerFoto(usuario.foto_perfil)"
               [alt]="usuario.nombre"
               class="user-avatar-small"
               (click)="verPerfil(usuario)"
             />
-            
             <div class="user-info-modal">
               <h4>{{ usuario.nombre }} {{ usuario.apellido }}</h4>
               <p *ngIf="usuario.distrito">📍 {{ usuario.distrito }}</p>
             </div>
-
             <button class="btn-view-modal" (click)="verPerfil(usuario)">
               <i class="bi bi-eye"></i>
             </button>
@@ -280,7 +408,11 @@
   </div>
 
   <!-- ========== MODAL SEGUIDOS ========== -->
-  <div class="modal-overlay" *ngIf="mostrarModalSeguidos" (click)="cerrarModal()">
+  <div
+    class="modal-overlay"
+    *ngIf="mostrarModalSeguidos"
+    (click)="cerrarModal()"
+  >
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Siguiendo ({{ seguidosCount }})</h2>
@@ -288,34 +420,34 @@
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
-
       <div class="modal-body">
         <div *ngIf="loadingModal" class="modal-loading">
           <p>⏳ Cargando...</p>
         </div>
-
-        <div *ngIf="!loadingModal && listaSeguidos.length === 0" class="modal-empty">
+        <div
+          *ngIf="!loadingModal && listaSeguidos.length === 0"
+          class="modal-empty"
+        >
           <p>No sigues a nadie aún</p>
         </div>
-
-        <div *ngIf="!loadingModal && listaSeguidos.length > 0" class="users-list">
+        <div
+          *ngIf="!loadingModal && listaSeguidos.length > 0"
+          class="users-list"
+        >
           <div *ngFor="let usuario of listaSeguidos" class="user-item">
-            <img 
-              [src]="obtenerFoto(usuario.foto_perfil)" 
+            <img
+              [src]="obtenerFoto(usuario.foto_perfil)"
               [alt]="usuario.nombre"
               class="user-avatar-small"
               (click)="verPerfil(usuario)"
             />
-            
             <div class="user-info-modal">
               <h4>{{ usuario.nombre }} {{ usuario.apellido }}</h4>
               <p *ngIf="usuario.distrito">📍 {{ usuario.distrito }}</p>
             </div>
-
             <button class="btn-unfollow" (click)="dejarDeSeguir(usuario)">
               Dejar de seguir
             </button>
-
             <button class="btn-view-modal" (click)="verPerfil(usuario)">
               <i class="bi bi-eye"></i>
             </button>

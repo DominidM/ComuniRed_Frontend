@@ -1,8 +1,18 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ConversacionService, Conversacion, Mensaje } from '../../services/conversacion.service';
+import {
+  ConversacionService,
+  Conversacion,
+  Mensaje,
+} from '../../services/conversacion.service';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
 import { SeguimientoService } from '../../services/seguimiento.service';
 
@@ -16,7 +26,7 @@ interface ConversacionConUsuario extends Conversacion {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './message.component.html',
-  styleUrls: ['./message.component.css']
+  styleUrls: ['./message.component.css'],
 })
 export class MessageComponent implements OnInit, OnDestroy {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
@@ -27,34 +37,35 @@ export class MessageComponent implements OnInit, OnDestroy {
   mensajes: Mensaje[] = [];
   usuarioChat: Usuario | null = null;
   nuevoMensaje: string = '';
-  
+
   loadingConversaciones: boolean = false;
   loadingMensajes: boolean = false;
   enviandoMensaje: boolean = false;
-  
+
   seSiguenMutuamente: boolean = true;
-  
+
   private pollingInterval: any;
   private ultimoConteoMensajes: number = 0;
-  private readonly DEFAULT_AVATAR = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
+  private readonly DEFAULT_AVATAR =
+    'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
 
   constructor(
     private conversacionService: ConversacionService,
     private usuarioService: UsuarioService,
     private seguimientoService: SeguimientoService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
     this.usuarioActual = this.usuarioService.getUser();
-    
+
     if (this.usuarioActual) {
       this.cargarConversaciones();
-      
+
       setTimeout(() => {
         this.crearConversacionesConMutuos();
       }, 1500);
-      
+
       this.iniciarPolling();
     }
   }
@@ -89,7 +100,7 @@ export class MessageComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error actualizando estado:', error);
-      }
+      },
     });
   }
 
@@ -111,9 +122,9 @@ export class MessageComponent implements OnInit, OnDestroy {
             return;
           }
 
-          this.conversaciones = pageData.content.map(conv => ({ ...conv }));
+          this.conversaciones = pageData.content.map((conv) => ({ ...conv }));
 
-          this.conversaciones.forEach(conv => {
+          this.conversaciones.forEach((conv) => {
             this.cargarInfoUsuarioConversacion(conv);
           });
 
@@ -122,30 +133,44 @@ export class MessageComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Error cargando conversaciones:', error);
           this.loadingConversaciones = false;
-        }
+        },
       });
   }
 
   cargarInfoUsuarioConversacion(conversacion: ConversacionConUsuario): void {
     if (!this.usuarioActual) return;
 
-    const otroUsuarioId = conversacion.participante1Id === this.usuarioActual.id
-      ? conversacion.participante2Id
-      : conversacion.participante1Id;
+    const otroUsuarioId =
+      conversacion.participante1Id === this.usuarioActual.id
+        ? conversacion.participante2Id
+        : conversacion.participante1Id;
+
+    if (!otroUsuarioId) {
+      console.warn(
+        'No se pudo determinar otroUsuarioId para conversación:',
+        conversacion.id,
+      );
+      return;
+    }
 
     this.usuarioService.obtenerUsuarioPorId(otroUsuarioId).subscribe({
       next: (usuario) => {
+        const idx = this.conversaciones.findIndex(
+          (c) => c.id === conversacion.id,
+        );
+        if (idx !== -1) {
+          this.conversaciones[idx].otroUsuario = usuario;
+        }
         conversacion.otroUsuario = usuario;
       },
-      error: (error) => {
-        console.error('Error cargando usuario:', error);
+      error: () => {
         conversacion.otroUsuario = {
           id: otroUsuarioId,
           nombre: 'Usuario',
           apellido: 'Desconocido',
-          email: ''
+          email: '',
         } as Usuario;
-      }
+      },
     });
 
     this.conversacionService
@@ -154,10 +179,9 @@ export class MessageComponent implements OnInit, OnDestroy {
         next: (noLeidos) => {
           conversacion.mensajesNoLeidos = noLeidos || 0;
         },
-        error: (error) => {
-          console.error('Error contando mensajes:', error);
+        error: () => {
           conversacion.mensajesNoLeidos = 0;
-        }
+        },
       });
   }
 
@@ -169,14 +193,12 @@ export class MessageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: async (pageData) => {
           for (let conv of pageData.content) {
-            const existente = this.conversaciones.find(c => c.id === conv.id);
-            
+            const existente = this.conversaciones.find((c) => c.id === conv.id);
+
             if (existente) {
-              const convClonada = { ...conv };
-              
-              existente.fechaUltimaActividad = convClonada.fechaUltimaActividad;
-              existente.ultimoMensaje = convClonada.ultimoMensaje;
-              
+              existente.fechaUltimaActividad = conv.fechaUltimaActividad;
+              existente.ultimoMensaje = conv.ultimoMensaje;
+
               if (this.conversacionSeleccionada?.id !== conv.id) {
                 try {
                   const noLeidos = await this.conversacionService
@@ -188,16 +210,21 @@ export class MessageComponent implements OnInit, OnDestroy {
                 }
               }
 
-              // 🆕 NUEVO: Actualizar estado del usuario
-              if (existente.otroUsuario) {
+              // Solo actualizar si el id del usuario es válido
+              if (existente.otroUsuario?.id) {
                 try {
                   const usuarioActualizado = await this.usuarioService
                     .obtenerUsuarioPorId(existente.otroUsuario.id)
                     .toPromise();
-                  existente.otroUsuario = usuarioActualizado;
+                  if (usuarioActualizado) {
+                    existente.otroUsuario = usuarioActualizado;
+                  }
                 } catch (error) {
                   console.error('Error actualizando usuario:', error);
                 }
+              } else if (!existente.otroUsuario) {
+                // Si todavía no tiene usuario cargado, intentar cargarlo ahora
+                this.cargarInfoUsuarioConversacion(existente);
               }
             } else {
               const nuevaConv = { ...conv };
@@ -205,33 +232,50 @@ export class MessageComponent implements OnInit, OnDestroy {
               this.cargarInfoUsuarioConversacion(nuevaConv);
             }
           }
-          
-          this.conversaciones.sort((a, b) => 
-            new Date(b.fechaUltimaActividad).getTime() - 
-            new Date(a.fechaUltimaActividad).getTime()
+
+          this.conversaciones.sort(
+            (a, b) =>
+              new Date(b.fechaUltimaActividad).getTime() -
+              new Date(a.fechaUltimaActividad).getTime(),
           );
         },
         error: (error) => {
           console.error('Error actualizando conversaciones:', error);
-        }
+        },
       });
   }
 
-  async seleccionarConversacion(conversacion: ConversacionConUsuario): Promise<void> {
+  async seleccionarConversacion(
+    conversacion: ConversacionConUsuario,
+  ): Promise<void> {
     this.conversacionSeleccionada = conversacion;
-    this.usuarioChat = conversacion.otroUsuario || null;
-    
-    if (this.usuarioChat && this.usuarioActual) {
-      this.seSiguenMutuamente = await this.verificarSeguimientoMutuo(
-        this.usuarioActual.id, 
-        this.usuarioChat.id
-      );
-      
-      if (!this.seSiguenMutuamente) {
-        console.log('Ya no se siguen mutuamente - Chat bloqueado');
+
+    // Si otroUsuario no está cargado aún, cargarlo ahora
+    if (!conversacion.otroUsuario && this.usuarioActual) {
+      const otroUsuarioId =
+        conversacion.participante1Id === this.usuarioActual.id
+          ? conversacion.participante2Id
+          : conversacion.participante1Id;
+
+      try {
+        const usuario = await this.usuarioService
+          .obtenerUsuarioPorId(otroUsuarioId)
+          .toPromise();
+        conversacion.otroUsuario = usuario;
+      } catch (error) {
+        console.error('Error cargando usuario del chat:', error);
       }
     }
-    
+
+    this.usuarioChat = conversacion.otroUsuario || null;
+
+    if (this.usuarioChat && this.usuarioActual) {
+      this.seSiguenMutuamente = await this.verificarSeguimientoMutuo(
+        this.usuarioActual.id,
+        this.usuarioChat.id,
+      );
+    }
+
     this.cargarMensajes();
     this.marcarComoLeido();
     conversacion.mensajesNoLeidos = 0;
@@ -242,11 +286,14 @@ export class MessageComponent implements OnInit, OnDestroy {
 
     this.seSiguenMutuamente = await this.verificarSeguimientoMutuo(
       this.usuarioActual.id,
-      this.usuarioChat.id
+      this.usuarioChat.id,
     );
   }
 
-  async verificarSeguimientoMutuo(usuarioId1: string, usuarioId2: string): Promise<boolean> {
+  async verificarSeguimientoMutuo(
+    usuarioId1: string,
+    usuarioId2: string,
+  ): Promise<boolean> {
     try {
       const resultado = await this.conversacionService
         .seSiguenMutuamente(usuarioId1, usuarioId2)
@@ -275,7 +322,7 @@ export class MessageComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Error cargando mensajes:', error);
           this.loadingMensajes = false;
-        }
+        },
       });
   }
 
@@ -287,7 +334,7 @@ export class MessageComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (pageData) => {
           const nuevosMensajes = [...pageData.content].reverse();
-          
+
           if (nuevosMensajes.length !== this.ultimoConteoMensajes) {
             this.mensajes = nuevosMensajes;
             this.ultimoConteoMensajes = nuevosMensajes.length;
@@ -297,12 +344,16 @@ export class MessageComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error actualizando mensajes:', error);
-        }
+        },
       });
   }
 
   async enviarMensaje(): Promise<void> {
-    if (!this.nuevoMensaje.trim() || !this.conversacionSeleccionada || !this.usuarioActual) {
+    if (
+      !this.nuevoMensaje.trim() ||
+      !this.conversacionSeleccionada ||
+      !this.usuarioActual
+    ) {
       return;
     }
 
@@ -316,7 +367,11 @@ export class MessageComponent implements OnInit, OnDestroy {
     this.nuevoMensaje = '';
 
     this.conversacionService
-      .enviarMensaje(this.conversacionSeleccionada.id, this.usuarioActual.id, mensajeAEnviar)
+      .enviarMensaje(
+        this.conversacionSeleccionada.id,
+        this.usuarioActual.id,
+        mensajeAEnviar,
+      )
       .subscribe({
         next: (mensaje) => {
           this.mensajes.push(mensaje);
@@ -328,8 +383,10 @@ export class MessageComponent implements OnInit, OnDestroy {
           console.error('Error enviando mensaje:', error);
           this.nuevoMensaje = mensajeAEnviar;
           this.enviandoMensaje = false;
-          alert('Error al enviar el mensaje. Puede que ya no se sigan mutuamente.');
-        }
+          alert(
+            'Error al enviar el mensaje. Puede que ya no se sigan mutuamente.',
+          );
+        },
       });
   }
 
@@ -337,7 +394,10 @@ export class MessageComponent implements OnInit, OnDestroy {
     if (!this.conversacionSeleccionada || !this.usuarioActual) return;
 
     this.conversacionService
-      .marcarMensajesComoLeidos(this.conversacionSeleccionada.id, this.usuarioActual.id)
+      .marcarMensajesComoLeidos(
+        this.conversacionSeleccionada.id,
+        this.usuarioActual.id,
+      )
       .subscribe({
         next: () => {
           if (this.conversacionSeleccionada) {
@@ -346,7 +406,7 @@ export class MessageComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error marcando como leídos:', error);
-        }
+        },
       });
   }
 
@@ -364,7 +424,7 @@ export class MessageComponent implements OnInit, OnDestroy {
   }
 
   obtenerNombreUsuario(conversacion: ConversacionConUsuario): string {
-    return conversacion.otroUsuario 
+    return conversacion.otroUsuario
       ? `${conversacion.otroUsuario.nombre} ${conversacion.otroUsuario.apellido}`
       : 'Usuario';
   }
@@ -384,16 +444,15 @@ export class MessageComponent implements OnInit, OnDestroy {
     return this.usuarioService.obtenerUltimaActividad(usuario);
   }
 
-
   obtenerFoto(foto_perfil?: string): string {
     if (!foto_perfil || foto_perfil.trim() === '') {
       return this.DEFAULT_AVATAR;
     }
-    
+
     if (this.usuarioService.esFotoCloudinary(foto_perfil)) {
       return this.usuarioService.obtenerFotoMiniatura(foto_perfil, 40);
     }
-    
+
     return foto_perfil;
   }
 
@@ -404,13 +463,19 @@ export class MessageComponent implements OnInit, OnDestroy {
     const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     if (dias === 0) {
-      return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
     } else if (dias === 1) {
       return 'Ayer';
     } else if (dias < 7) {
       return date.toLocaleDateString('es-ES', { weekday: 'short' });
     } else {
-      return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+      });
     }
   }
 
@@ -435,13 +500,17 @@ export class MessageComponent implements OnInit, OnDestroy {
         .obtenerSeguidos(this.usuarioActual.id, 0, 100)
         .subscribe({
           next: async (seguidos) => {
-            if (!seguidos || !seguidos.content || seguidos.content.length === 0) {
+            if (
+              !seguidos ||
+              !seguidos.content ||
+              seguidos.content.length === 0
+            ) {
               return;
             }
 
             for (const seguimiento of seguidos.content) {
               const otroUsuarioId = seguimiento.seguidoId;
-              
+
               const esMutuo = await this.conversacionService
                 .seSiguenMutuamente(this.usuarioActual!.id, otroUsuarioId)
                 .toPromise();
@@ -449,7 +518,10 @@ export class MessageComponent implements OnInit, OnDestroy {
               if (esMutuo) {
                 try {
                   await this.conversacionService
-                    .obtenerOCrearConversacion(this.usuarioActual!.id, otroUsuarioId)
+                    .obtenerOCrearConversacion(
+                      this.usuarioActual!.id,
+                      otroUsuarioId,
+                    )
                     .toPromise();
                 } catch (error) {
                   console.error('Error creando conversación:', error);
@@ -463,9 +535,8 @@ export class MessageComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error obteniendo seguidos:', error);
-          }
+          },
         });
-
     } catch (error) {
       console.error('Error general:', error);
     }

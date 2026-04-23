@@ -1,5 +1,6 @@
-<!-- Rightbar content (tendencias / areas / stats) -->
+<!-- Rightbar content -->
 <div class="rightbar-container">
+
   <!-- Tendencias -->
   <section class="rightbar-section">
     <div class="rightbar-section-title">
@@ -8,10 +9,10 @@
     </div>
     <div class="trend-list">
       <div class="trend-item" *ngFor="let t of trends">
-        <div>
+        <div class="trend-info">
           <span class="trend-hashtag">#{{ t.tag }}</span>
+          <span class="trend-desc">{{ t.desc }}</span>
         </div>
-        <div class="trend-desc">{{ t.desc }}</div>
         <div class="trend-count">{{ t.count }}</div>
       </div>
     </div>
@@ -34,12 +35,16 @@
 
   <!-- Estadísticas -->
   <section class="rightbar-section rightbar-stats">
+    <div class="rightbar-section-title">
+      <mat-icon>bar_chart</mat-icon>
+      Actividad
+    </div>
     <div class="stats-row">
-      <div>
+      <div class="stats-cell">
         <div class="stats-value">{{ stats.today }}</div>
         <div class="stats-label">Reportes hoy</div>
       </div>
-      <div>
+      <div class="stats-cell">
         <div class="stats-value stats-green">{{ stats.solvedPercent }}%</div>
         <div class="stats-label">Resueltos</div>
       </div>
@@ -49,7 +54,7 @@
   <div class="rightbar-spacer"></div>
 </div>
 
-<!-- Botón flotante de accesibilidad (siempre encima) -->
+<!-- Botón flotante de accesibilidad -->
 <button
   class="rightbar-accessibility-btn"
   aria-label="Accesibilidad"
@@ -61,8 +66,7 @@
   <mat-icon>accessibility</mat-icon>
 </button>
 
-<!-- Panel de accesibilidad: permanece en DOM, fuera del flujo visual (fixed) -->
-<!-- NOTE: important that this element is NOT inside .rightbar-container so it's fixed over the page -->
+<!-- Panel de accesibilidad -->
 <div
   class="accessibility-panel"
   [class.open]="accessibilityOpen"
@@ -74,7 +78,7 @@
 
   <div class="acc-controls">
     <div class="acc-row">
-      <label>Ajustar tamaño de letra</label>
+      <label>Tamaño de letra</label>
       <div class="acc-actions">
         <button (click)="decreaseText()" aria-label="Disminuir tamaño" type="button">A-</button>
         <button (click)="resetText()" aria-label="Restablecer tamaño" type="button">A</button>
