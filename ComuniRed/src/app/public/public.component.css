@@ -29,7 +29,7 @@ mat-sidenav-container.sidenav-container {
   overflow: hidden !important;
 }
 
-/* ==================== SIDEBAR (SIN POSITION FIXED) ==================== */
+/* ==================== SIDEBAR ==================== */
 mat-sidenav.app-public-sidebar {
   width: var(--sidebar-width) !important;
   height: 100% !important;
@@ -37,7 +37,6 @@ mat-sidenav.app-public-sidebar {
   background: #fdfcfc !important;
   border-right: 1px solid #e2e8f0;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
-  /* ✅ NO uses position: fixed aquí */
 }
 
 mat-sidenav.app-public-sidebar::ng-deep .mat-drawer-inner-container {
@@ -49,7 +48,6 @@ mat-sidenav-content {
   height: 100% !important;
   overflow: hidden !important;
   background-color: #eae9eef5;
-  /* ✅ Material ajusta automáticamente el margin-left en modo 'side' */
 }
 
 .public-layout {
@@ -63,36 +61,52 @@ mat-sidenav-content {
   overflow: hidden;
 }
 
-/* ==================== FEED AREA (CON SCROLL INDEPENDIENTE) ==================== */
+/* ==================== FEED AREA ==================== */
 .feed-area {
   flex: 1;
   min-width: 0;
   height: 100%;
-  overflow-y: auto !important;
+  overflow-y: auto;
   overflow-x: hidden;
-  padding: 0;          /* ← saca todo el padding del padre */
+  padding: 0;
   background-color: var(--cr-background-content);
   box-sizing: border-box;
 }
 
-/* Y en cada componente hijo, limitar el ancho: */
+/* ── REELS MODE ─────────────────────────────────────
+   Propagamos la altura a través del router-outlet.
+   Angular genera: feed-area > router-outlet + app-reels
+   Necesitamos que app-reels herede la altura.
+   ─────────────────────────────────────────────────── */
+.feed-area.reels-mode {
+  overflow: hidden !important;
+  background: #000 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* El componente app-reels directamente dentro del feed */
+.feed-area.reels-mode app-reels {
+  flex: 1 !important;
+  display: block !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.feed-area::-webkit-scrollbar { width: 8px; }
+.feed-area::-webkit-scrollbar-track { background: transparent; }
+.feed-area::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.2);
+  border-radius: 10px;
+}
+
+/* Limitar ancho en componentes hijos normales */
 .settings-container,
 .trending-container {
   max-width: 680px;
   margin: 0 auto;
-}
-
-.feed-area::-webkit-scrollbar {
-  width: 8px;
-}
-
-.feed-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.feed-area::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.2);
-  border-radius: 10px;
 }
 
 /* ==================== RIGHTBAR ==================== */
@@ -103,10 +117,7 @@ app-rightbar {
   overflow-y: auto;
 }
 
-app-rightbar::-webkit-scrollbar {
-  width: 6px;
-}
-
+app-rightbar::-webkit-scrollbar { width: 6px; }
 app-rightbar::-webkit-scrollbar-thumb {
   background: rgba(15, 23, 42, 0.15);
   border-radius: 10px;
@@ -114,28 +125,13 @@ app-rightbar::-webkit-scrollbar-thumb {
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
-  app-rightbar { 
-    display: none; 
+  app-rightbar { display: none; }
+
+  mat-sidenav.app-public-sidebar {
+    width: 80% !important;
+    max-width: 290px !important;
   }
-  
-  mat-sidenav.app-public-sidebar { 
-    width: 80% !important; 
-    max-width: 290px !important; 
-  }
-  
-  .feed-area { 
-    padding: 12px;
-  }
+
+  .feed-area { padding: 12px; }
+  .feed-area.reels-mode { padding: 0 !important; }
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
@@ -21,10 +21,13 @@ interface BannerOption {
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   currentTab = 'actividad';
   private readonly DEFAULT_AVATAR = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
   private readonly BANNER_KEY = 'comunired_profile_banner';
+
+  // ── ViewChild para controlar el video directamente ────────
+  @ViewChild('bannerVideoEl') bannerVideoEl!: ElementRef<HTMLVideoElement>;
 
   user: {
     id: string;
@@ -56,7 +59,7 @@ export class ProfileComponent implements OnInit {
 
   // ── Banner ────────────────────────────────────────────────
   editandoBanner = false;
-  muteoBanner = true; // NUEVO: Control de mute
+  muteoBanner = true;
 
   bannerOptions: BannerOption[] = [
     {
@@ -72,17 +75,17 @@ export class ProfileComponent implements OnInit {
     {
       id: 'banner_urbano',
       nombre: 'Urbano',
-      url: 'https://res.cloudinary.com/da4wxtjwu/video/upload/v1/banners/urbano.mp4',
+      url: 'https://res.cloudinary.com/dp1vgjhsq/video/upload/v1776926572/YTDown.com_YouTube_Trueno-FRESH-Official-Video_Media_mcJ-jFNARyg_001_1080p_fmvvcp.mp4',
     },
     {
       id: 'banner_comunidad',
       nombre: 'Comunidad',
-      url: 'https://res.cloudinary.com/da4wxtjwu/video/upload/v1/banners/comunidad.mp4',
+      url: 'https://res.cloudinary.com/dp1vgjhsq/video/upload/v1776926786/YTDown.com_YouTube_Bad-Bunny-Neverita-Video-Oficial-Un-Vera_Media_ARWg160eaX4_001_480p_v4z1uc.mp4',
     },
     {
       id: 'banner_lima',
       nombre: 'Lima',
-      url: 'https://res.cloudinary.com/da4wxtjwu/video/upload/v1/banners/lima.mp4',
+      url: 'https://res.cloudinary.com/dp1vgjhsq/video/upload/v1776927093/YTDown.com_YouTube_DUKI-Jhayco-RoCKSTAR-2-0-Video-Oficial_Media_cjmwG9aPGwM_001_1080p_ihlnvu.mp4',
     },
   ];
 
@@ -96,7 +99,14 @@ export class ProfileComponent implements OnInit {
     private reaccionService: ReaccionService,
     private router: Router
   ) {}
-
+  ngOnDestroy(): void {
+    const videoEl = this.bannerVideoEl?.nativeElement;
+    if (videoEl) {
+      videoEl.pause();
+      videoEl.src = '';
+      videoEl.load();
+    }
+  }
   ngOnInit(): void {
     const u = this.usuarioService.getUser();
 
@@ -134,10 +144,35 @@ export class ProfileComponent implements OnInit {
 
   toggleMuteoBanner(): void {
     this.muteoBanner = !this.muteoBanner;
+    // Aplicar directamente al elemento para que Angular no ignore el binding
+    const videoEl = this.bannerVideoEl?.nativeElement;
+    if (videoEl) videoEl.muted = this.muteoBanner;
   }
 
   seleccionarBanner(video: BannerOption): void {
+    if (this.bannerSeleccionado.id === video.id) return; // ya está seleccionado
+
+    // Pausar y limpiar el video actual antes de cambiar
+    const videoEl = this.bannerVideoEl?.nativeElement;
+    if (videoEl) {
+      videoEl.pause();
+      videoEl.src = '';       // fuerza que el browser suelte el stream anterior
+      videoEl.load();
+    }
+
     this.bannerSeleccionado = video;
+
+    // Pequeño timeout para que Angular actualice el [src] y luego reproducir
+    setTimeout(() => {
+      const el = this.bannerVideoEl?.nativeElement;
+      if (el) {
+        el.src = video.url;
+        el.muted = this.muteoBanner;
+        el.load();
+        el.play().catch(() => {});
+      }
+    }, 50);
+
     try {
       localStorage.setItem(this.BANNER_KEY, video.id);
     } catch {}

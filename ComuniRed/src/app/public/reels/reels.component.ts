@@ -1,4 +1,12 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  HostListener,
+  OnDestroy,
+  Input,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface Reel {
@@ -11,6 +19,8 @@ interface Reel {
   shares: number;
   description: string;
   avatarUrl?: string;
+  liked?: boolean;
+  saved?: boolean;
 }
 
 @Component({
@@ -18,49 +28,52 @@ interface Reel {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './reels.component.html',
-  styleUrls: ['./reels.component.css']
+  styleUrls: ['./reels.component.css'],
 })
 export class ReelsComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('videoPlayer', { static: false }) videoPlayer!: ElementRef<HTMLVideoElement>;
+  @ViewChild('videoPlayer', { static: false })
+  videoPlayer!: ElementRef<HTMLVideoElement>;
+
+  /** Recibe el modo oscuro del padre: <app-reels [isDarkMode]="isDarkMode"> */
+  @Input() isDarkMode = true;
 
   currentIndex = 0;
   isPlaying = false;
-  isMuted = false; // preference
+  isMuted = false;
   isLoading = true;
   hasError = false;
-  private userInteracted = false;
+  showComments = false;
+
+  /** Progreso del video 0-100 para la barra */
+  videoProgress = 0;
+  private isSeeking = false;
+
+  /** Throttle del scroll para evitar saltos múltiples */
+  private scrollThrottle = false;
 
   reels: Reel[] = [
-    { id: 1, videoUrl: 'assets/videos/reel1.mp4', title: 'ByPass las torres', author: 'Municipalidad de Lima', likes: 1234, comments: 89, shares: 45, description: 'Obras en construcción para mejorar el tráfico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png' },
-    { id: 2, videoUrl: 'assets/videos/reel2.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de SJL', likes: 856, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png' },
-    { id: 3, videoUrl: 'assets/videos/reel3.mp4', title: 'bailecito', author: 'Jose Jeri', likes: 46, comments: 34, shares: 21, description: 'Baile popular', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745297/imagen_2025-11-09_222811177_easpfs.png' },
-    { id: 4, videoUrl: 'assets/videos/reel4.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de SJL', likes: 86, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png' },
-    { id: 5, videoUrl: 'assets/videos/reel5.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de Lima', likes: 836, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png' },
-    { id: 6, videoUrl: 'assets/videos/reel6.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de Lima', likes: 53, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png' },
-    { id: 7, videoUrl: 'assets/videos/reel7.mp4', title: 'Via rapida Wiesse', author: 'Municipalidad de SJL', likes: 1, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png' },
-    { id: 8, videoUrl: 'assets/videos/reel8.mp4', title: 'Parque las Flores', author: 'Municipalidad de SJL', likes: 32, comments: 12, shares: 8, description: 'Manteniendo nuestros espacios verdes limpios y seguros', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png' }
+    { id: 1, videoUrl: 'assets/videos/reel1.mp4', title: 'ByPass las torres', author: 'Municipalidad de Lima', likes: 1234, comments: 89, shares: 45, description: 'Obras en construcción para mejorar el tráfico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png', liked: false, saved: false },
+    { id: 2, videoUrl: 'assets/videos/reel2.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de SJL', likes: 856, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png', liked: false, saved: false },
+    { id: 3, videoUrl: 'assets/videos/reel3.mp4', title: 'bailecito', author: 'Jose Jeri', likes: 46, comments: 34, shares: 21, description: 'Baile popular', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745297/imagen_2025-11-09_222811177_easpfs.png', liked: false, saved: false },
+    { id: 4, videoUrl: 'assets/videos/reel4.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de SJL', likes: 86, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png', liked: false, saved: false },
+    { id: 5, videoUrl: 'assets/videos/reel5.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de Lima', likes: 836, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png', liked: false, saved: false },
+    { id: 6, videoUrl: 'assets/videos/reel6.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de Lima', likes: 53, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png', liked: false, saved: false },
+    { id: 7, videoUrl: 'assets/videos/reel7.mp4', title: 'Via rapida Wiesse', author: 'Municipalidad de SJL', likes: 1, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png', liked: false, saved: false },
+    { id: 8, videoUrl: 'assets/videos/reel8.mp4', title: 'Parque las Flores', author: 'Municipalidad de SJL', likes: 32, comments: 12, shares: 8, description: 'Manteniendo nuestros espacios verdes limpios y seguros', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png', liked: false, saved: false },
   ];
 
-  private onWindowResizeBound = () => {
-    this.applySizingRules();
-  }
-
   ngAfterViewInit() {
-    // restore saved mute preference (si existe)
     try {
-      const saved = localStorage.getItem('reelsMuted');
-      if (saved !== null) {
-        this.isMuted = saved === 'true';
-        this.userInteracted = true;
-      }
-    } catch (e) { /* ignore localStorage errors */ }
-
-    setTimeout(() => this.initVideo(), 50);
-    window.addEventListener('resize', this.onWindowResizeBound);
+      const m = localStorage.getItem('reelsMuted');
+      if (m !== null) this.isMuted = m === 'true';
+    } catch {}
+    setTimeout(() => this.loadVideo(), 50);
   }
 
   ngOnDestroy() {
-    window.removeEventListener('resize', this.onWindowResizeBound);
+    const video = this.videoPlayer?.nativeElement;
+    if (video) { video.pause(); video.src = ''; video.load(); }
+    this.removeSeekListeners();
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -68,147 +81,92 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     if (event.key === 'ArrowDown') { event.preventDefault(); this.nextReel(); }
     else if (event.key === 'ArrowUp') { event.preventDefault(); this.previousReel(); }
     else if (event.key === ' ') { event.preventDefault(); this.togglePlayPause(); }
+    else if (event.key === 'Escape' && this.showComments) this.showComments = false;
   }
 
-  // --- GETTERS CLAVE PARA EL HTML ---
+  /** Scroll del mouse → cambia de video (con throttle 600ms) */
+  onWheel(event: WheelEvent) {
+    event.preventDefault();
+    if (this.scrollThrottle) return;
+    this.scrollThrottle = true;
+    setTimeout(() => { this.scrollThrottle = false; }, 600);
+
+    if (event.deltaY > 0) {
+      this.nextReel();
+    } else if (event.deltaY < 0) {
+      this.previousReel();
+    }
+  }
+
   get currentReel(): Reel { return this.reels[this.currentIndex]; }
+  get isFirstReel(): boolean { return this.currentIndex === 0; }
+  get isLastReel(): boolean { return this.currentIndex === this.reels.length - 1; }
 
-  get isFirstReel(): boolean {
-    return this.currentIndex === 0;
-  }
-
-  get isLastReel(): boolean {
-    return this.currentIndex === this.reels.length - 1;
-  }
-  // ------------------------------------
-
-  private initVideo() {
-    if (!this.videoPlayer) return;
+  // ── Video ────────────────────────────────────────────
+  private loadVideo() {
+    const video = this.videoPlayer?.nativeElement;
+    if (!video) return;
     this.hasError = false;
     this.isLoading = true;
-    this.setVideoSource(this.currentReel.videoUrl);
-  }
-
-  private setVideoSource(url: string) {
-    const video: HTMLVideoElement = this.videoPlayer.nativeElement;
-    video.style.width = '';
-    video.style.height = '';
-    video.style.maxWidth = '';
-    video.style.maxHeight = '';
-    video.style.objectFit = 'cover';
-    video.removeAttribute('src');
-
+    this.videoProgress = 0;
+    video.removeAttribute('style');
     const source = video.querySelector('source');
-    if (source) source.setAttribute('src', url);
-    else video.setAttribute('src', url);
+    if (source) source.setAttribute('src', this.currentReel.videoUrl);
+    else video.src = this.currentReel.videoUrl;
     video.load();
-
-    const onLoadedMeta = () => {
-      this.isLoading = false;
-      this.hasError = false;
-      this.applySizingRules();
-      this.tryPlayRespectingPreference();
-    };
-
-    const onError = (ev: Event) => {
-      console.error('Video load error', ev);
-      this.hasError = true;
-      this.isLoading = false;
-    };
-
-    video.removeEventListener('loadedmetadata', onLoadedMeta);
-    video.removeEventListener('error', onError);
-    video.addEventListener('loadedmetadata', onLoadedMeta, { once: true });
-    video.addEventListener('error', onError, { once: true });
+    video.addEventListener('loadedmetadata', () => { this.isLoading = false; this.tryPlay(); }, { once: true });
+    video.addEventListener('error', () => { this.hasError = true; this.isLoading = false; }, { once: true });
   }
 
-  private tryPlayRespectingPreference() {
-    const video = this.videoPlayer.nativeElement;
-
-    if (this.userInteracted) {
-      video.muted = this.isMuted;
-      video.play().then(() => { this.isPlaying = true; })
-        .catch((err) => { console.warn('Play failed after user interaction', err); this.isPlaying = false; });
-      return;
-    }
-
-    video.muted = this.isMuted;
-    video.play().then(() => { this.isPlaying = true; }).catch(() => {
-      // autoplay with sound blocked -> fallback to muted autoplay
-      video.muted = true;
-      this.isMuted = true;
-      video.play().then(() => { this.isPlaying = true; }).catch((err) => {
-        console.warn('Muted play also failed', err);
-        this.isPlaying = false;
-      });
-    });
-  }
-
-  // custom UI actions
-  togglePlayPause() {
-    const video = this.videoPlayer.nativeElement;
+  private tryPlay() {
+    const video = this.videoPlayer?.nativeElement;
     if (!video) return;
-    this.userInteracted = true;
+    video.muted = this.isMuted;
+    video.play()
+      .then(() => { this.isPlaying = true; })
+      .catch(() => {
+        video.muted = true; this.isMuted = true;
+        video.play().then(() => { this.isPlaying = true; }).catch(() => { this.isPlaying = false; });
+      });
+  }
+
+  togglePlayPause() {
+    const video = this.videoPlayer?.nativeElement;
+    if (!video) return;
     if (this.isPlaying) { video.pause(); this.isPlaying = false; }
     else {
       video.muted = this.isMuted;
-      video.play().then(() => { this.isPlaying = true; }).catch((err) => {
-        console.warn('Play blocked', err);
-        video.muted = true;
-        this.isMuted = true;
-        video.play().then(() => { this.isPlaying = true; }).catch(() => { this.isPlaying = false; });
-      });
+      video.play()
+        .then(() => { this.isPlaying = true; })
+        .catch(() => {
+          video.muted = true; this.isMuted = true;
+          video.play().then(() => { this.isPlaying = true; }).catch(() => {});
+        });
     }
   }
 
   toggleMute() {
-    const video = this.videoPlayer.nativeElement;
+    const video = this.videoPlayer?.nativeElement;
     if (!video) return;
-    this.userInteracted = true;
     this.isMuted = !this.isMuted;
     video.muted = this.isMuted;
-    try { localStorage.setItem('reelsMuted', String(this.isMuted)); } catch { }
-  }
-
-  // fullscreen toggle (no usado en HTML actual, pero buena práctica)
-  toggleFullscreen() {
-    const container = this.videoPlayer.nativeElement.parentElement as HTMLElement;
-    if (!container) return;
-    const doc: any = document;
-    if (doc.fullscreenElement) {
-      doc.exitFullscreen?.();
-    } else {
-      container.requestFullscreen?.();
-    }
+    try { localStorage.setItem('reelsMuted', String(this.isMuted)); } catch {}
   }
 
   resetVideo() {
-    const video = this.videoPlayer.nativeElement;
-    this.isLoading = true;
-    this.hasError = false;
-    try {
-      video.pause();
-      video.currentTime = 0;
-      this.setVideoSource(this.currentReel.videoUrl);
-    } catch (err) {
-      console.error('resetVideo error', err);
-      this.hasError = true;
-      this.isLoading = false;
-    }
+    const video = this.videoPlayer?.nativeElement;
+    if (!video) return;
+    video.pause(); video.currentTime = 0;
+    this.videoProgress = 0;
+    this.loadVideo();
   }
 
   nextReel() {
-    if (this.currentIndex < this.reels.length - 1) {
-      this.currentIndex++;
-      this.resetVideo();
-    }
+    if (this.currentIndex < this.reels.length - 1) { this.currentIndex++; this.resetVideo(); }
   }
 
   previousReel() {
-    if (this.currentIndex > 0) {
-      this.currentIndex--;
-      this.resetVideo();
-    }
+    if (this.currentIndex > 0) { this.currentIndex--; this.resetVideo(); }
   }
 
   onVideoEnd() {
@@ -216,61 +174,93 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     else { this.currentIndex = 0; this.resetVideo(); }
   }
 
-  private applySizingRules() {
-    const video: HTMLVideoElement = this.videoPlayer.nativeElement;
-    if (!video || !video.videoWidth || !video.videoHeight) return;
+  onCanPlay() { this.isLoading = false; }
+  onVideoLoaded() { this.isLoading = false; this.hasError = false; }
+  onVideoError(event: Event) { this.isLoading = false; this.hasError = true; }
 
-    const container = (video.parentElement as HTMLElement) || video;
-    const rect = container.getBoundingClientRect();
-    const containerW = rect.width;
-    const containerH = rect.height;
+  // ── Progreso del video ───────────────────────────────
+  onTimeUpdate() {
+    if (this.isSeeking) return;
+    const video = this.videoPlayer?.nativeElement;
+    if (!video || !video.duration) return;
+    this.videoProgress = (video.currentTime / video.duration) * 100;
+  }
 
-    const intrinsicW = video.videoWidth;
-    const intrinsicH = video.videoHeight;
+  /** Click directo en la barra para saltar */
+  seekVideo(event: MouseEvent) {
+    const video = this.videoPlayer?.nativeElement;
+    if (!video || !video.duration) return;
+    const bar = event.currentTarget as HTMLElement;
+    const rect = bar.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    video.currentTime = pct * video.duration;
+    this.videoProgress = pct * 100;
+    event.stopPropagation();
+  }
 
-    // Si el vídeo es más pequeño que el contenedor -> mostrarlo a tamaño nativo (no upscaling)
-    if (intrinsicW <= containerW && intrinsicH <= containerH) {
-      video.style.width = intrinsicW + 'px';
-      video.style.height = 'auto';
-      video.style.objectFit = 'none';
-      video.style.maxWidth = '100%';
-      video.style.maxHeight = '100%';
+  /** Drag en la barra */
+  startSeeking(event: MouseEvent) {
+    event.stopPropagation();
+    this.isSeeking = true;
+    const video = this.videoPlayer?.nativeElement;
+    if (!video || !video.duration) return;
+
+    const bar = (event.currentTarget as HTMLElement).querySelector('.progress-bar-bg') as HTMLElement
+      || event.currentTarget as HTMLElement;
+
+    const onMove = (e: MouseEvent) => {
+      const rect = bar.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      this.videoProgress = pct * 100;
+      video.currentTime = pct * video.duration;
+    };
+    const onUp = () => {
+      this.isSeeking = false;
+      this.removeSeekListeners();
+    };
+
+    this._seekMove = onMove;
+    this._seekUp = onUp;
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }
+
+  private _seekMove?: (e: MouseEvent) => void;
+  private _seekUp?: () => void;
+
+  private removeSeekListeners() {
+    if (this._seekMove) window.removeEventListener('mousemove', this._seekMove);
+    if (this._seekUp) window.removeEventListener('mouseup', this._seekUp);
+  }
+
+  // ── Acciones ─────────────────────────────────────────
+  likeReel() {
+    const r = this.reels[this.currentIndex];
+    r.liked ? (r.likes--, r.liked = false) : (r.likes++, r.liked = true);
+  }
+
+  saveReel() { this.reels[this.currentIndex].saved = !this.reels[this.currentIndex].saved; }
+
+  shareReel() {
+    if (navigator.share) {
+      navigator.share({ title: this.currentReel.title, text: this.currentReel.description }).catch(() => {});
     } else {
-      // suficiente resolución: llenar contenedor (crop en mobile) o contener en desktop
-      // decisión: por CSS usamos object-fit: contain en desktop y cover en móvil
-      video.style.width = '100%';
-      video.style.height = '100%';
-      video.style.objectFit = window.innerWidth >= 1200 ? 'contain' : 'cover';
-      video.style.maxWidth = 'none';
-      video.style.maxHeight = 'none';
+      try { navigator.clipboard.writeText(`${this.currentReel.title} — ${this.currentReel.description}`); } catch {}
     }
   }
 
-  onCanPlay() { this.isLoading = false; }
-  onVideoLoaded() { this.isLoading = false; this.hasError = false; }
-  onVideoError(event: Event) {
-    this.isLoading = false;
-    this.hasError = true;
-    console.error('Video error:', event);
-  }
-
-  retryVideo() { this.hasError = false; this.isLoading = true; this.resetVideo(); }
+  toggleComments() { this.showComments = !this.showComments; }
 
   formatNumber(num: number): string {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
+    if (num >= 1_000) return (num / 1_000).toFixed(1) + 'K';
     return num.toString();
   }
 
-  likeReel() { this.reels[this.currentIndex].likes++; }
-
-  // avatar fallback handler
   onAvatarError(event: Event) {
     const img = event.target as HTMLImageElement;
-    const fallback = 'assets/images/default-avatar.png';
-    if (!img) return;
-    if (img.dataset['fallbackApplied'] === '1') return;
+    if (!img || img.dataset['fallbackApplied'] === '1') return;
     img.dataset['fallbackApplied'] = '1';
-    img.src = fallback;
+    img.src = 'assets/images/default-avatar.png';
   }
 }

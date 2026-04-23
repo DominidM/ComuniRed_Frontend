@@ -67,14 +67,15 @@
           (click)="seleccionarBanner(video)"
           [attr.title]="video.nombre"
         >
-          <video
-            [src]="video.url"
-            muted
-            loop
-            autoplay
-            playsinline
-            class="picker-thumb"
-          ></video>
+        <video
+          [src]="video.url"
+          muted
+          loop
+          playsinline
+          class="picker-thumb"
+          (mouseenter)="$any($event.target).play()"
+          (mouseleave)="$any($event.target).pause()"
+        ></video>
           <div class="picker-item-overlay">
             <i
               *ngIf="bannerSeleccionado.id === video.id"

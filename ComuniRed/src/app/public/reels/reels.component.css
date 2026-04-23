@@ -1,339 +1,345 @@
-/* Paleta de colores ComuniRed */
+/* =====================================================
+   REELS — TikTok style: fullscreen, SIN scroll
+   ===================================================== */
+
 :root {
   --primary-red: #d32f2f;
-  --dark-bg: #1a1a1a;
-  --light-gray: #f5f5f5;
-  --text-dark: #333333;
-  --white: #ffffff;
 }
 
-/* Layout general: centrar una columna tipo TikTok */
-.reels-container {
-  position: relative;
-  width: 100%;
-  height: 92vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--dark-bg);
-  overflow: hidden;
-  padding: 16px;
-  box-sizing: border-box;
-}
-
-
-/* Column video: limitar ancho en desktop para evitar barras negras grandes */
-.video-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  /* <<--- ancho tipo TikTok en desktop */
-  height: calc(89vh - 32px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  overflow: hidden;
-  margin: 0 auto;
-  border-radius: 12px;
-  background: #000;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
-}
-
-/* vídeo: contain en desktop (ver todo), cover en móvil (llenar) */
-.video-player {
+/* ── BLOQUEAR scroll en el host ──────────────────── */
+:host {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  /* muestra todo el cuadro en desktop */
-  object-position: center center;
-  background-color: #000;
+  overflow: hidden;
+}
+
+/* ── Contenedor principal FIXED ──────────────────── */
+.reels-container {
+  position: fixed;
+  top: 72px;           /* altura exacta de tu navbar */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  overflow: hidden;
+  touch-action: none;
+  z-index: 10;
+}
+
+.reels-container.light-mode {
+  background: #e2e2e2;
+}
+
+/* ── Layout ──────────────────────────────────────── */
+.reels-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 37px;
+  height: 94%;
+  width: 100%;
+}
+
+/* ── Video wrapper ────────────────────────────────── */
+.video-wrapper {
+  position: relative;
+  height: 100%;
+  width: auto;
+  aspect-ratio: 9 / 16;
+  max-width: min(380px, calc(100vh * 9 / 16 - 60px));
+  cursor: pointer;
+  overflow: hidden;
+  background: #000;
+  border-radius: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px rgba(0,0,0,0.8);
+}
+
+.light-mode .video-wrapper {
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 20px 40px rgba(0,0,0,0.25);
+}
+
+@media (max-width: 767px) {
+  .reels-container { top: 56px; }
+  .reels-layout { gap: 8px; }
+  .video-wrapper {
+    height: 100%;
+    max-width: calc(100vw - 68px);
+    border-radius: 10px;
+  }
+}
+
+/* ── Video ────────────────────────────────────────── */
+.video-player {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center;
+  background: #000;
   z-index: 1;
-  transition: opacity 0.18s ease;
   -webkit-user-select: none;
   user-select: none;
 }
 
-/* On narrow screens (mobile) behave like reels: fill & crop */
-@media (max-width: 1024px) {
-  .video-wrapper {
-    max-width: none;
-    width: 100%;
-    height: 85vh;
-    border-radius: 0;
-  }
+video::-webkit-media-controls,
+video::-webkit-media-controls-panel { display: none !important; }
 
-  .video-player {
-    object-fit: cover;
-  }
-}
-
-/* Remove native controls visual */
-video::-webkit-media-controls {
-  display: none !important;
-}
-
-video::-webkit-media-controls-panel {
-  display: none !important;
-}
-
-/* Play overlay */
-.play-pause-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 30;
-}
-
-.play-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-/* Actions overlay (TikTok style): inside video, right center */
-.actions-overlay {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  z-index: 60;
-  /* 🟢 AJUSTE DE Z-INDEX: Máxima prioridad */
-  align-items: center;
-  pointer-events: auto;
-}
-
-/* Circular buttons */
-.action-circle {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-  position: relative;
-}
-
-.action-circle:hover {
-  transform: translateY(-3px);
-}
-
-.action-circle:focus {
-  outline: 2px solid #ffffff;
-  outline-offset: 2px;
-}
-
-/* Mejora de accesibilidad */
-
-/* small badge for likes */
-.action-badge {
-  position: absolute;
-  bottom: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  color: #fff;
-  font-weight: 700;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-}
-
-/* subtle frame overlay to improve contrast on text */
+/* ── Sombra inferior ──────────────────────────────── */
 .video-frame-shadow {
   pointer-events: none;
   position: absolute;
   inset: 0;
-  border-radius: 12px;
-  box-shadow: inset 0 -120px 100px -40px rgba(0, 0, 0, 0.8);
-  /* Sombra más fuerte para mejor contraste */
   z-index: 3;
+  border-radius: inherit;
+  background: linear-gradient(to top,
+    rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.2) 38%,
+    transparent 62%, rgba(0,0,0,0.08) 100%);
 }
 
-/* Info overlay bottom: higher contrast and readable text */
+/* ── Play/Pause overlay ───────────────────────────── */
+.play-pause-overlay {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  animation: popIn 0.18s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes popIn {
+  from { transform: translate(-50%,-50%) scale(0.5); opacity: 0; }
+  to   { transform: translate(-50%,-50%) scale(1);   opacity: 1; }
+}
+
+.play-icon {
+  width: 66px; height: 66px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* ── Info overlay ─────────────────────────────────── */
 .info-overlay {
   position: absolute;
-  bottom: 8px;
-  left: 12px;
-  right: 12px;
-  padding: 12px 14px;
-  z-index: 50;
-  /* 🟢 AJUSTE DE Z-INDEX: Debajo de las acciones (60) y navegación (55) */
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.05));
-  border-radius: 8px;
+  bottom: 44px; left: 14px; right: 14px;
+  z-index: 10;
+  display: flex; flex-direction: column; gap: 8px;
   pointer-events: none;
 }
 
-.author-info {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
+.author-info { display: flex; gap: 10px; align-items: center; }
 
 .author-avatar {
-  width: 40px;
-  height: 40px;
+  width: 42px; height: 42px;
   border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.75);
+  overflow: hidden; flex-shrink: 0;
   background: linear-gradient(135deg, var(--primary-red), #ff6b6b);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.06);
-  overflow: hidden;
 }
 
-.author-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  -webkit-user-drag: none;
-}
+.author-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* text styles */
+.author-details { display: flex; flex-direction: column; gap: 2px; }
+
 .author-name {
-  color: #fff;
-  font-weight: 700;
-  margin: 0;
-  font-size: 14px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  color: #fff; font-weight: 700; margin: 0;
+  font-size: 14px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); line-height: 1.2;
 }
 
 .video-title {
-  color: #e8e8e8;
-  margin: 0;
-  font-size: 13px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  color: rgba(255,255,255,0.8); margin: 0;
+  font-size: 12px; text-shadow: 0 1px 3px rgba(0,0,0,0.7);
 }
 
 .video-description {
-  color: #ddd;
-  font-size: 12px;
-  margin: 0;
-  opacity: 0.95;
+  color: rgba(255,255,255,0.75); font-size: 12px; margin: 0;
+  line-height: 1.4; text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
 }
 
-/* Progress dots (TikTok style) */
-.progress-dots {
-  position: absolute;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  z-index: 55;
-  /* 🟢 AJUSTE DE Z-INDEX: Alta prioridad */
-  pointer-events: auto;
+/* ── Barra de progreso ────────────────────────────── */
+.progress-bar-container {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 20; padding: 10px 0 6px; cursor: pointer;
 }
 
-.progress-dots .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
-  /* Color ligeramente más visible */
-  transition: all .18s ease;
+.progress-bar-bg {
+  position: relative; width: 100%; height: 3px;
+  background: rgba(255,255,255,0.25); border-radius: 2px;
+  transition: height 0.15s ease;
 }
 
-.progress-dots .dot.active {
-  width: 10px;
-  height: 10px;
-  background: rgba(255, 255, 255, 1);
-  /* Totalmente blanco */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+.progress-bar-container:hover .progress-bar-bg { height: 5px; }
+
+.progress-bar-fill {
+  position: absolute; left: 0; top: 0; height: 100%;
+  background: #fff; border-radius: 2px;
+  transition: width 0.1s linear; pointer-events: none;
 }
 
-/* ==================== NUEVO: BOTONES DE NAVEGACIÓN ==================== */
-.navigation-overlay {
-  position: absolute;
-  inset: 0;
-  /* Cubre todo el video-wrapper */
-  z-index: 55;
-  /* 🟢 AJUSTE DE Z-INDEX: Sobre info-overlay (50) y bajo acciones (60) */
-  pointer-events: none;
-  /* Crucial: no debe bloquear el clic en el video */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10% 0;
-  /* Espacio para que las flechas no toquen los bordes */
+.progress-bar-thumb {
+  position: absolute; top: 50%;
+  transform: translate(-50%,-50%) scale(0);
+  width: 13px; height: 13px; border-radius: 50%;
+  background: #fff; pointer-events: none; transition: transform 0.15s ease;
+}
+
+.progress-bar-container:hover .progress-bar-thumb {
+  transform: translate(-50%,-50%) scale(1);
+}
+
+/* ══ SIDEBAR DERECHO ═════════════════════════════════ */
+.sidebar-right {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px; flex-shrink: 0;
+  width: 64px; height: 100%; padding: 20px 0;
 }
 
 .nav-button {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  pointer-events: auto;
-  /* Permite click solo en el botón */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #fff;
+  transition: background 0.2s, transform 0.15s, opacity 0.2s;
+  flex-shrink: 0;
 }
 
-.nav-button svg {
-  fill: white;
+.nav-button:hover:not(:disabled) { background: rgba(255,255,255,0.22); transform: scale(1.1); }
+.nav-button:active:not(:disabled) { transform: scale(0.94); }
+.nav-button:disabled { opacity: 0.2; cursor: not-allowed; }
+
+.light-mode .nav-button {
+  border-color: rgba(0,0,0,0.12); background: rgba(255,255,255,0.85);
+  color: #1a1a1a; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.nav-button:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.05);
+.actions-group {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 18px;
+  flex: 1; justify-content: center;
 }
 
-.nav-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background: rgba(255, 255, 255, 0.1);
-  transform: none;
-  box-shadow: none;
+.action-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+.action-circle {
+  width: 50px; height: 50px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #fff;
+  transition: transform 0.15s, background 0.2s;
 }
 
-/* ====================================================================== */
+.action-circle:hover { transform: scale(1.1); background: rgba(255,255,255,0.2); }
+.action-circle:active { transform: scale(0.93); }
 
-
-/* Responsive tweaks */
-@media (max-width: 420px) {
-  .action-circle {
-    width: 48px;
-    height: 48px;
-  }
-
-  .action-badge {
-    font-size: 11px;
-  }
-
-  .reels-container {
-    padding: 0;
-    height: 100vh;
-  }
+.light-mode .action-circle {
+  border-color: rgba(0,0,0,0.1); background: rgba(255,255,255,0.88);
+  color: #1a1a1a; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* Accessibility & niceties */
-* {
-  -webkit-tap-highlight-color: transparent;
+.action-label {
+  font-size: 11px; font-weight: 700; color: #fff;
+  text-align: center; min-height: 14px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
 }
 
-button {
-  outline: none;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
+.light-mode .action-label { color: #1a1a1a; text-shadow: none; }
+
+.action-circle.is-liked { animation: heartPop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes heartPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.45); }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
 }
+
+.action-circle.is-saved { animation: bookmarkPop 0.3s ease; }
+@keyframes bookmarkPop {
+  0%   { transform: scale(1) rotate(0deg); }
+  40%  { transform: scale(1.3) rotate(-12deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.nav-separator {
+  width: 32px; height: 1px;
+  background: rgba(255,255,255,0.15); margin: 4px 0;
+}
+
+.light-mode .nav-separator { background: rgba(0,0,0,0.1); }
+
+/* ══ PANEL COMENTARIOS ══════════════════════════════ */
+.comments-panel {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 90; background: rgba(18,18,18,0.97);
+  backdrop-filter: blur(20px); border-radius: 20px 20px 0 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  max-height: 65%; display: flex; flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32,0.72,0,1);
+}
+
+.comments-panel.open { transform: translateY(0); }
+
+.light-mode .comments-panel {
+  background: rgba(248,248,248,0.98);
+  border-top-color: rgba(0,0,0,0.08);
+}
+
+.comments-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.07); flex-shrink: 0;
+}
+
+.comments-title { font-size: 15px; font-weight: 700; color: #fff; }
+.light-mode .comments-title { color: #1a1a1a; }
+
+.comments-close {
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #fff;
+}
+
+.light-mode .comments-close { background: rgba(0,0,0,0.07); color: #1a1a1a; }
+
+.comments-body { flex: 1; overflow-y: auto; padding: 16px 20px; min-height: 100px; }
+.comments-empty { color: rgba(255,255,255,0.38); font-size: 13px; text-align: center; margin-top: 24px; }
+.light-mode .comments-empty { color: rgba(0,0,0,0.32); }
+
+.comments-input-row {
+  display: flex; gap: 10px; padding: 12px 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  align-items: center; flex-shrink: 0;
+}
+
+.comments-input {
+  flex: 1; background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+  padding: 10px 16px; font-size: 14px; color: #fff; outline: none;
+}
+
+.comments-input::placeholder { color: rgba(255,255,255,0.32); }
+.light-mode .comments-input { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #1a1a1a; }
+
+.comments-send {
+  background: var(--primary-red); color: #fff; border: none;
+  border-radius: 20px; padding: 10px 18px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+}
+
+/* ── Accessibility ────────────────────────────────── */
+* { -webkit-tap-highlight-color: transparent; }
+button { outline: none; -webkit-user-select: none; user-select: none; }
+button:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 2px; }

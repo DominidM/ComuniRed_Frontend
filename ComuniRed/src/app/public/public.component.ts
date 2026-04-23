@@ -1,13 +1,14 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { RightbarComponent } from './rightbar/rightbar.component';
 import { NavbarComponent } from './navbar/navbar.component';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-public',
@@ -26,11 +27,24 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './public.component.html',
   styleUrls: ['./public.component.css']
 })
-export class PublicComponent {
+export class PublicComponent implements OnInit {
   isDesktop: boolean = true;
+  isReelsRoute: boolean = false;
+
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.checkScreenSize();
+
+    // Check inicial por si se entra directo a /reels
+    this.isReelsRoute = this.router.url.includes('/reels');
+
+    // Escuchar cambios de ruta
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd)
+    ).subscribe((e: any) => {
+      this.isReelsRoute = e.url.includes('/reels');
+    });
   }
 
   @HostListener('window:resize')
