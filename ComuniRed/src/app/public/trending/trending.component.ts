@@ -17,49 +17,40 @@ import { UsuarioService } from '../../services/usuario.service';
 })
 export class TrendingComponent implements OnInit {
   Math = Math;
-  
+
   posts: Queja[] = [];
   filteredPosts: Queja[] = [];
   loading = false;
-  
+
   user: { id?: string; name: string; avatarUrl: string } | null = null;
-  
+
   categorias: any[] = [];
   selectedCategory = '';
   sortBy: 'recent' | 'popular' | 'votes' = 'popular';
-  
+
   showReactionMenu: { [postId: string]: boolean } = {};
-  showCommentMenuModal: { [commentId: string]: boolean } = {};
   showCommentsInline: { [postId: string]: boolean } = {};
-  
-  // Modales
+
   showCommentsModal = false;
   showEditModal = false;
-  
-  // Comentarios
+
   selectedReporteForComments: Queja | null = null;
   newCommentText = '';
   editingCommentId: string | null = null;
   editingCommentText = '';
-  
-  // Edición de queja
+
   editingQueja: Queja | null = null;
-  
-  // Toast
+
   toastMessage = '';
   showToast = false;
-  
-  // Paginación
-  currentPage = 1;
-  reportsPerPage = 10;
-  totalReports = 0;
-  
-  // Vista actual
+
   currentView: 'populares' | 'recientes' | 'categorias' = 'populares';
   selectedPeriodo = 7;
   selectedCategoryName = '';
-  
-  // Stats
+
+  /** Cuántos reportes mostrar en el ranking */
+  readonly TOP_LIMIT = 5;
+
   stats = {
     reportePopular: '-',
     reportesEstaSemana: 0,
@@ -91,10 +82,10 @@ export class TrendingComponent implements OnInit {
     const u = this.usuarioService.getUser();
     if (u) {
       const avatar = (u as any).foto_perfil || 'assets/img/default-avatar.png';
-      this.user = { 
-        id: (u as any).id || undefined, 
-        name: `${(u as any).nombre || ''} ${(u as any).apellido || ''}`.trim() || 'Usuario', 
-        avatarUrl: avatar 
+      this.user = {
+        id: (u as any).id || undefined,
+        name: `${(u as any).nombre || ''} ${(u as any).apellido || ''}`.trim() || 'Usuario',
+        avatarUrl: avatar
       };
     } else {
       this.user = { name: 'Usuario', avatarUrl: 'assets/img/default-avatar.png' };
@@ -122,12 +113,12 @@ export class TrendingComponent implements OnInit {
 
   cargarReportes(): void {
     if (!this.user?.id) return;
-    
     this.loading = true;
     this.quejaService.obtenerQuejas(this.user.id).subscribe({
       next: (quejas) => {
-        this.posts = JSON.parse(JSON.stringify(quejas)).map((q: any) => {
-          const reactions = {
+        this.posts = JSON.parse(JSON.stringify(quejas)).map((q: any) => ({
+          ...q,
+          reactions: {
             total: q.reactions?.total || 0,
             userReaction: q.reactions?.userReaction || undefined,
             counts: {
@@ -138,27 +129,14 @@ export class TrendingComponent implements OnInit {
               dislike: q.reactions?.counts?.['dislike'] || 0,
               report: q.reactions?.counts?.['report'] || 0
             }
-          };
-
-          const votes = {
-            yes: q.votes?.yes || 0,
-            no: q.votes?.no || 0,
-            total: q.votes?.total || 0
-          };
-
-          return {
-            ...q,
-            reactions,
-            votes,
-            userVote: q.userVote || null,
-            canVote: q.canVote !== undefined ? q.canVote : !q.userVote,
-            showComments: false,
-            showMenu: false,
-            comments: q.comments || [],
-            commentsCount: q.commentsCount || 0
-          };
-        });
-        
+          },
+          votes: { yes: q.votes?.yes || 0, no: q.votes?.no || 0, total: q.votes?.total || 0 },
+          userVote: q.userVote || null,
+          canVote: q.canVote !== undefined ? q.canVote : !q.userVote,
+          showMenu: false,
+          comments: q.comments || [],
+          commentsCount: q.commentsCount || 0
+        }));
         this.updateStats();
         this.applyFilters();
         this.loading = false;
@@ -173,97 +151,61 @@ export class TrendingComponent implements OnInit {
 
   updateStats(): void {
     this.stats.totalReportes = this.posts.length;
-    
     if (this.posts.length > 0) {
-      const sorted = [...this.posts].sort((a, b) => 
-        (b.reactions?.total || 0) - (a.reactions?.total || 0)
-      );
-      this.stats.reportePopular = sorted[0]?.titulo.substring(0, 20) + '...' || '-';
-      
+      const sorted = [...this.posts].sort((a, b) => (b.reactions?.total || 0) - (a.reactions?.total || 0));
+      const titulo = sorted[0]?.titulo || '-';
+      this.stats.reportePopular = titulo.length > 22 ? titulo.substring(0, 22) + '…' : titulo;
+
       const categoryCounts: { [key: string]: number } = {};
       this.posts.forEach(p => {
         const catName = p.categoria?.nombre || 'Sin categoría';
         categoryCounts[catName] = (categoryCounts[catName] || 0) + 1;
       });
-      
       const topCat = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0];
       this.stats.categoriaTop = topCat ? topCat[0] : '-';
-      
+
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
-      this.stats.reportesEstaSemana = this.posts.filter(p => 
-        new Date(p.fecha_creacion) > weekAgo
-      ).length;
+      this.stats.reportesEstaSemana = this.posts.filter(p => new Date(p.fecha_creacion) > weekAgo).length;
     }
   }
 
   applyFilters(): void {
     let filtered = [...this.posts];
-
     if (this.selectedCategory) {
       filtered = filtered.filter(p => p.categoria?.id === this.selectedCategory);
     }
-
-    filtered = this.sortPosts(filtered);
-
-    this.filteredPosts = filtered;
-    this.currentPage = 1;
+    this.filteredPosts = this.sortPosts(filtered);
   }
 
   sortPosts(posts: Queja[]): Queja[] {
     switch (this.sortBy) {
       case 'recent':
-        return posts.sort((a, b) => 
-          new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime()
-        );
+        return posts.sort((a, b) => new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime());
       case 'popular':
-        return posts.sort((a, b) => 
-          (b.reactions?.total || 0) - (a.reactions?.total || 0)
-        );
+        return posts.sort((a, b) => (b.reactions?.total || 0) - (a.reactions?.total || 0));
       case 'votes':
-        return posts.sort((a, b) => 
-          this.getTotalVotes(b) - this.getTotalVotes(a)
-        );
+        return posts.sort((a, b) => this.getTotalVotes(b) - this.getTotalVotes(a));
       default:
         return posts;
     }
   }
 
-  onCategoryFilterChange(): void {
-    this.applyFilters();
+  // ── Devuelve solo el top N reportes ──────────────
+  getTopReportes(): Queja[] {
+    return this.filteredPosts.slice(0, this.TOP_LIMIT);
   }
 
-  onSortChange(): void {
-    this.applyFilters();
-  }
-
-  clearFilters(): void {
-    this.selectedCategory = '';
-    this.sortBy = 'popular';
-    this.applyFilters();
-  }
-
-  // ============================================
-  // VISTAS Y NAVEGACIÓN
-  // ============================================
-
+  // ── Vistas ────────────────────────────────────────
   changeView(view: 'populares' | 'recientes' | 'categorias'): void {
     this.currentView = view;
-    if (view === 'populares') {
-      this.sortBy = 'popular';
-    } else if (view === 'recientes') {
-      this.sortBy = 'recent';
-    }
+    if (view === 'populares') this.sortBy = 'popular';
+    else if (view === 'recientes') this.sortBy = 'recent';
     this.applyFilters();
   }
 
-  isViewActive(view: string): boolean {
-    return this.currentView === view;
-  }
-
-  hasActiveFilter(): boolean {
-    return !!this.selectedCategory;
-  }
+  isViewActive(view: string): boolean { return this.currentView === view; }
+  hasActiveFilter(): boolean { return !!this.selectedCategory; }
 
   clearCategoryFilter(): void {
     this.selectedCategory = '';
@@ -271,10 +213,7 @@ export class TrendingComponent implements OnInit {
     this.applyFilters();
   }
 
-  cambiarPeriodo(dias: number): void {
-    this.selectedPeriodo = dias;
-    // Aquí puedes agregar lógica para filtrar por período
-  }
+  cambiarPeriodo(dias: number): void { this.selectedPeriodo = dias; }
 
   getPeriodoTexto(): string {
     if (this.selectedPeriodo === 7) return 'Esta semana';
@@ -289,114 +228,42 @@ export class TrendingComponent implements OnInit {
     this.applyFilters();
   }
 
-  getReportes(): Queja[] {
-    return this.selectedCategory ? this.filteredPosts : this.posts;
-  }
-
-  // ============================================
-  // VOTACIÓN
-  // ============================================
-
-  isQuejaEnVotacion(post: Queja): boolean {
-    return post.estado?.clave === 'votacion';
-  }
-
-  hasVotes(post: Queja): boolean {
-    return !!post.votes;
-  }
-
-  canVote(post: Queja): boolean {
-    return !post.userVote && this.isQuejaEnVotacion(post);
-  }
-
-  getTotalVotes(post: Queja): number {
-    return (post.votes?.yes || 0) + (post.votes?.no || 0);
-  }
-
-  getYesVotes(post: Queja): number {
-    return post.votes?.yes || 0;
-  }
-
-  getNoVotes(post: Queja): number {
-    return post.votes?.no || 0;
-  }
-
-  getVotingProgress(post: Queja): number {
-    const total = this.getTotalVotes(post);
-    return Math.min((total / 5) * 100, 100);
-  }
-
-  needsMoreVotes(post: Queja): boolean {
-    return this.getTotalVotes(post) < 5;
-  }
-
-  getVotesNeeded(post: Queja): number {
-    return Math.max(0, 5 - this.getTotalVotes(post));
-  }
+  // ── Votación ──────────────────────────────────────
+  isQuejaEnVotacion(post: Queja): boolean { return post.estado?.clave === 'votacion'; }
+  hasVotes(post: Queja): boolean { return !!post.votes; }
+  canVote(post: Queja): boolean { return !post.userVote && this.isQuejaEnVotacion(post); }
+  getTotalVotes(post: Queja): number { return (post.votes?.yes || 0) + (post.votes?.no || 0); }
+  getYesVotes(post: Queja): number { return post.votes?.yes || 0; }
+  getNoVotes(post: Queja): number { return post.votes?.no || 0; }
+  getVotingProgress(post: Queja): number { return Math.min((this.getTotalVotes(post) / 5) * 100, 100); }
+  needsMoreVotes(post: Queja): boolean { return this.getTotalVotes(post) < 5; }
+  getVotesNeeded(post: Queja): number { return Math.max(0, 5 - this.getTotalVotes(post)); }
 
   vote(post: Queja, voteType: 'accept' | 'reject'): void {
-    if (!this.user?.id || !this.canVote(post)) {
-      return;
-    }
-
+    if (!this.user?.id || !this.canVote(post)) return;
     const voteValue = voteType === 'accept' ? 'YES' : 'NO';
-    
-    const previousVotes = { ...post.votes };
-    const previousUserVote = post.userVote;
-
-    if (voteType === 'accept') {
-      post.votes.yes = (post.votes.yes || 0) + 1;
-    } else {
-      post.votes.no = (post.votes.no || 0) + 1;
-    }
+    const prev = { votes: { ...post.votes }, userVote: post.userVote };
+    if (voteType === 'accept') post.votes.yes = (post.votes.yes || 0) + 1;
+    else post.votes.no = (post.votes.no || 0) + 1;
     post.votes.total = (post.votes.yes || 0) + (post.votes.no || 0);
     post.userVote = voteValue;
-
     this.quejaService.votarQueja(post.id, this.user.id, voteValue).subscribe({
-      next: (updatedQueja) => {
-        post.votes = updatedQueja.votes;
-        post.userVote = updatedQueja.userVote;
-        post.canVote = updatedQueja.canVote;
-        this.showToastMessage('Voto registrado exitosamente');
-      },
-      error: (err: any) => {
-        console.error('Error al votar:', err);
-        post.votes = previousVotes;
-        post.userVote = previousUserVote;
-        this.showToastMessage('Error al registrar el voto');
-      }
+      next: (u) => { post.votes = u.votes; post.userVote = u.userVote; post.canVote = u.canVote; this.showToastMessage('Voto registrado'); },
+      error: () => { post.votes = prev.votes; post.userVote = prev.userVote; this.showToastMessage('Error al votar'); }
     });
   }
 
-  // ============================================
-  // ESTADOS
-  // ============================================
+  // ── Estados ───────────────────────────────────────
+  isQuejaEnProceso(post: Queja): boolean { return post.estado?.clave === 'en_proceso'; }
+  isQuejaResuelta(post: Queja): boolean { return post.estado?.clave === 'resuelto' || post.estado?.clave === 'resuelta'; }
+  isQuejaPendiente(post: Queja): boolean { return post.estado?.clave === 'pendiente' || post.estado?.clave === 'aprobada'; }
 
-  isQuejaEnProceso(post: Queja): boolean {
-    return post.estado?.clave === 'en_proceso';
-  }
-
-  isQuejaResuelta(post: Queja): boolean {
-    return post.estado?.clave === 'resuelto' || post.estado?.clave === 'resuelta';
-  }
-
-  isQuejaPendiente(post: Queja): boolean {
-    return post.estado?.clave === 'pendiente' || post.estado?.clave === 'aprobada';
-  }
-
-  // ============================================
-  // REACCIONES
-  // ============================================
-
-  closeAllReactionMenus(): void {
-    this.showReactionMenu = {};
-  }
+  // ── Reacciones ────────────────────────────────────
+  closeAllReactionMenus(): void { this.showReactionMenu = {}; }
 
   toggleReactionMenu(postId: string, event: Event): void {
     event.stopPropagation();
-    Object.keys(this.showReactionMenu).forEach(key => {
-      if (key !== postId) this.showReactionMenu[key] = false;
-    });
+    Object.keys(this.showReactionMenu).forEach(k => { if (k !== postId) this.showReactionMenu[k] = false; });
     this.showReactionMenu[postId] = !this.showReactionMenu[postId];
   }
 
@@ -408,158 +275,78 @@ export class TrendingComponent implements OnInit {
 
   toggleReaction(post: Queja, type: string): void {
     if (!this.user?.id) return;
-
-    const previousReactions = { ...post.reactions, counts: { ...post.reactions.counts } };
-    const previousUserReaction = post.reactions.userReaction;
-
-    if (previousUserReaction === type) {
-      const currentCount = post.reactions.counts[type] ?? 0;
-      post.reactions.counts[type] = Math.max(0, currentCount - 1);
+    const prev = { ...post.reactions, counts: { ...post.reactions.counts } };
+    const prevType = post.reactions.userReaction;
+    if (prevType === type) {
+      post.reactions.counts[type] = Math.max(0, (post.reactions.counts[type] ?? 0) - 1);
       post.reactions.userReaction = undefined;
     } else {
-      if (previousUserReaction) {
-        const prevCount = post.reactions.counts[previousUserReaction] ?? 0;
-        post.reactions.counts[previousUserReaction] = Math.max(0, prevCount - 1);
-      }
-      const currentCount = post.reactions.counts[type] ?? 0;
-      post.reactions.counts[type] = currentCount + 1;
+      if (prevType) post.reactions.counts[prevType] = Math.max(0, (post.reactions.counts[prevType] ?? 0) - 1);
+      post.reactions.counts[type] = (post.reactions.counts[type] ?? 0) + 1;
       post.reactions.userReaction = type;
     }
-    
-    const total = Object.values(post.reactions.counts).reduce((sum: number, val) => sum + (val ?? 0), 0);
-    post.reactions.total = total;
-
+    post.reactions.total = Object.values(post.reactions.counts).reduce((s: number, v) => s + (v ?? 0), 0);
     this.reaccionService.toggleReaccion(post.id, type, this.user.id).subscribe({
-      next: (updated) => {
-        post.reactions = updated;
-        this.applyFilters();
-      },
-      error: (err: any) => {
-        console.error('Error al reaccionar', err);
-        post.reactions = previousReactions;
-      }
+      next: (u) => { post.reactions = u; this.applyFilters(); },
+      error: () => { post.reactions = prev; }
     });
   }
 
-  getReactionCount(post: Queja, type: string): number {
-    return post.reactions?.counts?.[type] ?? 0;
-  }
+  getReactionCount(post: Queja, type: string): number { return post.reactions?.counts?.[type] ?? 0; }
 
   getReactionIcon(reaction: string): string {
-    const icons: { [key: string]: string } = {
-      like: '❤️',
-      love: '😍',
-      wow: '😮',
-      helpful: '👍',
-      dislike: '👎'
-    };
+    const icons: { [key: string]: string } = { like: '❤️', love: '😍', wow: '😮', helpful: '👍', dislike: '👎' };
     return icons[reaction] || '👍';
   }
 
-  // ============================================
-  // COMENTARIOS
-  // ============================================
-
-  getCommentsCount(reporte: Queja): number {
-    return reporte.commentsCount || (reporte.comments || []).length;
-  }
-
-  getPreviewComments(reporte: Queja): any[] {
-    return (reporte.comments || []).slice(0, 3);
-  }
-
-  hasMoreComments(reporte: Queja): boolean {
-    return this.getCommentsCount(reporte) > 3;
-  }
-
-  canEditComment(comment: any): boolean {
-    return comment.author?.id === this.user?.id;
-  }
-
-  getCommentAuthor(comment: any): string {
-    return `${comment.author?.nombre || ''} ${comment.author?.apellido || ''}`.trim() || 'Usuario';
-  }
+  // ── Comentarios ───────────────────────────────────
+  getCommentsCount(reporte: Queja): number { return reporte.commentsCount || (reporte.comments || []).length; }
+  getPreviewComments(reporte: Queja): any[] { return (reporte.comments || []).slice(0, 3); }
+  hasMoreComments(reporte: Queja): boolean { return this.getCommentsCount(reporte) > 3; }
+  canEditComment(comment: any): boolean { return comment.author?.id === this.user?.id; }
+  getCommentAuthor(comment: any): string { return `${comment.author?.nombre || ''} ${comment.author?.apellido || ''}`.trim() || 'Usuario'; }
 
   formatCommentDate(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) return 'justo ahora';
-    if (diffInSeconds < 3600) return `hace ${Math.floor(diffInSeconds / 60)} min`;
-    if (diffInSeconds < 86400) return `hace ${Math.floor(diffInSeconds / 3600)}h`;
-    if (diffInSeconds < 172800) return 'hace 1 día';
-    if (diffInSeconds < 604800) return `hace ${Math.floor(diffInSeconds / 86400)} días`;
-    
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    const diff = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
+    if (diff < 60) return 'ahora';
+    if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`;
+    if (diff < 86400) return `hace ${Math.floor(diff / 3600)}h`;
+    if (diff < 172800) return 'hace 1 día';
+    if (diff < 604800) return `hace ${Math.floor(diff / 86400)} días`;
+    return new Date(dateString).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
   }
 
   addCommentInline(reporte: Queja, inputElement: HTMLInputElement): void {
     const text = inputElement.value.trim();
     if (!text || !this.user?.id) return;
-
-    const tempComment = {
-      id: 'temp-' + Date.now(),
-      texto: text,
-      author: {
-        id: this.user.id,
-        nombre: this.user.name.split(' ')[0] || 'Usuario',
-        apellido: this.user.name.split(' ')[1] || '',
-        foto_perfil: this.user.avatarUrl
-      },
-      fecha_creacion: new Date().toISOString(),
-      showMenu: false
+    const temp: any = {
+      id: 'temp-' + Date.now(), texto: text,
+      author: { id: this.user.id, nombre: this.user.name.split(' ')[0] || 'Usuario', apellido: this.user.name.split(' ')[1] || '', foto_perfil: this.user.avatarUrl },
+      fecha_creacion: new Date().toISOString(), showMenu: false
     };
-
-    if (!Array.isArray(reporte.comments)) {
-      reporte.comments = [];
-    }
-
-    reporte.comments = [...reporte.comments, tempComment as any];
+    if (!Array.isArray(reporte.comments)) reporte.comments = [];
+    reporte.comments = [...reporte.comments, temp];
     reporte.commentsCount = reporte.comments.length;
     inputElement.value = '';
-
     this.comentarioService.agregarComentario(reporte.id, this.user.id, text).subscribe({
-      next: (newComment) => {
-        const commentIndex = reporte.comments.findIndex(c => c.id === tempComment.id);
-        if (commentIndex !== -1) {
-          reporte.comments = [
-            ...reporte.comments.slice(0, commentIndex),
-            newComment,
-            ...reporte.comments.slice(commentIndex + 1)
-          ];
-        }
+      next: (n) => {
+        const idx = reporte.comments.findIndex(c => c.id === temp.id);
+        if (idx !== -1) reporte.comments = [...reporte.comments.slice(0, idx), n, ...reporte.comments.slice(idx + 1)];
         this.showToastMessage('Comentario agregado');
       },
-      error: (err: any) => {
-        console.error('Error al comentar', err);
-        reporte.comments = reporte.comments.filter(c => c.id !== tempComment.id);
-        reporte.commentsCount = reporte.comments.length;
-        this.showToastMessage('Error al agregar comentario');
-      }
+      error: () => { reporte.comments = reporte.comments.filter(c => c.id !== temp.id); reporte.commentsCount = reporte.comments.length; this.showToastMessage('Error al comentar'); }
     });
   }
 
   deleteCommentInline(reporte: Queja, comment: any): void {
     if (!this.user?.id || !confirm('¿Eliminar este comentario?')) return;
-
     this.comentarioService.eliminarComentario(comment.id, this.user.id).subscribe({
-      next: () => {
-        reporte.comments = reporte.comments.filter(c => c.id !== comment.id);
-        reporte.commentsCount = reporte.comments.length;
-        this.showToastMessage('Comentario eliminado');
-      },
-      error: (err: any) => {
-        console.error('Error al eliminar comentario', err);
-        this.showToastMessage('Error al eliminar comentario');
-      }
+      next: () => { reporte.comments = reporte.comments.filter(c => c.id !== comment.id); reporte.commentsCount = reporte.comments.length; this.showToastMessage('Comentario eliminado'); },
+      error: () => { this.showToastMessage('Error al eliminar comentario'); }
     });
   }
 
-  openCommentsModal(reporte: Queja): void {
-    this.selectedReporteForComments = reporte;
-    this.showCommentsModal = true;
-  }
+  openCommentsModal(reporte: Queja): void { this.selectedReporteForComments = reporte; this.showCommentsModal = true; }
 
   closeCommentsModal(): void {
     this.showCommentsModal = false;
@@ -571,101 +358,55 @@ export class TrendingComponent implements OnInit {
 
   addComment(): void {
     if (!this.newCommentText.trim() || !this.selectedReporteForComments || !this.user?.id) return;
-
-    const tempComment = {
-      id: 'temp-' + Date.now(),
-      texto: this.newCommentText.trim(),
-      author: {
-        id: this.user.id,
-        nombre: this.user.name.split(' ')[0] || 'Usuario',
-        apellido: this.user.name.split(' ')[1] || '',
-        foto_perfil: this.user.avatarUrl
-      },
-      fecha_creacion: new Date().toISOString(),
-      showMenu: false
+    const temp: any = {
+      id: 'temp-' + Date.now(), texto: this.newCommentText.trim(),
+      author: { id: this.user.id, nombre: this.user.name.split(' ')[0] || 'Usuario', apellido: this.user.name.split(' ')[1] || '', foto_perfil: this.user.avatarUrl },
+      fecha_creacion: new Date().toISOString(), showMenu: false
     };
-
-    if (!Array.isArray(this.selectedReporteForComments.comments)) {
-      this.selectedReporteForComments.comments = [];
-    }
-
-    this.selectedReporteForComments.comments = [...this.selectedReporteForComments.comments, tempComment as any];
+    if (!Array.isArray(this.selectedReporteForComments.comments)) this.selectedReporteForComments.comments = [];
+    this.selectedReporteForComments.comments = [...this.selectedReporteForComments.comments, temp];
     this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
-
     const commentText = this.newCommentText.trim();
     this.newCommentText = '';
-
     this.comentarioService.agregarComentario(this.selectedReporteForComments.id, this.user.id, commentText).subscribe({
-      next: (newComment) => {
+      next: (n) => {
         if (this.selectedReporteForComments) {
-          const commentIndex = this.selectedReporteForComments.comments.findIndex(c => c.id === tempComment.id);
-          if (commentIndex !== -1) {
-            this.selectedReporteForComments.comments = [
-              ...this.selectedReporteForComments.comments.slice(0, commentIndex),
-              newComment,
-              ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
-            ];
-          }
+          const idx = this.selectedReporteForComments.comments.findIndex(c => c.id === temp.id);
+          if (idx !== -1) this.selectedReporteForComments.comments = [...this.selectedReporteForComments.comments.slice(0, idx), n, ...this.selectedReporteForComments.comments.slice(idx + 1)];
         }
         this.showToastMessage('Comentario agregado');
       },
-      error: (err: any) => {
-        console.error('Error al comentar', err);
+      error: () => {
         if (this.selectedReporteForComments) {
-          this.selectedReporteForComments.comments = this.selectedReporteForComments.comments.filter(c => c.id !== tempComment.id);
+          this.selectedReporteForComments.comments = this.selectedReporteForComments.comments.filter(c => c.id !== temp.id);
           this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
         }
-        this.showToastMessage('Error al agregar comentario');
+        this.showToastMessage('Error al comentar');
       }
     });
   }
 
-  startEditComment(comment: any): void {
-    this.editingCommentId = comment.id;
-    this.editingCommentText = comment.texto;
-  }
-
-  cancelEditComment(): void {
-    this.editingCommentId = null;
-    this.editingCommentText = '';
-  }
+  startEditComment(comment: any): void { this.editingCommentId = comment.id; this.editingCommentText = comment.texto; }
+  cancelEditComment(): void { this.editingCommentId = null; this.editingCommentText = ''; }
 
   saveEditComment(): void {
     if (!this.editingCommentId || !this.editingCommentText.trim() || !this.selectedReporteForComments || !this.user?.id) return;
-
-    const commentIndex = this.selectedReporteForComments.comments.findIndex(c => c.id === this.editingCommentId);
-    if (commentIndex !== -1) {
-      const previousText = this.selectedReporteForComments.comments[commentIndex].texto;
-
+    const idx = this.selectedReporteForComments.comments.findIndex(c => c.id === this.editingCommentId);
+    if (idx !== -1) {
+      const prev = this.selectedReporteForComments.comments[idx].texto;
       this.selectedReporteForComments.comments = [
-        ...this.selectedReporteForComments.comments.slice(0, commentIndex),
-        {
-          ...this.selectedReporteForComments.comments[commentIndex],
-          texto: this.editingCommentText.trim(),
-          fecha_modificacion: new Date().toISOString()
-        } as any,
-        ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
+        ...this.selectedReporteForComments.comments.slice(0, idx),
+        { ...this.selectedReporteForComments.comments[idx], texto: this.editingCommentText.trim(), fecha_modificacion: new Date().toISOString() } as any,
+        ...this.selectedReporteForComments.comments.slice(idx + 1)
       ];
-
-      this.comentarioService.actualizarComentario(
-        this.editingCommentId,
-        this.user.id,
-        this.editingCommentText.trim()
-      ).subscribe({
-        next: () => {
-          this.showToastMessage('Comentario actualizado');
-          this.cancelEditComment();
-        },
-        error: (err: any) => {
-          console.error('Error al actualizar comentario', err);
+      this.comentarioService.actualizarComentario(this.editingCommentId, this.user.id, this.editingCommentText.trim()).subscribe({
+        next: () => { this.showToastMessage('Comentario actualizado'); this.cancelEditComment(); },
+        error: () => {
           if (this.selectedReporteForComments) {
             this.selectedReporteForComments.comments = [
-              ...this.selectedReporteForComments.comments.slice(0, commentIndex),
-              {
-                ...this.selectedReporteForComments.comments[commentIndex],
-                texto: previousText
-              },
-              ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
+              ...this.selectedReporteForComments.comments.slice(0, idx),
+              { ...this.selectedReporteForComments.comments[idx], texto: prev },
+              ...this.selectedReporteForComments.comments.slice(idx + 1)
             ];
           }
           this.showToastMessage('Error al actualizar comentario');
@@ -676,7 +417,6 @@ export class TrendingComponent implements OnInit {
 
   deleteComment(comment: any): void {
     if (!this.user?.id || !this.selectedReporteForComments || !confirm('¿Eliminar este comentario?')) return;
-
     this.comentarioService.eliminarComentario(comment.id, this.user.id).subscribe({
       next: () => {
         if (this.selectedReporteForComments) {
@@ -685,216 +425,73 @@ export class TrendingComponent implements OnInit {
         }
         this.showToastMessage('Comentario eliminado');
       },
-      error: (err: any) => {
-        console.error('Error al eliminar comentario', err);
-        this.showToastMessage('Error al eliminar comentario');
-      }
+      error: () => { this.showToastMessage('Error al eliminar comentario'); }
     });
   }
 
-  // ============================================
-  // EDITAR/ELIMINAR QUEJA
-  // ============================================
-
-  canEditQueja(reporte: Queja): boolean {
-    return reporte.usuario?.id === this.user?.id;
-  }
-
-  togglePostMenu(reporte: Queja): void {
-    reporte.showMenu = !reporte.showMenu;
-  }
-
-  openEditQueja(reporte: Queja): void {
-    this.editingQueja = JSON.parse(JSON.stringify(reporte));
-    this.showEditModal = true;
-  }
-
-  closeEditModal(): void {
-    this.showEditModal = false;
-    this.editingQueja = null;
-  }
+  // ── Editar/Eliminar queja ─────────────────────────
+  canEditQueja(reporte: Queja): boolean { return reporte.usuario?.id === this.user?.id; }
+  togglePostMenu(reporte: Queja): void { reporte.showMenu = !reporte.showMenu; }
+  openEditQueja(reporte: Queja): void { this.editingQueja = JSON.parse(JSON.stringify(reporte)); this.showEditModal = true; }
+  closeEditModal(): void { this.showEditModal = false; this.editingQueja = null; }
 
   saveEditQueja(): void {
     if (!this.editingQueja || !this.user?.id) return;
-
     this.loading = true;
-
     this.quejaService.actualizarQueja(
-      this.editingQueja.id,
-      this.editingQueja.titulo,
-      this.editingQueja.descripcion,
-      this.editingQueja.categoria?.id,
-      this.editingQueja.estado?.id,
-      this.editingQueja.ubicacion,
-      this.user.id
+      this.editingQueja.id, this.editingQueja.titulo, this.editingQueja.descripcion,
+      this.editingQueja.categoria?.id, this.editingQueja.estado?.id,
+      this.editingQueja.ubicacion, this.user.id
     ).subscribe({
       next: (updated) => {
         const index = this.posts.findIndex(p => p.id === updated.id);
-        if (index !== -1) {
-          this.posts[index] = { 
-            ...updated, 
-            showMenu: false,
-            fue_editado: true,
-            comments: this.posts[index].comments || []
-          };
-        }
+        if (index !== -1) this.posts[index] = { ...updated, showMenu: false, fue_editado: true, comments: this.posts[index].comments || [] };
         this.closeEditModal();
         this.loading = false;
         this.applyFilters();
         this.showToastMessage('Reporte actualizado');
       },
-      error: (err: any) => {
-        console.error('Error al actualizar queja', err);
-        this.loading = false;
-        this.showToastMessage('Error al actualizar reporte');
-      }
+      error: () => { this.loading = false; this.showToastMessage('Error al actualizar reporte'); }
     });
   }
 
   deleteQueja(reporte: Queja): void {
     if (!this.user?.id || !confirm('¿Eliminar este reporte permanentemente?')) return;
-
     this.loading = true;
-
     this.quejaService.eliminarQueja(reporte.id, this.user.id).subscribe({
-      next: () => {
-        this.posts = this.posts.filter(p => p.id !== reporte.id);
-        this.applyFilters();
-        this.loading = false;
-        this.showToastMessage('Reporte eliminado');
-      },
-      error: (err: any) => {
-        console.error('Error al eliminar queja', err);
-        this.loading = false;
-        this.showToastMessage('Error al eliminar reporte');
-      }
+      next: () => { this.posts = this.posts.filter(p => p.id !== reporte.id); this.applyFilters(); this.loading = false; this.showToastMessage('Reporte eliminado'); },
+      error: () => { this.loading = false; this.showToastMessage('Error al eliminar reporte'); }
     });
   }
 
-  // ============================================
-  // PAGINACIÓN
-  // ============================================
-
-  getPaginatedReportes(): Queja[] {
-    const posts = this.getReportes();
-    this.totalReports = posts.length;
-    const startIndex = (this.currentPage - 1) * this.reportsPerPage;
-    const endIndex = startIndex + this.reportsPerPage;
-    return posts.slice(startIndex, endIndex);
-  }
-
-  getTotalPages(): number {
-    return Math.ceil(this.totalReports / this.reportsPerPage);
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.getTotalPages()) {
-      this.currentPage = page;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.getTotalPages()) {
-      this.currentPage++;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  prevPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  getPageNumbers(): number[] {
-    const totalPages = this.getTotalPages();
-    const pages: number[] = [];
-    
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(totalPages);
-      } else if (this.currentPage >= totalPages - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(totalPages);
-      }
-    }
-    
-    return pages;
-  }
-
-  // ============================================
-  // UTILIDADES
-  // ============================================
-
+  // ── Utilidades ────────────────────────────────────
   verPerfilUsuario(usuario: Usuario): void {
     if (!usuario?.id) return;
-    if (usuario.id === this.user?.id) {
-      this.router.navigate(['/public/profile']);
-    } else {
-      this.router.navigate(['/public/user-profile', usuario.id]);
-    }
+    usuario.id === this.user?.id
+      ? this.router.navigate(['/public/profile'])
+      : this.router.navigate(['/public/user-profile', usuario.id]);
   }
 
-  getAvatarUrl(usuario: Usuario): string {
-    return usuario?.foto_perfil || 'assets/img/default-avatar.png';
-  }
-
-  getAuthorName(usuario: Usuario): string {
-    return `${usuario.nombre} ${usuario.apellido}`.trim() || 'Usuario';
-  }
+  getAvatarUrl(usuario: Usuario): string { return usuario?.foto_perfil || 'assets/img/default-avatar.png'; }
+  getAuthorName(usuario: Usuario): string { return `${usuario.nombre} ${usuario.apellido}`.trim() || 'Usuario'; }
 
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return 'hace unos minutos';
-    if (diffInHours < 24) return `hace ${diffInHours}h`;
-    if (diffInHours < 48) return 'hace 1 día';
-    const days = Math.floor(diffInHours / 24);
-    return `hace ${days} ${days === 1 ? 'día' : 'días'}`;
+    const hours = Math.floor((Date.now() - new Date(dateString).getTime()) / 3600000);
+    if (hours < 1) return 'hace unos minutos';
+    if (hours < 24) return `hace ${hours}h`;
+    if (hours < 48) return 'hace 1 día';
+    return `hace ${Math.floor(hours / 24)} días`;
   }
 
-  hasImage(reporte: Queja): boolean {
-    return !!(reporte.imagen_url || (reporte.evidence && reporte.evidence.length > 0));
-  }
-
-  getImageUrl(reporte: Queja): string {
-    return reporte.imagen_url || reporte.evidence?.[0]?.url || '';
-  }
+  hasImage(reporte: Queja): boolean { return !!(reporte.imagen_url || (reporte.evidence && reporte.evidence.length > 0)); }
+  getImageUrl(reporte: Queja): string { return reporte.imagen_url || reporte.evidence?.[0]?.url || ''; }
 
   getEstadoClass(estado: string): string {
-    const estadoMap: { [key: string]: string } = {
-      'Pendiente': 'estado-pendiente',
-      'En Proceso': 'estado-proceso',
-      'Resuelta': 'estado-resuelta',
-      'Rechazada': 'estado-rechazada',
-      'En Votación': 'estado-votacion'
+    const map: { [key: string]: string } = {
+      'Pendiente': 'estado-pendiente', 'En Proceso': 'estado-proceso',
+      'Resuelta': 'estado-resuelta', 'Rechazada': 'estado-rechazada', 'En Votación': 'estado-votacion'
     };
-    return estadoMap[estado] || 'estado-pendiente';
-  }
-
-  getCategoryName(post: Queja): string {
-    return post.categoria?.nombre || 'Sin categoría';
-  }
-
-  get displayedPosts(): Queja[] {
-    return this.selectedCategory ? this.filteredPosts : this.posts;
+    return map[estado] || 'estado-pendiente';
   }
 
   showToastMessage(message: string): void {
@@ -903,11 +500,6 @@ export class TrendingComponent implements OnInit {
     setTimeout(() => this.showToast = false, 3000);
   }
 
-  trackByComment(index: number, comment: any): string {
-    return comment.id;
-  }
-
-  trackByPostId(index: number, post: Queja): string {
-    return post.id;
-  }
+  trackByComment(index: number, comment: any): string { return comment.id; }
+  trackByPostId(index: number, post: Queja): string { return post.id; }
 }

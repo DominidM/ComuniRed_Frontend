@@ -6,8 +6,8 @@
 .messages-container-wrapper {
   position: fixed;
   top: 73px;
-  left: 240px;   /* ← cambia este valor al ancho real de tu nav */
-  right: 320px;
+  left: 260px;   /* ← cambia este valor al ancho real de tu nav */
+  right: 260px;
   bottom: 0;
   display: flex;
   overflow: hidden;

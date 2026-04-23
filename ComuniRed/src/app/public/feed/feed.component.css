@@ -37,7 +37,7 @@
   max-width: 100%;
   width: 100%;
   margin: 0 auto;
-  padding: 90px 400px 40px 320px;  /* ← top/right/bottom/left */
+  padding: 90px 360px 40px 360px;  /* ← top/right/bottom/left */
   box-sizing: border-box;
 }
 

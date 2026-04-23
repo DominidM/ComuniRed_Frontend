@@ -19,11 +19,12 @@ import {
   HistorialEventoService,
   HistorialEvento,
 } from '../../services/historial-evento.service';
+import { StoriesComponent } from '../stories/stories.component';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule],
+  imports: [CommonModule, HttpClientModule, FormsModule, StoriesComponent],
   templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.css'],
 })

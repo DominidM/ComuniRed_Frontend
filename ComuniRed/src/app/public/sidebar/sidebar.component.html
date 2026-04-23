@@ -1,38 +1,140 @@
 <div class="sidebar-container" role="navigation" aria-label="Sidebar">
-  <nav class="sidebar-menu" aria-label="Main menu">
-    <a
-      class="sidebar-link"
-      *ngFor="let item of menuItems"
-      [routerLink]="item.route"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: false }"
-      [class.soft]="item.soft"
-      title="{{ item.label }}"
-      type="button"
-    >
-      <span class="icon-wrap" aria-hidden="true">
-        <mat-icon>{{ item.icon }}</mat-icon>
-      </span>
-      <span class="link-label">{{ item.label }}</span>
-    </a>
-  </nav>
+  <!-- ── Botón crear ── -->
+  <button class="create-btn" (click)="onCrearPublicacion()" type="button">
+    <mat-icon>add</mat-icon>
+    <span class="create-label">Crear publicación</span>
+  </button>
 
-  <div class="sidebar-footer" role="region" aria-label="User">
-    <div class="user-card" *ngIf="user">
-      <div class="user-left">
-        <div class="user-avatar-wrap" aria-hidden="true">
-          <img [src]="user.avatarUrl" alt="{{ user.name }}" class="user-avatar" />
-        </div>
-        <div class="user-info">
-          <div class="user-name">{{ user.name }}</div>
-          <div class="user-email">{{ user.handle }}</div>
-        </div>
+  <!-- ── Menú ── -->
+  <nav class="sidebar-menu" aria-label="Menú principal">
+    <!-- Grupo principal -->
+    <ng-container *ngFor="let item of menuPrimary">
+      <a
+        class="sidebar-link"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: !!item.exact }"
+        [title]="item.label"
+      >
+        <span class="icon-wrap" aria-hidden="true">
+          <mat-icon>{{ item.icon }}</mat-icon>
+        </span>
+        <span class="link-label">{{ item.label }}</span>
+        <ng-container [ngSwitch]="item.badgeType">
+          <span
+            *ngSwitchCase="'count'"
+            class="badge-count"
+            [attr.aria-label]="item.badgeCount + ' mensajes'"
+          >
+            {{ badgeLabel(item) }}
+          </span>
+          <span *ngSwitchCase="'new'" class="badge-new">Nuevo</span>
+          <span
+            *ngSwitchCase="'dot'"
+            class="notif-dot"
+            aria-label="Nuevas notificaciones"
+          ></span>
+        </ng-container>
+      </a>
+    </ng-container>
+
+    <div class="menu-separator" role="separator"></div>
+
+    <!-- Grupo secundario (social) -->
+    <ng-container *ngFor="let item of menuSecondary">
+      <a
+        class="sidebar-link"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        [title]="item.label"
+      >
+        <span class="icon-wrap" aria-hidden="true">
+          <mat-icon>{{ item.icon }}</mat-icon>
+        </span>
+        <span class="link-label">{{ item.label }}</span>
+        <ng-container [ngSwitch]="item.badgeType">
+          <span *ngSwitchCase="'count'" class="badge-count">{{
+            badgeLabel(item)
+          }}</span>
+          <span *ngSwitchCase="'new'" class="badge-new">Nuevo</span>
+          <span *ngSwitchCase="'dot'" class="notif-dot"></span>
+        </ng-container>
+      </a>
+    </ng-container>
+
+    <div class="menu-separator" role="separator"></div>
+
+    <!-- Grupo ajustes -->
+    <ng-container *ngFor="let item of menuSettings">
+      <a
+        class="sidebar-link"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        [title]="item.label"
+      >
+        <span class="icon-wrap" aria-hidden="true">
+          <mat-icon>{{ item.icon }}</mat-icon>
+        </span>
+        <span class="link-label">{{ item.label }}</span>
+      </a>
+    </ng-container>
+  </nav>
+  <!-- ── Zona de perfil ── -->
+  <div class="profile-zone" *ngIf="user">
+    <div class="cover-strip"></div>
+
+    <div class="profile-head">
+      <div class="avatar-ring">
+        <img
+          *ngIf="user.avatarUrl"
+          [src]="user.avatarUrl"
+          [alt]="user.name"
+          class="user-avatar"
+        />
+        <span *ngIf="!user.avatarUrl" class="avatar-fallback">{{
+          user.initials
+        }}</span>
+        <span class="online-dot" aria-hidden="true"></span>
       </div>
+      <button class="btn-edit" [routerLink]="['/public/profile']" type="button">
+        Editar perfil
+      </button>
     </div>
 
-    <button class="logout-btn" (click)="onSalir()" aria-label="Cerrar sesión" type="button">
+    <div class="profile-info">
+      <div class="profile-name">{{ user.name }}</div>
+      <div class="profile-handle">{{ user.handle }}</div>
+
+      <div class="stats-row">
+        <a class="stat" [routerLink]="['/public/profile']">
+          <span class="stat-num">{{
+            formatearContador(user.followersCount)
+          }}</span>
+          <span class="stat-lbl">Seguidores</span>
+        </a>
+        <div class="stat-divider"></div>
+        <a class="stat" [routerLink]="['/public/profile']">
+          <span class="stat-num">{{
+            formatearContador(user.followingCount)
+          }}</span>
+          <span class="stat-lbl">Siguiendo</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="sidebar-footer">
+    <button
+      class="logout-btn"
+      (click)="onSalir()"
+      type="button"
+      aria-label="Cerrar sesión"
+    >
       <mat-icon>logout</mat-icon>
-      <span>Cerrar Sesión</span>
+      <span>Cerrar sesión</span>
     </button>
   </div>
 </div>

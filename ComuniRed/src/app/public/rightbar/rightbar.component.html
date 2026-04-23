@@ -1,111 +1,146 @@
-<!-- Rightbar content -->
 <div class="rightbar-container">
 
-  <!-- Tendencias -->
-  <section class="rightbar-section">
-    <div class="rightbar-section-title">
+  <!-- ── Mensajes estilo IG ── -->
+  <section class="rb-section" aria-label="Mensajes directos">
+    <div class="rb-section-header">
+      <div class="rb-title">
+        <mat-icon>chat_bubble</mat-icon>
+        Mensajes
+      </div>
+      <button class="rb-new-btn" (click)="onNuevoMensaje()" type="button">
+        + Nuevo
+      </button>
+    </div>
+
+    <div class="msg-list">
+      <div
+        class="msg-item"
+        *ngFor="let m of mensajes"
+        (click)="onAbrirChat(m)"
+        [class.unread]="m.unread"
+        role="button"
+        [attr.aria-label]="'Chat con ' + m.name"
+      >
+        <div class="msg-avatar" [style.background]="m.color">
+          {{ m.initials }}
+          <span *ngIf="m.online" class="msg-online-dot" aria-hidden="true"></span>
+        </div>
+        <div class="msg-body">
+          <div class="msg-name">{{ m.name }}</div>
+          <div class="msg-preview" [class.bold]="m.unread">{{ m.preview }}</div>
+        </div>
+        <div class="msg-meta">
+          <span class="msg-time">{{ m.time }}</span>
+          <span *ngIf="m.unreadCount" class="msg-badge" aria-label="{{ m.unreadCount }} mensajes nuevos">
+            {{ m.unreadCount }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <button class="rb-ver-todos" [routerLink]="['/public/messages']" type="button">
+      Ver todos los mensajes
+    </button>
+  </section>
+
+  <!-- ── Tendencias ── -->
+  <section class="rb-section" aria-label="Tendencias">
+    <div class="rb-title">
       <mat-icon>trending_up</mat-icon>
       Tendencias
     </div>
     <div class="trend-list">
-      <div class="trend-item" *ngFor="let t of trends">
+      <div class="trend-item" *ngFor="let t of trends; let i = index">
+        <span class="trend-rank">{{ i + 1 }}</span>
         <div class="trend-info">
-          <span class="trend-hashtag">#{{ t.tag }}</span>
+          <span class="trend-tag">#{{ t.tag }}</span>
           <span class="trend-desc">{{ t.desc }}</span>
         </div>
-        <div class="trend-count">{{ t.count }}</div>
+        <span class="trend-count">{{ t.count }}</span>
       </div>
     </div>
   </section>
 
-  <!-- Áreas cercanas -->
-  <section class="rightbar-section">
-    <div class="rightbar-section-title">
-      <mat-icon>location_on</mat-icon>
-      Áreas Cercanas
-    </div>
-    <div class="district-list">
-      <div class="district-item" *ngFor="let a of areas">
-        <span class="district-name">{{ a.name }}</span>
-        <span class="district-distance">{{ a.distance }}</span>
-        <span class="district-count">{{ a.reports }}</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Estadísticas -->
-  <section class="rightbar-section rightbar-stats">
-    <div class="rightbar-section-title">
+  <!-- ── Estadísticas ── -->
+  <section class="rb-section" aria-label="Actividad del día">
+    <div class="rb-title">
       <mat-icon>bar_chart</mat-icon>
-      Actividad
+      Actividad hoy
     </div>
-    <div class="stats-row">
-      <div class="stats-cell">
-        <div class="stats-value">{{ stats.today }}</div>
-        <div class="stats-label">Reportes hoy</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.today }}</div>
+        <div class="stat-label">Reportes</div>
       </div>
-      <div class="stats-cell">
-        <div class="stats-value stats-green">{{ stats.solvedPercent }}%</div>
-        <div class="stats-label">Resueltos</div>
+      <div class="stat-card">
+        <div class="stat-value green">{{ stats.solvedPercent }}%</div>
+        <div class="stat-label">Resueltos</div>
       </div>
     </div>
   </section>
 
-  <div class="rightbar-spacer"></div>
-</div>
+  <!-- ── Accesibilidad (integrada, sin botón flotante) ── -->
+  <section class="rb-section acc-section" aria-label="Opciones de accesibilidad">
+    <button
+      class="acc-toggle"
+      (click)="toggleAccessibility()"
+      [attr.aria-expanded]="accessibilityOpen"
+      aria-controls="acc-panel"
+      type="button"
+    >
+      <span class="acc-toggle-left">
+        <mat-icon>accessibility</mat-icon>
+        Accesibilidad
+      </span>
+      <mat-icon class="acc-chevron" [class.rotated]="accessibilityOpen">expand_more</mat-icon>
+    </button>
 
-<!-- Botón flotante de accesibilidad -->
-<button
-  class="rightbar-accessibility-btn"
-  aria-label="Accesibilidad"
-  (click)="toggleAccessibility()"
-  aria-haspopup="dialog"
-  [attr.aria-expanded]="accessibilityOpen"
-  type="button"
->
-  <mat-icon>accessibility</mat-icon>
-</button>
+    <div
+      id="acc-panel"
+      class="acc-panel"
+      [class.open]="accessibilityOpen"
+      role="region"
+      aria-label="Controles de accesibilidad"
+    >
+      <div class="acc-inner">
 
-<!-- Panel de accesibilidad -->
-<div
-  class="accessibility-panel"
-  [class.open]="accessibilityOpen"
-  role="dialog"
-  aria-label="Opciones de accesibilidad"
-  [attr.aria-hidden]="!accessibilityOpen"
->
-  <h3>Accesibilidad</h3>
+        <div class="acc-row">
+          <span class="acc-label">Tamaño de letra</span>
+          <div class="acc-btns">
+            <button (click)="decreaseText()" aria-label="Disminuir" type="button" class="acc-btn">A−</button>
+            <button (click)="resetText()"    aria-label="Restablecer" type="button" class="acc-btn">A</button>
+            <button (click)="increaseText()" aria-label="Aumentar" type="button" class="acc-btn">A+</button>
+          </div>
+        </div>
 
-  <div class="acc-controls">
-    <div class="acc-row">
-      <label>Tamaño de letra</label>
-      <div class="acc-actions">
-        <button (click)="decreaseText()" aria-label="Disminuir tamaño" type="button">A-</button>
-        <button (click)="resetText()" aria-label="Restablecer tamaño" type="button">A</button>
-        <button (click)="increaseText()" aria-label="Aumentar tamaño" type="button">A+</button>
+        <div class="acc-row">
+          <span class="acc-label">Alto contraste</span>
+          <button
+            (click)="toggleHighContrast()"
+            [class.active]="isHighContrast"
+            [attr.aria-pressed]="isHighContrast"
+            type="button"
+            class="acc-btn acc-btn--toggle"
+          >
+            {{ isHighContrast ? 'Desactivar' : 'Activar' }}
+          </button>
+        </div>
+
+        <div class="acc-row">
+          <span class="acc-label">Reducir animaciones</span>
+          <button
+            (click)="toggleReducedMotion()"
+            [class.active]="isReducedMotion"
+            [attr.aria-pressed]="isReducedMotion"
+            type="button"
+            class="acc-btn acc-btn--toggle"
+          >
+            {{ isReducedMotion ? 'Desactivar' : 'Activar' }}
+          </button>
+        </div>
+
       </div>
     </div>
+  </section>
 
-    <div class="acc-row">
-      <label>Alto contraste</label>
-      <div class="acc-actions">
-        <button (click)="toggleHighContrast()" [attr.aria-pressed]="isHighContrast" type="button">
-          {{ isHighContrast ? 'Desactivar' : 'Activar' }}
-        </button>
-      </div>
-    </div>
-
-    <div class="acc-row">
-      <label>Reducir animaciones</label>
-      <div class="acc-actions">
-        <button (click)="toggleReducedMotion()" [attr.aria-pressed]="isReducedMotion" type="button">
-          {{ isReducedMotion ? 'Desactivar' : 'Activar' }}
-        </button>
-      </div>
-    </div>
-
-    <div class="acc-row">
-      <button class="acc-close" (click)="toggleAccessibility()" type="button">Cerrar</button>
-    </div>
-  </div>
 </div>

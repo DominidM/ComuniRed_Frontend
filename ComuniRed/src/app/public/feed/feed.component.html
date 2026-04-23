@@ -10,6 +10,10 @@
       <div class="spinner"></div>
     </div>
 
+    <!-- En feed.component.html -->
+    <app-stories [user]="user" (storyPublished)="showToastMessage('Historia publicada')"></app-stories>
+
+
     <!-- Crear Reporte -->
     <div class="create-card card">
       <div class="create-top">
