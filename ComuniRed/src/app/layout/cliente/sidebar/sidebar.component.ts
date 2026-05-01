@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject, forkJoin, of } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
-import { UsuarioService, Usuario } from '../../services/usuario.service';
+import { UsuarioService, Usuario } from '../../../services/usuario.service';
 
 export type BadgeType = 'count' | 'dot' | 'new' | null;
 

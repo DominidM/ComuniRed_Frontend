@@ -51,11 +51,7 @@
         <div class="form-row">
           <div class="form-group">
             <label>Nombre *</label>
-            <input 
-              type="text" 
-              formControlName="nombre" 
-              placeholder="Ingresa tu nombre" 
-            />
+            <input type="text" formControlName="nombre" placeholder="Ingresa tu nombre" />
             <span class="error" *ngIf="profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched">
               El nombre es obligatorio
             </span>
@@ -63,11 +59,7 @@
           
           <div class="form-group">
             <label>Apellido *</label>
-            <input 
-              type="text" 
-              formControlName="apellido" 
-              placeholder="Ingresa tu apellido" 
-            />
+            <input type="text" formControlName="apellido" placeholder="Ingresa tu apellido" />
             <span class="error" *ngIf="profileForm.get('apellido')?.invalid && profileForm.get('apellido')?.touched">
               El apellido es obligatorio
             </span>
@@ -77,11 +69,7 @@
         <div class="form-row">
           <div class="form-group">
             <label>Correo electrónico *</label>
-            <input 
-              type="email" 
-              formControlName="email" 
-              placeholder="tu@email.com" 
-            />
+            <input type="email" formControlName="email" placeholder="tu@email.com" />
             <span class="error" *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
               Ingresa un email válido
             </span>
@@ -89,32 +77,19 @@
           
           <div class="form-group">
             <label>DNI</label>
-            <input 
-              type="text" 
-              formControlName="dni" 
-              placeholder="12345678" 
-              maxlength="8"
-            />
+            <input type="text" formControlName="dni" placeholder="12345678" maxlength="8" />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Teléfono</label>
-            <input 
-              type="text" 
-              formControlName="numero_telefono" 
-              placeholder="987654321" 
-            />
+            <input type="text" formControlName="numero_telefono" placeholder="987654321" />
           </div>
           
           <div class="form-group">
             <label>Fecha de Nacimiento</label>
-            <input 
-              type="date" 
-              formControlName="fecha_nacimiento" 
-              [max]="hoy"
-            />
+            <input type="date" formControlName="fecha_nacimiento" [max]="hoy" />
           </div>
         </div>
 
@@ -131,32 +106,19 @@
           
           <div class="form-group">
             <label>Distrito</label>
-            <input 
-              type="text" 
-              formControlName="distrito" 
-              placeholder="Ej: Miraflores" 
-            />
+            <input type="text" formControlName="distrito" placeholder="Ej: Miraflores" />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Código Postal</label>
-            <input 
-              type="text" 
-              formControlName="codigo_postal" 
-              placeholder="15073" 
-              maxlength="5"
-            />
+            <input type="text" formControlName="codigo_postal" placeholder="15073" maxlength="5" />
           </div>
           
           <div class="form-group">
             <label>Dirección</label>
-            <input 
-              type="text" 
-              formControlName="direccion" 
-              placeholder="Av. Principal 123" 
-            />
+            <input type="text" formControlName="direccion" placeholder="Av. Principal 123" />
           </div>
         </div>
 

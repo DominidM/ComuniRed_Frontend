@@ -2,9 +2,9 @@ import { Component, EventEmitter, Output, HostListener, OnInit, OnDestroy } from
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
 import { Router } from "@angular/router"
-import { QuejaService } from "../../services/queja.service"
-import { UsuarioService } from "../../services/usuario.service"
-import { ThemeService } from "../../services/theme.service" // <-- 1. Importación de ThemeService
+import { QuejaService } from "../../../services/queja.service"
+import { UsuarioService } from "../../../services/usuario.service"
+import { ThemeService } from "../../../services/theme.service" // <-- 1. Importación de ThemeService
 
 interface SearchResult {
   type: "reporte" | "persona"

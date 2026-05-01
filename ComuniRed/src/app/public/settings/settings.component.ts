@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AlertService } from '../../shared/services/change.service';
 
 @Component({
   selector: 'app-settings',
@@ -17,13 +18,13 @@ export class SettingsComponent {
     { label: 'Seguridad', route: 'security', icon: 'security' }
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private alertService: AlertService) {}
 
   isActive(route: string): boolean {
     return this.router.url.includes(route);
   }
 
   save() {
-    console.log('Configuración guardada.');
+    this.alertService.success('Configuración guardada correctamente');
   }
 }

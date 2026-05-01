@@ -1,0 +1,30 @@
+<!-- Toasts -->
+<div class="alert-wrapper">
+  <div *ngFor="let alert of alerts" class="alert alert-{{ alert.type }}">
+    <span class="alert-icon">
+      <i *ngIf="alert.type === 'success'" class="bi bi-check-circle-fill"></i>
+      <i *ngIf="alert.type === 'error'" class="bi bi-x-circle-fill"></i>
+      <i *ngIf="alert.type === 'warning'" class="bi bi-exclamation-triangle-fill"></i>
+      <i *ngIf="alert.type === 'info'" class="bi bi-info-circle-fill"></i>
+    </span>
+    <span class="alert-message">{{ alert.message }}</span>
+    <button class="alert-close" (click)="remove(alert)">✕</button>
+  </div>
+</div>
+
+<!-- Modal confirmación -->
+<div class="confirm-overlay" *ngIf="confirmDialog" (click)="onCancel()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <span class="material-icons confirm-icon">warning</span>
+    <h3>{{ confirmDialog.title }}</h3>
+    <p>{{ confirmDialog.message }}</p>
+    <div class="confirm-actions">
+      <button class="confirm-btn-cancel" (click)="onCancel()">
+        {{ confirmDialog.cancelText }}
+      </button>
+      <button class="confirm-btn-ok" (click)="onConfirm()">
+        {{ confirmDialog.confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

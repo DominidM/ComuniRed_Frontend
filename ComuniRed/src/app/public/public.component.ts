@@ -1,9 +1,9 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SidebarComponent } from './sidebar/sidebar.component';
+import { SidebarComponent } from '../layout/cliente/sidebar/sidebar.component';
 import { RightbarComponent } from './rightbar/rightbar.component';
-import { NavbarComponent } from './navbar/navbar.component';
+import { NavbarComponent } from '../layout/cliente/navbar/navbar.component';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
