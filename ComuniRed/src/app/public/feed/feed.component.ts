@@ -33,7 +33,6 @@ import { HistorialComponent } from './historial/historial.component';
     StoriesComponent,
     PostCardComponent,
     CreateReportComponent,
-    CommentsComponent,
     HistorialComponent,
   ],
   templateUrl: './feed.component.html',
