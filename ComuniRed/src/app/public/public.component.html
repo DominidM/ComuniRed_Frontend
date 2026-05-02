@@ -5,20 +5,16 @@
     #sidenav
     [mode]="sidenavMode"
     [opened]="sidenavOpened"
-    [fixedInViewport]="true"
-    [fixedTopGap]="72"
     class="app-public-sidebar">
     <app-public-sidebar></app-public-sidebar>
   </mat-sidenav>
 
   <mat-sidenav-content>
     <div class="public-layout">
-      <div class="feed-right-wrapper">
-        <div class="feed-area" [class.reels-mode]="isReelsRoute">
-          <router-outlet></router-outlet>
-        </div>
-        <app-rightbar *ngIf="isDesktop && !isReelsRoute"></app-rightbar>
+      <div class="feed-area" [class.reels-mode]="isReelsRoute">
+        <router-outlet></router-outlet>
       </div>
+      <app-rightbar *ngIf="isDesktop && !isReelsRoute"></app-rightbar>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

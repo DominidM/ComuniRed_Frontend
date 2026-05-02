@@ -413,3 +413,12 @@
     display: none;
   }
 }
+
+.sidebar-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;   /* ← agrega esto */
+  overflow-x: hidden;
+}

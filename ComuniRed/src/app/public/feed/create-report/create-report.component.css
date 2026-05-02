@@ -1,0 +1,242 @@
+/* Hereda todo del feed — solo overrides específicos */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeInOverlay 0.3s ease;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-container {
+  background: var(--cr-card-bg, #fff);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--cr-border);
+  background: var(--cr-background);
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--cr-text);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--cr-text-muted);
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 50%;
+  transition: background 0.2s;
+  line-height: 1;
+}
+
+.modal-close:hover { background: var(--cr-hover); }
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: var(--cr-background);
+}
+
+.modal-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.modal-username {
+  font-weight: 700;
+  color: var(--cr-text);
+  font-size: 0.95rem;
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--cr-text);
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--cr-border);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  outline: none;
+  background: var(--cr-background);
+  color: var(--cr-text);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: #667eea;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.upload-area {
+  border: 2px dashed var(--cr-border);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  background: var(--cr-background);
+  transition: all 0.2s;
+}
+
+.upload-area:hover {
+  border-color: #667eea;
+  background: var(--cr-hover);
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+}
+
+.upload-text {
+  color: var(--cr-text-muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.image-preview {
+  position: relative;
+  display: inline-block;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 280px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.remove-image {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  width: 28px;
+  height: 28px;
+  background: rgba(0,0,0,0.65);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.remove-image:hover { background: rgba(0,0,0,0.9); }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--cr-border);
+  background: var(--cr-background);
+}
+
+.btn {
+  padding: 0.7rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-cancel {
+  background: var(--cr-background);
+  color: var(--cr-text);
+  border-color: var(--cr-border);
+}
+
+.btn-cancel:hover { background: var(--cr-hover); }
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}

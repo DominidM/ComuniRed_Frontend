@@ -1,0 +1,55 @@
+<div class="comments-section">
+  <div class="comments-list-preview">
+    <div *ngFor="let comment of getPreviewComments()" class="comment-item-preview">
+      <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'"
+        class="comment-avatar-preview clickable" loading="lazy"
+        (click)="profileClicked.emit(comment.author)"/>
+      <div class="comment-content-preview">
+        <div class="comment-header-preview">
+          <strong class="comment-author-preview clickable"
+            (click)="profileClicked.emit(comment.author)">
+            {{ getAuthor(comment) }}
+          </strong>
+          <span class="comment-date-preview">{{ formatDate(comment.fecha_creacion) }}</span>
+        </div>
+        <p class="comment-text-preview">{{ comment.texto }}</p>
+      </div>
+      <div class="comment-menu-container" *ngIf="canEditComment(comment)">
+        <button class="comment-menu-btn"
+          (click)="$event.stopPropagation(); menuToggle.emit({ commentId: comment.id })">
+          <i class="bi bi-three-dots"></i>
+        </button>
+        <div *ngIf="showCommentMenuModal[comment.id]" class="comment-menu-dropdown"
+          (click)="$event.stopPropagation()">
+          <button class="comment-menu-item" (click)="startEdit.emit(comment)">
+            <i class="bi bi-pencil"></i> Editar
+          </button>
+          <button class="comment-menu-item danger"
+            (click)="deleteComment.emit({ post, commentId: comment.id })">
+            <i class="bi bi-trash"></i> Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button *ngIf="hasMoreComments()" class="view-all-modal-btn" (click)="openModal.emit()">
+      Ver todos los comentarios ({{ getCommentsCount() }})
+    </button>
+  </div>
+
+  <div class="comment-input-container">
+    <img [src]="currentUser?.avatarUrl || 'assets/img/default-avatar.png'"
+      class="comment-avatar-preview"/>
+    <input type="text"
+      [ngModel]="commentText"
+      (ngModelChange)="commentTextChange.emit($event)"
+      placeholder="Escribe un comentario..."
+      class="comment-input-preview"
+      (keyup.enter)="commentAdded.emit({ post, text: commentText })"/>
+    <button class="btn-send-preview"
+      (click)="commentAdded.emit({ post, text: commentText })"
+      [disabled]="!commentText?.trim()">
+      <i class="bi bi-send-fill"></i>
+    </button>
+  </div>
+</div>

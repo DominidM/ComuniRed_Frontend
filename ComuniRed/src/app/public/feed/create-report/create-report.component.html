@@ -1,0 +1,77 @@
+<div class="modal-overlay" (click)="cancelled.emit()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">Crear Reporte</h2>
+      <button class="modal-close" (click)="cancelled.emit()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-user">
+        <img [src]="user?.avatarUrl" class="modal-avatar"/>
+        <span class="modal-username">{{ user?.name }}</span>
+      </div>
+
+      <div class="create-form">
+        <div class="form-group">
+          <label class="form-label">Título del problema</label>
+          <input type="text" class="form-input"
+            [(ngModel)]="form.titulo"
+            placeholder="Ej: Bache peligroso en la avenida principal"
+            maxlength="100"/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Descripción detallada</label>
+          <textarea class="form-textarea" rows="4"
+            [(ngModel)]="form.descripcion"
+            placeholder="Describe el problema de infraestructura..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Categoría</label>
+          <select class="form-select" [(ngModel)]="form.categoriaId">
+            <option value="">Selecciona una categoría</option>
+            <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">📍 Ubicación</label>
+          <input type="text" class="form-input"
+            [(ngModel)]="form.ubicacion"
+            placeholder="Ej: Av. Principal 123, San Isidro"/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">🖼️ Foto del problema (opcional, máx 5MB)</label>
+          <div class="upload-area" (click)="fileInput.click()">
+            <input #fileInput type="file" accept="image/*"
+              (change)="onFileSelected($event)"
+              style="display:none"/>
+
+            <div *ngIf="!form.imagenPreview" class="upload-placeholder">
+              <span class="upload-icon">📷</span>
+              <span class="upload-text">Click para subir una foto</span>
+            </div>
+
+            <div *ngIf="form.imagenPreview" class="image-preview">
+              <img [src]="form.imagenPreview" alt="Preview"/>
+              <button type="button" class="remove-image" (click)="removeImage($event)">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-cancel" (click)="cancelled.emit()">Cancelar</button>
+      <button class="btn btn-primary"
+        (click)="submit()"
+        [disabled]="!isValid() || loading">
+        {{ loading ? 'Publicando...' : 'Publicar Reporte' }}
+      </button>
+    </div>
+
+  </div>
+</div>

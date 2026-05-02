@@ -1,0 +1,189 @@
+<!-- post-card.component.html -->
+<div class="post-card">
+
+  <!-- Header -->
+  <div class="post-header">
+    <div class="avatar-container" (click)="profileClicked.emit(post.usuario)">
+      <img [src]="getAvatarUrl()" [alt]="getAuthorName()" class="avatar clickable" loading="lazy"/>
+    </div>
+    <div class="post-info">
+      <div class="post-title-row">
+        <div class="post-author-section">
+          <div class="post-author clickable" (click)="profileClicked.emit(post.usuario)">
+            {{ getAuthorName() }}
+          </div>
+          <div class="post-meta">
+            <span class="post-date">{{ formatDate(post.fecha_creacion) }}</span>
+            <ng-container *ngIf="hasLocation()">
+              <span class="dot-sep">•</span>
+              <span class="post-location">📍 {{ post.ubicacion }}</span>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="post-menu-container">
+          <button class="post-menu" (click)="post.showMenu = !post.showMenu">⋯</button>
+          <div *ngIf="post.showMenu" class="post-menu-dropdown">
+            <button *ngIf="canEdit()" class="menu-item"
+              (click)="editPost.emit(post); post.showMenu = false">✏️ Editar</button>
+            <button *ngIf="canEdit()" class="menu-item danger"
+              (click)="deletePost.emit(post); post.showMenu = false">🗑️ Eliminar</button>
+            <button class="menu-item"
+              (click)="sharePost.emit(post); post.showMenu = false">📤 Compartir</button>
+            <button class="menu-item"
+              (click)="bookmarkToggled.emit(post); post.showMenu = false">
+              {{ getBookmarkEmoji() }} {{ getBookmarkText() }}
+            </button>
+            <button *ngIf="hasHistorial()" class="menu-item"
+              (click)="openHistorial.emit(post); post.showMenu = false">📜 Ver Historial</button>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="post-heading">{{ post.titulo }}</h3>
+      <p class="post-text">{{ post.descripcion }}</p>
+
+      <div class="post-tags">
+        <span class="tag category-tag">{{ getCategoryName() }}</span>
+        <span *ngIf="post.estado" [class]="getEstadoBadgeClass()">
+          {{ post.estado?.nombre }}
+        </span>
+        <span *ngIf="hasRiesgo()" [class]="getRiesgoBadgeClass()">
+          {{ getRiesgoIcon() }} {{ getRiesgoTexto() }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Imagen -->
+  <div class="post-image-wrapper">
+    <ng-container *ngIf="hasEvidence() || post.imagen_url; else imgPlaceholder">
+      <img [src]="getFirstEvidenceUrl()" [alt]="post.titulo" class="post-image" loading="lazy"/>
+    </ng-container>
+    <ng-template #imgPlaceholder>
+      <div class="image-placeholder"><div class="image-placeholder-icon">🖼️</div></div>
+    </ng-template>
+  </div>
+
+  <!-- Votación -->
+  <div *ngIf="isEnVotacion() && hasVotes()" class="vote-section">
+    <div class="vote-header">
+      <div class="vote-question">¿Estás de acuerdo con este reporte?</div>
+      <div class="vote-count-info">
+        <span class="vote-count">{{ getTotalVotes() }}/5 votos</span>
+      </div>
+    </div>
+    <div class="vote-progress-container">
+      <div class="vote-progress-bar">
+        <div class="vote-progress-fill"
+          [style.width.%]="getVotingProgress()"
+          [class.complete]="getTotalVotes() >= 5"></div>
+      </div>
+      <span *ngIf="needsMoreVotes()" class="votes-needed-text">
+        Faltan {{ getVotesNeeded() }} votos para aprobar
+      </span>
+      <span *ngIf="getTotalVotes() >= 5" class="votes-complete-text">
+        ✅ Votos requeridos alcanzados
+      </span>
+    </div>
+    <div class="vote-buttons">
+      <button class="vote-btn accept" [class.voted]="post.userVote === 'YES'"
+        [disabled]="!canVote()" (click)="voted.emit({ post, choice: 'accept' })">
+        <span class="vote-icon">✅</span>
+        <span class="vote-label">Sí</span>
+        <span class="vote-count-badge">{{ getYesVotes() }}</span>
+      </button>
+      <button class="vote-btn reject" [class.voted]="post.userVote === 'NO'"
+        [disabled]="!canVote()" (click)="voted.emit({ post, choice: 'reject' })">
+        <span class="vote-icon">❌</span>
+        <span class="vote-label">No</span>
+        <span class="vote-count-badge">{{ getNoVotes() }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Estado (no votación) -->
+  <div *ngIf="!isEnVotacion()" class="status-info-section">
+    <div class="status-info-item" *ngIf="isEnProceso()">
+      <i class="bi bi-hourglass-split"></i>
+      <span>Este reporte está siendo atendido</span>
+    </div>
+    <div class="status-info-item success" *ngIf="isResuelta()">
+      <i class="bi bi-check-circle-fill"></i>
+      <span>Este reporte ha sido resuelto</span>
+    </div>
+    <div class="status-info-item" *ngIf="isPendiente()">
+      <i class="bi bi-clock-fill"></i>
+      <span>Reporte aprobado - En espera de asignación</span>
+    </div>
+  </div>
+
+  <!-- Reacciones -->
+  <div class="reactions-bar">
+    <div class="reaction-picker-container">
+      <button class="reaction-btn main-reaction"
+        [class.active]="post.reactions.userReaction"
+        (click)="reactionMenuToggle.emit({ postId: post.id, event: $event })">
+        <i [class]="post.reactions.userReaction === 'like' ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+        <span class="count">{{ post.reactions.total || 0 }}</span>
+      </button>
+      <div *ngIf="showReactionMenu" class="reactions-menu" (click)="$event.stopPropagation()">
+        <button class="reaction-option" *ngFor="let r of reactions"
+          (click)="reactionToggled.emit({ post, type: r.type })"
+          [class.selected]="post.reactions.userReaction === r.type">
+          <span class="emoji">{{ r.emoji }}</span>
+          <span class="label">{{ r.label }}</span>
+          <span class="count-small">{{ getReactionCount(r.type) }}</span>
+        </button>
+      </div>
+    </div>
+    <button class="reaction-btn" (click)="commentsToggled.emit(post)">
+      <i class="bi bi-chat-left-text"></i>
+      <span class="count">{{ getCommentsCount() }}</span>
+    </button>
+  </div>
+
+  <!-- Acciones -->
+  <div class="post-actions">
+    <div class="left-actions">
+      <button class="action-btn" (click)="commentsToggled.emit(post)">
+        <span class="action-emoji">💬</span>
+        <span class="action-text">Comentar</span>
+      </button>
+    </div>
+    <div class="right-actions">
+      <button class="action-btn" (click)="bookmarkToggled.emit(post)">
+        <span class="action-emoji">{{ getBookmarkEmoji() }}</span>
+        <span class="action-text">Guardar</span>
+      </button>
+      <button class="action-btn" (click)="sharePost.emit(post)">
+        <span class="action-emoji">📤</span>
+        <span class="action-text">Compartir</span>
+      </button>
+      <button *ngIf="hasHistorial()" class="action-btn" (click)="openHistorial.emit(post)">
+        <span class="action-emoji">📜</span>
+        <span class="action-text">Historial</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Comentarios inline -->
+  <app-comments *ngIf="post.showComments"
+    [post]="post"
+    [currentUser]="currentUser"
+    [commentText]="commentText"
+    [editingCommentId]="editingCommentId"
+    [editingCommentText]="editingCommentText"
+    [showCommentMenuModal]="showCommentMenuModal"
+    (commentAdded)="commentAdded.emit($event)"
+    (commentTextChange)="commentTextChange.emit($event)"
+    (openModal)="openCommentsModal.emit(post)"
+    (startEdit)="startEditComment.emit($event)"
+    (saveEdit)="saveEditComment.emit({ post })"
+    (cancelEdit)="cancelEditComment.emit()"
+    (deleteComment)="deleteComment.emit($event)"
+    (menuToggle)="commentMenuToggle.emit($event)"
+    (profileClicked)="profileClicked.emit($event)">
+  </app-comments>
+
+</div>

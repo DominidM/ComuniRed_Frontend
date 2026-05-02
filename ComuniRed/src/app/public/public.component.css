@@ -1,59 +1,78 @@
-:root {
-  --navbar-height: 72px;
-  --sidebar-width: 260px;
-  --rightbar-width: 280px;
+:host {
+  display: block;
+  height: 100%;
 }
 
+/* ── Variables locales ── */
+:host {
+  --navbar-h: 72px;
+  --sidebar-w: 260px;
+  --rightbar-w: 280px;
+}
+
+@media (max-width: 768px) {
+  :host { --navbar-h: 56px; }
+}
+
+/* ── Sidenav container: ocupa toda la pantalla menos el navbar ── */
 mat-sidenav-container.sidenav-container {
-  height: 100vh !important;
+  position: fixed !important;
+  top: var(--navbar-h) !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  height: calc(100vh - var(--navbar-h)) !important;
   background-color: var(--cr-background-content) !important;
 }
 
+/* ── Sidebar: sin overflow propio, el mat-sidenav lo maneja ── */
 mat-sidenav.app-public-sidebar {
-  width: var(--sidebar-width) !important;
-  overflow: hidden !important;
+  width: var(--sidebar-w) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   border-right: 1px solid var(--cr-border) !important;
   background: var(--cr-background) !important;
   box-shadow: none !important;
 }
 
+/* ── Contenido principal: AQUÍ vive el único scroll vertical ── */
 mat-sidenav-content {
-  margin-top: var(--navbar-height) !important;
-  max-height: calc(100vh - var(--navbar-height)) !important;
-  height: calc(100vh - var(--navbar-height)) !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
+  height: 100% !important;
   background-color: var(--cr-background-content) !important;
-}
-
-.public-layout {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.feed-right-wrapper {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-}
-
-.feed-area {
-  flex: 1;
-  min-width: 0;
-  padding: 24px 16px;
-  background-color: var(--cr-background-content);
-  box-sizing: border-box;
-}
-
-.feed-area.reels-mode {
-  overflow: hidden !important;
-  background: #000 !important;
-  padding: 0 !important;
   display: flex !important;
   flex-direction: column !important;
 }
 
+/* ── Layout row: feed + rightbar ── */
+.public-layout {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 100%;
+  width: 100%;
+}
+
+/* ── Área central del feed ── */
+.feed-area {
+  flex: 1;
+  min-width: 0;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background-color: var(--cr-background-content);
+  /* SIN overflow ni height — el scroll está en mat-sidenav-content */
+}
+
+/* ── Modo reels ── */
+.feed-area.reels-mode {
+  padding: 0 !important;
+  background: #000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  height: 100% !important;
+}
 .feed-area.reels-mode app-reels {
   flex: 1 !important;
   display: block !important;
@@ -61,17 +80,22 @@ mat-sidenav-content {
   overflow: hidden !important;
 }
 
+/* ── Rightbar: sticky dentro del scroll de mat-sidenav-content ── */
 app-rightbar {
-  flex: 0 0 var(--rightbar-width);
-  width: var(--rightbar-width);
-  height: 100%;
+  flex: 0 0 var(--rightbar-w);
+  width: var(--rightbar-w);
+  position: sticky;
+  top: 0;
+  height: calc(100vh - var(--navbar-h));
   overflow-y: auto;
+  overflow-x: hidden;
   border-left: 1px solid var(--cr-border);
   background: var(--cr-background);
+  flex-shrink: 0;
 }
 
 @media (max-width: 1100px) {
-  app-rightbar { display: none; }
+  app-rightbar { display: none !important; }
 }
 
 @media (max-width: 768px) {
@@ -79,7 +103,6 @@ app-rightbar {
     width: 85% !important;
     max-width: 290px !important;
   }
-
   .feed-area { padding: 16px 12px; }
   .feed-area.reels-mode { padding: 0 !important; }
 }
