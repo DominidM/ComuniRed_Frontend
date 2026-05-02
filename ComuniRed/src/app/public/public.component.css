@@ -1,93 +1,59 @@
 :root {
   --navbar-height: 72px;
   --sidebar-width: 260px;
-  --rightbar-width: 320px;
+  --rightbar-width: 280px;
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-}
-
-/* ==================== NAVBAR FIJO ==================== */
-app-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--navbar-height);
-  z-index: 1100;
-  background: white;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-/* ==================== SIDENAV CONTAINER ==================== */
 mat-sidenav-container.sidenav-container {
-  margin-top: var(--navbar-height) !important;
-  height: calc(100vh - var(--navbar-height)) !important;
-  overflow: hidden !important;
+  height: 100vh !important;
+  background-color: var(--cr-background-content) !important;
 }
 
-/* ==================== SIDEBAR ==================== */
 mat-sidenav.app-public-sidebar {
   width: var(--sidebar-width) !important;
-  height: 100% !important;
   overflow: hidden !important;
-  background: #fdfcfc !important;
-  border-right: 1px solid #e2e8f0;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+  border-right: 1px solid var(--cr-border) !important;
+  background: var(--cr-background) !important;
+  box-shadow: none !important;
 }
 
-mat-sidenav.app-public-sidebar::ng-deep .mat-drawer-inner-container {
-  overflow: hidden !important;
-}
-
-/* ==================== CONTENIDO PRINCIPAL ==================== */
 mat-sidenav-content {
-  height: 100% !important;
-  overflow: hidden !important;
-  background-color: #eae9eef5;
+  margin-top: var(--navbar-height) !important;
+  max-height: calc(100vh - var(--navbar-height)) !important;
+  height: calc(100vh - var(--navbar-height)) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  background-color: var(--cr-background-content) !important;
 }
 
 .public-layout {
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .feed-right-wrapper {
   display: flex;
-  height: 100%;
-  overflow: hidden;
+  flex: 1;
+  min-height: 0;
 }
 
-/* ==================== FEED AREA ==================== */
 .feed-area {
   flex: 1;
   min-width: 0;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 0;
+  padding: 24px 16px;
   background-color: var(--cr-background-content);
   box-sizing: border-box;
 }
 
-/* ── REELS MODE ─────────────────────────────────────
-   Propagamos la altura a través del router-outlet.
-   Angular genera: feed-area > router-outlet + app-reels
-   Necesitamos que app-reels herede la altura.
-   ─────────────────────────────────────────────────── */
 .feed-area.reels-mode {
   overflow: hidden !important;
   background: #000 !important;
   padding: 0 !important;
-  height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
 }
 
-/* El componente app-reels directamente dentro del feed */
 .feed-area.reels-mode app-reels {
   flex: 1 !important;
   display: block !important;
@@ -95,43 +61,25 @@ mat-sidenav-content {
   overflow: hidden !important;
 }
 
-.feed-area::-webkit-scrollbar { width: 8px; }
-.feed-area::-webkit-scrollbar-track { background: transparent; }
-.feed-area::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.2);
-  border-radius: 10px;
-}
-
-/* Limitar ancho en componentes hijos normales */
-.settings-container,
-.trending-container {
-  max-width: 680px;
-  margin: 0 auto;
-}
-
-/* ==================== RIGHTBAR ==================== */
 app-rightbar {
   flex: 0 0 var(--rightbar-width);
   width: var(--rightbar-width);
   height: 100%;
   overflow-y: auto;
+  border-left: 1px solid var(--cr-border);
+  background: var(--cr-background);
 }
 
-app-rightbar::-webkit-scrollbar { width: 6px; }
-app-rightbar::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.15);
-  border-radius: 10px;
-}
-
-/* ==================== RESPONSIVE ==================== */
-@media (max-width: 768px) {
+@media (max-width: 1100px) {
   app-rightbar { display: none; }
+}
 
+@media (max-width: 768px) {
   mat-sidenav.app-public-sidebar {
-    width: 80% !important;
+    width: 85% !important;
     max-width: 290px !important;
   }
 
-  .feed-area { padding: 12px; }
+  .feed-area { padding: 16px 12px; }
   .feed-area.reels-mode { padding: 0 !important; }
 }

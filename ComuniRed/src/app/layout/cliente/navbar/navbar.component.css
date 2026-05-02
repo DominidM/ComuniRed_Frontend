@@ -1,375 +1,350 @@
-html.dark :host {
-  display: block;
-  font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-
-/* Variables para modo oscuro (aplicadas vía clase .dark en root) */
-:host ::ng-deep .dark {
-  --bg-primary: #0a0e27;
-  --bg-secondary: #1a1f3a;
-  --text-primary: #ffffff;
-  --text-secondary: #b0b0b0;
-  --border-color: rgba(255, 255, 255, 0.08);
-}
-
-:host ::ng-deep .dark body,
-:host ::ng-deep .dark {
-  background-color: #0a0e27;
-  color: #ffffff;
-}
-
-/* NAVBAR (completo, fijo arriba) */
 :host {
   display: block;
-}
-
-/* ==================== NAVBAR ==================== */
-.cr-navbar {
-  background: var(--cr-background);
-  color: var(--cr-text);
-  height: 72px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 0 18px;
-  box-shadow: 0 1px 0 0 rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 40;
-  transition:
-    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(0);
-  will-change: transform;
+  left: 0;
+  right: 0;
+  height: 72px;
+  z-index: 1100;
 }
 
-/* modo oscuro específico para navbar */
-html.dark .cr-navbar,
-:host ::ng-deep .dark .cr-navbar {
-  background: var(--bg-secondary, #1a1f3a);
-  color: var(--text-primary, #ffffff);
-  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 1px 3px rgba(0, 0, 0, 0.2);
+.cr-navbar {
+  width: 100%;
+  height: 72px;
+  background: var(--cr-background);
+  border-bottom: 1px solid var(--cr-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
 }
 
-:host ::ng-deep .dark .cr-navbar.hidden {
-  box-shadow: none;
-}
-
-.cr-navbar__left {
+.navbar-inner {
   display: flex;
   align-items: center;
-  min-width: 160px;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 20px;
+  gap: 16px;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.menu-toggle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--cr-border);
+  background: transparent;
+  color: var(--cr-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 120ms ease;
+  padding: 0;
+}
+
+.menu-toggle-btn:hover {
+  background: var(--cr-background-content);
+}
+
+.menu-toggle-btn mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  color: inherit;
 }
 
 .cr-logo {
   display: flex;
-  gap: 10px;
   align-items: center;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  padding: 8px 10px;
-  transition: opacity 0.2s ease;
-}
-
-.cr-logo:hover {
-  opacity: 0.8;
+  gap: 8px;
+  text-decoration: none;
 }
 
 .cr-logo__icon {
-  display: block;
-  width: 46px;
-  height: 46px;
-  border-radius: 6px;
-  object-fit: cover;
+  font-size: 22px;
+  color: #e63c3c;
+  line-height: 1;
 }
 
 .cr-logo__text {
+  font-size: 18px;
   font-weight: 700;
   color: var(--cr-text);
-  font-size: 20px;
-  letter-spacing: -0.02em;
-  transition: color 0.3s ease;
+  white-space: nowrap;
 }
 
-:host ::ng-deep .dark .cr-logo__text {
-  color: #ffffff;
-}
-
-/* ==================== BÚSQUEDA CON DROPDOWN ==================== */
-.cr-navbar__center {
+.navbar-center {
   flex: 1;
-  display: flex;
-  justify-content: center;
-  position: relative;
-  max-width: 740px;
-  margin: 0 auto;
-}
-
-.cr-search-container {
-  position: relative;
-  width: 100%;
+  max-width: 480px;
 }
 
 .cr-search {
-  width: 100%;
-  max-width: calc(100% - 40px);
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 8px;
   background: var(--cr-search);
-  padding: 6px 12px;
-  border-radius: 22px;
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
-  position: relative;
+  border: 1px solid var(--cr-border);
+  border-radius: 10px;
+  padding: 0 14px;
+  height: 40px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
-.cr-search:hover {
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.1);
+.cr-search:focus-within {
+  border-color: var(--cr-primary);
+  box-shadow: 0 0 0 3px rgba(95, 92, 246, 0.1);
 }
 
-/* modo oscuro para search */
-:host ::ng-deep .dark .cr-search {
-  background: #272d48;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-:host ::ng-deep .dark .cr-search:hover {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
-}
-
-.cr-search__icon {
-  flex: 0 0 18px;
-  transition: color 0.3s ease;
-}
-
-:host ::ng-deep .dark .cr-search__icon svg {
-  stroke: #999999;
+.search-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  color: var(--cr-text);
+  opacity: 0.45;
+  flex-shrink: 0;
 }
 
 .cr-search input {
+  flex: 1;
   border: none;
   background: transparent;
-  outline: none;
-  width: 100%;
-  font-size: 16px;
   color: var(--cr-text);
-  transition: color 0.3s ease;
-}
-
-:host ::ng-deep .dark .cr-search input {
-  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  box-shadow: none;
+  padding: 0;
+  height: 100%;
 }
 
 .cr-search input::placeholder {
-  color: #6b6f76;
-  transition: color 0.3s ease;
+  color: var(--cr-text);
+  opacity: 0.45;
 }
 
-:host ::ng-deep .dark .cr-search input::placeholder {
-  color: #888888;
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
-/* Spinner de búsqueda */
-.cr-search__spinner {
+.nav-icon-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--cr-border);
+  background: transparent;
+  color: var(--cr-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 120ms ease;
+  padding: 0;
+}
+
+.nav-icon-btn:hover {
+  background: var(--cr-background-content);
+}
+
+.nav-icon-btn mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  color: inherit;
+}
+
+.nav-badge {
   position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 4px;
+  right: 4px;
+  background: #e63c3c;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 5px;
+  min-width: 16px;
+  text-align: center;
+  line-height: 1.4;
+  border: 2px solid var(--cr-background);
 }
 
-.spinner-small {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #e2e8f0;
-  border-top-color: #0b3b36;
+.nav-avatar {
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid var(--cr-border);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 120ms ease;
 }
 
-:host ::ng-deep .dark .spinner-small {
-  border-color: #4a5568;
-  border-top-color: #667eea;
+.nav-avatar:hover {
+  border-color: var(--cr-primary);
+}
+
+.nav-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-avatar-fallback {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  :host {
+    height: 56px;
+  }
+
+  .cr-navbar {
+    height: 56px;
+  }
+
+  .navbar-center {
+    display: none;
+  }
+
+  .cr-logo__text {
+    display: none;
+  }
+
+  .navbar-inner {
+    padding: 0 14px;
+  }
+}
+
+.navbar-center {
+  flex: 1;
+  max-width: 480px;
+  position: relative;
+}
+
+.search-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--cr-background);
+  border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 1000;
+  overflow: hidden;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.search-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  color: var(--cr-text);
+  opacity: 0.5;
+  font-size: 13px;
+}
+
+.search-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.search-item:hover { background: var(--cr-background-content); }
+
+.search-item-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--cr-text);
+  opacity: 0.6;
+}
+
+.search-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.search-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.search-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cr-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-item-sub {
+  font-size: 11px;
+  color: var(--cr-text);
+  opacity: 0.55;
+}
+
+.search-item-date {
+  font-size: 11px;
+  color: var(--cr-text);
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+
+.cr-logo__img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.search-spinner {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--cr-primary);
+  opacity: 0.7;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-
-/* Dropdown de resultados */
-.search-dropdown {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  left: 0;
-  right: 0;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  max-height: 400px;
-  overflow-y: auto;
-  z-index: 1000;
-  animation: dropdownSlide 0.2s ease;
-}
-
-@keyframes dropdownSlide {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-:host ::ng-deep .dark .search-dropdown {
-  background: #272d48;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.search-backdrop {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: transparent;
-  z-index: 999;
-}
-
-.search-loading,
-.search-empty {
-  padding: 2rem;
-  text-align: center;
-  color: #718096;
-}
-
-:host ::ng-deep .dark .search-loading,
-:host ::ng-deep .dark .search-empty {
-  color: #a0aec0;
-}
-
-.search-loading { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
-.search-empty-icon { font-size: 3rem; margin-bottom: 0.5rem; }
-.search-empty p { margin: 0; font-size: 0.875rem; }
-
-/* Items de resultados */
-.search-results { padding: 0.5rem 0; }
-
-.search-result-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.search-result-item:hover { background: #f7fafc; }
-:host ::ng-deep .dark .search-result-item:hover { background: rgba(255, 255, 255, 0.05); }
-
-.search-result-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
-.search-result-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-.search-result-content { flex: 1; min-width: 0; }
-
-.search-result-title {
-  font-weight: 600;
-  color: #1a202c;
-  font-size: 0.9rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-:host ::ng-deep .dark .search-result-title { color: #e2e8f0; }
-
-.search-result-subtitle { font-size: 0.8rem; color: #718096; margin-top: 0.125rem; }
-:host ::ng-deep .dark .search-result-subtitle { color: #a0aec0; }
-
-.search-result-arrow { color: #cbd5e0; font-size: 1.25rem; flex-shrink: 0; }
-:host ::ng-deep .dark .search-result-arrow { color: #4a5568; }
-
-/* ==================== BOTONES ==================== */
-.cr-navbar__right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 220px;
-  justify-content: flex-end;
-}
-
-.cr-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-  width: 40px;
-  border-radius: 50%;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.cr-btn:hover { background-color: rgba(0, 0, 0, 0.05); }
-.cr-btn:active { background-color: rgba(0, 0, 0, 0.08); }
-
-:host ::ng-deep .dark .cr-btn:hover { background-color: rgba(255, 255, 255, 0.08); }
-:host ::ng-deep .dark .cr-btn:active { background-color: rgba(255, 255, 255, 0.12); }
-
-.cr-btn:focus { outline: 2px solid rgba(11, 59, 54, 0.12); outline-offset: 2px; }
-:host ::ng-deep .dark .cr-btn:focus { outline: 2px solid rgba(255, 255, 255, 0.12); }
-
-.cr-btn--icon svg { transition: stroke 0.3s ease, transform 0.3s ease; stroke: #333333; }
-:host ::ng-deep .dark .cr-btn--icon svg { stroke: #e5e5e5; }
-.cr-btn--icon:hover svg { transform: scale(1.1); }
-
-.cr-badge {
-  position: absolute;
-  top: -2px; right: -2px;
-  display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #e02424 0%, #c41e1e 100%);
-  color: #ffffff;
-  min-width: 18px; height: 18px; font-size: 11px; font-weight: 600;
-  border-radius: 999px; padding: 0 5px;
-  box-shadow: 0 2px 8px rgba(224, 36, 36, 0.4);
-  border: 2px solid #ffffff;
-  animation: pulse 2s infinite;
-}
-:host ::ng-deep .dark .cr-badge { border-color: #1a1f3a; }
-
-@keyframes pulse {
-  0%, 100% { box-shadow: 0 2px 8px rgba(224, 36, 36, 0.4); }
-  50% { box-shadow: 0 2px 12px rgba(224, 36, 36, 0.6); }
-}
-
-.cr-btn--avatar { width: 44px; height: 44px; padding: 0; border-radius: 50%; overflow: hidden; border: 2px solid transparent; transition: border-color 0.3s ease; }
-.cr-btn--avatar:hover { border-color: rgba(0, 0, 0, 0.1); }
-:host ::ng-deep .dark .cr-btn--avatar:hover { border-color: rgba(255, 255, 255, 0.1); }
-
-.cr-avatar { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-/* ==================== RESPONSIVE ==================== */
-@media (max-width: 780px) {
-  .cr-search { width: 100%; max-width: 420px; }
-  .cr-navbar__left { min-width: 120px; }
-  .cr-logo__text { display: none; }
-  .cr-navbar__center { max-width: 100%; }
-  .search-dropdown { left: 1rem; right: 1rem; }
-}
-
-@media (max-width: 480px) {
-  .cr-navbar { padding: 0 12px; }
-  .search-dropdown { left: 0; right: 0; border-radius: 12px; }
-  .cr-navbar__right { min-width: auto; gap: 4px; }
-}
-
-/* ==================== FIX PARA LINEA VISIBLE ==================== */
-:host { overflow-x: hidden; }
-body { overflow-x: hidden; }
-
-/* Asegurar que el navbar no deje rastro visual */
-.cr-navbar::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: transparent;
-  transition: background 0.3s ease;
-}
-
-.cr-navbar:not(.hidden)::after { background: rgba(15, 23, 42, 0.08); }
-:host ::ng-deep .dark .cr-navbar:not(.hidden)::after { background: rgba(255, 255, 255, 0.08); }

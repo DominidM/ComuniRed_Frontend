@@ -1,16 +1,9 @@
 html {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f0f2f5;
-  --text-primary: #1c1e21;
-  --text-secondary: #606770;
-  --border-color: #dadde1;
-
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.08);
   --shadow-medium: 0 2px 6px rgba(0, 0, 0, 0.10);
   --shadow-strong: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-/* ===== VARIABLES GLOBALES ===== */
 :root {
   --cr-primary: #5f5cf6;
   --cr-background: #ffffff;
@@ -24,7 +17,6 @@ html {
   --cr-sidebar-width: 240px;
 }
 
-/* Tema oscuro */
 .dark-theme {
   --cr-primary: #5f5cf6;
   --cr-background: #161717;
@@ -36,7 +28,6 @@ html {
   --cr-titulo: #e4e6eb;
 }
 
-/* ===== ESTILOS GLOBALES BASE ===== */
 html, body {
   height: 100%;
   margin: 0;
@@ -50,13 +41,12 @@ html, body {
 }
 
 app-root {
-  background: var(--cr-background-content);
   display: block;
   width: 100%;
   height: 100%;
+  background: var(--cr-background-content);
 }
 
-/* ===== NAVBAR (GLOBAL) ===== */
 .cr-navbar {
   background: var(--cr-background);
   color: var(--cr-text);
@@ -78,7 +68,6 @@ app-root {
   color: var(--cr-text);
 }
 
-/* ===== SEARCH / INPUT ===== */
 .cr-search {
   background: var(--cr-search);
   color: var(--cr-text);
@@ -90,6 +79,7 @@ app-root {
   background: transparent;
   color: var(--cr-text);
   border: none;
+  box-shadow: none;
 }
 
 .cr-search input::placeholder {
@@ -113,15 +103,8 @@ input:focus, textarea:focus, select:focus {
   color: color-mix(in srgb, var(--cr-text) 50%, transparent 50%);
 }
 
-/* ===== ICONOS / SVG ===== */
-svg, i {
-  color: #080808(--cr-background);
-}
-
-/* ===== CARDS / CONTENEDORES ===== */
-.card, .box, .panel, .container, .section, .widget,
-.sidebar, .content, .feed, .report-card, .trends-card,
-.suggestions-card, .right-panel, .left-panel, .nav-section,
+.card, .box, .panel, .widget,
+.report-card, .trends-card, .suggestions-card,
 .post-box, .search-box {
   background-color: var(--cr-background);
   color: var(--cr-text);
@@ -130,7 +113,6 @@ svg, i {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* ===== BOTONES ===== */
 button, .btn, .action-btn, .icon-btn, [role="button"] {
   background: var(--cr-surface);
   color: var(--cr-text);
@@ -150,14 +132,13 @@ button:active {
   transform: scale(0.98);
 }
 
-/* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--cr-background);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -169,53 +150,34 @@ button:active {
   background: color-mix(in srgb, var(--cr-border), var(--cr-text) 30%);
 }
 
-/* Firefox */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--cr-border) transparent;
 }
 
-/* ===== LAYOUT (NAVBAR + SIDEBAR) ===== */
 app-feed, app-home, app-tendencias, app-reels, app-perfil,
 app-sugerencias, app-mensajes, app-configuracion, app-ayuda,
-.main-content, .feed-container, .content-wrapper,
-.page-content, .app-content, .layout-content {
-  margin-left: var(--cr-sidebar-width);
-  margin-top: var(--cr-navbar-height);
-  width: calc(100% - var(--cr-sidebar-width));
-  min-height: calc(100vh - var(--cr-navbar-height));
-  padding: 30px;
+.main-content, .content-wrapper, .page-content,
+.app-content, .layout-content {
+  display: block;
+  width: 100%;
   box-sizing: border-box;
 }
 
-/* Páginas fullscreen (login, register, etc) */
 app-login, app-register, app-landing, .fullscreen-page, .auth-page {
-  margin-left: 0;
-  margin-top: 0;
+  display: block;
   width: 100%;
+  margin: 0;
   padding: 0;
 }
 
-/* Mobile */
 @media (max-width: 768px) {
   :root {
     --cr-navbar-height: 56px;
     --cr-sidebar-width: 60px;
   }
-  
-  app-feed, app-home, .main-content, .app-content {
-    padding: 16px;
-  }
 }
 
-/* Safe Area (notch) */
-@supports(padding: env(safe-area-inset-top)) {
-  app-feed, app-home, .main-content {
-    margin-top: calc(var(--cr-navbar-height) + env(safe-area-inset-top));
-  }
-}
-
-/* ===== FEED / CONTENIDO PRINCIPAL ===== */
 .feed-container {
   max-width: 800px;
   margin: 0 auto;
@@ -228,9 +190,15 @@ app-login, app-register, app-landing, .fullscreen-page, .auth-page {
   overflow-y: auto;
   overflow-x: hidden;
   background: var(--cr-background-content);
+  height: 100%;
+  box-sizing: border-box;
 }
 
-/* ===== TOASTS / MODALES / LOADER (SIN CAMBIOS) ===== */
+.mat-drawer-content {
+  overflow: auto !important;
+  box-sizing: border-box !important;
+}
+
 .toast-notification {
   position: fixed;
   top: 20px;
@@ -275,7 +243,6 @@ app-login, app-register, app-landing, .fullscreen-page, .auth-page {
   to { transform: rotate(360deg); }
 }
 
-/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -319,7 +286,6 @@ app-login, app-register, app-landing, .fullscreen-page, .auth-page {
   gap: 1rem;
 }
 
-/* ===== POSTS / COMMENTS / CREAR REPORTE ===== */
 .create-card {
   background: var(--cr-background);
   border: 1px solid var(--cr-border);
@@ -354,8 +320,31 @@ app-login, app-register, app-landing, .fullscreen-page, .auth-page {
   color: var(--cr-primary);
 }
 
-/* ===== DEFENSIVA: OCULTAR DIVIDERS/GUTTERS ===== */
 .splitter, .gutter, .col-divider, .panel-divider,
 .resize-handle, .resizer, .divider, .left-gutter, .right-gutter {
   display: none !important;
+}
+
+.dark-theme .mat-drawer-container,
+.dark-theme mat-sidenav-container,
+.dark-theme .mat-drawer,
+.dark-theme mat-sidenav {
+  background: var(--cr-background) !important;
+  color: var(--cr-text) !important;
+}
+
+.dark-theme .mat-drawer-content,
+.dark-theme mat-sidenav-content {
+  background: var(--cr-background-content) !important;
+  color: var(--cr-text) !important;
+}
+
+.mat-drawer-content {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.mat-sidenav-content {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
 }

@@ -1,15 +1,12 @@
 :host {
   display: block;
-  height: calc(100vh - 72px);
-  position: fixed;
-  top: 72px;
-  right: 0;
   width: 280px;
+  flex-shrink: 0;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
-  z-index: 40;
 }
 
 :host::-webkit-scrollbar { width: 3px; }

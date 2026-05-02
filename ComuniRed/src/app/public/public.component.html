@@ -1,28 +1,23 @@
-<app-navbar></app-navbar>
+<app-navbar (menuToggle)="toggleSidenav()"></app-navbar>
 
 <mat-sidenav-container class="sidenav-container">
-  <!-- Sidebar -->
   <mat-sidenav
     #sidenav
     [mode]="sidenavMode"
     [opened]="sidenavOpened"
+    [fixedInViewport]="true"
+    [fixedTopGap]="72"
     class="app-public-sidebar">
     <app-public-sidebar></app-public-sidebar>
   </mat-sidenav>
 
-  <!-- Contenido principal -->
   <mat-sidenav-content>
     <div class="public-layout">
       <div class="feed-right-wrapper">
-
-        <!-- Feed -->
         <div class="feed-area" [class.reels-mode]="isReelsRoute">
           <router-outlet></router-outlet>
         </div>
-
-        <!-- Rightbar solo desktop y solo si NO es reels -->
         <app-rightbar *ngIf="isDesktop && !isReelsRoute"></app-rightbar>
-
       </div>
     </div>
   </mat-sidenav-content>

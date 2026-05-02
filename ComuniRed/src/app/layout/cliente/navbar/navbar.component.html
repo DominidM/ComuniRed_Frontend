@@ -1,111 +1,85 @@
-<nav class="cr-navbar" [class.hidden]="isNavbarHidden" role="navigation" aria-label="ComuniRed top navigation">
-  <div class="cr-navbar__left">
-    <button class="cr-logo" (click)="goHome()" aria-label="Inicio">
-      <img class="cr-logo__icon" [src]="logoUrl" alt="ComuniRed logo" loading="lazy" width="28" height="28" />
-      <span class="cr-logo__text">ComuniRed</span>
-    </button>
-  </div>
+<nav class="cr-navbar">
+  <div class="navbar-inner">
 
-  <div class="cr-navbar__center">
-    <div class="cr-search-container">
-      <label class="cr-search" aria-label="Buscar">
-        <svg class="cr-search__icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M21 21l-4.35-4.35" stroke="#6b6f76" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <circle cx="11" cy="11" r="6" stroke="#6b6f76" stroke-width="1.6" fill="none"/>
-        </svg>
+    <div class="navbar-left">
+      <button class="menu-toggle-btn" (click)="onMenuToggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <a class="cr-logo" (click)="goHome()" style="cursor:pointer;">
+        <img [src]="logoUrl" alt="ComuniRed" class="cr-logo__img" />
+        <span class="cr-logo__text">ComuniRed</span>
+      </a>
+    </div>
+
+    <div class="navbar-center">
+      <div class="cr-search" [class.has-results]="showSearchResults">
+        <mat-icon class="search-icon">search</mat-icon>
         <input
-          type="search"
-          placeholder="Buscar reportes, personas..."
-          [(ngModel)]="query"
-          (ngModelChange)="onQueryChange($event)"
-          (focus)="query && performSearch(query)"
-          aria-label="Buscar reportes, personas"
+          type="text"
+          placeholder="Buscar reportes o personas..."
+          [value]="query"
+          (input)="onQueryChange($event)"
+          (keyup.escape)="closeSearch()"
+          autocomplete="off"
         />
-        
-        <!-- Spinner de carga -->
-        <div *ngIf="searching" class="cr-search__spinner">
-          <div class="spinner-small"></div>
-        </div>
-      </label>
+        <mat-icon class="search-spinner" *ngIf="searching">autorenew</mat-icon>
+      </div>
 
-      <!-- Dropdown de resultados -->
-      <div *ngIf="showSearchResults" class="search-dropdown">
-        <div *ngIf="searching" class="search-loading">
-          <div class="spinner-small"></div>
-          <span>Buscando...</span>
-        </div>
-
-        <div *ngIf="!searching && searchResults.length === 0" class="search-empty">
-          <div class="search-empty-icon">🔍</div>
-          <p>No se encontraron resultados para "{{ query }}"</p>
-        </div>
-
-        <div *ngIf="!searching && searchResults.length > 0" class="search-results">
-          <div 
-            *ngFor="let result of searchResults; trackBy: trackByResult" 
-            class="search-result-item"
-            (click)="selectResult(result)"
-          >
-            <div class="search-result-icon">
-              <ng-container *ngIf="result.type === 'reporte'">
-                📋
-              </ng-container>
-              <ng-container *ngIf="result.type === 'persona'">
-                <img 
-                  [src]="result.foto_perfil || 'assets/img/default-avatar.png'" 
-                  [alt]="getResultTitle(result)"
-                  class="search-result-avatar"
-                />
-              </ng-container>
-            </div>
-
-            <div class="search-result-content">
-              <div class="search-result-title">{{ getResultTitle(result) }}</div>
-              <div class="search-result-subtitle">
-                {{ getResultSubtitle(result) }}
-                <!-- Make fecha check more explicit for TypeScript -->
-                <ng-container *ngIf="result.type === 'reporte' && result.fecha !== undefined">
-                  • {{ formatDate(result.fecha) }}
-                </ng-container>
-              </div>
-            </div>
-
-            <div class="search-result-arrow">→</div>
+      <div class="search-dropdown" *ngIf="showSearchResults && searchResults.length > 0">
+        <div
+          class="search-item"
+          *ngFor="let result of searchResults; trackBy: trackByResult"
+          (click)="selectResult(result)"
+        >
+          <div class="search-item-icon">
+            <img
+              *ngIf="result.type === 'persona' && result.foto_perfil"
+              [src]="result.foto_perfil"
+              class="search-avatar"
+              alt="avatar"
+            />
+            <mat-icon *ngIf="result.type === 'reporte'">report_problem</mat-icon>
+            <mat-icon *ngIf="result.type === 'persona' && !result.foto_perfil">person</mat-icon>
           </div>
+          <div class="search-item-info">
+            <span class="search-item-title">{{ getResultTitle(result) }}</span>
+            <span class="search-item-sub">{{ getResultSubtitle(result) }}</span>
+          </div>
+          <span class="search-item-date" *ngIf="result.fecha">
+            {{ formatDate(result.fecha) }}
+          </span>
         </div>
       </div>
 
-      <!-- Backdrop para cerrar -->
-      <div *ngIf="showSearchResults" class="search-backdrop" (click)="closeSearch()"></div>
+      <div class="search-dropdown search-empty" *ngIf="showSearchResults && !searching && searchResults.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <span>Sin resultados para "{{ query }}"</span>
+      </div>
     </div>
-  </div>
 
-  <div class="cr-navbar__right" role="toolbar" aria-label="Controles">
-    <button class="cr-btn cr-btn--icon" title="Notificaciones" (click)="openNotifications()">
-      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none">
-        <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v0.68C7.64 5.36 6 7.93 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5" stroke="#333" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span class="cr-badge" *ngIf="notificationCount > 0" aria-live="polite">{{ notificationCount }}</span>
-    </button>
+    <div class="navbar-right">
+      <button class="nav-icon-btn" matTooltip="Notificaciones" (click)="openNotifications()">
+        <mat-icon>notifications_none</mat-icon>
+        <span class="nav-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+      </button>
+      <button class="nav-icon-btn" matTooltip="Mensajes" routerLink="/public/mensajes">
+        <mat-icon>chat_bubble_outline</mat-icon>
+      </button>
+      <button class="nav-icon-btn" matTooltip="Cambiar tema" (click)="toggleTheme()">
+        <mat-icon>{{ themeService.isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+      <div class="nav-avatar" (click)="goProfile()" matTooltip="Mi perfil">
+        <img
+          *ngIf="avatarUrl"
+          [src]="avatarUrl"
+          class="nav-avatar-img"
+          alt="avatar"
+        />
+        <span *ngIf="!avatarUrl" class="nav-avatar-fallback">{{ initials }}</span>
+      </div>
+    </div>
 
-    <button class="cr-btn cr-btn--icon" (click)="toggleTheme()" [attr.aria-label]="isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
-          <svg *ngIf="!isDarkMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5" />
-            <line x1="12" y1="1" x2="12" y2="3" />
-            <line x1="12" y1="21" x2="12" y2="23" />
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-            <line x1="1" y1="12" x2="3" y2="12" />
-            <line x1="21" y1="12" x2="23" y2="12" />
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-          </svg>
-
-          <svg *ngIf="isDarkMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-        </button>
   </div>
 </nav>
+
+<div class="search-backdrop" *ngIf="showSearchResults" (click)="closeSearch()"></div>
