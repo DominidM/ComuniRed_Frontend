@@ -116,13 +116,19 @@ export class FeedComponent implements OnInit, OnDestroy {
 
   loadUser(): void {
     const u = this.usuarioService.getUser() as any;
+    console.log('👤 Usuario del localStorage:', u);
+
     if (u) {
       this.user = {
         id: u.id || u._id,
         name: `${u.nombre || ''} ${u.apellido || ''}`.trim() || 'Usuario',
         avatarUrl: u.foto_perfil || 'assets/img/default-avatar.png',
       };
+      console.log('👤 User seteado:', this.user);
+    } else {
+      console.warn('⚠️ No hay usuario en localStorage — redirigir a login?');
     }
+
     this.loadPosts();
   }
 
@@ -144,22 +150,39 @@ export class FeedComponent implements OnInit, OnDestroy {
     if (this.allLoaded || this.loadingMore) return;
 
     this.loadingMore = true;
+    console.log(
+      '📤 Cargando posts — página:',
+      this.page,
+      '| userId:',
+      this.user?.id,
+    );
+
     this.quejaService
       .obtenerQuejasPaginadas(this.user?.id || '', this.page, this.pageSize)
       .subscribe({
         next: (pageData) => {
+          console.log('📥 Respuesta del backend:', pageData);
+          console.log('📥 Content:', pageData?.content);
+          console.log('📥 Total:', pageData?.totalElements);
+
+          if (!pageData || !pageData.content) {
+            console.warn('⚠️ pageData vacío o sin content');
+            this.loadingMore = false;
+            return;
+          }
+
           const newPosts = pageData.content.map((q: any) => ({
             ...q,
             reactions: {
               total: q.reactions?.total || 0,
-              userReaction: q.reactions?.userReaction,
+              userReaction: q.reactions?.userReaction || undefined,
               counts: {
-                like: 0,
-                love: 0,
-                wow: 0,
-                helpful: 0,
-                dislike: 0,
-                ...q.reactions?.counts,
+                like: q.reactions?.counts?.like || 0,
+                love: q.reactions?.counts?.love || 0,
+                wow: q.reactions?.counts?.wow || 0,
+                helpful: q.reactions?.counts?.helpful || 0,
+                dislike: q.reactions?.counts?.dislike || 0,
+                report: q.reactions?.counts?.report || 0,
               },
             },
             votes: {
@@ -172,13 +195,20 @@ export class FeedComponent implements OnInit, OnDestroy {
             comments: [],
             commentsCount: q.commentsCount || 0,
           }));
+
+          console.log('✅ Posts mapeados:', newPosts.length);
+
           this.posts = [...this.posts, ...newPosts];
           this.allLoaded = pageData.last === true || newPosts.length === 0;
           this.page++;
           this.loadingMore = false;
           this.cdr.detectChanges();
         },
-        error: () => {
+        error: (err) => {
+          console.error('❌ Error cargando posts:', err);
+          console.error('❌ Error message:', err?.message);
+          console.error('❌ GraphQL errors:', err?.graphQLErrors);
+          console.error('❌ Network error:', err?.networkError);
           this.loadingMore = false;
         },
       });
@@ -197,6 +227,7 @@ export class FeedComponent implements OnInit, OnDestroy {
     const { post, type } = e;
     const prev = post.reactions.userReaction;
 
+    // Optimistic update
     if (prev === type) {
       post.reactions.counts[type] = Math.max(
         0,
@@ -204,11 +235,12 @@ export class FeedComponent implements OnInit, OnDestroy {
       );
       post.reactions.userReaction = undefined;
     } else {
-      if (prev)
+      if (prev) {
         post.reactions.counts[prev] = Math.max(
           0,
           (post.reactions.counts[prev] ?? 0) - 1,
         );
+      }
       post.reactions.counts[type] = (post.reactions.counts[type] ?? 0) + 1;
       post.reactions.userReaction = type;
     }
@@ -216,62 +248,103 @@ export class FeedComponent implements OnInit, OnDestroy {
       (s: number, v) => s + (v ?? 0),
       0,
     );
-    this.showReactionMenu[post.id] = false;
 
+    // El service espera tipoReaccion como segundo parámetro
     this.reaccionService.toggleReaccion(post.id, type, this.user.id).subscribe({
       next: (updated) => {
         post.reactions = updated;
+        this.cdr.detectChanges();
       },
-      error: () => {},
+      error: () => {
+        // Revierte optimistic
+        if (prev === type) {
+          post.reactions.counts[type] = (post.reactions.counts[type] ?? 0) + 1;
+          post.reactions.userReaction = prev;
+        } else {
+          post.reactions.counts[type] = Math.max(
+            0,
+            (post.reactions.counts[type] ?? 0) - 1,
+          );
+          if (prev)
+            post.reactions.counts[prev] =
+              (post.reactions.counts[prev] ?? 0) + 1;
+          post.reactions.userReaction = prev;
+        }
+        this.toast('Error al reaccionar');
+      },
     });
   }
 
-  // ── Votos ─────────────────────────────────────────────────────
   onVoted(e: { post: Queja; choice: 'accept' | 'reject' }): void {
     const { post, choice } = e;
     if (!post.canVote || !this.user?.id) return;
+
+    // Optimistic update
     if (choice === 'accept') post.votes.yes++;
     else post.votes.no++;
     post.votes.total = post.votes.yes + post.votes.no;
     post.canVote = false;
 
-    this.reaccionService
-      .toggleReaccion(post.id, choice, this.user.id)
-      .subscribe({
-        next: () => this.toast('Voto registrado'),
-        error: () => {},
-      });
+    // USA votarQueja — NO toggleReaccion
+    const voto = choice === 'accept' ? 'SI' : 'NO';
+    this.quejaService.votarQueja(post.id, this.user.id, voto).subscribe({
+      next: (updated) => {
+        post.votes = updated.votes;
+        post.canVote = updated.canVote;
+        post.userVote = updated.userVote;
+        if (updated.estado) post.estado = updated.estado;
+        this.toast('Voto registrado');
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        // Revierte optimistic
+        if (choice === 'accept') post.votes.yes--;
+        else post.votes.no--;
+        post.votes.total = post.votes.yes + post.votes.no;
+        post.canVote = true;
+        this.toast('Error al votar');
+      },
+    });
   }
 
-  // ── Comentarios ───────────────────────────────────────────────
   onCommentsToggled(post: Queja): void {
     post.showComments = !post.showComments;
-    if (
-      post.showComments &&
-      post.comments.length === 0 &&
-      post.commentsCount > 0
-    ) {
+
+    if (post.showComments && post.comments.length === 0) {
+      // Siempre recarga — el paginado no trae comments
       this.quejaService
         .obtenerQuejaPorId(post.id, this.user?.id || '')
         .subscribe({
           next: (u) => {
-            post.comments = u.comments || [];
+            const found = this.posts.find((p) => p.id === post.id);
+            if (found) {
+              found.comments = u.comments || [];
+              found.commentsCount = u.commentsCount || found.comments.length;
+            }
+            this.cdr.detectChanges();
           },
+          error: () => this.toast('Error al cargar comentarios'),
         });
     }
   }
 
   onCommentAdded(e: { post: Queja; text: string }): void {
     if (!e.text?.trim() || !this.user?.id) return;
+
     this.comentarioService
       .agregarComentario(e.post.id, this.user.id, e.text.trim())
       .subscribe({
         next: (c) => {
-          e.post.comments.push(c);
-          e.post.commentsCount = e.post.comments.length;
-          this.commentTexts[e.post.id] = '';
+          // Busca el post en el array original (no la referencia del evento)
+          const post = this.posts.find((p) => p.id === e.post.id);
+          if (post) {
+            post.comments = [...post.comments, c];
+            post.commentsCount = post.comments.length;
+          }
           this.toast('Comentario agregado');
+          this.cdr.detectChanges();
         },
+        error: () => this.toast('Error al comentar'),
       });
   }
 

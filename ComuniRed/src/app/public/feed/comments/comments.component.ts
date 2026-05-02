@@ -1,4 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component, Input, Output, EventEmitter, OnChanges, SimpleChanges
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Queja, Usuario } from '../../../services/queja.service';
@@ -10,16 +12,17 @@ import { Queja, Usuario } from '../../../services/queja.service';
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.css']
 })
-export class CommentsComponent {
+export class CommentsComponent implements OnChanges {
   @Input() post!: Queja;
   @Input() currentUser: { id?: string; name: string; avatarUrl: string } | null = null;
-  @Input() commentText: string = '';
   @Input() editingCommentId: string | null = null;
   @Input() editingCommentText: string = '';
   @Input() showCommentMenuModal: { [id: string]: boolean } = {};
 
+  // Estado interno — el texto lo maneja este componente
+  localText = '';
+
   @Output() commentAdded      = new EventEmitter<{ post: Queja; text: string }>();
-  @Output() commentTextChange = new EventEmitter<string>();
   @Output() openModal         = new EventEmitter<void>();
   @Output() startEdit         = new EventEmitter<any>();
   @Output() saveEdit          = new EventEmitter<void>();
@@ -27,11 +30,35 @@ export class CommentsComponent {
   @Output() deleteComment     = new EventEmitter<{ post: Queja; commentId: string }>();
   @Output() menuToggle        = new EventEmitter<{ commentId: string }>();
   @Output() profileClicked    = new EventEmitter<Usuario>();
+  @Output() editingTextChange = new EventEmitter<string>();
 
-  getPreviewComments(): any[] { return (this.post.comments || []).slice(0, 3); }
-  hasMoreComments(): boolean  { return (this.post.comments || []).length > 3; }
-  getCommentsCount(): number  { return this.post.commentsCount || (this.post.comments || []).length; }
-  canEditComment(c: any): boolean { return c.author?.id === this.currentUser?.id; }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['post']) {
+      this.localText = '';
+    }
+  }
+
+  sendComment(): void {
+    if (!this.localText.trim()) return;
+    this.commentAdded.emit({ post: this.post, text: this.localText.trim() });
+    this.localText = '';
+  }
+
+  getPreviewComments(): any[] {
+    return (this.post.comments || []).slice(0, 3);
+  }
+
+  hasMoreComments(): boolean {
+    return (this.post.comments || []).length > 3;
+  }
+
+  getCommentsCount(): number {
+    return this.post.commentsCount || (this.post.comments || []).length;
+  }
+
+  canEditComment(c: any): boolean {
+    return c.author?.id === this.currentUser?.id;
+  }
 
   getAuthor(c: any): string {
     return `${c.author?.nombre || ''} ${c.author?.apellido || ''}`.trim() || 'Usuario';
@@ -39,8 +66,8 @@ export class CommentsComponent {
 
   formatDate(d: string): string {
     const s = Math.floor((Date.now() - new Date(d).getTime()) / 1000);
-    if (s < 60) return 'justo ahora';
-    if (s < 3600) return `hace ${Math.floor(s / 60)} min`;
+    if (s < 60)    return 'justo ahora';
+    if (s < 3600)  return `hace ${Math.floor(s / 60)} min`;
     if (s < 86400) return `hace ${Math.floor(s / 3600)}h`;
     return `hace ${Math.floor(s / 86400)} días`;
   }

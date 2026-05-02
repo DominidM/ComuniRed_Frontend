@@ -1,55 +1,107 @@
 <div class="comments-section">
+
+  <!-- Lista preview (máx 3) -->
   <div class="comments-list-preview">
-    <div *ngFor="let comment of getPreviewComments()" class="comment-item-preview">
-      <img [src]="comment.author.foto_perfil || 'assets/img/default-avatar.png'"
-        class="comment-avatar-preview clickable" loading="lazy"
+
+    <div *ngFor="let comment of getPreviewComments()"
+      class="comment-item-preview">
+
+      <img
+        [src]="comment.author?.foto_perfil || 'assets/img/default-avatar.png'"
+        class="comment-avatar-preview clickable"
+        loading="lazy"
         (click)="profileClicked.emit(comment.author)"/>
-      <div class="comment-content-preview">
+
+      <!-- Modo lectura -->
+      <div *ngIf="editingCommentId !== comment.id"
+        class="comment-content-preview">
         <div class="comment-header-preview">
           <strong class="comment-author-preview clickable"
             (click)="profileClicked.emit(comment.author)">
             {{ getAuthor(comment) }}
           </strong>
-          <span class="comment-date-preview">{{ formatDate(comment.fecha_creacion) }}</span>
+          <span class="comment-date-preview">
+            {{ formatDate(comment.fecha_creacion) }}
+          </span>
+          <span *ngIf="comment.fecha_modificacion" class="edited-badge">
+            editado
+          </span>
         </div>
         <p class="comment-text-preview">{{ comment.texto }}</p>
       </div>
+
+      <!-- Modo edición inline -->
+      <div *ngIf="editingCommentId === comment.id"
+        class="comment-edit-inline">
+        <input
+          type="text"
+          class="comment-edit-input"
+          [ngModel]="editingCommentText"
+          (ngModelChange)="editingTextChange.emit($event)"
+          (keyup.enter)="saveEdit.emit()"
+          (keyup.escape)="cancelEdit.emit()"
+          placeholder="Editar comentario..."/>
+        <div class="comment-edit-actions">
+          <button class="btn-save-inline" (click)="saveEdit.emit()">
+            <i class="bi bi-check-lg"></i>
+          </button>
+          <button class="btn-cancel-inline" (click)="cancelEdit.emit()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Menú 3 puntos -->
       <div class="comment-menu-container" *ngIf="canEditComment(comment)">
         <button class="comment-menu-btn"
-          (click)="$event.stopPropagation(); menuToggle.emit({ commentId: comment.id })">
+          (click)="$event.stopPropagation();
+                   menuToggle.emit({ commentId: comment.id })">
           <i class="bi bi-three-dots"></i>
         </button>
-        <div *ngIf="showCommentMenuModal[comment.id]" class="comment-menu-dropdown"
+        <div *ngIf="showCommentMenuModal[comment.id]"
+          class="comment-menu-dropdown"
           (click)="$event.stopPropagation()">
-          <button class="comment-menu-item" (click)="startEdit.emit(comment)">
+          <button class="comment-menu-item"
+            (click)="startEdit.emit(comment);
+                     menuToggle.emit({ commentId: comment.id })">
             <i class="bi bi-pencil"></i> Editar
           </button>
           <button class="comment-menu-item danger"
-            (click)="deleteComment.emit({ post, commentId: comment.id })">
+            (click)="deleteComment.emit({ post: post, commentId: comment.id });
+                     menuToggle.emit({ commentId: comment.id })">
             <i class="bi bi-trash"></i> Eliminar
           </button>
         </div>
       </div>
+
     </div>
 
-    <button *ngIf="hasMoreComments()" class="view-all-modal-btn" (click)="openModal.emit()">
+    <!-- Ver todos -->
+    <button *ngIf="hasMoreComments()"
+      class="view-all-modal-btn"
+      (click)="openModal.emit()">
       Ver todos los comentarios ({{ getCommentsCount() }})
     </button>
+
   </div>
 
+  <!-- Input nuevo comentario -->
   <div class="comment-input-container">
-    <img [src]="currentUser?.avatarUrl || 'assets/img/default-avatar.png'"
+    <img
+      [src]="currentUser?.avatarUrl || 'assets/img/default-avatar.png'"
       class="comment-avatar-preview"/>
-    <input type="text"
-      [ngModel]="commentText"
-      (ngModelChange)="commentTextChange.emit($event)"
+    <input
+      type="text"
+      [(ngModel)]="localText"
       placeholder="Escribe un comentario..."
       class="comment-input-preview"
-      (keyup.enter)="commentAdded.emit({ post, text: commentText })"/>
-    <button class="btn-send-preview"
-      (click)="commentAdded.emit({ post, text: commentText })"
-      [disabled]="!commentText?.trim()">
+      (keyup.enter)="sendComment()"/>
+    <button
+      class="btn-send-preview"
+      (click)="sendComment()"
+      [disabled]="!localText.trim()">
       <i class="bi bi-send-fill"></i>
     </button>
   </div>
+
 </div>

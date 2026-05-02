@@ -2,20 +2,23 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { QuejaService } from '../../../services/queja.service';
-import { CategoriaService, Categoria } from '../../../services/categoria.service';
+import {
+  CategoriaService,
+  Categoria,
+} from '../../../services/categoria.service';
 
 @Component({
   selector: 'app-create-report',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './create-report.component.html',
-  styleUrls: ['./create-report.component.css']
+  styleUrls: ['./create-report.component.css'],
 })
 export class CreateReportComponent implements OnInit {
   @Input() user: { id?: string; name: string; avatarUrl: string } | null = null;
   @Input() categorias: Categoria[] = [];
 
-  @Output() created   = new EventEmitter<void>();
+  @Output() created = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 
   loading = false;
@@ -30,18 +33,30 @@ export class CreateReportComponent implements OnInit {
   };
 
   isValid(): boolean {
-    return !!(this.form.titulo.trim() && this.form.descripcion.trim() && this.form.categoriaId);
+    return !!(
+      this.form.titulo.trim() &&
+      this.form.descripcion.trim() &&
+      this.form.categoriaId
+    );
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files?.[0]) return;
     const file = input.files[0];
-    if (file.size > 5 * 1024 * 1024) { alert('La imagen no debe superar 5MB'); return; }
-    if (!file.type.startsWith('image/')) { alert('Solo se permiten imágenes'); return; }
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen no debe superar 5MB');
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      alert('Solo se permiten imágenes');
+      return;
+    }
     this.form.imagenFile = file;
     const reader = new FileReader();
-    reader.onload = (e: any) => { this.form.imagenPreview = e.target.result; };
+    reader.onload = (e: any) => {
+      this.form.imagenPreview = e.target.result;
+    };
     reader.readAsDataURL(file);
   }
 
@@ -59,16 +74,32 @@ export class CreateReportComponent implements OnInit {
     if (!this.isValid() || !this.user?.id) return;
     this.loading = true;
 
-    this.quejaService.crearQueja(
-      this.form.titulo,
-      this.form.descripcion,
-      this.form.categoriaId,
-      this.user.id,
-      this.form.ubicacion || undefined,
-      this.form.imagenFile || undefined,
-    ).subscribe({
-      next: () => { this.loading = false; this.created.emit(); },
-      error: () => { this.loading = false; }
-    });
+    // quejaService.crearQueja ya sube a Cloudinary si le pasas el File
+    this.quejaService
+      .crearQueja(
+        this.form.titulo,
+        this.form.descripcion,
+        this.form.categoriaId,
+        this.user.id,
+        this.form.ubicacion || undefined,
+        this.form.imagenFile || undefined, // ← el service lo sube a Cloudinary
+      )
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          this.created.emit();
+        },
+        error: (err) => {
+          console.error('Error creando reporte:', err);
+          this.loading = false;
+          this.toast('Error al publicar el reporte');
+        },
+      });
+  }
+
+  // Agrega este método para el toast local
+  private toastMsg = '';
+  toast(msg: string): void {
+    console.error(msg);
   }
 }

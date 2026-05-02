@@ -4,11 +4,12 @@
   <div *ngIf="loading" class="loading-overlay"><div class="spinner"></div></div>
 
   <!-- Stories -->
-  <app-stories [user]="user"
+  <app-stories
+    [user]="user"
     (storyPublished)="toast('Historia publicada')">
   </app-stories>
 
-  <!-- Crear reporte (trigger) -->
+  <!-- Crear reporte -->
   <div class="create-card card">
     <div class="create-top">
       <div class="create-avatar">
@@ -21,16 +22,19 @@
     <div class="create-sep"></div>
     <div class="create-actions">
       <button class="create-action" (click)="showCreateModal = true">
-        <i class="bi bi-image create-icon"></i><span>Foto/Video</span>
+        <i class="bi bi-image create-icon"></i>
+        <span>Foto/Video</span>
       </button>
       <button class="create-action" (click)="showCreateModal = true">
-        <i class="bi bi-geo-alt-fill create-icon"></i><span>Ubicación</span>
+        <i class="bi bi-geo-alt-fill create-icon"></i>
+        <span>Ubicación</span>
       </button>
     </div>
   </div>
 
   <!-- Modal crear reporte -->
-  <app-create-report *ngIf="showCreateModal"
+  <app-create-report
+    *ngIf="showCreateModal"
     [user]="user"
     [categorias]="categorias"
     (created)="onReportCreated()"
@@ -43,8 +47,6 @@
       *ngFor="let post of posts; trackBy: trackByPostId"
       [post]="post"
       [currentUser]="user"
-      [showReactionMenu]="showReactionMenu[post.id]"
-      [commentText]="commentTexts[post.id] || ''"
       [editingCommentId]="editingCommentId"
       [editingCommentText]="editingCommentText"
       [showCommentMenuModal]="showCommentMenuModal"
@@ -53,7 +55,6 @@
       (voted)="onVoted($event)"
       (commentsToggled)="onCommentsToggled($event)"
       (commentAdded)="onCommentAdded($event)"
-      (commentTextChange)="onCommentTextChange(post.id, $event)"
       (openCommentsModal)="openCommentsModal($event)"
       (openHistorial)="onOpenHistorial($event)"
       (editPost)="onEditPost($event)"
@@ -63,9 +64,10 @@
       (profileClicked)="onProfileClicked($event)"
       (startEditComment)="onStartEditComment($event)"
       (saveEditComment)="onSaveEditComment($event)"
-      (cancelEditComment)="editingCommentId = null"
+      (cancelEditComment)="editingCommentId = null; editingCommentText = ''"
       (deleteComment)="onDeleteComment($event)"
-      (commentMenuToggle)="onCommentMenuToggle($event)">
+      (commentMenuToggle)="onCommentMenuToggle($event)"
+      (editingTextChange)="editingCommentText = $event">
     </app-post-card>
   </ng-container>
 
@@ -101,7 +103,8 @@
   </ng-template>
 
   <!-- Modal historial -->
-  <app-historial *ngIf="showHistorialModal"
+  <app-historial
+    *ngIf="showHistorialModal"
     [queja]="selectedQuejaHistorial"
     [eventos]="historialEventos"
     [loading]="loadingHistorial"

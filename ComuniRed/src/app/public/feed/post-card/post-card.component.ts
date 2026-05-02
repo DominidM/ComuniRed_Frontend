@@ -1,50 +1,74 @@
 import {
-  Component, Input, Output, EventEmitter,
-  OnInit, ChangeDetectorRef
+  Component, Input, Output, EventEmitter, HostListener
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Queja, Usuario } from '../../../services/queja.service';
+import { CommentsComponent } from '../comments/comments.component';
 
 @Component({
   selector: 'app-post-card',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, CommentsComponent],
   templateUrl: './post-card.component.html',
   styleUrls: ['./post-card.component.css']
 })
 export class PostCardComponent {
   @Input() post!: Queja;
   @Input() currentUser: { id?: string; name: string; avatarUrl: string } | null = null;
-  @Input() showReactionMenu: boolean = false;
-  @Input() commentText: string = '';
   @Input() editingCommentId: string | null = null;
   @Input() editingCommentText: string = '';
   @Input() showCommentMenuModal: { [id: string]: boolean } = {};
 
-  @Output() reactionToggled    = new EventEmitter<{ post: Queja; type: string }>();
-  @Output() reactionMenuToggle = new EventEmitter<{ postId: string; event: Event }>();
-  @Output() voted              = new EventEmitter<{ post: Queja; choice: 'accept' | 'reject' }>();
-  @Output() commentsToggled    = new EventEmitter<Queja>();
-  @Output() commentAdded       = new EventEmitter<{ post: Queja; text: string }>();
-  @Output() commentTextChange  = new EventEmitter<string>();
-  @Output() openCommentsModal  = new EventEmitter<Queja>();
-  @Output() openHistorial      = new EventEmitter<Queja>();
-  @Output() editPost           = new EventEmitter<Queja>();
-  @Output() deletePost         = new EventEmitter<Queja>();
-  @Output() bookmarkToggled    = new EventEmitter<Queja>();
-  @Output() sharePost          = new EventEmitter<Queja>();
-  @Output() profileClicked     = new EventEmitter<Usuario>();
-  @Output() startEditComment   = new EventEmitter<any>();
-  @Output() saveEditComment    = new EventEmitter<{ post: Queja }>();
-  @Output() cancelEditComment  = new EventEmitter<void>();
-  @Output() deleteComment      = new EventEmitter<{ post: Queja; commentId: string }>();
-  @Output() commentMenuToggle  = new EventEmitter<{ commentId: string }>();
+  @Output() reactionToggled   = new EventEmitter<{ post: Queja; type: string }>();
+  @Output() reactionMenuToggle= new EventEmitter<{ postId: string; event: Event }>();
+  @Output() voted             = new EventEmitter<{ post: Queja; choice: 'accept' | 'reject' }>();
+  @Output() commentsToggled   = new EventEmitter<Queja>();
+  @Output() commentAdded      = new EventEmitter<{ post: Queja; text: string }>();
+  @Output() openCommentsModal = new EventEmitter<Queja>();
+  @Output() openHistorial     = new EventEmitter<Queja>();
+  @Output() editPost          = new EventEmitter<Queja>();
+  @Output() deletePost        = new EventEmitter<Queja>();
+  @Output() bookmarkToggled   = new EventEmitter<Queja>();
+  @Output() sharePost         = new EventEmitter<Queja>();
+  @Output() profileClicked    = new EventEmitter<Usuario>();
+  @Output() startEditComment  = new EventEmitter<any>();
+  @Output() saveEditComment   = new EventEmitter<{ post: Queja }>();
+  @Output() cancelEditComment = new EventEmitter<void>();
+  @Output() deleteComment     = new EventEmitter<{ post: Queja; commentId: string }>();
+  @Output() commentMenuToggle = new EventEmitter<{ commentId: string }>();
+  @Output() editingTextChange = new EventEmitter<string>();
 
-  // ── Helpers de visualización ──────────────────────────────────
+  // ── Estado local del menú de reacciones ──
+  showReactionMenu = false;
 
+  reactions = [
+    { type: 'like',    emoji: '❤️', label: 'Me gusta' },
+    { type: 'love',    emoji: '😍', label: 'Me encanta' },
+    { type: 'wow',     emoji: '😮', label: 'Me asombra' },
+    { type: 'helpful', emoji: '👍', label: 'Útil' },
+    { type: 'dislike', emoji: '👎', label: 'No me gusta' },
+  ];
+
+  // Cierra el menú al hacer click fuera
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.showReactionMenu = false;
+  }
+
+  toggleReactionMenu(event: Event): void {
+    event.stopPropagation();
+    this.showReactionMenu = !this.showReactionMenu;
+  }
+
+  selectReaction(type: string, event: Event): void {
+    event.stopPropagation();
+    this.reactionToggled.emit({ post: this.post, type });
+    this.showReactionMenu = false;
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────
   getAvatarUrl(): string {
     return this.post.usuario?.foto_perfil || 'assets/img/default-avatar.png';
   }
@@ -58,27 +82,39 @@ export class PostCardComponent {
   }
 
   hasLocation(): boolean { return !!this.post.ubicacion; }
-  hasEvidence(): boolean { return this.post.evidence?.length > 0; }
+  hasEvidence(): boolean { return (this.post.evidence?.length ?? 0) > 0; }
 
   getFirstEvidenceUrl(): string {
     return this.post.evidence?.[0]?.url || this.post.imagen_url || '';
   }
 
   canEdit(): boolean { return this.post.usuario?.id === this.currentUser?.id; }
-  canVote(): boolean { return !!this.post.canVote && !this.post.userVote && this.isEnVotacion(); }
 
-  isEnVotacion(): boolean  { return this.post.estado?.clave === 'votacion'; }
-  isResuelta(): boolean    { return this.post.estado?.clave === 'resuelto'; }
-  isEnProceso(): boolean   { return ['en_proceso','asignada'].includes(this.post.estado?.clave || ''); }
-  isPendiente(): boolean   { return ['pendiente','aprobada'].includes(this.post.estado?.clave || ''); }
+  canVote(): boolean {
+    return !!this.post.canVote && !this.post.userVote && this.isEnVotacion();
+  }
 
-  hasVotes(): boolean      { return !!this.post.votes; }
-  getTotalVotes(): number  { return (this.post.votes?.yes || 0) + (this.post.votes?.no || 0); }
-  getYesVotes(): number    { return this.post.votes?.yes || 0; }
-  getNoVotes(): number     { return this.post.votes?.no || 0; }
-  getVotingProgress(): number { return Math.min((this.getTotalVotes() / 5) * 100, 100); }
-  needsMoreVotes(): boolean { return this.getTotalVotes() < 5 && this.isEnVotacion(); }
-  getVotesNeeded(): number { return Math.max(5 - this.getTotalVotes(), 0); }
+  isEnVotacion(): boolean { return this.post.estado?.clave === 'votacion'; }
+  isResuelta(): boolean   { return this.post.estado?.clave === 'resuelto'; }
+  isEnProceso(): boolean  { return ['en_proceso','asignada'].includes(this.post.estado?.clave || ''); }
+  isPendiente(): boolean  { return ['pendiente','aprobada'].includes(this.post.estado?.clave || ''); }
+
+  hasVotes(): boolean     { return !!this.post.votes; }
+  getTotalVotes(): number { return (this.post.votes?.yes || 0) + (this.post.votes?.no || 0); }
+  getYesVotes(): number   { return this.post.votes?.yes || 0; }
+  getNoVotes(): number    { return this.post.votes?.no || 0; }
+
+  getVotingProgress(): number {
+    return Math.min((this.getTotalVotes() / 5) * 100, 100);
+  }
+
+  needsMoreVotes(): boolean {
+    return this.getTotalVotes() < 5 && this.isEnVotacion();
+  }
+
+  getVotesNeeded(): number {
+    return Math.max(5 - this.getTotalVotes(), 0);
+  }
 
   getReactionCount(type: string): number {
     return this.post.reactions?.counts?.[type] ?? 0;
@@ -86,14 +122,6 @@ export class PostCardComponent {
 
   getCommentsCount(): number {
     return this.post.commentsCount || (this.post.comments || []).length;
-  }
-
-  getPreviewComments(): any[] {
-    return (this.post.comments || []).slice(0, 3);
-  }
-
-  hasMoreComments(): boolean {
-    return (this.post.comments || []).length > 3;
   }
 
   hasHistorial(): boolean {
@@ -107,11 +135,11 @@ export class PostCardComponent {
 
   getEstadoBadgeClass(): string {
     const map: { [k: string]: string } = {
-      nulo: 'badge bg-secondary', votacion: 'badge bg-primary',
+      nulo: 'badge bg-secondary',    votacion: 'badge bg-primary',
       pendiente: 'badge bg-warning', aprobada: 'badge bg-success',
-      asignada: 'badge bg-info', clasificada: 'badge bg-purple',
-      en_proceso: 'badge bg-info', observado: 'badge bg-warning',
-      resuelto: 'badge bg-success', cancelado: 'badge bg-danger',
+      asignada: 'badge bg-info',     clasificada: 'badge bg-purple',
+      en_proceso: 'badge bg-info',   observado: 'badge bg-warning',
+      resuelto: 'badge bg-success',  cancelado: 'badge bg-danger',
     };
     return map[this.post.estado?.clave || ''] || 'badge bg-secondary';
   }
@@ -119,7 +147,7 @@ export class PostCardComponent {
   getRiesgoBadgeClass(): string {
     const map: { [k: string]: string } = {
       BAJO: 'badge bg-success', MEDIO: 'badge bg-warning',
-      ALTO: 'badge bg-orange', CRITICO: 'badge bg-danger',
+      ALTO: 'badge bg-orange',  CRITICO: 'badge bg-danger',
     };
     return map[this.post.nivel_riesgo?.toUpperCase() || ''] || 'badge bg-secondary';
   }
@@ -142,26 +170,9 @@ export class PostCardComponent {
   formatDate(d: string): string {
     if (!d) return '';
     const h = Math.floor((Date.now() - new Date(d).getTime()) / 3600000);
-    if (h < 1) return 'hace unos minutos';
+    if (h < 1)  return 'hace unos minutos';
     if (h < 24) return `hace ${h} horas`;
     if (h < 48) return 'hace 1 día';
     return `hace ${Math.floor(h / 24)} días`;
-  }
-
-  formatCommentDate(d: string): string {
-    const s = Math.floor((Date.now() - new Date(d).getTime()) / 1000);
-    if (s < 60)    return 'justo ahora';
-    if (s < 3600)  return `hace ${Math.floor(s / 60)} min`;
-    if (s < 86400) return `hace ${Math.floor(s / 3600)}h`;
-    if (s < 172800)return 'hace 1 día';
-    return new Date(d).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-  }
-
-  getCommentAuthor(c: any): string {
-    return `${c.author?.nombre || ''} ${c.author?.apellido || ''}`.trim() || 'Usuario';
-  }
-
-  canEditComment(comment: any): boolean {
-    return comment.author?.id === this.currentUser?.id;
   }
 }
