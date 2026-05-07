@@ -47,7 +47,7 @@
           {{ story.categoryEmoji }}
         </div>
       </div>
-      <span class="story-label">{{ story.userName | slice: 0 : 10 }}{{ story.userName.length > 10 ? '…' : '' }}</span>
+      <span class="story-label">{{ truncateName(story.userName) }}</span>
     </div>
 
     <!-- Skeleton loaders mientras carga -->
@@ -75,7 +75,11 @@
 </div>
 
 <!-- Modal Crear Historia -->
-<div *ngIf="showCreateModal" class="story-modal-overlay" (click)="closeCreateModal()">
+<div
+  *ngIf="showCreateModal"
+  class="story-modal-overlay"
+  (click)="closeCreateModal()"
+>
   <div class="story-create-modal" (click)="$event.stopPropagation()">
     <div class="story-create-header">
       <h3>Crear Historia</h3>
@@ -96,7 +100,10 @@
         <div *ngIf="storyText && !storyImagePreview" class="story-preview-text">
           {{ storyText }}
         </div>
-        <div *ngIf="!storyImagePreview && !storyText" class="story-preview-placeholder">
+        <div
+          *ngIf="!storyImagePreview && !storyText"
+          class="story-preview-placeholder"
+        >
           <i class="bi bi-card-image"></i>
           <span>Vista previa</span>
         </div>
@@ -117,14 +124,20 @@
               type="file"
               accept="image/*,video/*"
               (change)="onStoryFileSelected($event)"
-              style="display:none"
+              style="display: none"
             />
             <span *ngIf="!storyImagePreview">
               <i class="bi bi-cloud-upload"></i> Subir archivo
             </span>
             <span *ngIf="storyImagePreview" class="file-chosen">
               <i class="bi bi-check-circle-fill"></i> Archivo cargado
-              <button type="button" class="remove-file-btn" (click)="removeStoryFile($event)">✕</button>
+              <button
+                type="button"
+                class="remove-file-btn"
+                (click)="removeStoryFile($event)"
+              >
+                ✕
+              </button>
             </span>
           </div>
         </div>
@@ -167,14 +180,18 @@
               [class.selected]="selectedDuration === d.value"
               (click)="selectedDuration = d.value"
               type="button"
-            >{{ d.label }}</button>
+            >
+              {{ d.label }}
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="story-create-footer">
-      <button class="btn-story-cancel" (click)="closeCreateModal()">Cancelar</button>
+      <button class="btn-story-cancel" (click)="closeCreateModal()">
+        Cancelar
+      </button>
       <button
         class="btn-story-publish"
         (click)="publishStory()"
@@ -182,14 +199,18 @@
       >
         <i class="bi bi-broadcast" *ngIf="!publishingStory"></i>
         <div class="spinner-mini" *ngIf="publishingStory"></div>
-        {{ publishingStory ? 'Publicando...' : 'Publicar Historia' }}
+        {{ publishingStory ? "Publicando..." : "Publicar Historia" }}
       </button>
     </div>
   </div>
 </div>
 
 <!-- Modal Ver Historia (Visor) -->
-<div *ngIf="showViewerModal && activeStory" class="story-viewer-overlay" (click)="closeViewer()">
+<div
+  *ngIf="showViewerModal && activeStory"
+  class="story-viewer-overlay"
+  (click)="closeViewer()"
+>
   <div class="story-viewer" (click)="$event.stopPropagation()">
     <!-- Barra de progreso -->
     <div class="story-progress-bar">
@@ -210,8 +231,14 @@
         </div>
       </div>
       <div class="viewer-actions">
-        <button class="viewer-btn" (click)="toggleAutoPlay()" [title]="storyAutoPlay ? 'Pausar' : 'Reproducir'">
-          <i [class]="storyAutoPlay ? 'bi bi-pause-fill' : 'bi bi-play-fill'"></i>
+        <button
+          class="viewer-btn"
+          (click)="toggleAutoPlay()"
+          [title]="storyAutoPlay ? 'Pausar' : 'Reproducir'"
+        >
+          <i
+            [class]="storyAutoPlay ? 'bi bi-pause-fill' : 'bi bi-play-fill'"
+          ></i>
         </button>
         <button class="viewer-btn" (click)="closeViewer()">
           <i class="bi bi-x-lg"></i>
@@ -220,9 +247,18 @@
     </div>
 
     <!-- Contenido de la historia -->
-    <div class="story-viewer-content" [style.background]="activeStory.bgColor || '#1a1a2e'">
-      <img *ngIf="activeStory.imageUrl" [src]="activeStory.imageUrl" class="story-viewer-img" />
-      <p *ngIf="activeStory.text" class="story-viewer-text">{{ activeStory.text }}</p>
+    <div
+      class="story-viewer-content"
+      [style.background]="activeStory.bgColor || '#1a1a2e'"
+    >
+      <img
+        *ngIf="activeStory.imageUrl"
+        [src]="activeStory.imageUrl"
+        class="story-viewer-img"
+      />
+      <p *ngIf="activeStory.text" class="story-viewer-text">
+        {{ activeStory.text }}
+      </p>
 
       <!-- Badge de categoría en el visor -->
       <div *ngIf="activeStory.categoryEmoji" class="story-viewer-badge">
@@ -231,10 +267,18 @@
     </div>
 
     <!-- Navegación prev/next -->
-    <button class="story-nav prev" (click)="prevStory($event)" *ngIf="currentStoryIndex > 0">
+    <button
+      class="story-nav prev"
+      (click)="prevStory($event)"
+      *ngIf="currentStoryIndex > 0"
+    >
       <i class="bi bi-chevron-left"></i>
     </button>
-    <button class="story-nav next" (click)="nextStory($event)" *ngIf="currentStoryIndex < stories.length - 1">
+    <button
+      class="story-nav next"
+      (click)="nextStory($event)"
+      *ngIf="currentStoryIndex < stories.length - 1"
+    >
       <i class="bi bi-chevron-right"></i>
     </button>
 
@@ -248,12 +292,20 @@
           class="story-reply-input"
           (keyup.enter)="sendStoryReply()"
         />
-        <button class="story-reply-send" (click)="sendStoryReply()" [disabled]="!storyReplyText.trim()">
+        <button
+          class="story-reply-send"
+          (click)="sendStoryReply()"
+          [disabled]="!storyReplyText.trim()"
+        >
           <i class="bi bi-send-fill"></i>
         </button>
       </div>
       <div class="story-quick-reactions">
-        <button *ngFor="let emoji of quickReactions" class="quick-reaction-btn" (click)="sendQuickReaction(emoji)">
+        <button
+          *ngFor="let emoji of quickReactions"
+          class="quick-reaction-btn"
+          (click)="sendQuickReaction(emoji)"
+        >
           {{ emoji }}
         </button>
       </div>

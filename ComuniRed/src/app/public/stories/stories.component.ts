@@ -11,6 +11,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
+import { HistoriaService } from '../../services/historia.service';
 
 export interface Story {
   id: string;
@@ -24,7 +26,7 @@ export interface Story {
   seen: boolean;
   categoryEmoji?: string;
   categoryName?: string;
-  duration: number; // segundos
+  duration: number;
 }
 
 @Component({
@@ -40,84 +42,14 @@ export class StoriesComponent implements OnInit, OnDestroy {
 
   @ViewChild('storiesTrack') storiesTrack!: ElementRef<HTMLDivElement>;
 
-  // Lista de historias (mock - reemplazar con servicio real)
-  stories: Story[] = [
-    {
-      id: '1',
-      userId: 'u1',
-      userName: 'Ana López',
-      userAvatar: 'assets/img/default-avatar.png',
-      imageUrl: '',
-      text: 'Bache enorme en la Av. Javier Prado altura cdra 12 🚧',
-      bgColor: 'linear-gradient(135deg, #c0392b, #e74c3c)',
-      timeAgo: 'hace 2h',
-      seen: false,
-      categoryEmoji: '🚧',
-      categoryName: 'Vías',
-      duration: 5,
-    },
-    {
-      id: '2',
-      userId: 'u2',
-      userName: 'Carlos Ríos',
-      userAvatar: 'assets/img/default-avatar.png',
-      text: 'Sin luz desde ayer en Surco ⚡',
-      bgColor: 'linear-gradient(135deg, #f39c12, #e67e22)',
-      timeAgo: 'hace 14m',
-      seen: false,
-      categoryEmoji: '💡',
-      categoryName: 'Alumbrado',
-      duration: 5,
-    },
-    {
-      id: '3',
-      userId: 'u3',
-      userName: 'María Vega',
-      userAvatar: 'assets/img/default-avatar.png',
-      text: 'Agua cortada en Miraflores toda la mañana 💧',
-      bgColor: 'linear-gradient(135deg, #2980b9, #3498db)',
-      timeAgo: 'hace 1h',
-      seen: true,
-      categoryEmoji: '💧',
-      categoryName: 'Agua',
-      duration: 5,
-    },
-    {
-      id: '4',
-      userId: 'u4',
-      userName: 'José Paredes',
-      userAvatar: 'assets/img/default-avatar.png',
-      text: 'Desmonte abandonado en calle Las Flores 🗑️',
-      bgColor: 'linear-gradient(135deg, #27ae60, #2ecc71)',
-      timeAgo: 'hace 3h',
-      seen: true,
-      categoryEmoji: '🗑️',
-      categoryName: 'Limpieza',
-      duration: 5,
-    },
-    {
-      id: '5',
-      userId: 'u5',
-      userName: 'Luisa Torres',
-      userAvatar: 'assets/img/default-avatar.png',
-      text: 'Semáforo sin funcionar en cruce peligroso 🚦',
-      bgColor: 'linear-gradient(135deg, #8e44ad, #9b59b6)',
-      timeAgo: 'hace 5h',
-      seen: false,
-      categoryEmoji: '🚦',
-      categoryName: 'Señalización',
-      duration: 5,
-    },
-  ];
-
+  stories: Story[] = [];
   loadingStories = false;
   skeletonItems = [1, 2, 3];
 
-  // Scroll arrows
   showLeftArrow = false;
   showRightArrow = true;
 
-  // Modal crear historia
+  // Modal crear
   showCreateModal = false;
   storyText = '';
   storyImagePreview: string | null = null;
@@ -154,14 +86,56 @@ export class StoriesComponent implements OnInit, OnDestroy {
 
   private progressInterval: any;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private historiaService: HistoriaService,
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.cargarHistorias();
+  }
 
   ngOnDestroy(): void {
     this.clearProgressInterval();
   }
 
+  // ─── Carga inicial ─────────────────────────────────────────────
+  private cargarHistorias(): void {
+    if (!this.user?.id) return;
+    this.loadingStories = true;
+    this.historiaService
+      .obtenerActivas(this.user.id)
+      .pipe(
+        finalize(() => {
+          this.loadingStories = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (stories) => {
+          console.log('📋 Campo raw de la primera historia:', stories[0]);
+          this.stories = (stories ?? []).map((s: any) => ({
+            ...s,
+            userName:
+              s.userName ?? s.nombre ?? s.name ?? s.autorNombre ?? 'Sin nombre',
+            userAvatar: s.userAvatar ?? s.avatar ?? s.avatarUrl ?? s.foto ?? '',
+            text: s.text ?? s.texto ?? '',
+            imageUrl: s.imageUrl ?? s.imagenUrl ?? '',
+            bgColor: s.bgColor ?? s.colorFondo ?? '',
+            categoryName: s.categoryName ?? '',
+            categoryEmoji: s.categoryEmoji ?? '',
+          }));
+          setTimeout(() => this.onTrackScroll(), 100);
+        },
+        error: (err) => console.error('Error cargando historias:', err),
+      });
+  }
+
+  truncateName(name: string | undefined): string {
+    if (!name) return '';
+    return name.length > 10 ? name.slice(0, 10) + '…' : name;
+  }
+  // ─── Scroll ────────────────────────────────────────────────────
   onTrackScroll(): void {
     const el = this.storiesTrack?.nativeElement;
     if (!el) return;
@@ -170,16 +144,22 @@ export class StoriesComponent implements OnInit, OnDestroy {
   }
 
   scrollLeft(): void {
-    this.storiesTrack?.nativeElement.scrollBy({ left: -220, behavior: 'smooth' });
+    this.storiesTrack?.nativeElement.scrollBy({
+      left: -220,
+      behavior: 'smooth',
+    });
     setTimeout(() => this.onTrackScroll(), 300);
   }
 
   scrollRight(): void {
-    this.storiesTrack?.nativeElement.scrollBy({ left: 220, behavior: 'smooth' });
+    this.storiesTrack?.nativeElement.scrollBy({
+      left: 220,
+      behavior: 'smooth',
+    });
     setTimeout(() => this.onTrackScroll(), 300);
   }
 
-  // ─── Crear historia ───────────────────────────────────────────
+  // ─── Crear historia ────────────────────────────────────────────
   openCreateStory(): void {
     this.showCreateModal = true;
   }
@@ -195,17 +175,16 @@ export class StoriesComponent implements OnInit, OnDestroy {
 
   onStoryFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      if (file.size > 10 * 1024 * 1024) return; // 10MB max
-      this.storyImageFile = file;
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.storyImagePreview = e.target.result;
-        this.cdr.detectChanges();
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!input.files?.[0]) return;
+    const file = input.files[0];
+    if (file.size > 10 * 1024 * 1024) return;
+    this.storyImageFile = file;
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.storyImagePreview = e.target.result;
+      this.cdr.detectChanges();
+    };
+    reader.readAsDataURL(file);
   }
 
   removeStoryFile(event: Event): void {
@@ -219,41 +198,49 @@ export class StoriesComponent implements OnInit, OnDestroy {
   }
 
   publishStory(): void {
-    if (!this.isStoryValid()) return;
+    if (!this.isStoryValid() || !this.user?.id) return;
     this.publishingStory = true;
 
-    // Simular publicación (reemplazar con servicio real)
-    setTimeout(() => {
-      const newStory: Story = {
-        id: 'new-' + Date.now(),
-        userId: this.user?.id || '',
-        userName: this.user?.name || 'Tú',
-        userAvatar: this.user?.avatarUrl || 'assets/img/default-avatar.png',
-        imageUrl: this.storyImagePreview || '',
-        text: this.storyText,
-        bgColor: this.storyImagePreview ? undefined : this.selectedBg,
-        timeAgo: 'ahora',
-        seen: false,
-        duration: this.selectedDuration,
-      };
-
-      this.stories = [newStory, ...this.stories];
-      this.publishingStory = false;
-      this.closeCreateModal();
-      this.storyPublished.emit();
-      this.cdr.detectChanges();
-    }, 1200);
+    this.historiaService
+      .crear(
+        this.user.id,
+        this.storyText,
+        this.storyImagePreview ? '' : this.selectedBg,
+        this.selectedDuration,
+        this.storyImageFile,
+      )
+      .pipe(
+        finalize(() => {
+          this.publishingStory = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (newStory) => {
+          this.stories = [newStory, ...this.stories];
+          this.closeCreateModal();
+          this.storyPublished.emit();
+        },
+        error: (err) => console.error('Error publicando historia:', err),
+      });
   }
 
-  // ─── Visor de historias ───────────────────────────────────────
+  // ─── Visor ─────────────────────────────────────────────────────
   openStory(story: Story): void {
     this.currentStoryIndex = this.stories.findIndex((s) => s.id === story.id);
     this.activeStory = story;
     this.showViewerModal = true;
-    story.seen = true;
     this.storyProgress = 0;
     this.storyAutoPlay = true;
     this.startProgress();
+
+    // Marcar como vista en el backend (fire-and-forget)
+    if (!story.seen && this.user?.id) {
+      story.seen = true;
+      this.historiaService
+        .marcarVista(story.id, this.user.id)
+        .subscribe({ error: (e) => console.warn('marcarVista error:', e) });
+    }
   }
 
   closeViewer(): void {
@@ -268,9 +255,15 @@ export class StoriesComponent implements OnInit, OnDestroy {
     if (this.currentStoryIndex < this.stories.length - 1) {
       this.currentStoryIndex++;
       this.activeStory = this.stories[this.currentStoryIndex];
-      this.activeStory.seen = true;
       this.storyProgress = 0;
       this.startProgress();
+      // Marcar vista
+      if (!this.activeStory.seen && this.user?.id) {
+        this.activeStory.seen = true;
+        this.historiaService
+          .marcarVista(this.activeStory.id, this.user.id)
+          .subscribe();
+      }
     } else {
       this.closeViewer();
     }
@@ -319,16 +312,17 @@ export class StoriesComponent implements OnInit, OnDestroy {
 
   sendStoryReply(): void {
     if (!this.storyReplyText.trim()) return;
-    // Aquí se integraría con el servicio de mensajes
+    // TODO: integrar con servicio de mensajes cuando esté disponible
     console.log('Reply to story:', this.activeStory?.id, this.storyReplyText);
     this.storyReplyText = '';
   }
 
   sendQuickReaction(emoji: string): void {
+    // TODO: integrar con servicio de reacciones cuando esté disponible
     console.log('Quick reaction:', emoji, 'to story:', this.activeStory?.id);
   }
 
-  trackByStoryId(index: number, story: Story): string {
+  trackByStoryId(_index: number, story: Story): string {
     return story.id;
   }
 }

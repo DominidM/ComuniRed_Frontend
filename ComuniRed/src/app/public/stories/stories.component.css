@@ -39,6 +39,7 @@
   --story-swatch-sel:     #333333;
   --story-badge-bg:       #ffffff;
   --story-badge-border:   #f0f0f0;
+  --story-body-bg:        #f4f4f4;
 }
 
 /* ── Dark mode automático (OS) ── */
@@ -54,7 +55,7 @@
     --story-scroll-color:   #e0e0e8;
     --story-skeleton-a:     #2a2a3e;
     --story-skeleton-b:     #333348;
-    --story-modal-bg:       #1e1e2e;
+    --story-modal-bg:       #252538;
     --story-modal-border:   #2e2e42;
     --story-modal-title:    #f0f0f8;
     --story-close-bg:       #2a2a3e;
@@ -66,25 +67,33 @@
     --story-upload-hover-bg:#2a1a1e;
     --story-input-border:   #3a3a4e;
     --story-input-color:    #e0e0ec;
-    --story-input-bg:       #252538;
+    --story-input-bg:       #1e1e2e;
     --story-counter:        #505068;
     --story-dur-border:     #3a3a4e;
-    --story-dur-bg:         #252538;
+    --story-dur-bg:         #1e1e2e;
     --story-dur-color:      #a0a0b8;
     --story-cancel-border:  #3a3a4e;
-    --story-cancel-bg:      #252538;
+    --story-cancel-bg:      #1e1e2e;
     --story-cancel-color:   #909098;
     --story-cancel-hover:   #2e2e42;
     --story-swatch-sel:     #ffffff;
     --story-badge-bg:       #252538;
     --story-badge-border:   #3a3a4e;
+    --story-body-bg:        #13131f;
   }
 }
 
-/* ── Dark mode por clase (si tu app lo controla con JS) ── */
+/* ── Dark mode por clase (JS controlado) ── */
+/* Cubre los selectores más comunes de Angular/Bootstrap/Custom */
 .dark-mode,
+.dark,
+body.dark,
+body.dark-mode,
 [data-theme="dark"],
-body.dark {
+[data-bs-theme="dark"],
+html.dark,
+html[data-theme="dark"],
+html[data-bs-theme="dark"] {
   --story-bg:             #1e1e2e;
   --story-card-shadow:    0 1px 6px rgba(0,0,0,0.4);
   --story-label-color:    #b8b8cc;
@@ -95,7 +104,7 @@ body.dark {
   --story-scroll-color:   #e0e0e8;
   --story-skeleton-a:     #2a2a3e;
   --story-skeleton-b:     #333348;
-  --story-modal-bg:       #1e1e2e;
+  --story-modal-bg:       #252538;
   --story-modal-border:   #2e2e42;
   --story-modal-title:    #f0f0f8;
   --story-close-bg:       #2a2a3e;
@@ -107,18 +116,19 @@ body.dark {
   --story-upload-hover-bg:#2a1a1e;
   --story-input-border:   #3a3a4e;
   --story-input-color:    #e0e0ec;
-  --story-input-bg:       #252538;
+  --story-input-bg:       #1e1e2e;
   --story-counter:        #505068;
   --story-dur-border:     #3a3a4e;
-  --story-dur-bg:         #252538;
+  --story-dur-bg:         #1e1e2e;
   --story-dur-color:      #a0a0b8;
   --story-cancel-border:  #3a3a4e;
-  --story-cancel-bg:      #252538;
+  --story-cancel-bg:      #1e1e2e;
   --story-cancel-color:   #909098;
   --story-cancel-hover:   #2e2e42;
   --story-swatch-sel:     #ffffff;
   --story-badge-bg:       #252538;
   --story-badge-border:   #3a3a4e;
+  --story-body-bg:        #13131f;
 }
 
 /* ════════════════════════════════════════════
@@ -148,9 +158,7 @@ body.dark {
   flex: 1;
 }
 .stories-track::-webkit-scrollbar { display: none; }
-[data-theme="dark"] .story-label {
-  color: var(#e0e0e0);
-}
+
 .story-item {
   display: flex;
   flex-direction: column;
@@ -270,7 +278,7 @@ body.dark {
 .scroll-left  { left: 6px; }
 .scroll-right { right: 6px; }
 
-/* Skeleton */
+/* ── Skeleton ── */
 .skeleton-ring {
   background: linear-gradient(
     90deg,
@@ -308,8 +316,9 @@ body.dark {
    ════════════════════════════════════════════ */
 .story-modal-overlay {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(5px);
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 1100;
   display: flex;
   align-items: center;
@@ -319,16 +328,19 @@ body.dark {
 @keyframes fadeInOverlay { from { opacity:0; } to { opacity:1; } }
 
 .story-create-modal {
-  background: var(--story-modal-bg);
+  /* Fondo con fallback sólido — nunca transparente */
+  background-color: var(--story-modal-bg, #ffffff);
   border-radius: 16px;
   width: 100%; max-width: 520px;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  /* Borde sutil para separar del overlay en dark mode */
+  border: 1px solid var(--story-modal-border, #f0f0f0);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.2);
   animation: slideUp 0.25s ease;
-  transition: background 0.2s;
+  /* Sin transition en background para evitar flash */
 }
 @keyframes slideUp {
   from { transform: translateY(20px); opacity:0; }
@@ -340,32 +352,43 @@ body.dark {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--story-modal-border);
+  border-bottom: 1px solid var(--story-modal-border, #f0f0f0);
+  background-color: var(--story-modal-bg, #ffffff);
 }
 .story-create-header h3 {
   font-size: 17px; font-weight: 700;
-  color: var(--story-modal-title); margin: 0;
-  transition: color 0.2s;
+  color: var(--story-modal-title, #1a1a1a);
+  margin: 0;
 }
 
 .story-modal-close {
-  background: var(--story-close-bg);
+  background: var(--story-close-bg, #f5f5f5);
   border: none; border-radius: 50%;
   width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; font-size: 14px;
-  color: var(--story-close-color);
+  color: var(--story-close-color, #555);
   transition: background 0.15s;
 }
-.story-modal-close:hover { background: var(--story-close-hover); }
+.story-modal-close:hover { background: var(--story-close-hover, #eaeaea); }
 
 .story-create-body {
   display: flex; gap: 16px;
   padding: 18px 20px;
   overflow-y: auto;
+  background-color: var(--story-modal-bg, #ffffff);
+  /* Scrollbar dark mode */
+  scrollbar-width: thin;
+  scrollbar-color: var(--story-modal-border, #e0e0e0) transparent;
+}
+.story-create-body::-webkit-scrollbar { width: 5px; }
+.story-create-body::-webkit-scrollbar-track { background: transparent; }
+.story-create-body::-webkit-scrollbar-thumb {
+  background: var(--story-modal-border, #e0e0e0);
+  border-radius: 4px;
 }
 
-/* Preview (siempre oscuro) */
+/* ── Preview (siempre oscuro — es la historia) ── */
 .story-preview-card {
   width: 140px; min-width: 140px; height: 240px;
   border-radius: 14px; overflow: hidden;
@@ -408,28 +431,28 @@ body.dark {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* Opciones */
+/* ── Opciones ── */
 .story-create-options {
   flex: 1; display: flex; flex-direction: column; gap: 14px;
 }
 .option-group { display: flex; flex-direction: column; gap: 6px; }
 .option-label {
   font-size: 12.5px; font-weight: 600;
-  color: var(--story-opt-label);
-  transition: color 0.2s;
+  color: var(--story-opt-label, #555);
 }
 
 .upload-area-story {
-  border: 1.5px dashed var(--story-upload-border);
+  border: 1.5px dashed var(--story-upload-border, #ddd);
   border-radius: 10px; padding: 11px 14px;
   cursor: pointer; font-size: 13px;
-  color: var(--story-upload-color);
+  color: var(--story-upload-color, #666);
+  background-color: transparent;
   display: flex; align-items: center; gap: 8px;
   transition: border-color 0.15s, background 0.15s;
 }
 .upload-area-story:hover {
   border-color: #e74c3c;
-  background: var(--story-upload-hover-bg);
+  background: var(--story-upload-hover-bg, #fff5f5);
 }
 .file-chosen {
   color: #4caf50;
@@ -442,19 +465,20 @@ body.dark {
 }
 
 .story-text-input {
-  border: 1.5px solid var(--story-input-border);
+  border: 1.5px solid var(--story-input-border, #e0e0e0);
   border-radius: 10px; padding: 9px 12px;
   font-size: 13px; resize: none;
-  color: var(--story-input-color);
-  background: var(--story-input-bg);
+  color: var(--story-input-color, #333);
+  background-color: var(--story-input-bg, #ffffff);
   font-family: inherit;
   transition: border-color 0.15s, background 0.2s, color 0.2s;
 }
+.story-text-input::placeholder { color: var(--story-upload-color, #aaa); }
 .story-text-input:focus { outline: none; border-color: #e74c3c; }
 
 .char-counter {
-  font-size: 11px; color: var(--story-counter);
-  text-align: right; transition: color 0.2s;
+  font-size: 11px; color: var(--story-counter, #aaa);
+  text-align: right;
 }
 
 .bg-color-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -466,16 +490,16 @@ body.dark {
   transition: transform 0.15s, border-color 0.15s;
 }
 .bg-swatch:hover    { transform: scale(1.15); }
-.bg-swatch.selected { border-color: var(--story-swatch-sel); transform: scale(1.2); }
+.bg-swatch.selected { border-color: var(--story-swatch-sel, #333); transform: scale(1.2); }
 
 .duration-row { display: flex; gap: 8px; }
 .duration-btn {
   padding: 6px 14px;
-  border: 1.5px solid var(--story-dur-border);
+  border: 1.5px solid var(--story-dur-border, #e0e0e0);
   border-radius: 20px;
-  background: var(--story-dur-bg);
+  background-color: var(--story-dur-bg, #ffffff);
   font-size: 13px; cursor: pointer;
-  color: var(--story-dur-color);
+  color: var(--story-dur-color, #555);
   font-weight: 500;
   transition: all 0.15s;
 }
@@ -486,19 +510,20 @@ body.dark {
 .story-create-footer {
   display: flex; gap: 10px; justify-content: flex-end;
   padding: 14px 20px;
-  border-top: 1px solid var(--story-modal-border);
+  border-top: 1px solid var(--story-modal-border, #f0f0f0);
+  background-color: var(--story-modal-bg, #ffffff);
 }
 
 .btn-story-cancel {
   padding: 9px 18px;
-  border: 1.5px solid var(--story-cancel-border);
+  border: 1.5px solid var(--story-cancel-border, #e0e0e0);
   border-radius: 22px;
-  background: var(--story-cancel-bg);
-  color: var(--story-cancel-color);
+  background-color: var(--story-cancel-bg, #ffffff);
+  color: var(--story-cancel-color, #666);
   font-size: 14px; cursor: pointer; font-weight: 500;
   transition: background 0.15s;
 }
-.btn-story-cancel:hover { background: var(--story-cancel-hover); }
+.btn-story-cancel:hover { background: var(--story-cancel-hover, #f5f5f5); }
 
 .btn-story-publish {
   padding: 9px 20px;
