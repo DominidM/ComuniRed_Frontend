@@ -64,7 +64,41 @@
   gap: 0.875rem;
   align-items: center;
 }
+/* ── Dark mode overrides para create-card ── */
+.dark-theme .create-card {
+  background: #1a1a1a;
+  border-color: #333;
+}
 
+.dark-theme .create-input {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.dark-theme .create-input::placeholder,
+.dark-theme .create-input {
+  color: #aaa;
+}
+
+.dark-theme .create-sep {
+  background: #333;
+}
+
+.dark-theme .create-action {
+  background: transparent;
+  color: #aaa;
+  border-color: #444;
+}
+
+.dark-theme .create-action:hover {
+  background: #2a2a2a;
+  color: #e0e0e0;
+}
+
+.dark-theme .create-icon {
+  color: #aaa;
+}
 .create-avatar { flex-shrink: 0; }
 
 .user-avatar {
@@ -153,8 +187,14 @@
   --skeleton-shine: #3a3a3a;
 }
 
+.dark-theme .create-card {
+  background: #1a1a1a;
+  border-color: #333;
+}
+
+
 .skeleton-card {
-  background: var(--cr-card-bg, #fff);
+  background: var(--cr-background-content); 
   border: 1px solid var(--cr-border);
   border-radius: 16px;
   padding: 1.25rem;

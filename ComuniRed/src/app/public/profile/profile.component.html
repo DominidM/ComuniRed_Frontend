@@ -67,15 +67,15 @@
           (click)="seleccionarBanner(video)"
           [attr.title]="video.nombre"
         >
-        <video
-          [src]="video.url"
-          muted
-          loop
-          playsinline
-          class="picker-thumb"
-          (mouseenter)="$any($event.target).play()"
-          (mouseleave)="$any($event.target).pause()"
-        ></video>
+          <video
+            [src]="video.url"
+            muted
+            loop
+            playsinline
+            class="picker-thumb"
+            (mouseenter)="$any($event.target).play()"
+            (mouseleave)="$any($event.target).pause()"
+          ></video>
           <div class="picker-item-overlay">
             <i
               *ngIf="bannerSeleccionado.id === video.id"
@@ -185,7 +185,7 @@
           <!-- Mis Reportes -->
           <div class="activity-section">
             <div class="activity-section-header">
-              <h3>📋 Mis Reportes</h3>
+              <h3>Mis Reportes</h3>
               <span class="activity-count">{{ cantidadQuejas }}</span>
             </div>
 
@@ -199,7 +199,9 @@
                 class="activity-item"
                 (click)="verQueja(queja)"
               >
-                <div class="activity-icon">📌</div>
+                <div class="activity-icon">
+                  <i class="pi pi-map-marker"></i>
+                </div>
                 <div class="activity-info">
                   <h4>{{ queja.titulo }}</h4>
                   <p>
@@ -222,7 +224,7 @@
           <!-- Reportes Comentados -->
           <div class="activity-section">
             <div class="activity-section-header">
-              <h3>💬 Reportes Comentados</h3>
+              <h3> Reportes Comentados</h3>
               <span class="activity-count">{{ cantidadComentarios }}</span>
             </div>
 
@@ -236,7 +238,9 @@
                 class="activity-item"
                 (click)="verQueja(queja)"
               >
-                <div class="activity-icon">💬</div>
+                <div class="activity-icon">
+                  <i class="pi pi-comment"></i>
+                </div>
                 <div class="activity-info">
                   <h4>{{ queja.titulo }}</h4>
                   <p>
@@ -263,13 +267,15 @@
               class="logro-icon"
               style="background: linear-gradient(135deg, #ff6b6b, #ff8787)"
             >
-              🎯
+              <i class="pi pi-flag"></i>
             </div>
             <div class="logro-info">
               <h3>Primer Reporte</h3>
               <p>Creaste tu primer reporte</p>
             </div>
-            <div class="logro-badge">✓</div>
+            <div class="logro-badge">
+              <i class="pi pi-check-circle"></i>
+            </div>
           </div>
 
           <div class="logro-card" [class.unlocked]="true">
@@ -277,13 +283,15 @@
               class="logro-icon"
               style="background: linear-gradient(135deg, #ffd93d, #ffed4e)"
             >
-              ⭐
+              <i class="pi pi-star-fill"></i>
             </div>
             <div class="logro-info">
               <h3>Ciudadano Activo</h3>
               <p>Creaste 5 reportes</p>
             </div>
-            <div class="logro-badge">✓</div>
+            <div class="logro-badge">
+              <i class="pi pi-check-circle"></i>
+            </div>
           </div>
 
           <div class="logro-card" [class.unlocked]="true">
@@ -291,13 +299,15 @@
               class="logro-icon"
               style="background: linear-gradient(135deg, #ff9f43, #ffb366)"
             >
-              🏆
+              <i class="pi pi-trophy"></i>
             </div>
             <div class="logro-info">
               <h3>Influencer Cívico</h3>
               <p>Obtuviste 100 reacciones</p>
             </div>
-            <div class="logro-badge">✓</div>
+            <div class="logro-badge">
+              <i class="pi pi-check-circle"></i>
+            </div>
           </div>
 
           <div class="logro-card" [class.unlocked]="false">
@@ -305,13 +315,15 @@
               class="logro-icon"
               style="background: linear-gradient(135deg, #d0d0d0, #e0e0e0)"
             >
-              📋
+              <i class="pi pi-list-check"></i>
             </div>
             <div class="logro-info">
               <h3>Problema Resuelto</h3>
               <p>Un reporte tuyo fue resuelto</p>
             </div>
-            <div class="logro-badge">🔒</div>
+            <div class="logro-badge">
+              <i class="pi pi-lock"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -350,9 +362,7 @@
               </div>
               <div class="estadistica-item">
                 <span class="estadistica-label">Racha actual</span>
-                <span class="estadistica-value" style="color: #f97316"
-                  >0 días</span
-                >
+                <span class="estadistica-value" style="color: #f97316">0 días</span>
               </div>
             </div>
           </div>
@@ -376,7 +386,8 @@
       </div>
       <div class="modal-body">
         <div *ngIf="loadingModal" class="modal-loading">
-          <p>⏳ Cargando...</p>
+          <i class="pi pi-spin pi-spinner"></i>
+          <p>Cargando...</p>
         </div>
         <div
           *ngIf="!loadingModal && listaSeguidores.length === 0"
@@ -397,7 +408,9 @@
             />
             <div class="user-info-modal">
               <h4>{{ usuario.nombre }} {{ usuario.apellido }}</h4>
-              <p *ngIf="usuario.distrito">📍 {{ usuario.distrito }}</p>
+              <p *ngIf="usuario.distrito">
+                <i class="pi pi-map-marker"></i> {{ usuario.distrito }}
+              </p>
             </div>
             <button class="btn-view-modal" (click)="verPerfil(usuario)">
               <i class="bi bi-eye"></i>
@@ -423,7 +436,8 @@
       </div>
       <div class="modal-body">
         <div *ngIf="loadingModal" class="modal-loading">
-          <p>⏳ Cargando...</p>
+          <i class="pi pi-spin pi-spinner"></i>
+          <p>Cargando...</p>
         </div>
         <div
           *ngIf="!loadingModal && listaSeguidos.length === 0"
@@ -444,7 +458,9 @@
             />
             <div class="user-info-modal">
               <h4>{{ usuario.nombre }} {{ usuario.apellido }}</h4>
-              <p *ngIf="usuario.distrito">📍 {{ usuario.distrito }}</p>
+              <p *ngIf="usuario.distrito">
+                <i class="pi pi-map-marker"></i> {{ usuario.distrito }}
+              </p>
             </div>
             <button class="btn-unfollow" (click)="dejarDeSeguir(usuario)">
               Dejar de seguir

@@ -45,8 +45,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   query = '';
   notificationCount = 5;
   logoUrl =
-    'https://res.cloudinary.com/dxuk9bogw/image/upload/v1761270927/fcd83bdf-0f03-44bf-9f55-7cfdc8244e99.png';
-
+    'https://res.cloudinary.com/dp1vgjhsq/image/upload/v1778266727/WhatsApp_Image_2026-05-08_at_12.35.24_PM-removebg-preview_sga0m0.png';
   showSearchResults = false;
   searchResults: SearchResult[] = [];
   searching = false;
@@ -65,10 +64,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
     public themeService: ThemeService,
   ) {}
 
-  ngOnInit(): void {
-    const user = this.usuarioService.getUser();
-    if (user) this.currentUserId = (user as any).id;
+ngOnInit(): void {
+  const user = this.usuarioService.getUser();
+  if (user) {
+    this.currentUserId = (user as any).id;
+    
+    this.avatarUrl = this.usuarioService.obtenerFotoMiniatura(user.foto_perfil, 44);
+    this.initials = `${user.nombre?.[0] ?? ''}${user.apellido?.[0] ?? ''}`.toUpperCase() || 'CR';
   }
+}
 
   ngOnDestroy(): void {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
@@ -208,7 +212,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   goHome(): void {
-    this.router.navigate(['/public/feed']);
+    this.router.navigate(['/public/home']);
   }
 
   trackByResult(index: number, result: SearchResult): string {

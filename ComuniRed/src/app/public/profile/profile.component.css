@@ -171,8 +171,8 @@
 .stats-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 4px;
+  margin-bottom: 10px;
 }
 
 .stat-card {
@@ -253,7 +253,7 @@
 
 .tab-content {
   border: var(--cr-border);
-  padding: 40px;
+  padding: 2px;
   min-height: 300px;
   background: var(--cr-background-content);
   color: var(--cr-text);
@@ -1269,4 +1269,33 @@ html.dark .banner-picker.open::-webkit-scrollbar-thumb {
 
 .btn-change-banner:hover {
   background: rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 480px) {
+  .banner-controls {
+    bottom: 8px;
+    right: 8px;
+    gap: 6px;
+  }
+
+  /* Ocultar texto, dejar solo ícono */
+  .btn-change-banner span,
+  .btn-change-banner {
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 0;        /* oculta el texto */
+    gap: 0;
+  }
+
+  .btn-change-banner i,
+  .btn-mute-banner i {
+    font-size: 14px;
+  }
+
+  .btn-mute-banner {
+    width: 28px;
+    height: 28px;
+  }
 }

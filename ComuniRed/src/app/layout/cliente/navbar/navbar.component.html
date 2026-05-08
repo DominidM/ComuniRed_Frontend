@@ -7,7 +7,7 @@
       </button>
       <a class="cr-logo" (click)="goHome()" style="cursor:pointer;">
         <img [src]="logoUrl" alt="ComuniRed" class="cr-logo__img" />
-        <span class="cr-logo__text">ComuniRed</span>
+        <span class="cr-logo__text">ComuniReD</span>
       </a>
     </div>
 
@@ -62,7 +62,7 @@
         <mat-icon>notifications_none</mat-icon>
         <span class="nav-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
       </button>
-      <button class="nav-icon-btn" matTooltip="Mensajes" routerLink="/public/mensajes">
+      <button class="nav-icon-btn" matTooltip="Mensajes" routerLink="/public/messages">
         <mat-icon>chat_bubble_outline</mat-icon>
       </button>
       <button class="nav-icon-btn" matTooltip="Cambiar tema" (click)="toggleTheme()">

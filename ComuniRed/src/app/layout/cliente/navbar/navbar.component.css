@@ -74,8 +74,8 @@
 }
 
 .cr-logo__text {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 900;
   color: var(--cr-text);
   white-space: nowrap;
 }
@@ -330,10 +330,10 @@
 }
 
 .cr-logo__img {
-  width: 28px;
-  height: 28px;
+  width: 51px;
+  height: 105px;
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: 7px;
 }
 
 .search-spinner {

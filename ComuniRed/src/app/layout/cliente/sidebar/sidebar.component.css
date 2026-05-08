@@ -15,7 +15,6 @@
   box-sizing: border-box;
   overflow: hidden;
   position: relative;
-  border-right: 1px solid var(--cr-border);
 }
 
 .profile-zone {

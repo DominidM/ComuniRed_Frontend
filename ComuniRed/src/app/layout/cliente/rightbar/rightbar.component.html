@@ -1,5 +1,4 @@
 <div class="rightbar-container">
-
   <!-- ── Mensajes estilo IG ── -->
   <section class="rb-section" aria-label="Mensajes directos">
     <div class="rb-section-header">
@@ -7,9 +6,7 @@
         <mat-icon>chat_bubble</mat-icon>
         Mensajes
       </div>
-      <button class="rb-new-btn" (click)="onNuevoMensaje()" type="button">
-        + Nuevo
-      </button>
+
     </div>
 
     <div class="msg-list">
@@ -21,9 +18,23 @@
         role="button"
         [attr.aria-label]="'Chat con ' + m.name"
       >
-        <div class="msg-avatar" [style.background]="m.color">
-          {{ m.initials }}
-          <span *ngIf="m.online" class="msg-online-dot" aria-hidden="true"></span>
+        <div
+          class="msg-avatar"
+          [style.background]="m.avatarUrl ? 'transparent' : m.color"
+        >
+          <img
+            *ngIf="m.avatarUrl"
+            [src]="m.avatarUrl"
+            [alt]="m.name"
+            style="
+              width: 100%;
+              height: 100%;
+              border-radius: 50%;
+              object-fit: cover;
+            "
+          />
+          <span *ngIf="!m.avatarUrl">{{ m.initials }}</span>
+          <span *ngIf="m.online" class="msg-online-dot"></span>
         </div>
         <div class="msg-body">
           <div class="msg-name">{{ m.name }}</div>
@@ -31,14 +42,22 @@
         </div>
         <div class="msg-meta">
           <span class="msg-time">{{ m.time }}</span>
-          <span *ngIf="m.unreadCount" class="msg-badge" aria-label="{{ m.unreadCount }} mensajes nuevos">
+          <span
+            *ngIf="m.unreadCount"
+            class="msg-badge"
+            aria-label="{{ m.unreadCount }} mensajes nuevos"
+          >
             {{ m.unreadCount }}
           </span>
         </div>
       </div>
     </div>
 
-    <button class="rb-ver-todos" [routerLink]="['/public/messages']" type="button">
+    <button
+      class="rb-ver-todos"
+      [routerLink]="['/public/messages']"
+      type="button"
+    >
       Ver todos los mensajes
     </button>
   </section>
@@ -80,7 +99,10 @@
   </section>
 
   <!-- ── Accesibilidad (integrada, sin botón flotante) ── -->
-  <section class="rb-section acc-section" aria-label="Opciones de accesibilidad">
+  <section
+    class="rb-section acc-section"
+    aria-label="Opciones de accesibilidad"
+  >
     <button
       class="acc-toggle"
       (click)="toggleAccessibility()"
@@ -92,7 +114,9 @@
         <mat-icon>accessibility</mat-icon>
         Accesibilidad
       </span>
-      <mat-icon class="acc-chevron" [class.rotated]="accessibilityOpen">expand_more</mat-icon>
+      <mat-icon class="acc-chevron" [class.rotated]="accessibilityOpen"
+        >expand_more</mat-icon
+      >
     </button>
 
     <div
@@ -103,13 +127,33 @@
       aria-label="Controles de accesibilidad"
     >
       <div class="acc-inner">
-
         <div class="acc-row">
           <span class="acc-label">Tamaño de letra</span>
           <div class="acc-btns">
-            <button (click)="decreaseText()" aria-label="Disminuir" type="button" class="acc-btn">A−</button>
-            <button (click)="resetText()"    aria-label="Restablecer" type="button" class="acc-btn">A</button>
-            <button (click)="increaseText()" aria-label="Aumentar" type="button" class="acc-btn">A+</button>
+            <button
+              (click)="decreaseText()"
+              aria-label="Disminuir"
+              type="button"
+              class="acc-btn"
+            >
+              A−
+            </button>
+            <button
+              (click)="resetText()"
+              aria-label="Restablecer"
+              type="button"
+              class="acc-btn"
+            >
+              A
+            </button>
+            <button
+              (click)="increaseText()"
+              aria-label="Aumentar"
+              type="button"
+              class="acc-btn"
+            >
+              A+
+            </button>
           </div>
         </div>
 
@@ -122,7 +166,7 @@
             type="button"
             class="acc-btn acc-btn--toggle"
           >
-            {{ isHighContrast ? 'Desactivar' : 'Activar' }}
+            {{ isHighContrast ? "Desactivar" : "Activar" }}
           </button>
         </div>
 
@@ -135,12 +179,10 @@
             type="button"
             class="acc-btn acc-btn--toggle"
           >
-            {{ isReducedMotion ? 'Desactivar' : 'Activar' }}
+            {{ isReducedMotion ? "Desactivar" : "Activar" }}
           </button>
         </div>
-
       </div>
     </div>
   </section>
-
 </div>
