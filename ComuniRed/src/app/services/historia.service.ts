@@ -7,16 +7,17 @@ import { Story } from '../public/stories/stories.component';
 export interface HistoriaResponse {
   id: string;
   usuarioId: string;
-  nombreUsuario: string;
-  avatarUsuario: string;
+  userName: string;      
+  userAvatar: string;    
   imagenUrl?: string;
   texto?: string;
   colorFondo?: string;
-  tiempoTranscurrido: string;
-  vista: boolean;
-  categoriaEmoji?: string;
-  categoriaNombre?: string;
   duracion: number;
+  activa: boolean;
+  fechaCreacion: string;
+  fechaExpiracion: string;
+  totalVistas: number;
+  vistaPorMi: boolean;    
 }
 
 @Injectable({ providedIn: 'root' })
@@ -25,7 +26,6 @@ export class HistoriaService {
 
   constructor(private http: HttpClient) {}
 
-  /** Obtiene historias activas de otros usuarios */
   obtenerActivas(usuarioId: string): Observable<Story[]> {
     const params = new HttpParams().set('usuarioId', usuarioId);
     return this.http
@@ -33,7 +33,6 @@ export class HistoriaService {
       .pipe(map((res) => res.map(this.mapToStory)));
   }
 
-  /** Publica una nueva historia */
   crear(
     usuarioId: string,
     texto: string,
@@ -52,7 +51,6 @@ export class HistoriaService {
       .pipe(map(this.mapToStory));
   }
 
-  /** Marca una historia como vista */
   marcarVista(historiaId: string, usuarioId: string): Observable<Story> {
     const params = new HttpParams().set('usuarioId', usuarioId);
     return this.http
@@ -60,25 +58,23 @@ export class HistoriaService {
       .pipe(map(this.mapToStory));
   }
 
-  /** Elimina una historia propia */
   eliminar(historiaId: string): Observable<void> {
     return this.http.delete<void>(`${this.API}/${historiaId}`);
   }
 
-  // Mapea HistoriaResponse → Story (modelo del componente)
   private mapToStory(r: HistoriaResponse): Story {
     return {
       id: r.id,
       userId: r.usuarioId,
-      userName: r.nombreUsuario,
-      userAvatar: r.avatarUsuario || 'assets/img/default-avatar.png',
+      userName: r.userName,
+      userAvatar: r.userAvatar || 'assets/img/default-avatar.png',
       imageUrl: r.imagenUrl,
       text: r.texto,
       bgColor: r.colorFondo,
-      timeAgo: r.tiempoTranscurrido,
-      seen: r.vista,
-      categoryEmoji: r.categoriaEmoji,
-      categoryName: r.categoriaNombre,
+      timeAgo: r.fechaCreacion,  
+      seen: r.vistaPorMi,         
+      categoryEmoji: undefined,  
+      categoryName: undefined,    
       duration: r.duracion ?? 5,
     };
   }

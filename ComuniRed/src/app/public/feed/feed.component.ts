@@ -115,15 +115,12 @@ export class FeedComponent implements OnInit, OnDestroy {
 
   loadUser(): void {
     const u = this.usuarioService.getUser() as any;
-    console.log('👤 Usuario del localStorage:', u);
-
     if (u) {
       this.user = {
         id: u.id || u._id,
         name: `${u.nombre || ''} ${u.apellido || ''}`.trim() || 'Usuario',
         avatarUrl: u.foto_perfil || 'assets/img/default-avatar.png',
       };
-      console.log('👤 User seteado:', this.user);
     } else {
       console.warn('⚠️ No hay usuario en localStorage — redirigir a login?');
     }
@@ -149,12 +146,6 @@ export class FeedComponent implements OnInit, OnDestroy {
     if (this.allLoaded || this.loadingMore) return;
 
     this.loadingMore = true;
-    console.log(
-      '📤 Cargando posts — página:',
-      this.page,
-      '| userId:',
-      this.user?.id,
-    );
 
     this.quejaService
       .obtenerQuejasPaginadas(this.user?.id || '', this.page, this.pageSize)

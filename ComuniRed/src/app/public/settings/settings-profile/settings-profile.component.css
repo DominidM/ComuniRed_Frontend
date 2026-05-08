@@ -1,5 +1,4 @@
 .config-container {
-  max-width: 1000px;
   margin: 0 auto;
   padding: 2rem;
   background: var(--cr-background);
@@ -10,7 +9,6 @@
 }
 
 .tab-content {
-  padding: 0 24px 24px 24px;
   animation: fadeIn 0.3s ease;
 }
 

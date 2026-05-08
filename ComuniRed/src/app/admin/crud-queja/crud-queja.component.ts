@@ -92,8 +92,6 @@ export class CrudQuejaComponent implements OnInit {
           categoria_nombre: q.categoria?.nombre || ''
         }));
         this.loading = false;
-        console.log('✅ Quejas cargadas:', this.quejas.length);
-        console.log('📊 Primera queja:', this.quejas[0]);
       },
       error: (err) => {
         console.error('❌ Error cargando quejas:', err);

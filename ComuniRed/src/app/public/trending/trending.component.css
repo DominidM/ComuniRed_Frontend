@@ -7,7 +7,6 @@
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
-  padding: 90px 20px 70px 0;
 }
 
 /* ── Toast ─────────────────────────────────────────── */
@@ -17,7 +16,6 @@
   right: 20px;
   background: #2C2C2A;
   color: #fff;
-  padding: 0.875rem 1.25rem;
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
   z-index: 10000;

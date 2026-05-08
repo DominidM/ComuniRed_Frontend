@@ -2,7 +2,6 @@
   max-width: 100%;
   width: 100%;
   margin: 0 auto;
-  padding: 90px 330px 40px 320px;  /* ← top/right/bottom/left */
   box-sizing: border-box;
 }
 
@@ -611,7 +610,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -620,7 +619,7 @@
 }
 
 .modal-content {
-  background: var(--bg-secondary);
+  background: var(#f8f9fb);
   border-radius: 16px;
   width: 90%;
   max-width: 500px;

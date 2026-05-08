@@ -11,14 +11,17 @@
   </button>
 
   <div class="stories-track" #storiesTrack (scroll)="onTrackScroll()">
-    <!-- Tu historia (crear) -->
-    <div class="story-item create-story" (click)="openCreateStory()">
+
+    <!-- Tu historia: anillo rojo si tienes historia, sin anillo si no -->
+    <div class="story-item create-story" (click)="openMyStory()">
       <div class="story-avatar-wrapper">
-        <img
-          [src]="user?.avatarUrl || 'assets/img/default-avatar.png'"
-          [alt]="user?.name"
-          class="story-avatar"
-        />
+        <div class="story-ring" [class.unseen-ring]="myActiveStory">
+          <img
+            [src]="user?.avatarUrl || 'assets/img/default-avatar.png'"
+            [alt]="user?.name"
+            class="story-avatar"
+          />
+        </div>
         <div class="add-story-btn">
           <i class="bi bi-plus"></i>
         </div>
@@ -42,7 +45,6 @@
             class="story-avatar"
           />
         </div>
-        <!-- Badge de categoría (opcional) -->
         <div *ngIf="story.categoryEmoji" class="story-category-badge">
           {{ story.categoryEmoji }}
         </div>
@@ -89,7 +91,6 @@
     </div>
 
     <div class="story-create-body">
-      <!-- Preview -->
       <div class="story-preview-card" [style.background]="selectedBg">
         <img
           *ngIf="storyImagePreview"
@@ -100,10 +101,7 @@
         <div *ngIf="storyText && !storyImagePreview" class="story-preview-text">
           {{ storyText }}
         </div>
-        <div
-          *ngIf="!storyImagePreview && !storyText"
-          class="story-preview-placeholder"
-        >
+        <div *ngIf="!storyImagePreview && !storyText" class="story-preview-placeholder">
           <i class="bi bi-card-image"></i>
           <span>Vista previa</span>
         </div>
@@ -113,9 +111,7 @@
         </div>
       </div>
 
-      <!-- Opciones -->
       <div class="story-create-options">
-        <!-- Subir imagen -->
         <div class="option-group">
           <label class="option-label">📷 Imagen o Video</label>
           <div class="upload-area-story" (click)="storyFileInput.click()">
@@ -131,18 +127,11 @@
             </span>
             <span *ngIf="storyImagePreview" class="file-chosen">
               <i class="bi bi-check-circle-fill"></i> Archivo cargado
-              <button
-                type="button"
-                class="remove-file-btn"
-                (click)="removeStoryFile($event)"
-              >
-                ✕
-              </button>
+              <button type="button" class="remove-file-btn" (click)="removeStoryFile($event)">✕</button>
             </span>
           </div>
         </div>
 
-        <!-- Texto -->
         <div class="option-group">
           <label class="option-label">✏️ Texto (opcional)</label>
           <textarea
@@ -155,7 +144,6 @@
           <span class="char-counter">{{ storyText.length }}/150</span>
         </div>
 
-        <!-- Color de fondo -->
         <div class="option-group" *ngIf="!storyImagePreview">
           <label class="option-label">🎨 Fondo</label>
           <div class="bg-color-row">
@@ -170,7 +158,6 @@
           </div>
         </div>
 
-        <!-- Duración visible -->
         <div class="option-group">
           <label class="option-label">⏱️ Duración</label>
           <div class="duration-row">
@@ -189,9 +176,7 @@
     </div>
 
     <div class="story-create-footer">
-      <button class="btn-story-cancel" (click)="closeCreateModal()">
-        Cancelar
-      </button>
+      <button class="btn-story-cancel" (click)="closeCreateModal()">Cancelar</button>
       <button
         class="btn-story-publish"
         (click)="publishStory()"
@@ -212,7 +197,6 @@
   (click)="closeViewer()"
 >
   <div class="story-viewer" (click)="$event.stopPropagation()">
-    <!-- Barra de progreso -->
     <div class="story-progress-bar">
       <div
         class="story-progress-fill"
@@ -221,7 +205,6 @@
       ></div>
     </div>
 
-    <!-- Header del visor -->
     <div class="story-viewer-header">
       <div class="story-viewer-user">
         <img [src]="activeStory.userAvatar" class="viewer-avatar" />
@@ -236,9 +219,7 @@
           (click)="toggleAutoPlay()"
           [title]="storyAutoPlay ? 'Pausar' : 'Reproducir'"
         >
-          <i
-            [class]="storyAutoPlay ? 'bi bi-pause-fill' : 'bi bi-play-fill'"
-          ></i>
+          <i [class]="storyAutoPlay ? 'bi bi-pause-fill' : 'bi bi-play-fill'"></i>
         </button>
         <button class="viewer-btn" (click)="closeViewer()">
           <i class="bi bi-x-lg"></i>
@@ -246,7 +227,6 @@
       </div>
     </div>
 
-    <!-- Contenido de la historia -->
     <div
       class="story-viewer-content"
       [style.background]="activeStory.bgColor || '#1a1a2e'"
@@ -259,14 +239,12 @@
       <p *ngIf="activeStory.text" class="story-viewer-text">
         {{ activeStory.text }}
       </p>
-
-      <!-- Badge de categoría en el visor -->
       <div *ngIf="activeStory.categoryEmoji" class="story-viewer-badge">
         {{ activeStory.categoryEmoji }} {{ activeStory.categoryName }}
       </div>
     </div>
 
-    <!-- Navegación prev/next -->
+    <!-- prev: no mostrar si es mi historia (índice -1) ni si es la primera -->
     <button
       class="story-nav prev"
       (click)="prevStory($event)"
@@ -274,15 +252,16 @@
     >
       <i class="bi bi-chevron-left"></i>
     </button>
+
+    <!-- next: no mostrar si es mi historia (índice -1) ni si es la última -->
     <button
       class="story-nav next"
       (click)="nextStory($event)"
-      *ngIf="currentStoryIndex < stories.length - 1"
+      *ngIf="currentStoryIndex >= 0 && currentStoryIndex < stories.length - 1"
     >
       <i class="bi bi-chevron-right"></i>
     </button>
 
-    <!-- Footer del visor (reaccionar) -->
     <div class="story-viewer-footer">
       <div class="story-reaction-input">
         <input

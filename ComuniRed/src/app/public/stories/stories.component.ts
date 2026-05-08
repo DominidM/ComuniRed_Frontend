@@ -41,6 +41,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
   @Output() storyPublished = new EventEmitter<void>();
 
   @ViewChild('storiesTrack') storiesTrack!: ElementRef<HTMLDivElement>;
+  myActiveStory: Story | null = null;
 
   stories: Story[] = [];
   loadingStories = false;
@@ -113,18 +114,22 @@ export class StoriesComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (stories) => {
-          console.log('📋 Campo raw de la primera historia:', stories[0]);
-          this.stories = (stories ?? []).map((s: any) => ({
+          const mapped = (stories ?? []).map((s: any) => ({
             ...s,
-            userName:
-              s.userName ?? s.nombre ?? s.name ?? s.autorNombre ?? 'Sin nombre',
-            userAvatar: s.userAvatar ?? s.avatar ?? s.avatarUrl ?? s.foto ?? '',
+            userName: s.userName ?? 'Sin nombre',
+            userAvatar: s.userAvatar ?? 'assets/img/default-avatar.png',
             text: s.text ?? s.texto ?? '',
             imageUrl: s.imageUrl ?? s.imagenUrl ?? '',
             bgColor: s.bgColor ?? s.colorFondo ?? '',
             categoryName: s.categoryName ?? '',
             categoryEmoji: s.categoryEmoji ?? '',
           }));
+
+          // Separar mi historia de las de otros
+          this.myActiveStory =
+            mapped.find((s) => s.userId === this.user?.id) ?? null;
+          this.stories = mapped.filter((s) => s.userId !== this.user?.id);
+
           setTimeout(() => this.onTrackScroll(), 100);
         },
         error: (err) => console.error('Error cargando historias:', err),
@@ -190,6 +195,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
   removeStoryFile(event: Event): void {
     event.stopPropagation();
     this.storyImageFile = null;
+
     this.storyImagePreview = null;
   }
 
@@ -217,7 +223,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (newStory) => {
-          this.stories = [newStory, ...this.stories];
+          this.myActiveStory = newStory;
           this.closeCreateModal();
           this.storyPublished.emit();
         },
@@ -225,6 +231,19 @@ export class StoriesComponent implements OnInit, OnDestroy {
       });
   }
 
+  // Agrega este método para abrir tu propia historia
+  openMyStory(): void {
+    if (this.myActiveStory) {
+      this.activeStory = this.myActiveStory;
+      this.currentStoryIndex = -1; // índice especial: es mi historia
+      this.showViewerModal = true;
+      this.storyProgress = 0;
+      this.storyAutoPlay = true;
+      this.startProgress();
+    } else {
+      this.openCreateStory();
+    }
+  }
   // ─── Visor ─────────────────────────────────────────────────────
   openStory(story: Story): void {
     this.currentStoryIndex = this.stories.findIndex((s) => s.id === story.id);
@@ -234,7 +253,6 @@ export class StoriesComponent implements OnInit, OnDestroy {
     this.storyAutoPlay = true;
     this.startProgress();
 
-    // Marcar como vista en el backend (fire-and-forget)
     if (!story.seen && this.user?.id) {
       story.seen = true;
       this.historiaService
@@ -324,5 +342,10 @@ export class StoriesComponent implements OnInit, OnDestroy {
 
   trackByStoryId(_index: number, story: Story): string {
     return story.id;
+  }
+
+  // Reemplaza el bloque "Tu historia" en el HTML — en el TS agrega este getter
+  get hasMyStory(): boolean {
+    return this.myActiveStory !== null;
   }
 }
