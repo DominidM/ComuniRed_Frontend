@@ -104,10 +104,10 @@ export interface QuejasPage {
   content: Queja[];
   totalElements: number;
   totalPages: number;
-  last: boolean;       
-  first: boolean;      
-  number: number;     
-  size: number;         
+  last: boolean;
+  first: boolean;
+  number: number;
+  size: number;
 }
 
 const OBTENER_QUEJAS_PAGINADAS = gql`
@@ -607,7 +607,41 @@ const VOTAR_QUEJA = gql`
     }
   }
 `;
-
+const OBTENER_QUEJAS_ADMIN_PAGINADAS = gql`
+  query ObtenerQuejasAdminPaginadas(
+    $usuarioActualId: ID!
+    $page: Int!
+    $size: Int!
+  ) {
+    obtenerQuejasAdminPaginadas(
+      usuarioActualId: $usuarioActualId
+      page: $page
+      size: $size
+    ) {
+      content {
+        id
+        titulo
+        descripcion
+        imagen_url
+        fecha_creacion
+        usuario {
+          id
+          nombre
+          apellido
+        }
+        estado {
+          id
+          clave
+          nombre
+        }
+      }
+      totalElements
+      totalPages
+      number
+      last
+    }
+  }
+`;
 @Injectable({ providedIn: 'root' })
 export class QuejaService {
   constructor(private apollo: Apollo) {}
@@ -618,16 +652,29 @@ export class QuejaService {
     size: number = 10,
   ): Observable<QuejasPage> {
     return this.apollo
-      .query<any>({                         
+      .query<any>({
         query: OBTENER_QUEJAS_PAGINADAS,
         variables: { usuarioActualId, page, size },
         fetchPolicy: 'network-only',
       })
+      .pipe(map((result) => result.data?.obtenerQuejasPaginadas as QuejasPage));
+  }
+  
+  obtenerQuejasAdminPaginadas(
+    usuarioActualId: string,
+    page: number,
+    size: number = 10,
+  ): Observable<QuejasPage> {
+    return this.apollo
+      .query<any>({
+        query: OBTENER_QUEJAS_ADMIN_PAGINADAS,
+        variables: { usuarioActualId, page, size },
+        fetchPolicy: 'network-only',
+      })
       .pipe(
-        map((result) => result.data?.obtenerQuejasPaginadas as QuejasPage),
+        map((result) => result.data?.obtenerQuejasAdminPaginadas as QuejasPage),
       );
   }
- 
 
   obtenerQuejas(usuarioActualId: string): Observable<Queja[]> {
     return this.apollo
