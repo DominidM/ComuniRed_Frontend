@@ -1,29 +1,43 @@
-<!-- Toasts -->
-<div class="alert-wrapper">
-  <div *ngFor="let alert of alerts" class="alert alert-{{ alert.type }}">
-    <span class="alert-icon">
-      <i *ngIf="alert.type === 'success'" class="bi bi-check-circle-fill"></i>
-      <i *ngIf="alert.type === 'error'" class="bi bi-x-circle-fill"></i>
-      <i *ngIf="alert.type === 'warning'" class="bi bi-exclamation-triangle-fill"></i>
-      <i *ngIf="alert.type === 'info'" class="bi bi-info-circle-fill"></i>
+<!-- ===== TOASTS ===== -->
+<div class="toast-stack" *ngIf="alerts.length > 0">
+  <div
+    *ngFor="let alert of alerts"
+    class="toast"
+    [class.toast-success]="alert.type === 'success'"
+    [class.toast-error]="alert.type === 'error'"
+    [class.toast-warning]="alert.type === 'warning'"
+    [class.toast-info]="alert.type === 'info'"
+  >
+    <span class="toast-icon">
+      <i
+        class="bi"
+        [class.bi-check-circle-fill]="alert.type === 'success'"
+        [class.bi-x-circle-fill]="alert.type === 'error'"
+        [class.bi-exclamation-triangle-fill]="alert.type === 'warning'"
+        [class.bi-info-circle-fill]="alert.type === 'info' || !alert.type"
+      ></i>
     </span>
-    <span class="alert-message">{{ alert.message }}</span>
-    <button class="alert-close" (click)="remove(alert)">✕</button>
+    <span class="toast-message">{{ alert.message }}</span>
+    <button class="toast-close" (click)="remove(alert)">
+      <i class="bi bi-x"></i>
+    </button>
   </div>
 </div>
 
-<!-- Modal confirmación -->
+<!-- ===== CONFIRM DIALOG ===== -->
 <div class="confirm-overlay" *ngIf="confirmDialog" (click)="onCancel()">
-  <div class="confirm-dialog" (click)="$event.stopPropagation()">
-    <span class="material-icons confirm-icon">warning</span>
-    <h3>{{ confirmDialog.title }}</h3>
-    <p>{{ confirmDialog.message }}</p>
+  <div class="confirm-box" (click)="$event.stopPropagation()">
+    <div class="confirm-icon">
+      <i class="bi bi-exclamation-triangle"></i>
+    </div>
+    <h3 class="confirm-title">{{ confirmDialog.title }}</h3>
+    <p class="confirm-message">{{ confirmDialog.message }}</p>
     <div class="confirm-actions">
-      <button class="confirm-btn-cancel" (click)="onCancel()">
-        {{ confirmDialog.cancelText }}
+      <button class="confirm-btn confirm-btn-cancel" (click)="onCancel()">
+        Cancelar
       </button>
-      <button class="confirm-btn-ok" (click)="onConfirm()">
-        {{ confirmDialog.confirmText }}
+      <button class="confirm-btn confirm-btn-ok" (click)="onConfirm()">
+        Confirmar
       </button>
     </div>
   </div>

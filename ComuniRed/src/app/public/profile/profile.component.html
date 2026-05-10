@@ -5,6 +5,7 @@
     <div class="header-background" [class.editing]="editandoBanner">
       <!-- Video activo -->
       <video
+        #bannerVideoEl
         class="banner-video"
         [src]="bannerSeleccionado.url"
         autoplay
@@ -51,7 +52,7 @@
             [class.bi-camera-video]="!editandoBanner"
             [class.bi-x-lg]="editandoBanner"
           ></i>
-          {{ editandoBanner ? "Cerrar" : "Cambiar portada" }}
+          <span>{{ editandoBanner ? "Cerrar" : "Cambiar portada" }}</span>
         </button>
       </div>
     </div>
@@ -110,24 +111,24 @@
         <div class="user-info-section">
           <h1 class="user-name">{{ user?.nombre }} {{ user?.apellido }}</h1>
           <p class="user-email">{{ user?.email }}</p>
-        </div>
 
-        <div class="stats-row">
-          <button class="stat-item stat-clickable" (click)="verSeguidores()">
-            <span class="stat-number">{{ seguidoresCount }}</span>
-            <span class="stat-label">seguidores</span>
-          </button>
-          <div class="stat-divider"></div>
-          <button class="stat-item stat-clickable" (click)="verSeguidos()">
-            <span class="stat-number">{{ seguidosCount }}</span>
-            <span class="stat-label">seguidos</span>
-          </button>
+          <!-- Chips compactos de seguidores/seguidos -->
+          <div class="user-chips">
+            <button class="chip" (click)="verSeguidores()">
+              <span class="chip-number">{{ seguidoresCount }}</span>
+              <span class="chip-label">seguidores</span>
+            </button>
+            <button class="chip" (click)="verSeguidos()">
+              <span class="chip-number">{{ seguidosCount }}</span>
+              <span class="chip-label">seguidos</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ========== STATS CARDS ========== -->
+  <!-- ========== STATS CARDS (si quieres mantener KPIs) ========== -->
   <div class="stats-container">
     <div class="stat-card">
       <div class="stat-number">{{ cantidadQuejas }}</div>
@@ -174,86 +175,58 @@
     </div>
 
     <div class="tab-content">
-      <!-- TAB ACTIVIDAD -->
       <div *ngIf="currentTab === 'actividad'" class="activity-content">
         <div *ngIf="loadingActividad" class="loading-state">
           <div class="spinner"></div>
           <p>Cargando actividad...</p>
         </div>
 
-        <div *ngIf="!loadingActividad" class="activity-grid">
-          <!-- Mis Reportes -->
-          <div class="activity-section">
-            <div class="activity-section-header">
-              <h3>Mis Reportes</h3>
-              <span class="activity-count">{{ cantidadQuejas }}</span>
-            </div>
+        <div *ngIf="!loadingActividad" class="gallery-grid">
+          <div
+            *ngIf="misQuejas.length === 0 && quejasComentadas.length === 0"
+            class="empty-activity"
+          >
+            <p>
+              Aún no tienes actividad. Crea tu primer reporte para ver tu
+              galería.
+            </p>
+          </div>
 
-            <div *ngIf="misQuejas.length === 0" class="empty-activity">
-              <p>No has creado reportes aún</p>
-            </div>
-
-            <div *ngIf="misQuejas.length > 0" class="activity-list">
-              <div
-                *ngFor="let queja of misQuejas"
-                class="activity-item"
-                (click)="verQueja(queja)"
-              >
-                <div class="activity-icon">
-                  <i class="pi pi-map-marker"></i>
-                </div>
-                <div class="activity-info">
-                  <h4>{{ queja.titulo }}</h4>
-                  <p>
-                    {{ queja.descripcion?.slice(0, 80)
-                    }}{{ queja.descripcion?.length > 80 ? "..." : "" }}
-                  </p>
-                  <div class="activity-meta">
-                    <span class="activity-date">{{
-                      queja.fecha_creacion | date: "dd/MM/yyyy"
-                    }}</span>
-                    <span class="activity-category" *ngIf="queja.categoria">{{
-                      queja.categoria.nombre
-                    }}</span>
-                  </div>
-                </div>
+          <!-- Mis reportes -->
+          <div
+            *ngFor="let queja of misQuejas"
+            class="gallery-item"
+            (click)="verQueja(queja)"
+          >
+            <div class="gallery-thumb">
+              <div class="gallery-placeholder">
+                <i class="pi pi-map-marker"></i>
               </div>
+            </div>
+            <div class="gallery-overlay">
+              <h4 class="gallery-title">{{ queja.titulo }}</h4>
+              <span class="gallery-date">
+                {{ queja.fecha_creacion | date: "dd/MM/yyyy" }}
+              </span>
             </div>
           </div>
 
-          <!-- Reportes Comentados -->
-          <div class="activity-section">
-            <div class="activity-section-header">
-              <h3> Reportes Comentados</h3>
-              <span class="activity-count">{{ cantidadComentarios }}</span>
-            </div>
-
-            <div *ngIf="quejasComentadas.length === 0" class="empty-activity">
-              <p>No has comentado en reportes aún</p>
-            </div>
-
-            <div *ngIf="quejasComentadas.length > 0" class="activity-list">
-              <div
-                *ngFor="let queja of quejasComentadas"
-                class="activity-item"
-                (click)="verQueja(queja)"
-              >
-                <div class="activity-icon">
-                  <i class="pi pi-comment"></i>
-                </div>
-                <div class="activity-info">
-                  <h4>{{ queja.titulo }}</h4>
-                  <p>
-                    {{ queja.descripcion?.slice(0, 80)
-                    }}{{ queja.descripcion?.length > 80 ? "..." : "" }}
-                  </p>
-                  <div class="activity-meta">
-                    <span class="activity-date">{{
-                      queja.fecha_creacion | date: "dd/MM/yyyy"
-                    }}</span>
-                  </div>
-                </div>
+          <!-- Reportes comentados -->
+          <div
+            *ngFor="let queja of quejasComentadas"
+            class="gallery-item gallery-item-secondary"
+            (click)="verQueja(queja)"
+          >
+            <div class="gallery-thumb">
+              <div class="gallery-placeholder secondary">
+                <i class="pi pi-comment"></i>
               </div>
+            </div>
+            <div class="gallery-overlay">
+              <h4 class="gallery-title">{{ queja.titulo }}</h4>
+              <span class="gallery-date">
+                {{ queja.fecha_creacion | date: "dd/MM/yyyy" }}
+              </span>
             </div>
           </div>
         </div>
@@ -362,7 +335,9 @@
               </div>
               <div class="estadistica-item">
                 <span class="estadistica-label">Racha actual</span>
-                <span class="estadistica-value" style="color: #f97316">0 días</span>
+                <span class="estadistica-value" style="color: #f97316"
+                  >0 días</span
+                >
               </div>
             </div>
           </div>

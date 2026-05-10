@@ -18,7 +18,7 @@ import {
   HistorialEventoService,
   HistorialEvento,
 } from '../../services/historial-evento.service';
-import { StoriesComponent } from '../stories/stories.component';
+import { StoriesComponent } from './stories/stories.component';
 import { PostCardComponent } from './post-card/post-card.component';
 import { CreateReportComponent } from './create-report/create-report.component';
 import { CommentsComponent } from './comments/comments.component';

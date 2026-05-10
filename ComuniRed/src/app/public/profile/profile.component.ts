@@ -1,8 +1,17 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
-import { SeguimientoService, Seguimiento } from '../../services/seguimiento.service';
+import {
+  SeguimientoService,
+  Seguimiento,
+} from '../../services/seguimiento.service';
 import { QuejaService } from '../../services/queja.service';
 import { ComentarioService } from '../../services/comentario.service';
 import { ReaccionService } from '../../services/reaccion.service';
@@ -19,14 +28,12 @@ interface BannerOption {
   imports: [CommonModule],
   providers: [DatePipe],
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css']
+  styleUrls: ['./profile.component.css'],
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   currentTab = 'actividad';
-  private readonly DEFAULT_AVATAR = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
   private readonly BANNER_KEY = 'comunired_profile_banner';
 
-  // ── ViewChild para controlar el video directamente ────────
   @ViewChild('bannerVideoEl') bannerVideoEl!: ElementRef<HTMLVideoElement>;
 
   user: {
@@ -42,7 +49,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   seguidosCount = 0;
   loading = false;
 
-  // Actividad
   misQuejas: any[] = [];
   quejasComentadas: any[] = [];
   cantidadQuejas = 0;
@@ -50,14 +56,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
   cantidadReacciones = 0;
   loadingActividad = false;
 
-  // Modales
   mostrarModalSeguidores = false;
   mostrarModalSeguidos = false;
   listaSeguidores: Usuario[] = [];
   listaSeguidos: Usuario[] = [];
   loadingModal = false;
 
-  // ── Banner ────────────────────────────────────────────────
   editandoBanner = false;
   muteoBanner = true;
 
@@ -97,16 +101,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private quejaService: QuejaService,
     private comentarioService: ComentarioService,
     private reaccionService: ReaccionService,
-    private router: Router
+    private router: Router,
   ) {}
-  ngOnDestroy(): void {
-    const videoEl = this.bannerVideoEl?.nativeElement;
-    if (videoEl) {
-      videoEl.pause();
-      videoEl.src = '';
-      videoEl.load();
-    }
-  }
+
   ngOnInit(): void {
     const u = this.usuarioService.getUser();
 
@@ -116,8 +113,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
         nombre: (u as any).nombre || 'Usuario',
         apellido: (u as any).apellido || '',
         email: (u as any).email || 'correo@ejemplo.com',
-        foto_perfil: (u as any).foto_perfil || this.DEFAULT_AVATAR,
-        fecha_registro: (u as any).fecha_registro || null
+        foto_perfil: (u as any).foto_perfil || '',
+        fecha_registro: (u as any).fecha_registro || null,
       };
 
       this.cargarContadores();
@@ -128,12 +125,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
         nombre: 'Usuario',
         apellido: '',
         email: 'correo@ejemplo.com',
-        foto_perfil: this.DEFAULT_AVATAR,
-        fecha_registro: null
+        foto_perfil: '',
+        fecha_registro: null,
       };
     }
 
     this.restoreBanner();
+  }
+
+  ngOnDestroy(): void {
+    const videoEl = this.bannerVideoEl?.nativeElement;
+    if (videoEl) {
+      videoEl.pause();
+      videoEl.src = '';
+      videoEl.load();
+    }
   }
 
   // ── Banner methods ────────────────────────────────────────
@@ -144,25 +150,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   toggleMuteoBanner(): void {
     this.muteoBanner = !this.muteoBanner;
-    // Aplicar directamente al elemento para que Angular no ignore el binding
     const videoEl = this.bannerVideoEl?.nativeElement;
     if (videoEl) videoEl.muted = this.muteoBanner;
   }
 
   seleccionarBanner(video: BannerOption): void {
-    if (this.bannerSeleccionado.id === video.id) return; // ya está seleccionado
+    if (this.bannerSeleccionado.id === video.id) return;
 
-    // Pausar y limpiar el video actual antes de cambiar
     const videoEl = this.bannerVideoEl?.nativeElement;
     if (videoEl) {
       videoEl.pause();
-      videoEl.src = '';       // fuerza que el browser suelte el stream anterior
+      videoEl.src = '';
       videoEl.load();
     }
 
     this.bannerSeleccionado = video;
 
-    // Pequeño timeout para que Angular actualice el [src] y luego reproducir
     setTimeout(() => {
       const el = this.bannerVideoEl?.nativeElement;
       if (el) {
@@ -182,7 +185,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     try {
       const savedId = localStorage.getItem(this.BANNER_KEY);
       if (savedId) {
-        const found = this.bannerOptions.find(b => b.id === savedId);
+        const found = this.bannerOptions.find((b) => b.id === savedId);
         if (found) this.bannerSeleccionado = found;
       }
     } catch {}
@@ -195,13 +198,23 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.loading = true;
 
     this.seguimientoService.contarSeguidores(this.user.id).subscribe({
-      next: (count) => { this.seguidoresCount = count; },
-      error: (err) => { console.error('Error contando seguidores:', err); }
+      next: (count) => {
+        this.seguidoresCount = count;
+      },
+      error: (err) => {
+        console.error('Error contando seguidores:', err);
+      },
     });
 
     this.seguimientoService.contarSeguidos(this.user.id).subscribe({
-      next: (count) => { this.seguidosCount = count; this.loading = false; },
-      error: (err) => { console.error('Error contando seguidos:', err); this.loading = false; }
+      next: (count) => {
+        this.seguidosCount = count;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error contando seguidos:', err);
+        this.loading = false;
+      },
     });
   }
 
@@ -216,29 +229,43 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.misQuejas = quejas || [];
         this.cantidadQuejas = quejas?.length || 0;
       },
-      error: (err) => { console.error('Error cargando quejas:', err); this.misQuejas = []; }
+      error: (err) => {
+        console.error('Error cargando quejas:', err);
+        this.misQuejas = [];
+      },
     });
 
-    this.comentarioService.obtenerReportesComentados(this.user.id, 0, 10).subscribe({
-      next: (quejas: any[]) => {
-        this.quejasComentadas = quejas;
-        this.loadingActividad = false;
-      },
-      error: (err) => {
-        console.error('Error cargando quejas comentadas:', err);
-        this.quejasComentadas = [];
-        this.loadingActividad = false;
-      }
-    });
+    this.comentarioService
+      .obtenerReportesComentados(this.user.id, 0, 10)
+      .subscribe({
+        next: (quejas: any[]) => {
+          this.quejasComentadas = quejas;
+          this.loadingActividad = false;
+        },
+        error: (err) => {
+          console.error('Error cargando quejas comentadas:', err);
+          this.quejasComentadas = [];
+          this.loadingActividad = false;
+        },
+      });
 
     this.comentarioService.contarComentariosPorUsuario(this.user.id).subscribe({
-      next: (count: number) => { this.cantidadComentarios = count; },
-      error: (err) => { console.error('Error contando comentarios:', err); }
+      next: (count: number) => {
+        this.cantidadComentarios = count;
+      },
+      error: (err) => {
+        console.error('Error contando comentarios:', err);
+      },
     });
 
     this.reaccionService.contarReaccionesPorUsuario(this.user.id).subscribe({
-      next: (count: number) => { this.cantidadReacciones = count; },
-      error: (err) => { console.error('Error contando reacciones:', err); this.cantidadReacciones = 0; }
+      next: (count: number) => {
+        this.cantidadReacciones = count;
+      },
+      error: (err) => {
+        console.error('Error contando reacciones:', err);
+        this.cantidadReacciones = 0;
+      },
     });
   }
 
@@ -254,13 +281,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
       next: (pageData: any) => {
         pageData.content.forEach((seg: Seguimiento) => {
           this.usuarioService.obtenerUsuarioPorId(seg.seguidorId).subscribe({
-            next: (usuario) => { this.listaSeguidores.push(usuario); },
-            error: (err) => { console.error('Error cargando seguidor:', err); }
+            next: (usuario) => {
+              this.listaSeguidores.push(usuario);
+            },
+            error: (err) => {
+              console.error('Error cargando seguidor:', err);
+            },
           });
         });
         this.loadingModal = false;
       },
-      error: (err) => { console.error('Error cargando seguidores:', err); this.loadingModal = false; }
+      error: (err) => {
+        console.error('Error cargando seguidores:', err);
+        this.loadingModal = false;
+      },
     });
   }
 
@@ -274,13 +308,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
       next: (pageData: any) => {
         pageData.content.forEach((seg: Seguimiento) => {
           this.usuarioService.obtenerUsuarioPorId(seg.seguidoId).subscribe({
-            next: (usuario) => { this.listaSeguidos.push(usuario); },
-            error: (err) => { console.error('Error cargando seguido:', err); }
+            next: (usuario) => {
+              this.listaSeguidos.push(usuario);
+            },
+            error: (err) => {
+              console.error('Error cargando seguido:', err);
+            },
           });
         });
         this.loadingModal = false;
       },
-      error: (err) => { console.error('Error cargando seguidos:', err); this.loadingModal = false; }
+      error: (err) => {
+        console.error('Error cargando seguidos:', err);
+        this.loadingModal = false;
+      },
     });
   }
 
@@ -294,10 +335,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     this.seguimientoService.dejarDeSeguir(this.user.id, usuario.id).subscribe({
       next: () => {
-        this.listaSeguidos = this.listaSeguidos.filter(u => u.id !== usuario.id);
+        this.listaSeguidos = this.listaSeguidos.filter(
+          (u) => u.id !== usuario.id,
+        );
         this.seguidosCount--;
       },
-      error: (err) => { console.error('Error dejando de seguir:', err); alert('Error al dejar de seguir'); }
+      error: (err) => {
+        console.error('Error dejando de seguir:', err);
+        alert('Error al dejar de seguir');
+      },
     });
   }
 
@@ -318,7 +364,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   // ── Helpers ───────────────────────────────────────────────
 
   obtenerFoto(foto_perfil?: string): string {
-    if (!foto_perfil || foto_perfil.trim() === '') return this.DEFAULT_AVATAR;
+    if (!foto_perfil || foto_perfil.trim() === '') return '';
     if (this.usuarioService.esFotoCloudinary(foto_perfil)) {
       return this.usuarioService.obtenerFotoMiniatura(foto_perfil, 48);
     }
