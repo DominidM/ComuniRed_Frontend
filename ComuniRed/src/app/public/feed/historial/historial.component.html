@@ -1,0 +1,59 @@
+<div class="modal-overlay" (click)="closed.emit()">
+  <div class="modal-historial" (click)="$event.stopPropagation()">
+
+    <div class="modal-header-historial">
+      <h3><i class="bi bi-clock-history"></i> Historial del Reporte</h3>
+      <button class="modal-close-btn" (click)="closed.emit()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="modal-body-historial">
+
+      <!-- Info del reporte -->
+      <div *ngIf="queja" class="historial-report-info">
+        <h4>{{ queja.titulo }}</h4>
+        <div class="historial-badges">
+          <span [class]="getEstadoBadgeClass()">{{ queja.estado?.nombre }}</span>
+          <span *ngIf="hasRiesgo()" [class]="getRiesgoBadgeClass()">
+            {{ getRiesgoTexto() }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="historial-loading">
+        <div class="spinner-small"></div>
+        <p>Cargando historial...</p>
+      </div>
+
+      <!-- Timeline -->
+      <div *ngIf="!loading && eventos.length > 0" class="timeline">
+        <div *ngFor="let evento of eventos" class="timeline-item">
+          <div class="timeline-marker" [class]="'marker-' + getColor(evento.tipo_evento)">
+            <span class="timeline-icon">{{ getIcono(evento.tipo_evento) }}</span>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <span class="timeline-title">{{ getTexto(evento.tipo_evento) }}</span>
+              <span class="timeline-date">{{ formatFecha(evento.fecha_evento) }}</span>
+            </div>
+            <p class="timeline-description">{{ evento.descripcion }}</p>
+            <div *ngIf="evento.estado_anterior && evento.estado_nuevo" class="timeline-states">
+              <span class="state-change">
+                {{ evento.estado_anterior }} → {{ evento.estado_nuevo }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sin eventos -->
+      <div *ngIf="!loading && eventos.length === 0" class="no-historial">
+        <i class="bi bi-inbox"></i>
+        <p>No hay eventos registrados</p>
+      </div>
+
+    </div>
+  </div>
+</div>

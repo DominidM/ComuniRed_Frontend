@@ -1,72 +1,80 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  HostListener,
+  ChangeDetectorRef,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { QuejaService, Queja, Usuario } from '../../services/queja.service';
 import { ReaccionService } from '../../services/reaccion.service';
 import { ComentarioService } from '../../services/comentario.service';
 import { CategoriaService, Categoria } from '../../services/categoria.service';
 import { UsuarioService } from '../../services/usuario.service';
-import { HistorialEventoService, HistorialEvento } from '../../services/historial-evento.service';
+import {
+  HistorialEventoService,
+  HistorialEvento,
+} from '../../services/historial-evento.service';
+import { StoriesComponent } from '../stories/stories.component';
+import { PostCardComponent } from './post-card/post-card.component';
+import { CreateReportComponent } from './create-report/create-report.component';
+import { CommentsComponent } from './comments/comments.component';
+import { HistorialComponent } from './historial/historial.component';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    StoriesComponent,
+    PostCardComponent,
+    CreateReportComponent,
+    HistorialComponent,
+  ],
   templateUrl: './feed.component.html',
-  styleUrls: ['./feed.component.css']
+  styleUrls: ['./feed.component.css'],
 })
-export class FeedComponent implements OnInit {
-  Math = Math;
-  
+export class FeedComponent implements OnInit, OnDestroy {
   user: { id?: string; name: string; avatarUrl: string } | null = null;
   posts: Queja[] = [];
-  filteredPosts: Queja[] = [];
-  loading = false;
   categorias: Categoria[] = [];
+  loading = false;
+
   commentTexts: { [postId: string]: string } = {};
-  selectedCategory = '';
-  selectedStatus = '';
-  sortBy: 'recent' | 'popular' | 'votes' = 'recent';
-  
+  showReactionMenu: { [postId: string]: boolean } = {};
+  showCommentMenuModal: { [commentId: string]: boolean } = {};
+  editingCommentId: string | null = null;
+  editingCommentText = '';
+
+  // Modales
   showCreateModal = false;
-  newQueja = {
-    titulo: '',
-    descripcion: '',
-    categoriaId: '',
-    ubicacion: '',
-    imagenFile: null as File | null,
-    imagenPreview: null as string | null
-  };
+  showCommentsModal = false;
+  showHistorialModal = false;
+  selectedReporteForComments: Queja | null = null;
+  selectedQuejaHistorial: Queja | null = null;
+  historialEventos: HistorialEvento[] = [];
+  loadingHistorial = false;
+  newCommentText = '';
 
   showEditModal = false;
   editingQueja: Queja | null = null;
 
-  editingCommentId: string | null = null;
-  editingCommentText = '';
+  // Paginación
+  page = 0;
+  pageSize = 5;
+  allLoaded = false;
+  loadingMore = false;
+  skeletonItems = [1, 2, 3];
 
   toastMessage = '';
   showToast = false;
 
-  page = 0;
-  hasMore = true;
-
-  showReactionMenu: { [postId: string]: boolean } = {};
-  showCommentsInline: { [postId: string]: boolean } = {};
-  showCommentMenuModal: { [commentId: string]: boolean } = {};
-  currentPage = 1;
-  reportsPerPage = 10;
-  totalReports = 0;
-
-  showCommentsModal = false;
-  selectedReporteForComments: Queja | null = null;
-  newCommentText = '';
-
-  showHistorialModal = false;
-  selectedQuejaHistorial: Queja | null = null;
-  historialEventos: HistorialEvento[] = [];
-  loadingHistorial = false;
+  private scrollContainer: HTMLElement | null = null;
+  private boundOnScroll = this.onScroll.bind(this);
 
   constructor(
     private quejaService: QuejaService,
@@ -75,396 +83,366 @@ export class FeedComponent implements OnInit {
     private categoriaService: CategoriaService,
     private usuarioService: UsuarioService,
     private historialService: HistorialEventoService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   @HostListener('document:click')
   onDocumentClick(): void {
-    this.closeAllReactionMenus();
-  }
-
-  @HostListener('window:scroll')
-  onScroll(): void {
-    const scrollPosition = window.pageYOffset + window.innerHeight;
-    const pageHeight = document.documentElement.scrollHeight;
-
-    if (scrollPosition >= pageHeight - 100 && !this.loading && this.hasMore) {
-      this.loadMorePosts();
-    }
+    this.showReactionMenu = {};
   }
 
   ngOnInit(): void {
     this.loadUser();
     this.loadCategorias();
-    this.loadPosts();
+    setTimeout(() => {
+      this.scrollContainer = document.querySelector(
+        'mat-sidenav-content',
+      ) as HTMLElement;
+      this.scrollContainer?.addEventListener('scroll', this.boundOnScroll);
+    }, 0);
   }
 
-  loadMorePosts(): void {
-    console.log('Cargando más posts...');
+  ngOnDestroy(): void {
+    this.scrollContainer?.removeEventListener('scroll', this.boundOnScroll);
+  }
+
+  private onScroll(): void {
+    if (this.loadingMore || this.allLoaded || !this.scrollContainer) return;
+    const { scrollTop, scrollHeight, clientHeight } = this.scrollContainer;
+    if (scrollHeight - scrollTop <= clientHeight + 400) this.loadPosts();
   }
 
   loadUser(): void {
-    const u = this.usuarioService.getUser();
+    const u = this.usuarioService.getUser() as any;
     if (u) {
-      const avatar = (u as any).foto_perfil || 'assets/img/default-avatar.png';
-      this.user = { 
-        id: (u as any).id || undefined, 
-        name: `${(u as any).nombre || ''} ${(u as any).apellido || ''}`.trim() || 'Usuario', 
-        avatarUrl: avatar 
+      this.user = {
+        id: u.id || u._id,
+        name: `${u.nombre || ''} ${u.apellido || ''}`.trim() || 'Usuario',
+        avatarUrl: u.foto_perfil || 'assets/img/default-avatar.png',
       };
     } else {
-      this.user = { name: 'Usuario', avatarUrl: 'assets/img/default-avatar.png' };
+      console.warn('⚠️ No hay usuario en localStorage — redirigir a login?');
     }
+
+    this.loadPosts();
   }
 
   loadCategorias(): void {
     this.categoriaService.obtenerCategorias(0, 100).subscribe({
-      next: (page) => {
-        this.categorias = page.content.filter(c => c.activo);
+      next: (p) => {
+        this.categorias = p.content.filter((c: Categoria) => c.activo);
       },
-      error: (err) => {
-        console.error('Error cargando categorías', err);
-        this.categorias = [
-          { id: '68f5c40c77c9f1339092c6f5', nombre: 'Vías', descripcion: '', activo: true },
-          { id: '68f5c40c77c9f1339092c6f2', nombre: 'Alumbrado', descripcion: '', activo: true },
-          { id: '68f5c40c77c9f1339092c6f7', nombre: 'Agua y Saneamiento', descripcion: '', activo: true },
-          { id: '68f5c40c77c9f1339092c6f3', nombre: 'Limpieza', descripcion: '', activo: true },
-          { id: '68f5c40c77c9f1339092c6f4', nombre: 'Seguridad', descripcion: '', activo: true },
-          { id: '68f5c40c77c9f1339092c6f6', nombre: 'Señalización', descripcion: '', activo: true }
-        ];
-      }
+      error: () => {},
     });
   }
 
-  loadPosts(): void {
-    if (!this.user?.id) return;
-    
-    this.loading = true;
-    this.quejaService.obtenerQuejas(this.user.id).subscribe({
-      next: (quejas) => {
-        this.posts = JSON.parse(JSON.stringify(quejas)).map((q: any) => {
-          const reactions = {
-            total: q.reactions?.total || 0,
-            userReaction: q.reactions?.userReaction || undefined,
-            counts: {
-              like: q.reactions?.counts?.['like'] || 0,
-              love: q.reactions?.counts?.['love'] || 0,
-              wow: q.reactions?.counts?.['wow'] || 0,
-              helpful: q.reactions?.counts?.['helpful'] || 0,
-              dislike: q.reactions?.counts?.['dislike'] || 0,
-              report: q.reactions?.counts?.['report'] || 0
-            }
-          };
+  loadPosts(reset = false): void {
+    if (reset) {
+      this.page = 0;
+      this.posts = [];
+      this.allLoaded = false;
+    }
+    if (this.allLoaded || this.loadingMore) return;
 
-          const votes = {
-            yes: q.votes?.yes || 0,
-            no: q.votes?.no || 0,
-            total: q.votes?.total || 0
-          };
+    this.loadingMore = true;
 
-          return {
+    this.quejaService
+      .obtenerQuejasPaginadas(this.user?.id || '', this.page, this.pageSize)
+      .subscribe({
+        next: (pageData) => {
+          console.log('📥 Respuesta del backend:', pageData);
+          console.log('📥 Content:', pageData?.content);
+          console.log('📥 Total:', pageData?.totalElements);
+
+          if (!pageData || !pageData.content) {
+            console.warn('⚠️ pageData vacío o sin content');
+            this.loadingMore = false;
+            return;
+          }
+
+          const newPosts = pageData.content.map((q: any) => ({
             ...q,
-            reactions,
-            votes,
+            reactions: {
+              total: q.reactions?.total || 0,
+              userReaction: q.reactions?.userReaction || undefined,
+              counts: {
+                like: q.reactions?.counts?.like || 0,
+                love: q.reactions?.counts?.love || 0,
+                wow: q.reactions?.counts?.wow || 0,
+                helpful: q.reactions?.counts?.helpful || 0,
+                dislike: q.reactions?.counts?.dislike || 0,
+                report: q.reactions?.counts?.report || 0,
+              },
+            },
+            votes: {
+              yes: q.votes?.yes || 0,
+              no: q.votes?.no || 0,
+              total: q.votes?.total || 0,
+            },
             showComments: false,
             showMenu: false,
-            comments: q.comments || [],
-            commentsCount: q.commentsCount || 0
-          };
-        });
-        
-        this.applyFilters();
-        this.loading = false;
-      },
-      error: (err: any) => {
-        console.error('Error cargando quejas:', err);
-        this.loading = false;
-        this.showToastMessage('Error al cargar reportes');
-      }
-    });
+            comments: [],
+            commentsCount: q.commentsCount || 0,
+          }));
+
+          console.log('✅ Posts mapeados:', newPosts.length);
+
+          this.posts = [...this.posts, ...newPosts];
+          this.allLoaded = pageData.last === true || newPosts.length === 0;
+          this.page++;
+          this.loadingMore = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('❌ Error cargando posts:', err);
+          console.error('❌ Error message:', err?.message);
+          console.error('❌ GraphQL errors:', err?.graphQLErrors);
+          console.error('❌ Network error:', err?.networkError);
+          this.loadingMore = false;
+        },
+      });
   }
 
-  refreshPosts(): void {
-    this.showToastMessage('Actualizando...');
-    this.currentPage = 1;
-    this.loadPosts();
-  }
-
-  applyFilters(): void {
-    let filtered = [...this.posts];
-
-    if (this.selectedCategory) {
-      filtered = filtered.filter(p => p.categoria?.id === this.selectedCategory);
-    }
-
-    if (this.selectedStatus) {
-      filtered = filtered.filter(p => p.estado?.id === this.selectedStatus);
-    }
-
-    filtered = this.sortPosts(filtered);
-
-    this.filteredPosts = filtered;
-    this.currentPage = 1;
-  }
-
-  sortPosts(posts: Queja[]): Queja[] {
-    switch (this.sortBy) {
-      case 'recent':
-        return posts.sort((a, b) => 
-          new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime()
-        );
-      case 'popular':
-        return posts.sort((a, b) => 
-          (b.reactions?.total || 0) - (a.reactions?.total || 0)
-        );
-      case 'votes':
-        return posts.sort((a, b) => 
-          this.getTotalVotes(b) - this.getTotalVotes(a)
-        );
-      default:
-        return posts;
-    }
-  }
-
-  onCategoryFilterChange(): void {
-    this.applyFilters();
-  }
-
-  onSortChange(): void {
-    this.applyFilters();
-  }
-
-  clearFilters(): void {
-    this.selectedCategory = '';
-    this.selectedStatus = '';
-    this.sortBy = 'recent';
-    this.applyFilters();
-  }
-
-  closeAllReactionMenus(): void {
+  // ── Reacciones ────────────────────────────────────────────────
+  onReactionMenuToggle(e: { postId: string; event: Event }): void {
+    e.event.stopPropagation();
+    const open = !this.showReactionMenu[e.postId];
     this.showReactionMenu = {};
+    this.showReactionMenu[e.postId] = open;
   }
 
-  toggleReactionMenu(postId: string, event: Event): void {
-    event.stopPropagation();
-    Object.keys(this.showReactionMenu).forEach(key => {
-      if (key !== postId) this.showReactionMenu[key] = false;
-    });
-    this.showReactionMenu[postId] = !this.showReactionMenu[postId];
-  }
-
-  selectReaction(post: Queja, type: string, event: Event): void {
-    event.stopPropagation();
-    this.toggleReaction(post, type);
-    this.showReactionMenu[post.id] = false;
-  }
-
-  toggleReaction(post: Queja, type: string): void {
+  onReactionToggled(e: { post: Queja; type: string }): void {
     if (!this.user?.id) return;
+    const { post, type } = e;
+    const prev = post.reactions.userReaction;
 
-    const previousReactions = { ...post.reactions, counts: { ...post.reactions.counts } };
-    const previousUserReaction = post.reactions.userReaction;
-
-    if (previousUserReaction === type) {
-      const currentCount = post.reactions.counts[type] ?? 0;
-      post.reactions.counts[type] = Math.max(0, currentCount - 1);
+    // Optimistic update
+    if (prev === type) {
+      post.reactions.counts[type] = Math.max(
+        0,
+        (post.reactions.counts[type] ?? 0) - 1,
+      );
       post.reactions.userReaction = undefined;
     } else {
-      if (previousUserReaction) {
-        const prevCount = post.reactions.counts[previousUserReaction] ?? 0;
-        post.reactions.counts[previousUserReaction] = Math.max(0, prevCount - 1);
+      if (prev) {
+        post.reactions.counts[prev] = Math.max(
+          0,
+          (post.reactions.counts[prev] ?? 0) - 1,
+        );
       }
-      const currentCount = post.reactions.counts[type] ?? 0;
-      post.reactions.counts[type] = currentCount + 1;
+      post.reactions.counts[type] = (post.reactions.counts[type] ?? 0) + 1;
       post.reactions.userReaction = type;
     }
-    
-    const total = Object.values(post.reactions.counts)
-      .reduce((sum: number, val) => sum + (val ?? 0), 0);
-    post.reactions.total = total;
+    post.reactions.total = Object.values(post.reactions.counts).reduce(
+      (s: number, v) => s + (v ?? 0),
+      0,
+    );
 
+    // El service espera tipoReaccion como segundo parámetro
     this.reaccionService.toggleReaccion(post.id, type, this.user.id).subscribe({
       next: (updated) => {
         post.reactions = updated;
-        this.applyFilters();
+        this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Error al reaccionar', err);
-        post.reactions = previousReactions;
-      }
+      error: () => {
+        // Revierte optimistic
+        if (prev === type) {
+          post.reactions.counts[type] = (post.reactions.counts[type] ?? 0) + 1;
+          post.reactions.userReaction = prev;
+        } else {
+          post.reactions.counts[type] = Math.max(
+            0,
+            (post.reactions.counts[type] ?? 0) - 1,
+          );
+          if (prev)
+            post.reactions.counts[prev] =
+              (post.reactions.counts[prev] ?? 0) + 1;
+          post.reactions.userReaction = prev;
+        }
+        this.toast('Error al reaccionar');
+      },
     });
   }
 
-  getReactionIcon(type: string): string {
-    const icons: { [key: string]: string } = {
-      'like': '❤️',
-      'love': '😍',
-      'wow': '😮',
-      'helpful': '👍',
-      'dislike': '👎'
-    };
-    return icons[type] || '👍';
-  }
+  onVoted(e: { post: Queja; choice: 'accept' | 'reject' }): void {
+    const { post, choice } = e;
+    if (!post.canVote || !this.user?.id) return;
 
-  getReactionCount(post: Queja, type: string): number {
-    return post.reactions?.counts?.[type] ?? 0;
-  }
-
-  vote(post: Queja, choice: 'accept' | 'reject'): void {
-    if (!this.canVote(post) || !this.user?.id) return;
-
-    const previousVotes = { ...post.votes };
-    const previousCanVote = post.canVote;
-    
-    if (choice === 'accept') {
-      post.votes.yes++;
-    } else {
-      post.votes.no++;
-    }
+    // Optimistic update
+    if (choice === 'accept') post.votes.yes++;
+    else post.votes.no++;
     post.votes.total = post.votes.yes + post.votes.no;
     post.canVote = false;
 
-    this.reaccionService.toggleReaccion(post.id, choice, this.user.id).subscribe({
-      next: () => {
-        this.quejaService.obtenerQuejaPorId(post.id, this.user!.id!).subscribe({
-          next: (updated) => {
-            const index = this.posts.findIndex(p => p.id === post.id);
-            if (index !== -1) {
-              this.posts[index] = { ...updated, showComments: post.showComments };
-              this.applyFilters();
-            }
-            this.showToastMessage('Voto registrado');
-          }
-        });
+    // USA votarQueja — NO toggleReaccion
+    const voto = choice === 'accept' ? 'SI' : 'NO';
+    this.quejaService.votarQueja(post.id, this.user.id, voto).subscribe({
+      next: (updated) => {
+        post.votes = updated.votes;
+        post.canVote = updated.canVote;
+        post.userVote = updated.userVote;
+        if (updated.estado) post.estado = updated.estado;
+        this.toast('Voto registrado');
+        this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Error al votar', err);
-        post.votes = previousVotes;
-        post.canVote = previousCanVote;
-        this.showToastMessage('Error al votar');
-      }
+      error: () => {
+        // Revierte optimistic
+        if (choice === 'accept') post.votes.yes--;
+        else post.votes.no--;
+        post.votes.total = post.votes.yes + post.votes.no;
+        post.canVote = true;
+        this.toast('Error al votar');
+      },
     });
   }
 
-  toggleComments(post: Queja): void {
+  onCommentsToggled(post: Queja): void {
     post.showComments = !post.showComments;
+
+    if (post.showComments && post.comments.length === 0) {
+      // Siempre recarga — el paginado no trae comments
+      this.quejaService
+        .obtenerQuejaPorId(post.id, this.user?.id || '')
+        .subscribe({
+          next: (u) => {
+            const found = this.posts.find((p) => p.id === post.id);
+            if (found) {
+              found.comments = u.comments || [];
+              found.commentsCount = u.commentsCount || found.comments.length;
+            }
+            this.cdr.detectChanges();
+          },
+          error: () => this.toast('Error al cargar comentarios'),
+        });
+    }
   }
 
-  addComment(post: Queja, text: string): void {
-    if (!text?.trim() || !this.user?.id) return;
+  onCommentAdded(e: { post: Queja; text: string }): void {
+    if (!e.text?.trim() || !this.user?.id) return;
 
-    const tempComment = {
-      id: 'temp-' + Date.now(),
-      queja_id: post.id,
-      texto: text.trim(),
-      author: {
-        id: this.user.id,
-        nombre: this.user.name.split(' ')[0] || 'Usuario',
-        apellido: this.user.name.split(' ')[1] || '',
-        foto_perfil: this.user.avatarUrl
-      },
-      fecha_creacion: new Date().toISOString()
-    };
-
-    post.comments.push(tempComment as any);
-    post.commentsCount = post.comments.length;
-    this.commentTexts[post.id] = '';
-
-    this.comentarioService.agregarComentario(post.id, this.user.id, text.trim()).subscribe({
-      next: (newComment) => {
-        const commentIndex = post.comments.findIndex(c => c.id === tempComment.id);
-        if (commentIndex !== -1) {
-          post.comments[commentIndex] = newComment;
-        }
-        this.showToastMessage('Comentario agregado');
-      },
-      error: (err: any) => {
-        console.error('Error al comentar', err);
-        post.comments = post.comments.filter(c => c.id !== tempComment.id);
-        post.commentsCount = post.comments.length;
-        this.showToastMessage('Error al agregar comentario');
-      }
-    });
+    this.comentarioService
+      .agregarComentario(e.post.id, this.user.id, e.text.trim())
+      .subscribe({
+        next: (c) => {
+          // Busca el post en el array original (no la referencia del evento)
+          const post = this.posts.find((p) => p.id === e.post.id);
+          if (post) {
+            post.comments = [...post.comments, c];
+            post.commentsCount = post.comments.length;
+          }
+          this.toast('Comentario agregado');
+          this.cdr.detectChanges();
+        },
+        error: () => this.toast('Error al comentar'),
+      });
   }
 
-  startEditComment(comment: any): void {
+  onCommentTextChange(postId: string, text: string): void {
+    this.commentTexts[postId] = text;
+  }
+
+  onCommentMenuToggle(e: { commentId: string }): void {
+    this.showCommentMenuModal[e.commentId] =
+      !this.showCommentMenuModal[e.commentId];
+  }
+
+  onStartEditComment(comment: any): void {
     this.editingCommentId = comment.id;
     this.editingCommentText = comment.texto;
   }
 
-  saveEditComment(post: Queja): void {
-    if (!this.editingCommentId || !this.editingCommentText.trim() || !this.user?.id) return;
-
-    const commentIndex = post.comments.findIndex(c => c.id === this.editingCommentId);
-    if (commentIndex !== -1) {
-      const previousText = post.comments[commentIndex].texto;
-      
-      post.comments[commentIndex] = {
-        ...post.comments[commentIndex],
-        texto: this.editingCommentText.trim()
-      };
-      
-      this.comentarioService.actualizarComentario(
+  onSaveEditComment(e: { post: Queja }): void {
+    if (!this.editingCommentId || !this.user?.id) return;
+    this.comentarioService
+      .actualizarComentario(
         this.editingCommentId,
         this.user.id,
-        this.editingCommentText.trim()
-      ).subscribe({
+        this.editingCommentText.trim(),
+      )
+      .subscribe({
         next: () => {
-          this.showToastMessage('Comentario actualizado');
-          this.cancelEditComment();
+          const c = e.post.comments.find((x) => x.id === this.editingCommentId);
+          if (c) c.texto = this.editingCommentText.trim();
+          this.editingCommentId = null;
+          this.toast('Comentario actualizado');
         },
-        error: (err: any) => {
-          console.error('Error al actualizar comentario', err);
-          post.comments[commentIndex] = {
-            ...post.comments[commentIndex],
-            texto: previousText
-          };
-          this.showToastMessage('Error al actualizar comentario');
-          this.cancelEditComment();
-        }
       });
-    }
   }
 
-  cancelEditComment(): void {
-    this.editingCommentId = null;
-    this.editingCommentText = '';
-  }
-
-  deleteComment(post: Queja, commentId: string): void {
+  onDeleteComment(e: { post: Queja; commentId: string }): void {
     if (!this.user?.id || !confirm('¿Eliminar este comentario?')) return;
+    this.comentarioService
+      .eliminarComentario(e.commentId, this.user.id)
+      .subscribe({
+        next: () => {
+          e.post.comments = e.post.comments.filter((c) => c.id !== e.commentId);
+          e.post.commentsCount = e.post.comments.length;
+          this.toast('Comentario eliminado');
+        },
+      });
+  }
 
-    this.comentarioService.eliminarComentario(commentId, this.user.id).subscribe({
+  // ── Posts CRUD ────────────────────────────────────────────────
+  onEditPost(post: Queja): void {
+    this.editingQueja = { ...post };
+    this.showEditModal = true;
+  }
+  onDeletePost(post: Queja): void {
+    if (!confirm('¿Eliminar este reporte?') || !this.user?.id) return;
+    this.quejaService.eliminarQueja(post.id, this.user.id).subscribe({
       next: () => {
-        post.comments = post.comments.filter(c => c.id !== commentId);
-        post.commentsCount = post.comments.length;
-        this.showToastMessage('Comentario eliminado');
+        this.posts = this.posts.filter((p) => p.id !== post.id);
+        this.toast('Reporte eliminado');
       },
-      error: (err: any) => {
-        console.error('Error al eliminar comentario', err);
-        this.showToastMessage('Error al eliminar comentario');
-      }
     });
   }
 
-  canEditComment(comment: any): boolean {
-    return comment.author?.id === this.user?.id;
+  onBookmark(post: Queja): void {
+    (post as any).meta = (post as any).meta || {};
+    (post as any).meta.saved = !(post as any).meta.saved;
+    this.toast(
+      (post as any).meta.saved ? 'Guardado' : 'Eliminado de guardados',
+    );
   }
 
-  getCommentsCount(post: Queja): number {
-    return post.commentsCount || (post.comments || []).length;
+  onShare(post: Queja): void {
+    const url = `${location.origin}/quejas/${post.id}`;
+    navigator.clipboard.writeText(url).then(() => this.toast('Enlace copiado'));
   }
 
-  getPreviewComments(post: Queja): any[] {
-    return (post.comments || []).slice(0, 3);
+  onProfileClicked(usuario: Usuario): void {
+    if (!usuario?.id) return;
+    usuario.id === this.user?.id
+      ? this.router.navigate(['/public/profile'])
+      : this.router.navigate(['/public/user-profile', usuario.id]);
   }
 
-  hasMoreComments(post: Queja): boolean {
-    return (post.comments || []).length > 3;
+  // ── Historial ─────────────────────────────────────────────────
+  onOpenHistorial(queja: Queja): void {
+    this.selectedQuejaHistorial = queja;
+    this.showHistorialModal = true;
+    this.loadingHistorial = true;
+    this.historialService.obtenerHistorialPorQueja(queja.id).subscribe({
+      next: (e) => {
+        this.historialEventos = this.historialService.ordenarPorFecha(e, false);
+        this.loadingHistorial = false;
+      },
+      error: () => {
+        this.loadingHistorial = false;
+      },
+    });
   }
 
-  openCommentsModal(reporte: Queja): void {
-    this.selectedReporteForComments = JSON.parse(JSON.stringify(reporte));
+  closeHistorial(): void {
+    this.showHistorialModal = false;
+    this.selectedQuejaHistorial = null;
+    this.historialEventos = [];
+  }
+
+  // ── Modal comentarios ─────────────────────────────────────────
+  openCommentsModal(post: Queja): void {
+    this.selectedReporteForComments = JSON.parse(JSON.stringify(post));
     this.showCommentsModal = true;
   }
 
@@ -472,734 +450,22 @@ export class FeedComponent implements OnInit {
     this.showCommentsModal = false;
     this.selectedReporteForComments = null;
     this.newCommentText = '';
-    this.editingCommentId = null;
-    this.editingCommentText = '';
   }
 
-  addCommentModal(): void {
-    if (!this.newCommentText.trim() || !this.selectedReporteForComments || !this.user?.id) return;
-
-    const tempComment = {
-      id: 'temp-' + Date.now(),
-      queja_id: this.selectedReporteForComments.id,
-      texto: this.newCommentText.trim(),
-      author: {
-        id: this.user.id,
-        nombre: this.user.name.split(' ')[0] || 'Usuario',
-        apellido: this.user.name.split(' ')[1] || '',
-        foto_perfil: this.user.avatarUrl
-      },
-      fecha_creacion: new Date().toISOString()
-    };
-
-    if (!Array.isArray(this.selectedReporteForComments.comments)) {
-      this.selectedReporteForComments.comments = [];
-    }
-
-    this.selectedReporteForComments.comments = [...this.selectedReporteForComments.comments, tempComment as any];
-    this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
-
-    const quejaIndex = this.posts.findIndex(q => q.id === this.selectedReporteForComments!.id);
-    if (quejaIndex !== -1) {
-      this.posts[quejaIndex] = {
-        ...this.posts[quejaIndex],
-        comments: [...this.selectedReporteForComments.comments],
-        commentsCount: this.selectedReporteForComments.commentsCount
-      };
-      this.applyFilters();
-    }
-
-    const commentText = this.newCommentText.trim();
-    this.newCommentText = '';
-
-    this.comentarioService.agregarComentario(
-      this.selectedReporteForComments.id, 
-      this.user.id, 
-      commentText
-    ).subscribe({
-      next: (newComment) => {
-        if (this.selectedReporteForComments) {
-          const commentIndex = this.selectedReporteForComments.comments.findIndex(c => c.id === tempComment.id);
-          if (commentIndex !== -1) {
-            this.selectedReporteForComments.comments = [
-              ...this.selectedReporteForComments.comments.slice(0, commentIndex),
-              newComment,
-              ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
-            ];
-          }
-        }
-        this.showToastMessage('Comentario agregado');
-      },
-      error: (err: any) => {
-        console.error('Error al comentar', err);
-        if (this.selectedReporteForComments) {
-          this.selectedReporteForComments.comments = this.selectedReporteForComments.comments.filter(c => c.id !== tempComment.id);
-          this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
-        }
-        this.showToastMessage('Error al agregar comentario');
-      }
-    });
-  }
-
-  saveEditCommentModal(): void {
-    if (!this.editingCommentId || !this.editingCommentText.trim() || !this.selectedReporteForComments || !this.user?.id) return;
-
-    const commentIndex = this.selectedReporteForComments.comments.findIndex(c => c.id === this.editingCommentId);
-    if (commentIndex !== -1) {
-      const previousText = this.selectedReporteForComments.comments[commentIndex].texto;
-
-      this.selectedReporteForComments.comments = [
-        ...this.selectedReporteForComments.comments.slice(0, commentIndex),
-        {
-          ...this.selectedReporteForComments.comments[commentIndex],
-          texto: this.editingCommentText.trim(),
-          fecha_modificacion: new Date().toISOString()
-        } as any,
-        ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
-      ];
-
-      const postIndex = this.posts.findIndex(p => p.id === this.selectedReporteForComments!.id);
-      if (postIndex !== -1) {
-        this.posts[postIndex] = {
-          ...this.posts[postIndex],
-          comments: [...this.selectedReporteForComments.comments]
-        };
-        this.applyFilters();
-      }
-
-      this.comentarioService.actualizarComentario(
-        this.editingCommentId,
-        this.user.id,
-        this.editingCommentText.trim()
-      ).subscribe({
-        next: () => {
-          this.showToastMessage('Comentario actualizado');
-          this.cancelEditComment();
-        },
-        error: (err: any) => {
-          console.error('Error al actualizar comentario', err);
-          if (this.selectedReporteForComments) {
-            this.selectedReporteForComments.comments = [
-              ...this.selectedReporteForComments.comments.slice(0, commentIndex),
-              {
-                ...this.selectedReporteForComments.comments[commentIndex],
-                texto: previousText
-              },
-              ...this.selectedReporteForComments.comments.slice(commentIndex + 1)
-            ];
-          }
-          this.showToastMessage('Error al actualizar comentario');
-        }
-      });
-    }
-  }
-
-  deleteCommentModal(comment: any): void {
-    if (!this.user?.id || !this.selectedReporteForComments || !confirm('¿Eliminar este comentario?')) return;
-
-    this.comentarioService.eliminarComentario(comment.id, this.user.id).subscribe({
-      next: () => {
-        if (this.selectedReporteForComments) {
-          this.selectedReporteForComments.comments = this.selectedReporteForComments.comments.filter(c => c.id !== comment.id);
-          this.selectedReporteForComments.commentsCount = this.selectedReporteForComments.comments.length;
-
-          const postIndex = this.posts.findIndex(p => p.id === this.selectedReporteForComments!.id);
-          if (postIndex !== -1) {
-            this.posts[postIndex] = {
-              ...this.posts[postIndex],
-              comments: [...this.selectedReporteForComments.comments],
-              commentsCount: this.selectedReporteForComments.commentsCount
-            };
-            this.applyFilters();
-          }
-        }
-        this.showToastMessage('Comentario eliminado');
-      },
-      error: (err: any) => {
-        console.error('Error al eliminar comentario', err);
-        this.showToastMessage('Error al eliminar comentario');
-      }
-    });
-  }
-
-  canEditQueja(post: Queja): boolean {
-    return post.usuario?.id === this.user?.id;
-  }
-
-  openEditQueja(post: Queja): void {
-    this.editingQueja = { ...post };
-    this.showEditModal = true;
-  }
-
-  closeEditModal(): void {
-    this.showEditModal = false;
-    this.editingQueja = null;
-  }
-
-  saveEditQueja(): void {
-    if (!this.editingQueja || !this.user?.id) return;
-
-    this.loading = true;
-
-    this.quejaService.actualizarQueja(
-      this.editingQueja.id,
-      this.editingQueja.titulo,
-      this.editingQueja.descripcion,
-      this.editingQueja.categoria?.id,
-      this.editingQueja.estado?.id,
-      this.editingQueja.ubicacion,
-      this.user.id
-    ).subscribe({
-      next: (updated) => {
-        const index = this.posts.findIndex(p => p.id === updated.id);
-        if (index !== -1) {
-          this.posts[index] = { ...updated, showComments: this.posts[index].showComments };
-          this.applyFilters();
-        }
-        this.closeEditModal();
-        this.loading = false;
-        this.showToastMessage('Reporte actualizado');
-      },
-      error: (err) => {
-        console.error('Error al actualizar queja', err);
-        this.loading = false;
-        this.showToastMessage('Error al actualizar reporte');
-      }
-    });
-  }
-
-  deleteQueja(post: Queja): void {
-    if (!this.user?.id || !confirm('¿Eliminar este reporte permanentemente?')) return;
-
-    this.loading = true;
-
-    this.quejaService.eliminarQueja(post.id, this.user.id).subscribe({
-      next: () => {
-        this.posts = this.posts.filter(p => p.id !== post.id);
-        this.applyFilters();
-        this.loading = false;
-        this.showToastMessage('Reporte eliminado');
-      },
-      error: (err) => {
-        console.error('Error al eliminar queja', err);
-        this.loading = false;
-        this.showToastMessage('Error al eliminar reporte');
-      }
-    });
-  }
-
-  openCreateReport(): void {
-    this.showCreateModal = true;
-    this.resetQuejaForm();
-  }
-
-  openCreateReportWithMedia(): void {
-    this.showCreateModal = true;
-    this.resetQuejaForm();
-    setTimeout(() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click(), 100);
-  }
-
-  openCreateReportWithLocation(): void {
-    this.showCreateModal = true;
-    this.resetQuejaForm();
-    setTimeout(() => document.getElementById('ubicacion')?.focus(), 100);
-  }
-
-  closeCreateModal(): void {
+  // ── Crear reporte ─────────────────────────────────────────────
+  onReportCreated(): void {
     this.showCreateModal = false;
-    this.resetQuejaForm();
+    this.loadPosts(true);
+    this.toast('¡Reporte publicado!');
   }
 
-  resetQuejaForm(): void {
-    this.newQueja = {
-      titulo: '',
-      descripcion: '',
-      categoriaId: '',
-      ubicacion: '',
-      imagenFile: null,
-      imagenPreview: null
-    };
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      
-      if (file.size > 5 * 1024 * 1024) {
-        this.showToastMessage('La imagen no debe superar 5MB');
-        return;
-      }
-
-      if (!file.type.startsWith('image/')) {
-        this.showToastMessage('Solo se permiten imágenes');
-        return;
-      }
-
-      this.newQueja.imagenFile = file;
-
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.newQueja.imagenPreview = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  removeImage(event: Event): void {
-    event.stopPropagation();
-    this.newQueja.imagenFile = null;
-    this.newQueja.imagenPreview = null;
-  }
-
-  isFormValid(): boolean {
-    return !!(
-      this.newQueja.titulo.trim() &&
-      this.newQueja.descripcion.trim() &&
-      this.newQueja.categoriaId
-    );
-  }
-
-  submitQueja(): void {
-    if (!this.isFormValid() || !this.user?.id) {
-      this.showToastMessage('Por favor completa todos los campos requeridos');
-      return;
-    }
-
-    this.loading = true;
-
-    this.quejaService.crearQueja(
-      this.newQueja.titulo,
-      this.newQueja.descripcion,
-      this.newQueja.categoriaId,
-      this.user.id,
-      this.newQueja.ubicacion || undefined,
-      this.newQueja.imagenFile || undefined
-    ).subscribe({
-      next: (nuevaQueja) => {
-        this.loadPosts();
-        this.closeCreateModal();
-        this.loading = false;
-        this.showToastMessage('¡Reporte publicado exitosamente!');
-      },
-      error: (err) => {
-        console.error('Error al crear queja', err);
-        this.loading = false;
-        this.showToastMessage('Error al publicar el reporte');
-      }
-    });
-  }
-
-  toggleBookmark(post: Queja): void {
-    (post as any).meta = (post as any).meta || {};
-    (post as any).meta.saved = !((post as any).meta.saved);
-    this.showToastMessage((post as any).meta.saved ? 'Guardado' : 'Eliminado de guardados');
-  }
-
-  sharePost(post: Queja): void {
-    const url = `${location.origin}/quejas/${post.id}`;
-    if (navigator.share) {
-      navigator.share({ 
-        title: post.titulo, 
-        text: post.descripcion, 
-        url 
-      }).catch(console.error);
-    } else {
-      navigator.clipboard.writeText(url).then(() => {
-        this.showToastMessage('Enlace copiado al portapapeles');
-      }).catch(() => this.showToastMessage('No se pudo compartir'));
-    }
-  }
-
-  downloadPostJson(post: Queja): void {
-    const data = JSON.stringify(post, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `queja-${post.id}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    this.showToastMessage('JSON descargado');
-  }
-
-  getPaginatedPosts(): Queja[] {
-    const posts = this.displayedPosts;
-    this.totalReports = posts.length;
-    const startIndex = (this.currentPage - 1) * this.reportsPerPage;
-    const endIndex = startIndex + this.reportsPerPage;
-    return posts.slice(startIndex, endIndex);
-  }
-
-  getTotalPages(): number {
-    return Math.ceil(this.totalReports / this.reportsPerPage);
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.getTotalPages()) {
-      this.currentPage = page;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.getTotalPages()) {
-      this.currentPage++;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  prevPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  getPageNumbers(): number[] {
-    const totalPages = this.getTotalPages();
-    const pages: number[] = [];
-    
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(totalPages);
-      } else if (this.currentPage >= totalPages - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(totalPages);
-      }
-    }
-    
-    return pages;
-  }
-
-  verPerfilUsuario(usuario: Usuario): void {
-    if (!usuario?.id) return;
-    
-    if (usuario.id === this.user?.id) {
-      this.router.navigate(['/public/profile']);
-    } else {
-      this.router.navigate(['/public/user-profile', usuario.id]);
-    }
-  }
-
-  openHistorialModal(queja: Queja): void {
-    this.selectedQuejaHistorial = queja;
-    this.showHistorialModal = true;
-    this.loadingHistorial = true;
-    
-    this.historialService.obtenerHistorialPorQueja(queja.id).subscribe({
-      next: (eventos) => {
-        this.historialEventos = this.historialService.ordenarPorFecha(eventos, false);
-        this.loadingHistorial = false;
-      },
-      error: (err) => {
-        console.error('Error cargando historial:', err);
-        this.loadingHistorial = false;
-        this.showToastMessage('Error al cargar historial');
-      }
-    });
-  }
-
-  closeHistorialModal(): void {
-    this.showHistorialModal = false;
-    this.selectedQuejaHistorial = null;
-    this.historialEventos = [];
-  }
-
-  getEventoIcono(tipo: string): string {
-    return this.historialService.obtenerIconoPorTipo(tipo);
-  }
-
-  getEventoTexto(tipo: string): string {
-    return this.historialService.obtenerTextoTipo(tipo);
-  }
-
-  getEventoColor(tipo: string): string {
-    return this.historialService.obtenerColorPorTipo(tipo);
-  }
-
-  formatearFechaEvento(fecha: string): string {
-    return this.historialService.formatearFechaRelativa(fecha);
-  }
-
-  hasHistorial(post: Queja): boolean {
-    return post.fecha_clasificacion != null || post.nivel_riesgo != null;
-  }
-
-  hasRiesgo(post: Queja): boolean {
-    return !!post.nivel_riesgo;
-  }
-
-  getNivelRiesgo(post: Queja): string {
-    return post.nivel_riesgo || '';
-  }
-
-  getRiesgoBadgeClass(nivel: string): string {
-    switch (nivel?.toUpperCase()) {
-      case 'BAJO':
-        return 'badge bg-success';
-      case 'MEDIO':
-        return 'badge bg-warning';
-      case 'ALTO':
-        return 'badge bg-orange';
-      case 'CRITICO':
-        return 'badge bg-danger';
-      default:
-        return 'badge bg-secondary';
-    }
-  }
-
-  getRiesgoTexto(nivel: string): string {
-    switch (nivel?.toUpperCase()) {
-      case 'BAJO':
-        return 'Riesgo Bajo';
-      case 'MEDIO':
-        return 'Riesgo Medio';
-      case 'ALTO':
-        return 'Riesgo Alto';
-      case 'CRITICO':
-        return '⚠️ Crítico';
-      default:
-        return nivel;
-    }
-  }
-
-  getRiesgoIcon(nivel: string): string {
-    switch (nivel?.toUpperCase()) {
-      case 'BAJO':
-        return '🟢';
-      case 'MEDIO':
-        return '🟡';
-      case 'ALTO':
-        return '🟠';
-      case 'CRITICO':
-        return '🔴';
-      default:
-        return '⚪';
-    }
-  }
-
-  getEstadoTexto(post: Queja): string {
-    return post.estado?.nombre || 'Sin estado';
-  }
-
-  getEstadoClave(post: Queja): string {
-    return post.estado?.clave || '';
-  }
-
-  getEstadoBadgeClass(clave: string): string {
-    switch (clave?.toLowerCase()) {
-      case 'nulo':
-        return 'badge bg-secondary';
-      case 'votacion':
-        return 'badge bg-primary';
-      case 'pendiente':
-        return 'badge bg-warning';
-      case 'aprobada':
-        return 'badge bg-success';
-      case 'asignada':
-        return 'badge bg-info';
-      case 'clasificada':
-        return 'badge bg-purple';
-      case 'en_proceso':
-        return 'badge bg-info';
-      case 'observado':
-        return 'badge bg-warning';
-      case 'resuelto':
-        return 'badge bg-success';
-      case 'cancelado':
-        return 'badge bg-danger';
-      default:
-        return 'badge bg-secondary';
-    }
-  }
-
-  isQuejaResuelta(post: Queja): boolean {
-    return post.estado?.clave === 'resuelto';
-  }
-
-  isQuejaEnProceso(post: Queja): boolean {
-    return post.estado?.clave === 'en_proceso' || post.estado?.clave === 'asignada';
-  }
-
-  isQuejaPendiente(post: Queja): boolean {
-    return post.estado?.clave === 'pendiente' || post.estado?.clave === 'aprobada';
-  }
-
-  isQuejaAsignada(post: Queja): boolean {
-    return post.estado?.clave === 'asignada' || post.estado?.clave === 'en_proceso';
-  }
-
-  isQuejaEnVotacion(post: Queja): boolean {
-    return post.estado?.clave === 'votacion';
-  }
-
-  getFechaClasificacion(post: Queja): string {
-    if (!post.fecha_clasificacion) return '';
-    return this.formatDate(post.fecha_clasificacion);
-  }
-
-  hasClasificacion(post: Queja): boolean {
-    return !!post.nivel_riesgo && !!post.fecha_clasificacion;
-  }
-
-  getVotingProgress(post: Queja): number {
-    const total = post.votes.total;
-    const minVotes = 5;
-    return Math.min((total / minVotes) * 100, 100);
-  }
-
-  needsMoreVotes(post: Queja): boolean {
-    return post.votes.total < 5 && this.isQuejaEnVotacion(post);
-  }
-
-  getVotesNeeded(post: Queja): number {
-    return Math.max(5 - post.votes.total, 0);
-  }
-
-  getAvatarUrl(post: Queja): string {
-    return post.usuario?.foto_perfil || 'assets/img/default-avatar.png';
-  }
-
-  getAuthorName(post: Queja): string {
-    return `${post.usuario.nombre} ${post.usuario.apellido}`.trim() || 'Usuario';
-  }
-
-  getPostDate(post: Queja): string {
-    return this.formatDate(post.fecha_creacion);
-  }
-
-  getLocation(post: Queja): string {
-    return post.ubicacion || '';
-  }
-
-  hasLocation(post: Queja): boolean {
-    return !!post.ubicacion;
-  }
-
-  getTitle(post: Queja): string {
-    return post.titulo;
-  }
-
-  getDescription(post: Queja): string {
-    return post.descripcion;
-  }
-
-  getCategoryName(post: Queja): string {
-    return post.categoria?.nombre || 'Sin categoría';
-  }
-
-  hasEvidence(post: Queja): boolean {
-    return post.evidence && post.evidence.length > 0;
-  }
-
-  getFirstEvidenceUrl(post: Queja): string {
-    return post.evidence?.[0]?.url || post.imagen_url || '';
-  }
-
-  hasVotes(post: Queja): boolean {
-    return !!post.votes;
-  }
-
-  getYesVotes(post: Queja): number {
-    return post.votes?.yes || 0;
-  }
-
-  getNoVotes(post: Queja): number {
-    return post.votes?.no || 0;
-  }
-
-  getTotalVotes(post: Queja): number {
-    return (post.votes?.yes || 0) + (post.votes?.no || 0);
-  }
-
-  canVote(post: Queja): boolean {
-    return post.canVote && !post.userVote && this.isQuejaEnVotacion(post);
-  }
-
-  getLikeEmoji(post: Queja): string {
-    return post.reactions?.userReaction === 'like' ? '❤️' : '🤍';
-  }
-
-  getBookmarkEmoji(post: Queja): string {
-    return (post as any).meta?.saved ? '🔖' : '📑';
-  }
-
-  getShowComments(post: Queja): boolean {
-    return !!post.showComments;
-  }
-
-  getCommentAuthor(comment: any): string {
-    return `${comment.author?.nombre || ''} ${comment.author?.apellido || ''}`.trim() || 'Usuario';
-  }
-
-  getCommentText(comment: any): string {
-    return comment.texto || '';
-  }
-
-  formatDate(dateString: string): string {
-    if (!dateString) return '';
-    const now = new Date();
-    const postDate = new Date(dateString);
-    const diffInHours = Math.floor((now.getTime() - postDate.getTime()) / (1000 * 60 * 60));
-    if (diffInHours < 1) return 'hace unos minutos';
-    if (diffInHours < 24) return `hace ${diffInHours} horas`;
-    if (diffInHours < 48) return 'hace 1 día';
-    return `hace ${Math.floor(diffInHours / 24)} días`;
-  }
-
-  formatCommentDate(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) return 'justo ahora';
-    if (diffInSeconds < 3600) return `hace ${Math.floor(diffInSeconds / 60)} min`;
-    if (diffInSeconds < 86400) return `hace ${Math.floor(diffInSeconds / 3600)}h`;
-    if (diffInSeconds < 172800) return 'hace 1 día';
-    if (diffInSeconds < 604800) return `hace ${Math.floor(diffInSeconds / 86400)} días`;
-    
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-  }
-
-  trackByPostId(index: number, post: Queja): string {
+  // ── Utils ─────────────────────────────────────────────────────
+  trackByPostId(_: number, post: Queja): string {
     return post.id;
   }
-
-  trackByComment(index: number, comment: any): string {
-    return comment.id;
-  }
-
-  get displayedPosts(): Queja[] {
-    return this.selectedCategory || this.selectedStatus 
-      ? this.filteredPosts 
-      : this.posts;
-  }
-
-  getBookmarkText(post: Queja): string {
-    return (post as any).meta?.saved ? 'Quitar de guardados' : 'Guardar';
-  }
-
-  showToastMessage(message: string): void {
-    this.toastMessage = message;
+  toast(msg: string): void {
+    this.toastMessage = msg;
     this.showToast = true;
-    setTimeout(() => {
-      this.showToast = false;
-    }, 3000);
+    setTimeout(() => (this.showToast = false), 3000);
   }
 }

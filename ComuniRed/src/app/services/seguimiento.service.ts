@@ -165,7 +165,7 @@ export class SeguimientoService {
       query: USUARIOS_SUGERIDOS,
       variables: { usuarioId, page, size },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.usuariosSugeridos || {
         content: [],
         totalElements: 0,
@@ -181,7 +181,7 @@ export class SeguimientoService {
       query: BUSCAR_USUARIOS,
       variables: { termino, page, size },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.buscarUsuarios || {
         content: [],
         totalElements: 0,
@@ -198,7 +198,7 @@ export class SeguimientoService {
       query: ESTADO_SEGUIMIENTO,
       variables: { usuarioActualId, otroUsuarioId },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.estadoSeguimiento || {
         estaSiguiendo: false,
         teSigue: false,
@@ -215,7 +215,7 @@ export class SeguimientoService {
       query: SEGUIDORES_DE,
       variables: { usuarioId, page, size },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.seguidoresDe || {
         content: [],
         totalElements: 0,
@@ -231,7 +231,7 @@ export class SeguimientoService {
       query: SEGUIDOS_POR,
       variables: { usuarioId, page, size },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.seguidosPor || {
         content: [],
         totalElements: 0,
@@ -247,7 +247,7 @@ export class SeguimientoService {
       query: SOLICITUDES_PENDIENTES,
       variables: { usuarioId, page, size },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.solicitudesPendientes || {
         content: [],
         totalElements: 0,
@@ -263,7 +263,7 @@ export class SeguimientoService {
       query: SOLICITUDES_ENVIADAS,
       variables: { usuarioId, page, size },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.solicitudesEnviadas || {
         content: [],
         totalElements: 0,
@@ -279,7 +279,7 @@ export class SeguimientoService {
       query: CONTAR_SEGUIDORES,
       variables: { usuarioId },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.contarSeguidores || 0)
     );
   }
@@ -289,7 +289,7 @@ export class SeguimientoService {
       query: CONTAR_SEGUIDOS,
       variables: { usuarioId },
       fetchPolicy: 'network-only'
-    }).valueChanges.pipe(
+    }).valueChanges.pipe(map((r: any) => r), 
       map(result => result.data?.contarSeguidos || 0)
     );
   }

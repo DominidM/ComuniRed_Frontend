@@ -140,7 +140,7 @@ export class AsignacionService {
         variables: { soporteId },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => {
           console.log('📥 Asignaciones del soporte:', result.data.asignacionesPorSoporte);
           return result.data.asignacionesPorSoporte;
@@ -154,7 +154,7 @@ export class AsignacionService {
         query: GET_ASIGNACIONES_ACTIVAS,
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => {
           console.log('📥 Asignaciones activas:', result.data.asignacionesActivas);
           return result.data.asignacionesActivas;
@@ -169,7 +169,7 @@ export class AsignacionService {
         variables: { id },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => {
           console.log('📥 Asignación recibida:', result.data.asignacionPorId);
           return result.data.asignacionPorId;

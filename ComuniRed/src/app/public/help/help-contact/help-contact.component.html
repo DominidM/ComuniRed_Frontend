@@ -1,0 +1,65 @@
+<div class="contact-wrapper">
+  <div class="contact-header">
+    <h2>¿No encontraste lo que buscabas?</h2>
+    <p>Envía un mensaje al área de soporte y te responderemos a la brevedad.</p>
+  </div>
+
+  <form [formGroup]="contactForm" (ngSubmit)="submit()" class="contact-form">
+    <div class="form-group">
+      <label>Correo Electrónico *</label>
+      <input type="email" formControlName="correo" placeholder="tu@email.com" />
+      <span class="error" *ngIf="contactForm.get('correo')?.invalid && contactForm.get('correo')?.touched">
+        Ingresa un correo válido
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label>Asunto *</label>
+      <input type="text" formControlName="asunto" placeholder="Describe brevemente tu problema" />
+      <span class="error" *ngIf="contactForm.get('asunto')?.invalid && contactForm.get('asunto')?.touched">
+        El asunto es obligatorio
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label>Mensaje *</label>
+      <textarea formControlName="mensaje" rows="5" placeholder="Describe tu problema con detalle..."></textarea>
+      <span class="error" *ngIf="contactForm.get('mensaje')?.invalid && contactForm.get('mensaje')?.touched">
+        El mensaje debe tener al menos 10 caracteres
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label>Fotos de evidencia</label>
+      <label class="file-upload-label" [class.disabled]="enviando">
+        <span class="material-icons">upload</span>
+        Seleccionar imágenes
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          (change)="onFilesSelected($event)"
+          [disabled]="enviando"
+          style="display: none;"
+        />
+      </label>
+      <p class="photo-info">JPG, PNG o GIF. Máx. 5MB por imagen</p>
+
+      <div class="previews" *ngIf="previews.length > 0">
+        <div class="preview-item" *ngFor="let preview of previews; let i = index">
+          <img [src]="preview" alt="evidencia" />
+          <button type="button" class="remove-preview" (click)="removeFile(i)">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-save" [disabled]="contactForm.invalid || enviando">
+        <span *ngIf="!enviando">Enviar Mensaje</span>
+        <span *ngIf="enviando" class="loading-text">
+          <span class="spinner-small"></span> Enviando...
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,85 @@
+<nav class="cr-navbar">
+  <div class="navbar-inner">
+
+    <div class="navbar-left">
+      <button class="menu-toggle-btn" (click)="onMenuToggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <a class="cr-logo" (click)="goHome()" style="cursor:pointer;">
+        <img [src]="logoUrl" alt="ComuniRed" class="cr-logo__img" />
+        <span class="cr-logo__text">ComuniReD</span>
+      </a>
+    </div>
+
+    <div class="navbar-center">
+      <div class="cr-search" [class.has-results]="showSearchResults">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          placeholder="Buscar reportes o personas..."
+          [value]="query"
+          (input)="onQueryChange($event)"
+          (keyup.escape)="closeSearch()"
+          autocomplete="off"
+        />
+        <mat-icon class="search-spinner" *ngIf="searching">autorenew</mat-icon>
+      </div>
+
+      <div class="search-dropdown" *ngIf="showSearchResults && searchResults.length > 0">
+        <div
+          class="search-item"
+          *ngFor="let result of searchResults; trackBy: trackByResult"
+          (click)="selectResult(result)"
+        >
+          <div class="search-item-icon">
+            <img
+              *ngIf="result.type === 'persona' && result.foto_perfil"
+              [src]="result.foto_perfil"
+              class="search-avatar"
+              alt="avatar"
+            />
+            <mat-icon *ngIf="result.type === 'reporte'">report_problem</mat-icon>
+            <mat-icon *ngIf="result.type === 'persona' && !result.foto_perfil">person</mat-icon>
+          </div>
+          <div class="search-item-info">
+            <span class="search-item-title">{{ getResultTitle(result) }}</span>
+            <span class="search-item-sub">{{ getResultSubtitle(result) }}</span>
+          </div>
+          <span class="search-item-date" *ngIf="result.fecha">
+            {{ formatDate(result.fecha) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="search-dropdown search-empty" *ngIf="showSearchResults && !searching && searchResults.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <span>Sin resultados para "{{ query }}"</span>
+      </div>
+    </div>
+
+    <div class="navbar-right">
+      <button class="nav-icon-btn" matTooltip="Notificaciones" (click)="openNotifications()">
+        <mat-icon>notifications_none</mat-icon>
+        <span class="nav-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+      </button>
+      <button class="nav-icon-btn" matTooltip="Mensajes" routerLink="/public/messages">
+        <mat-icon>chat_bubble_outline</mat-icon>
+      </button>
+      <button class="nav-icon-btn" matTooltip="Cambiar tema" (click)="toggleTheme()">
+        <mat-icon>{{ themeService.isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+      <div class="nav-avatar" (click)="goProfile()" matTooltip="Mi perfil">
+        <img
+          *ngIf="avatarUrl"
+          [src]="avatarUrl"
+          class="nav-avatar-img"
+          alt="avatar"
+        />
+        <span *ngIf="!avatarUrl" class="nav-avatar-fallback">{{ initials }}</span>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+<div class="search-backdrop" *ngIf="showSearchResults" (click)="closeSearch()"></div>

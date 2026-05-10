@@ -1,0 +1,35 @@
+<div class="faq-wrapper">
+  <div class="faq-search">
+    <input
+      type="text"
+      placeholder="Busca tu pregunta aquí..."
+      [(ngModel)]="searchQuery"
+      class="search-input"
+    />
+  </div>
+
+  @if (filteredFAQs.length > 0) {
+    <div class="faq-list">
+      @for (faq of filteredFAQs; track faq.id) {
+        <div class="faq-item">
+          <button
+            class="faq-question"
+            (click)="toggleFAQ(faq)"
+            [class.expanded]="faq.expanded"
+          >
+            <span>{{ faq.question }}</span>
+            <span class="faq-icon">{{ faq.expanded ? '−' : '+' }}</span>
+          </button>
+          @if (faq.expanded) {
+            <div class="faq-answer">{{ faq.answer }}</div>
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="no-results">
+      <p>No se encontraron resultados para "{{ searchQuery }}"</p>
+      <p class="no-results-hint">Intenta con otras palabras clave</p>
+    </div>
+  }
+</div>

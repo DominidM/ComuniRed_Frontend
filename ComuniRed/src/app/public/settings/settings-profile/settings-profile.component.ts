@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsuarioService, Usuario } from '../../../services/usuario.service';
+import { AlertService } from '../../../shared/services/change.service';
 
 @Component({
   selector: 'app-settings-profile',
@@ -26,17 +27,18 @@ export class SettingsProfileComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {
     this.inicializarFormularioVacio();
   }
 
   ngOnInit(): void {
     const currentUser = this.usuarioService.getUser();
-    
+
     if (currentUser && currentUser.id) {
       this.cargando = true;
-      
+
       this.usuarioService.obtenerUsuarioPorId(currentUser.id).subscribe({
         next: (usuario) => {
           this.usuario = usuario;
@@ -45,12 +47,12 @@ export class SettingsProfileComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al cargar usuario:', err);
-          alert('Error al cargar los datos del usuario');
+          this.alertService.error('Error al cargar los datos del usuario');
           this.cargando = false;
         }
       });
     } else {
-      alert('No hay sesión activa. Por favor inicia sesión.');
+      this.alertService.warning('No hay sesión activa. Por favor inicia sesión.');
       this.router.navigate(['/login']);
     }
   }
@@ -100,12 +102,12 @@ export class SettingsProfileComponent implements OnInit {
       const file = input.files[0];
 
       if (!file.type.startsWith('image/')) {
-        alert('Por favor selecciona una imagen válida (JPG, PNG, GIF)');
+        this.alertService.warning('Por favor selecciona una imagen válida (JPG, PNG, GIF)');
         return;
       }
 
       if (file.size > 2 * 1024 * 1024) {
-        alert('La imagen no debe superar los 2MB');
+        this.alertService.warning('La imagen no debe superar los 2MB');
         return;
       }
 
@@ -119,33 +121,35 @@ export class SettingsProfileComponent implements OnInit {
     }
   }
 
-  eliminarFoto(): void {
+  async eliminarFoto(): Promise<void> {
     if (!this.usuario || !this.usuario.id) {
-      alert('Error: No se pudo identificar al usuario');
+      this.alertService.error('Error: No se pudo identificar al usuario');
       return;
     }
 
-    const confirmar = confirm('¿Estás seguro de que deseas eliminar tu foto de perfil?');
-    if (!confirmar) return;
+    const confirmado = await this.alertService.confirm(
+      '¿Eliminar foto de perfil?',
+      'Esta acción no se puede deshacer.',
+      'Sí, eliminar',
+      'Cancelar'
+    );
+
+    if (!confirmado) return;
 
     this.eliminandoFoto = true;
 
     this.usuarioService.eliminarFotoPerfil(this.usuario.id).subscribe({
       next: (exito) => {
         if (exito) {
-          console.log('Foto eliminada correctamente');
-          
           this.usuarioService.obtenerUsuarioPorId(this.usuario!.id).subscribe({
             next: (usuarioActualizado) => {
               this.usuarioService.saveUser(usuarioActualizado);
               this.usuario = usuarioActualizado;
-              
               this.foto_perfil_url = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
               this.avatarPreview = null;
               this.selectedFile = null;
-              
               this.eliminandoFoto = false;
-              alert('Foto de perfil eliminada correctamente');
+              this.alertService.success('Foto de perfil eliminada correctamente');
             },
             error: (err) => {
               console.error('Error recargando usuario:', err);
@@ -154,27 +158,36 @@ export class SettingsProfileComponent implements OnInit {
           });
         } else {
           this.eliminandoFoto = false;
-          alert('No se pudo eliminar la foto');
+          this.alertService.error('No se pudo eliminar la foto');
         }
       },
       error: (err) => {
         console.error('Error al eliminar foto:', err);
         this.eliminandoFoto = false;
-        alert('Error al eliminar la foto. Por favor, intenta de nuevo.');
+        this.alertService.error('Error al eliminar la foto. Por favor, intenta de nuevo.');
       }
     });
   }
 
   async save(): Promise<void> {
     if (this.profileForm.invalid) {
-      alert('Por favor, completa todos los campos requeridos correctamente.');
+      this.alertService.warning('Por favor, completa todos los campos requeridos correctamente.');
       return;
     }
 
     if (!this.usuario || !this.usuario.id) {
-      alert('Error: No se pudo identificar al usuario');
+      this.alertService.error('Error: No se pudo identificar al usuario');
       return;
     }
+
+    const confirmado = await this.alertService.confirm(
+      '¿Guardar cambios?',
+      '¿Estás seguro de que deseas actualizar tu perfil?',
+      'Sí, guardar',
+      'Cancelar'
+    );
+
+    if (!confirmado) return;
 
     this.guardando = true;
 
@@ -183,18 +196,16 @@ export class SettingsProfileComponent implements OnInit {
 
       if (this.selectedFile) {
         this.subiendoImagen = true;
-        console.log('Subiendo imagen a Cloudinary...');
-        
+
         try {
           fotoUrl = await this.usuarioService.subirFotoCloudinary(this.selectedFile);
-          console.log('Imagen subida:', fotoUrl);
         } catch (error) {
           this.subiendoImagen = false;
           this.guardando = false;
-          alert('Error al subir la imagen. Por favor, intenta de nuevo.');
+          this.alertService.error('Error al subir la imagen. Por favor, intenta de nuevo.');
           return;
         }
-        
+
         this.subiendoImagen = false;
       }
 
@@ -215,27 +226,24 @@ export class SettingsProfileComponent implements OnInit {
 
       this.usuarioService.actualizarUsuario(this.usuario.id, usuarioActualizado).subscribe({
         next: (usuarioActualizado) => {
-          console.log('Perfil actualizado:', usuarioActualizado);
-          
           this.usuarioService.saveUser(usuarioActualizado);
           this.usuario = usuarioActualizado;
           this.cargarDatosUsuario(usuarioActualizado);
-          
           this.selectedFile = null;
           this.guardando = false;
-          alert('Perfil actualizado correctamente');
+          this.alertService.success('Perfil actualizado correctamente');
         },
         error: (err) => {
           console.error('Error al actualizar perfil:', err);
           this.guardando = false;
-          alert('Error al actualizar el perfil. Por favor, intenta de nuevo.');
+          this.alertService.error('Error al actualizar el perfil. Por favor, intenta de nuevo.');
         }
       });
 
     } catch (error) {
       console.error('Error general:', error);
       this.guardando = false;
-      alert('Error al guardar el perfil');
+      this.alertService.error('Error al guardar el perfil');
     }
   }
 
@@ -243,7 +251,7 @@ export class SettingsProfileComponent implements OnInit {
     if (this.usuario) {
       this.cargarDatosUsuario(this.usuario);
       this.selectedFile = null;
-      alert('Cambios cancelados');
+      this.alertService.info('Cambios cancelados');
     }
   }
 }

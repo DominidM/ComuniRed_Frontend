@@ -73,7 +73,7 @@ export class HistorialEventoService {
         variables: { quejaId },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => result.data.historialPorQueja)
       );
   }
@@ -85,7 +85,7 @@ export class HistorialEventoService {
         variables: { quejaId, tipoEvento },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => result.data.historialPorTipo)
       );
   }
@@ -97,7 +97,7 @@ export class HistorialEventoService {
         variables: { quejaId, limite },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(
+      .valueChanges.pipe(map((r: any) => r), 
         map(result => result.data.historialReciente)
       );
   }

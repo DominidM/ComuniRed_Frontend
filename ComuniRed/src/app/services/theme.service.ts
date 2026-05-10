@@ -4,10 +4,18 @@ import { Injectable } from '@angular/core';
 export class ThemeService {
   private darkTheme = false;
 
+  constructor() {
+    const saved = localStorage.getItem('cr-theme');
+    if (saved === 'dark') {
+      this.darkTheme = true;
+      document.body.classList.add('dark-theme');
+    }
+  }
+
   toggleTheme(): void {
     this.darkTheme = !this.darkTheme;
-    const classList = document.documentElement.classList;
-    this.darkTheme ? classList.add('dark-theme') : classList.remove('dark-theme');
+    document.body.classList.toggle('dark-theme', this.darkTheme);
+    localStorage.setItem('cr-theme', this.darkTheme ? 'dark' : 'light');
   }
 
   isDarkTheme(): boolean {

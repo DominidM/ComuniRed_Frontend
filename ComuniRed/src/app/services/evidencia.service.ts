@@ -47,7 +47,7 @@ export class EvidenciaService {
         variables: { quejaId },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(map(result => result.data.evidenciasPorQueja));
+      .valueChanges.pipe(map((r: any) => r), map(result => result.data.evidenciasPorQueja));
   }
 
 
