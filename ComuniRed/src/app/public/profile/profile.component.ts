@@ -91,6 +91,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
       nombre: 'Lima',
       url: 'https://res.cloudinary.com/dp1vgjhsq/video/upload/v1776927093/YTDown.com_YouTube_DUKI-Jhayco-RoCKSTAR-2-0-Video-Oficial_Media_cjmwG9aPGwM_001_1080p_ihlnvu.mp4',
     },
+    {
+      id: 'mora',
+      nombre: 'Lima',
+      url: '    https://res.cloudinary.com/dxuk9bogw/video/upload/v1778410568/YTDown_YouTube_Mora-DONDE-SE-APRENDE-A-QUERER-Video-Ofi_Media_1Pb3AiiiDIM_001_1080p_cjxi0c.mp4',
+    },
   ];
 
   bannerSeleccionado: BannerOption = this.bannerOptions[0];
