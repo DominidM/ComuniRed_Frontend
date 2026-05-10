@@ -108,7 +108,6 @@ export class CrudAsignacionComponent implements OnInit {
           }));
         
         this.verificarQuejasAsignadas();
-        console.log('✅ Quejas con +5 votos listas para asignar:', this.quejasDisponibles);
       },
       error: (err) => {
         console.error('Error cargando quejas:', err);
@@ -127,7 +126,6 @@ export class CrudAsignacionComponent implements OnInit {
       queja.asignaciones = asignacionesDeQueja;
     });
 
-    console.log('✅ Estado actualizado de quejas:', this.quejasDisponibles);
   }
 
   obtenerTextoAsignacion(queja: QuejaParaAsignar): string {
@@ -155,7 +153,6 @@ export class CrudAsignacionComponent implements OnInit {
     this.usuarioService.obtenerUsuariosPorRol('68ca68bb0bc4d9ca3267b665').subscribe({
       next: (usuarios: any[]) => {
         this.usuariosSoporte = usuarios;
-        console.log('✅ Usuarios de soporte cargados:', this.usuariosSoporte);
       },
       error: (err) => {
         console.error('Error cargando soportes:', err);
@@ -224,9 +221,7 @@ export class CrudAsignacionComponent implements OnInit {
       this.nuevaAsignacion.observacion
     ).subscribe({
       next: (nuevaAsignacion) => {
-        console.log('✅ Queja asignada:', nuevaAsignacion);
         
-        // ✅ Agregar la nueva asignación inmediatamente a la lista
         this.asignaciones.push(nuevaAsignacion);
         this.aplicarFiltros();
         this.verificarQuejasAsignadas();

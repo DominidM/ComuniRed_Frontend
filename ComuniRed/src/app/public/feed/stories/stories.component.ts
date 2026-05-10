@@ -331,13 +331,10 @@ export class StoriesComponent implements OnInit, OnDestroy {
   sendStoryReply(): void {
     if (!this.storyReplyText.trim()) return;
     // TODO: integrar con servicio de mensajes cuando esté disponible
-    console.log('Reply to story:', this.activeStory?.id, this.storyReplyText);
     this.storyReplyText = '';
   }
 
   sendQuickReaction(emoji: string): void {
-    // TODO: integrar con servicio de reacciones cuando esté disponible
-    console.log('Quick reaction:', emoji, 'to story:', this.activeStory?.id);
   }
 
   trackByStoryId(_index: number, story: Story): string {

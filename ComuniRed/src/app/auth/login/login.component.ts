@@ -26,13 +26,11 @@ export class LoginComponent {
 
   login() {
     if (this.isLoading) return;
-    console.log('login() called', { email: this.email });
     this.isLoading = true;
     this.showError = null;
 
     this.usuarioService.loginAndStore(this.email, this.password).subscribe({
       next: (res: LoginResult) => {
-        console.log('login success', res);
         this.isLoading = false;
         this.showSuccess = true;
 

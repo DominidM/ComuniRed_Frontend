@@ -57,20 +57,17 @@ export class FeedReporteComponent implements OnInit {
     
     this.route.params.subscribe(params => {
       this.quejaId = params['id'];
-      console.log('📋 ID de queja recibido:', this.quejaId);
       
       if (this.quejaId && this.user?.id) {
         this.cargarQueja();
       } else if (!this.user?.id) {
         this.error = 'Usuario no autenticado';
-        console.error('❌ Usuario no autenticado');
       }
     });
   }
 
   loadUser(): void {
     const u = this.usuarioService.getUser();
-    console.log('👤 Usuario cargado:', u);
     
     if (u) {
       const avatar = (u as any).foto_perfil || 'assets/img/default-avatar.png';
@@ -79,10 +76,8 @@ export class FeedReporteComponent implements OnInit {
         name: `${(u as any).nombre || ''} ${(u as any).apellido || ''}`.trim() || 'Usuario', 
         avatarUrl: avatar 
       };
-      console.log('✅ Usuario procesado:', this.user);
     } else {
       this.user = { name: 'Usuario', avatarUrl: 'assets/img/default-avatar.png' };
-      console.warn('⚠️ No hay usuario en sesión');
     }
   }
 
@@ -103,14 +98,9 @@ export class FeedReporteComponent implements OnInit {
     
     this.loading = true;
     this.error = '';
-    
-    console.log('🔍 Cargando queja...');
-    console.log('   📌 ID:', this.quejaId);
-    console.log('   👤 Usuario:', this.user.id);
-    
+
     this.quejaService.obtenerQuejaPorId(this.quejaId, this.user.id).subscribe({
       next: (queja) => {
-        console.log('✅ Queja cargada exitosamente:', queja);
         
         this.queja = {
           ...queja,
@@ -207,10 +197,8 @@ export class FeedReporteComponent implements OnInit {
     this.reaccionService.toggleReaccion(post.id, type, this.user.id).subscribe({
       next: (updated) => {
         post.reactions = updated;
-        console.log('✅ Reacción actualizada:', updated);
       },
       error: (err: any) => {
-        console.error('❌ Error al reaccionar:', err);
         post.reactions = previousReactions;
         this.showToastMessage('Error al reaccionar');
       }
