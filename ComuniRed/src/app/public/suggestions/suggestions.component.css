@@ -3,102 +3,136 @@
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+  border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  overflow: hidden;
 }
-
 /* ========================================
    HEADER Y TABS
    ======================================== */
 
 .suggestions-header {
-  padding: 1rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--cr-border);
   border-bottom: 1px solid var(--cr-border);
-  margin-bottom: 0.5rem;
+  background: var(--cr-background);
 }
 
 .tabs {
   display: flex;
   gap: 0;
-  border-bottom: 1px solid var(--cr-border);
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+  background: var(--cr-background-content);
+  border-radius: 10px;
+  padding: 4px;
+  border: 1px solid var(--cr-border);
 }
 
+/* Override del global button reset */
 .tab {
   flex: 1;
-  padding: 12px;
-  background: none;
-  border: none;
-  border-bottom: 2px solid var(--cr-border);
-  font-size: 14px;
+  padding: 9px 12px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--cr-text);
+  color: color-mix(in srgb, var(--cr-text) 55%, transparent) !important;
   cursor: pointer;
   position: relative;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: none !important;
 }
 
 .tab:hover {
-  color: var(--cr-background);
+  color: var(--cr-text) !important;
+  background: var(--cr-background) !important;
+  border-color: transparent !important;
 }
 
 .tab.active {
-  color: var(--cr-text);
-  border-bottom-color: black;
+  color: var(--cr-text) !important;
+  background: var(--cr-background) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18) !important;
+  border-color: transparent !important;
 }
 
 .tab .badge {
-  display: inline-block;
-  background: #ff3b30;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 11px;
-  margin-left: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ef4444 !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
   font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  line-height: 1;
 }
 
 /* ========================================
    BUSCADOR
    ======================================== */
 
+/* .search-box ya tiene estilos globales en styles.css, refinamos */
 .search-box {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  display: flex !important;
+  gap: 0 !important;
+  border: 1px solid var(--cr-border) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  background: var(--cr-search) !important;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.search-box:focus-within {
+  border-color: var(--cr-primary) !important;
+  box-shadow: 0 0 0 3px rgba(95, 92, 246, 0.12) !important;
 }
 
 .search-box input {
   flex: 1;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--cr-border);
-  border-radius: 6px;
+  border: none !important;
   font-size: 0.875rem;
-  background: var(--cr-search);
-}
-
-.search-box input:focus {
+  background: transparent !important;
+  color: var(--cr-text);
   outline: none;
-  background: white;
-  border-color: black;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }
 
 .search-btn {
-  padding: 0.5rem 1rem;
-  background: black;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  padding: 0.5rem 0.9rem !important;
+  background: var(--cr-text) !important;
+  color: var(--cr-background) !important;
+  border: none !important;
+  border-radius: 0 !important;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.15s ease;
+  box-shadow: none !important;
 }
 
 .search-btn:hover {
-  background: #333;
-}
-
-.search-btn:active {
-  transform: scale(0.98);
+  opacity: 0.8;
+  background: var(--cr-text) !important;
+  color: var(--cr-background) !important;
+  border-color: transparent !important;
 }
 
 /* ========================================
@@ -106,69 +140,100 @@
    ======================================== */
 
 .loading {
-  text-align: center;
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.loading .pi-spinner {
+  font-size: 24px;
+  color: var(--cr-primary);
 }
 
 .loading p {
   font-size: 0.875rem;
-  color: #8e8e8e;
+  color: color-mix(in srgb, var(--cr-text) 55%, transparent);
   margin: 0;
+  animation: sgPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes sgPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 .no-results {
-  text-align: center;
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 3rem 2rem;
+}
+
+.no-results i {
+  font-size: 28px;
+  color: color-mix(in srgb, var(--cr-text) 35%, transparent);
 }
 
 .no-results p {
   font-size: 0.875rem;
-  color: #8e8e8e;
+  color: color-mix(in srgb, var(--cr-text) 55%, transparent);
   margin: 0;
 }
 
 /* ========================================
-   SUGERENCIAS (GRID)
+   CARDS DE USUARIO
    ======================================== */
- 
+
 .suggestions-grid {
   display: flex;
   flex-direction: column;
   gap: 0;
-  max-height: calc(100vh - 300px);
+  max-height: calc(100vh - 270px);
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #dbdbdb transparent;
+  scrollbar-color: var(--cr-border) transparent;
 }
 
 .suggestions-grid::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
-
-.suggestions-grid::-webkit-scrollbar-track {
-  background: transparent;
-}
-
 .suggestions-grid::-webkit-scrollbar-thumb {
-  background: #dbdbdb;
-  border-radius: 3px;
-}
-
-.suggestions-grid::-webkit-scrollbar-thumb:hover {
-  background: #b3b3b3;
+  background: var(--cr-border);
+  border-radius: 4px;
 }
 
 .user-card {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 10px 16px;
   gap: 12px;
-  border-bottom: 1px solid var(--cr-border);
-  animation: slideIn 0.2s ease-out;
+  border: none !important;
+  border-bottom: 1px solid var(--cr-border) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: background 0.15s ease;
+  animation: sgSlideIn 0.2s ease-out both;
+}
+
+.user-card:last-child {
+  border-bottom: none !important;
 }
 
 .user-card:hover {
-  background: var(--cr-background);
+  background: color-mix(
+    in srgb,
+    var(--cr-background-content) 80%,
+    var(--cr-text) 5%
+  ) !important;
+  border-color: transparent !important;
 }
 
 /* Avatar */
@@ -178,13 +243,17 @@
   min-width: 44px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #dbdbdb;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid var(--cr-border) !important;
   cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .user-avatar:hover {
-  transform: scale(1.05);
+  transform: scale(1.06);
+  border-color: var(--cr-primary) !important;
 }
 
 /* Info */
@@ -197,7 +266,7 @@
 }
 
 .user-info h3 {
-  font-size: 9px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--cr-text);
   margin: 0;
@@ -207,82 +276,101 @@
 }
 
 .user-details {
-  font-size: 12px;
-  color: var(--cr-text);
+  font-size: 11px;
+  color: color-mix(in srgb, var(--cr-text) 60%, transparent);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Botones de acción */
+/* Acciones */
 .user-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
+  flex-shrink: 0;
 }
 
+/* ── Botón Seguir — override total del global ── */
 .btn-primary {
-  padding: 6px 16px;
-  background: black;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 6px 16px !important;
+  background: var(--cr-text) !important;
+  color: var(--cr-background) !important;
+  border: 1.5px solid transparent !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #333;
+  opacity: 0.82 !important;
+  transform: translateY(-1px) !important;
+  background: var(--cr-text) !important;
+  color: var(--cr-background) !important;
+  border-color: transparent !important;
 }
 
-.btn-primary:active {
-  transform: scale(0.98);
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.97) !important;
 }
 
 .btn-primary:disabled {
-  opacity: 0.6;
+  opacity: 0.45 !important;
   cursor: not-allowed;
 }
 
-/* Estados del botón seguir */
+/* Estado: Siguiendo */
 .btn-primary.btn-siguiendo {
-  background: #e0e0e0;
-  color: #262626;
+  background: transparent !important;
+  color: var(--cr-text) !important;
+  border-color: var(--cr-border) !important;
 }
 
-.btn-primary.btn-siguiendo:hover {
-  background: #d0d0d0;
+.btn-primary.btn-siguiendo:hover:not(:disabled) {
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.08) !important;
 }
 
+/* Estado: Pendiente */
 .btn-primary.btn-pendiente {
-  background: #f59e0b;
-  color: white;
+  background: transparent !important;
+  color: #f59e0b !important;
+  border-color: #f59e0b !important;
 }
 
-.btn-primary.btn-pendiente:hover {
-  background: #d97706;
+.btn-primary.btn-pendiente:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.1) !important;
 }
 
+/* Botón Ver perfil */
 .btn-secondary {
-  padding: 6px 12px;
-  background: var(--cr-background);
-  color: var(--cr-text);
-  border: var(--cr-border);
-  font-size: 14px;
-  font-weight: 600;
+  padding: 6px 12px !important;
+  background: transparent !important;
+  color: color-mix(in srgb, var(--cr-text) 60%, transparent) !important;
+  border: 1.5px solid var(--cr-border) !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
 }
 
 .btn-secondary:hover {
-  color: #8e8e8e;
+  color: var(--cr-text) !important;
+  border-color: var(--cr-text) !important;
+  background: transparent !important;
 }
 
 /* ========================================
-   SOLICITUDES (LISTA)
+   SOLICITUDES
    ======================================== */
 
 .solicitudes-list {
@@ -292,84 +380,108 @@
   max-height: calc(100vh - 300px);
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #dbdbdb transparent;
+  scrollbar-color: var(--cr-border) transparent;
 }
 
 .solicitudes-list::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
-
-.solicitudes-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
 .solicitudes-list::-webkit-scrollbar-thumb {
-  background: #dbdbdb;
-  border-radius: 3px;
-}
-
-.solicitudes-list::-webkit-scrollbar-thumb:hover {
-  background: #b3b3b3;
+  background: var(--cr-border);
+  border-radius: 4px;
 }
 
 .solicitud-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 10px 16px;
   gap: 12px;
-  border-bottom: 1px solid var(--cr-border);
-  animation: slideIn 0.2s ease-out;
+  border: none !important;
+  border-bottom: 1px solid var(--cr-border) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  animation: sgSlideIn 0.2s ease-out both;
+  transition: background 0.15s ease;
+}
+
+.solicitud-item:last-child {
+  border-bottom: none !important;
 }
 
 .solicitud-item:hover {
-  background: #fafafa;
+  background: color-mix(
+    in srgb,
+    var(--cr-background-content) 80%,
+    var(--cr-text) 5%
+  ) !important;
 }
 
 .solicitud-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
+/* Botones circulares — override total del global */
 .btn-accept,
-.btn-reject {
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 50%;
-  font-size: 18px;
+.btn-reject,
+.btn-view {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--cr-border) !important;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 15px !important;
+  font-weight: 700;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0;
+  background: var(--cr-background-content) !important;
+  color: var(--cr-text) !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
+/* Aceptar */
 .btn-accept {
-  background: black;
-  color: white;
+  background: var(--cr-text) !important;
+  color: var(--cr-background) !important;
+  border-color: transparent !important;
 }
 
 .btn-accept:hover:not(:disabled) {
-  background: #333;
-  transform: scale(1.1);
+  background: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #fff !important;
+  transform: scale(1.1) !important;
 }
 
-.btn-reject {
-  background: #fafafa;
-  color: #262626;
-  border: 1px solid #dbdbdb;
+/* Ver */
+.btn-view i {
+  font-size: 14px;
 }
 
+.btn-view:hover {
+  background: var(--cr-text) !important;
+  color: var(--cr-background) !important;
+  border-color: var(--cr-text) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Rechazar */
 .btn-reject:hover:not(:disabled) {
-  background: #ff3b30;
-  color: white;
-  border-color: #ff3b30;
-  transform: scale(1.1);
+  background: #ef4444 !important;
+  color: #fff !important;
+  border-color: #ef4444 !important;
+  transform: scale(1.1) !important;
 }
 
 .btn-accept:disabled,
 .btn-reject:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
@@ -381,107 +493,50 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
-  padding: 1rem;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
   border-top: 1px solid var(--cr-border);
+  background: var(--cr-background);
 }
 
 .pagination button {
-  padding: 0.5rem 1rem;
-  background: var(--cr-background);
-  color: var(--cr-text);
-  border: none;
-  border-radius: 6px;
+  padding: 5px 14px !important;
+  background: transparent !important;
+  color: var(--cr-text) !important;
+  border: 1.5px solid var(--cr-border) !important;
+  border-radius: 7px !important;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 12px;
+  transition: all 0.15s ease !important;
+  box-shadow: none !important;
 }
 
 .pagination button:hover:not(:disabled) {
-  background: var(--cr-background);
+  background: var(--cr-text) !important;
+  color: var(--cr-background) !important;
+  border-color: var(--cr-text) !important;
 }
 
 .pagination button:disabled {
-  background: var(--cr-background);
-  color: var(--cr-text);
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
 .pagination span {
-  font-size: 0.875rem;
-  color: #262626;
+  font-size: 12px;
+  color: color-mix(in srgb, var(--cr-text) 60%, transparent);
   font-weight: 500;
-}
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-
-@media (max-width: 768px) {
-  .suggestions-container {
-    max-width: 100%;
-    padding: 0;
-    border-radius: 0;
-  }
-
-  .user-card,
-  .solicitud-item {
-    padding: 8px 12px;
-  }
-
-  .user-avatar {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-  }
-
-  .user-info h3 {
-    font-size: 13px;
-  }
-
-  .user-details {
-    font-size: 11px;
-  }
-
-  .btn-primary {
-    padding: 5px 12px;
-    font-size: 13px;
-  }
-
-  .btn-secondary {
-    display: none;
-  }
-
-  .btn-accept,
-  .btn-reject {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
-
-  .tabs {
-    margin-bottom: 0.5rem;
-  }
-
-  .tab {
-    padding: 10px;
-    font-size: 13px;
-  }
-
-  .search-box {
-    margin-top: 0.5rem;
-  }
 }
 
 /* ========================================
    ANIMACIONES
    ======================================== */
 
-@keyframes slideIn {
+@keyframes sgSlideIn {
   from {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateX(-8px);
   }
   to {
     opacity: 1;
@@ -489,46 +544,49 @@
   }
 }
 
+/* ========================================
+   RESPONSIVE
+   ======================================== */
 
-button:active {
-  transform: scale(0.98);
-}
-
-.btn-view {
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f0f0f0;
-  color: #262626;
-}
-
-.btn-view i {
-  font-size: 16px;
-}
-
-.btn-view:hover {
-  background: #262626;
-  color: white;
-  transform: scale(1.1);
-}
-
-.btn-view:active {
-  transform: scale(0.98);
-}
-
-/* Responsive móvil */
 @media (max-width: 768px) {
-  .btn-view {
-    width: 32px;
-    height: 32px;
+  .user-card,
+  .solicitud-item {
+    padding: 8px 12px;
+    gap: 10px;
   }
 
-  .btn-view i {
-    font-size: 14px;
+  .user-avatar {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+  }
+
+  .user-info h3 {
+    font-size: 12px;
+  }
+  .user-details {
+    font-size: 10px;
+  }
+
+  .btn-primary {
+    padding: 5px 11px !important;
+    font-size: 11px !important;
+  }
+
+  .btn-secondary {
+    display: none !important;
+  }
+
+  .btn-accept,
+  .btn-reject,
+  .btn-view {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 13px !important;
+  }
+
+  .tab {
+    font-size: 12px;
+    padding: 8px 10px;
   }
 }

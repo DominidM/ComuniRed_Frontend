@@ -12,7 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { HistoriaService } from '../../services/historia.service';
+import { HistoriaService } from '../../../services/historia.service';
 
 export interface Story {
   id: string;

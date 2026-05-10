@@ -11,7 +11,9 @@ import { UsuarioService, UsuarioInput } from '../../services/usuario.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
+
 export class RegisterComponent {
+
   usuarioData: UsuarioInput = {
     nombre: '',
     apellido: '',
@@ -24,7 +26,8 @@ export class RegisterComponent {
     email: '',
     password: '',
     rol_id: '',
-    fecha_nacimiento: '' // ✅ NUEVO: en lugar de edad
+    fecha_nacimiento: '', // ✅ NUEVO: en lugar de edad
+    foto_perfil: '',
   };
 
   // ✅ NUEVO: Para el max del input date
@@ -45,6 +48,7 @@ export class RegisterComponent {
     return (value ?? '').toString().trim();
   }
 
+  
   validateNombre() {
     const value = this.trim(this.usuarioData.nombre);
     if (!value) {
@@ -237,7 +241,8 @@ export class RegisterComponent {
       email: this.trim(this.usuarioData.email),
       password: this.trim(this.usuarioData.password),
       rol_id: this.usuarioData.rol_id,
-      fecha_nacimiento: this.usuarioData.fecha_nacimiento ?? undefined
+      fecha_nacimiento: this.usuarioData.fecha_nacimiento ?? undefined,
+      foto_perfil: this.usuarioData.foto_perfil || undefined
     };
 
     this.usuarioService.crearUsuario(payload).subscribe({
