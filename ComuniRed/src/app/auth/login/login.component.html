@@ -1,15 +1,32 @@
 <div class="login-page">
   <div class="login-left">
-    <img src="https://res.cloudinary.com/dxuk9bogw/image/upload/v1757487126/Inmobiliarias-en-Peru-Seis-estrategias-para-gestionar-la-relacion-con-los-vecinos_fiomik.jpg" alt="Imagen lateral" />
+    <img
+      src="https://res.cloudinary.com/dxuk9bogw/image/upload/v1757487126/Inmobiliarias-en-Peru-Seis-estrategias-para-gestionar-la-relacion-con-los-vecinos_fiomik.jpg"
+      alt="Imagen lateral"
+    />
   </div>
   <div class="login-form">
     <form (ngSubmit)="login()" #form="ngForm" autocomplete="off">
       <h2>ComuniRed</h2>
       <p>Bienvidos ayudanos a formar una comunidad</p>
       <label>Usuario</label>
-      <input type="email" [(ngModel)]="email" name="email" required autocomplete="off" [disabled]="isLoading" />
+      <input
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        required
+        autocomplete="off"
+        [disabled]="isLoading"
+      />
       <label>Contraseña</label>
-      <input type="password" [(ngModel)]="password" name="password" required autocomplete="off" [disabled]="isLoading" />
+      <input
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        required
+        autocomplete="off"
+        [disabled]="isLoading"
+      />
       <div class="login-options">
         <a routerLink="/olvide-clave">¿Olvidaste tu contraseña?</a>
         <a routerLink="/register">Regístrate</a>
@@ -24,11 +41,16 @@
   </div>
   <!-- Flotantes globales (dentro de login-page pero fuera del formulario) -->
   <div class="snackbar" *ngIf="showSuccess">
-    <span class="snackbar-icon">✔️</span>
-    ¡Bienvenido!
+    <span class="snackbar-icon" aria-hidden="true">
+      <i class="pi pi-check-circle"></i>
+    </span>
+    <span>Bienvenido</span>
   </div>
+
   <div class="snackbar error" *ngIf="showError">
-    <span class="snackbar-icon">❌</span>
-    {{ showError }}
+    <span class="snackbar-icon" aria-hidden="true">
+      <i class="pi pi-times-circle"></i>
+    </span>
+    <span>{{ showError }}</span>
   </div>
 </div>

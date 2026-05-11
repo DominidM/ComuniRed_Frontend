@@ -3,172 +3,200 @@
     <form (ngSubmit)="register()" #form="ngForm" autocomplete="off">
       <h2>Registro</h2>
       <p>Crea tu cuenta para acceder a la comunidad</p>
-      
+
       <div class="form-row">
         <div class="form-group">
-          <label>Nombre <span class="required">*</span></label>
-          <input 
-            type="text" 
-            [(ngModel)]="usuarioData.nombre" 
-            name="nombre" 
-            required 
+          <label for="nombre">Nombre <span class="required">*</span></label>
+          <input
+            id="nombre"
+            type="text"
+            [(ngModel)]="usuarioData.nombre"
+            name="nombre"
+            required
             autocomplete="off"
             (blur)="validateNombre()"
             (input)="validateNombre()"
             [class.error]="errors['nombre']"
           />
-          <span class="error-message" *ngIf="errors['nombre']">{{ errors['nombre'] }}</span>
+          <span class="error-message" *ngIf="errors['nombre']">
+            {{ errors["nombre"] }}
+          </span>
         </div>
-        
+
         <div class="form-group">
-          <label>Apellido <span class="required">*</span></label>
-          <input 
-            type="text" 
-            [(ngModel)]="usuarioData.apellido" 
-            name="apellido" 
-            required 
+          <label for="apellido">Apellido <span class="required">*</span></label>
+          <input
+            id="apellido"
+            type="text"
+            [(ngModel)]="usuarioData.apellido"
+            name="apellido"
+            required
             autocomplete="off"
             (blur)="validateApellido()"
             (input)="validateApellido()"
             [class.error]="errors['apellido']"
           />
-          <span class="error-message" *ngIf="errors['apellido']">{{ errors['apellido'] }}</span>
+          <span class="error-message" *ngIf="errors['apellido']">
+            {{ errors["apellido"] }}
+          </span>
         </div>
       </div>
-      
+
       <div class="form-row">
         <div class="form-group">
-          <label>DNI</label>
-          <input 
-            type="text" 
-            [(ngModel)]="usuarioData.dni" 
-            name="dni" 
+          <label for="dni">DNI</label>
+          <input
+            id="dni"
+            type="text"
+            [(ngModel)]="usuarioData.dni"
+            name="dni"
             autocomplete="off"
             placeholder="8 dígitos"
             maxlength="8"
             (input)="validateDni()"
             [class.error]="errors['dni']"
           />
-          <span class="error-message" *ngIf="errors['dni']">{{ errors['dni'] }}</span>
+          <span class="error-message" *ngIf="errors['dni']">
+            {{ errors["dni"] }}
+          </span>
         </div>
-        
+
         <div class="form-group">
-          <label>Teléfono</label>
-          <input 
-            type="text" 
-            [(ngModel)]="usuarioData.numero_telefono" 
-            name="numero_telefono" 
+          <label for="numero_telefono">Teléfono</label>
+          <input
+            id="numero_telefono"
+            type="text"
+            [(ngModel)]="usuarioData.numero_telefono"
+            name="numero_telefono"
             autocomplete="off"
             placeholder="9-15 dígitos"
             maxlength="15"
             (input)="validateTelefono()"
             [class.error]="errors['numero_telefono']"
           />
-          <span class="error-message" *ngIf="errors['numero_telefono']">{{ errors['numero_telefono'] }}</span>
+          <span class="error-message" *ngIf="errors['numero_telefono']">
+            {{ errors["numero_telefono"] }}
+          </span>
         </div>
       </div>
-      
+
       <div class="form-row">
         <div class="form-group">
-          <label>Fecha de Nacimiento</label>
-          <input 
-            type="date" 
-            [(ngModel)]="usuarioData.fecha_nacimiento" 
-            name="fecha_nacimiento" 
+          <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+          <input
+            id="fecha_nacimiento"
+            type="date"
+            [(ngModel)]="usuarioData.fecha_nacimiento"
+            name="fecha_nacimiento"
             autocomplete="off"
             [max]="hoy"
             (blur)="validateFechaNacimiento()"
             (change)="validateFechaNacimiento()"
             [class.error]="errors['fecha_nacimiento']"
           />
-          <span class="error-message" *ngIf="errors['fecha_nacimiento']">{{ errors['fecha_nacimiento'] }}</span>
-          <small style="display: block; color: #6b7280; font-size: 0.875rem; margin-top: 4px;">
-            Debes ser mayor de 18 años
-          </small>
+          <span class="error-message" *ngIf="errors['fecha_nacimiento']">
+            {{ errors["fecha_nacimiento"] }}
+          </span>
+          <small class="field-hint">Debes ser mayor de 18 años</small>
         </div>
-        
+
         <div class="form-group">
-          <label>Sexo</label>
-          <select [(ngModel)]="usuarioData.sexo" name="sexo">
-            <option value="">Sin especificar</option>
-            <option value="M">Masculino</option>
-            <option value="F">Femenino</option>
-            <option value="Otro">Otro</option>
+          <label for="sexo">Sexo</label>
+          <select id="sexo" [(ngModel)]="usuarioData.sexo" name="sexo">
+            <option *ngFor="let sexo of sexos" [value]="sexo.value">
+              {{ sexo.label }}
+            </option>
           </select>
         </div>
       </div>
-      
+
       <div class="form-row">
         <div class="form-group">
-          <label>Distrito</label>
-          <input 
-            type="text" 
-            [(ngModel)]="usuarioData.distrito" 
-            name="distrito" 
-            autocomplete="off"
-            maxlength="100"
-            (input)="validateDistrito()"
+          <label for="distrito">Distrito</label>
+          <select
+            id="distrito"
+            [(ngModel)]="usuarioData.distrito"
+            name="distrito"
+            (change)="validateDistrito()"
             [class.error]="errors['distrito']"
-          />
-          <span class="error-message" *ngIf="errors['distrito']">{{ errors['distrito'] }}</span>
+          >
+            <option *ngFor="let distrito of distritos" [value]="distrito.value">
+              {{ distrito.label }}
+            </option>
+          </select>
+          <span class="error-message" *ngIf="errors['distrito']">
+            {{ errors["distrito"] }}
+          </span>
         </div>
-        
+
         <div class="form-group">
-          <label>Código Postal</label>
-          <input 
-            type="text" 
-            [(ngModel)]="usuarioData.codigo_postal" 
-            name="codigo_postal" 
+          <label for="codigo_postal">Código Postal</label>
+          <input
+            id="codigo_postal"
+            type="text"
+            [(ngModel)]="usuarioData.codigo_postal"
+            name="codigo_postal"
             autocomplete="off"
             placeholder="5 dígitos"
             maxlength="5"
             (input)="validateCodigoPostal()"
             [class.error]="errors['codigo_postal']"
           />
-          <span class="error-message" *ngIf="errors['codigo_postal']">{{ errors['codigo_postal'] }}</span>
+          <span class="error-message" *ngIf="errors['codigo_postal']">
+            {{ errors["codigo_postal"] }}
+          </span>
         </div>
       </div>
-      
+
       <div class="form-row">
-        <div class="form-group" style="width:100%">
-          <label>Dirección</label>
-          <input 
-            type="text" 
-            [(ngModel)]="usuarioData.direccion" 
-            name="direccion" 
+        <div class="form-group form-group-full">
+          <label for="direccion">Dirección</label>
+          <input
+            id="direccion"
+            type="text"
+            [(ngModel)]="usuarioData.direccion"
+            name="direccion"
             autocomplete="off"
             maxlength="200"
             (input)="validateDireccion()"
             [class.error]="errors['direccion']"
           />
-          <span class="error-message" *ngIf="errors['direccion']">{{ errors['direccion'] }}</span>
+          <span class="error-message" *ngIf="errors['direccion']">
+            {{ errors["direccion"] }}
+          </span>
         </div>
       </div>
-      
+
       <div class="form-row">
         <div class="form-group">
-          <label>Email <span class="required">*</span></label>
-          <input 
-            type="email" 
-            [(ngModel)]="usuarioData.email" 
-            name="email" 
-            required 
+          <label for="email">Email <span class="required">*</span></label>
+          <input
+            id="email"
+            type="email"
+            [(ngModel)]="usuarioData.email"
+            name="email"
+            required
             autocomplete="off"
             placeholder="correo@ejemplo.com"
             (blur)="validateEmail()"
             (input)="validateEmail()"
             [class.error]="errors['email']"
           />
-          <span class="error-message" *ngIf="errors['email']">{{ errors['email'] }}</span>
+          <span class="error-message" *ngIf="errors['email']">
+            {{ errors["email"] }}
+          </span>
         </div>
-        
+
         <div class="form-group">
-          <label>Contraseña <span class="required">*</span></label>
-          <input 
-            type="password" 
-            [(ngModel)]="usuarioData.password" 
-            name="password" 
-            required 
+          <label for="password"
+            >Contraseña <span class="required">*</span></label
+          >
+          <input
+            id="password"
+            type="password"
+            [(ngModel)]="usuarioData.password"
+            name="password"
+            required
             autocomplete="off"
             placeholder="Mínimo 6 caracteres"
             maxlength="50"
@@ -176,34 +204,44 @@
             (input)="validatePassword()"
             [class.error]="errors['password']"
           />
-          <span class="error-message" *ngIf="errors['password']">{{ errors['password'] }}</span>
+          <span class="error-message" *ngIf="errors['password']">
+            {{ errors["password"] }}
+          </span>
         </div>
       </div>
-      
+
       <button type="submit" [disabled]="!isFormValid() || isLoading">
         <ng-container *ngIf="!isLoading">Registrarse</ng-container>
         <ng-container *ngIf="isLoading">
-          <span class="spinner"></span> Procesando...
+          <span class="spinner"></span>
+          Procesando...
         </ng-container>
       </button>
-      
+
       <div class="register-options">
         <a routerLink="/login">¿Ya tienes cuenta? Inicia sesión</a>
       </div>
     </form>
-    
+
     <div class="snackbar" *ngIf="showSuccess">
-      <span class="snackbar-icon">✔️</span>
-      ¡Usuario creado exitosamente!
+      <span class="snackbar-icon" aria-hidden="true">
+        <i class="pi pi-check-circle"></i>
+      </span>
+      <span>¡Usuario creado exitosamente!</span>
     </div>
-    
+
     <div class="snackbar error" *ngIf="showError">
-      <span class="snackbar-icon">❌</span>
-      {{ showError }}
+      <span class="snackbar-icon" aria-hidden="true">
+        <i class="pi pi-times-circle"></i>
+      </span>
+      <span>{{ showError }}</span>
     </div>
   </div>
-  
+
   <div class="register-left">
-    <img src="https://res.cloudinary.com/dxuk9bogw/image/upload/v1757488558/2YMJBJZ7ABFARCOAEINHGMPBQE_oauma2.avif" alt="Imagen lateral" />
+    <img
+      src="https://res.cloudinary.com/dxuk9bogw/image/upload/v1757488558/2YMJBJZ7ABFARCOAEINHGMPBQE_oauma2.avif"
+      alt="Imagen lateral del registro"
+    />
   </div>
 </div>

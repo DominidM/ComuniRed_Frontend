@@ -1,11 +1,27 @@
+:host {
+  display: block;
+}
+
 .config-container {
   margin: 0 auto;
-  padding: 2rem 2rem;
+  padding: 2rem;
   background: var(--cr-background);
   color: var(--cr-text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-strong);
+}
+
+.security-section {
+  padding: 0 24px 24px;
+  animation: fadeIn 0.3s ease;
 }
 
 .section-header {
@@ -15,18 +31,14 @@
 .section-header h2 {
   font-size: 1.3rem;
   font-weight: 600;
-  margin: 0 0 4px 0;
+  margin: 0 0 4px;
+  color: var(--cr-titulo, var(--cr-text));
 }
 
 .section-header p {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--cr-neutral-muted);
   margin: 0;
-}
-
-.security-section {
-  padding: 0 24px 24px 24px;
-  animation: fadeIn 0.3s ease;
 }
 
 .security-item {
@@ -34,6 +46,19 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  background: var(--cr-background-content);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.security-item:hover {
+  background: var(--cr-background);
+  border-color: var(--cr-border);
 }
 
 .checkbox-label {
@@ -44,56 +69,67 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  line-height: 1.4;
 }
 
 .checkbox-label input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  accent-color: #000;
+  margin: 0;
+  flex-shrink: 0;
   cursor: pointer;
+  accent-color: var(--cr-button-black);
 }
 
 .muted {
-  color: #6b7280;
+  color: var(--cr-neutral-muted);
 }
 
 .muted.small {
   font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--cr-border);
+  margin-top: 32px;
+  padding-top: 20px;
+  padding-bottom: 8px;
+  border-top: 1px solid var(--cr-neutral-border);
 }
 
-/* Reutilizamos los estilos de botones */
 .btn-cancel {
   background: var(--cr-background);
   color: var(--cr-text);
-  border: 1px solid var(--cr-border);
+  border: 1px solid var(--cr-border-strong);
   padding: 10px 24px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .btn-cancel:hover:not(:disabled) {
-  background: var(--cr-background-content);
+  background: color-mix(in srgb, var(--cr-neutral-strong) 6%, transparent);
 }
 
 .btn-cancel:disabled {
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .btn-save {
-  background: #000;
+  background: var(--cr-brand-red);
   color: #fff;
-  border: 1px solid var(--cr-background-content);
+  border: 1px solid var(--cr-brand-red);
   padding: 10px 24px;
   border-radius: 6px;
   cursor: pointer;
@@ -101,31 +137,87 @@
   font-size: 0.95rem;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .btn-save:hover:not(:disabled) {
-  background: #333;
+  background: var(--cr-brand-red-hover);
+  border-color: var(--cr-brand-red-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-strong);
 }
 
 .btn-save:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .spinner-small {
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top: 2px solid white;
+  border-top: 2px solid #ffffff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   display: inline-block;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .config-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .security-section {
+    padding: 0 16px 16px;
+  }
+
+  .security-item {
+    padding: 14px;
+  }
+
+  .checkbox-label {
+    align-items: flex-start;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+    margin-top: 28px;
+    padding-top: 18px;
+    padding-bottom: 0;
+  }
+
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+  }
 }

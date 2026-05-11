@@ -1,11 +1,15 @@
+:host {
+  display: block;
+}
+
 .config-container {
   margin: 0 auto;
   padding: 2rem;
   background: var(--cr-background);
   color: var(--cr-text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-strong);
 }
 
 .tab-content {
@@ -20,11 +24,12 @@
   font-size: 1.3rem;
   font-weight: 600;
   margin: 0 0 4px 0;
+  color: var(--cr-titulo, var(--cr-text));
 }
 
 .section-header p {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--cr-text-muted);
   margin: 0;
 }
 
@@ -47,14 +52,16 @@
   height: 130px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #000;
-  background: #f0f0f0;
-  transition: transform 0.2s, box-shadow 0.2s;
+  border: 3px solid var(--cr-border-strong);
+  background: var(--cr-surface);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .avatar-lg:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-strong);
 }
 
 .avatar-actions {
@@ -65,15 +72,15 @@
 }
 
 .btn-change-photo {
-  background: #000;
-  color: #fff;
-  border: none;
+  background: var(--cr-button-black);
+  color: var(--cr-button-black-text);
+  border: 1px solid var(--cr-button-black);
   border-radius: 6px;
-  padding: 4px 16px;
+  padding: 0;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,9 +89,8 @@
 }
 
 .btn-change-photo:hover:not(.disabled) {
-  background: #333;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: var(--cr-button-black-hover);
+  border-color: var(--cr-button-black-hover);
 }
 
 .btn-change-photo.disabled {
@@ -94,15 +100,15 @@
 }
 
 .btn-remove-photo {
-  background: #dc2626;
+  background: var(--cr-danger);
   color: #fff;
-  border: none;
+  border: 1px solid var(--cr-danger);
   border-radius: 6px;
   padding: 10px 16px;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,9 +117,10 @@
 }
 
 .btn-remove-photo:hover:not(:disabled) {
-  background: #b91c1c;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+  background: var(--cr-danger-hover);
+  border-color: var(--cr-danger-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
 }
 
 .btn-remove-photo:disabled {
@@ -130,8 +137,9 @@
 
 .photo-info {
   font-size: 0.8rem;
-  color: #999;
+  color: var(--cr-text-faint);
   margin: 0;
+  text-align: center;
 }
 
 .profile-form {
@@ -168,17 +176,20 @@
   color: var(--cr-text);
   font-size: 0.95rem;
   font-family: inherit;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
-.form-group select { cursor: pointer; }
+.form-group select {
+  cursor: pointer;
+}
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #000;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+  border-color: var(--cr-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cr-primary) 16%, transparent);
 }
 
 .form-group textarea {
@@ -187,7 +198,7 @@
 }
 
 .form-group .error {
-  color: #dc2626;
+  color: var(--cr-danger);
   font-size: 0.85rem;
   font-weight: 500;
 }
@@ -204,27 +215,34 @@
 .btn-cancel {
   background: var(--cr-background);
   color: var(--cr-text);
-  border: 1px solid #000;
+  border: 1px solid var(--cr-border-strong);
   padding: 10px 24px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
-  transition: background 0.3s ease;
+  transition: all 0.2s ease;
 }
 
-.btn-cancel:disabled { cursor: not-allowed; }
+.btn-cancel:hover:not(:disabled) {
+  background: var(--cr-surface);
+}
+
+.btn-cancel:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 
 .btn-save {
-  background: #000;
+  background: var(--cr-brand-red);
   color: #fff;
-  border: 1px solid #000;
+  border: 1px solid var(--cr-brand-red);
   padding: 10px 24px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -232,9 +250,10 @@
 }
 
 .btn-save:hover:not(:disabled) {
-  background: #333;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: var(--cr-brand-red-hover);
+  border-color: var(--cr-brand-red-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
 }
 
 .btn-save:disabled {
@@ -283,12 +302,13 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-strong);
+  border: 1px solid var(--cr-border);
 }
 
 .confirm-icon {
   font-size: 2.5rem;
-  color: #e65100;
+  color: var(--cr-warning);
 }
 
 .confirm-dialog h3 {
@@ -299,7 +319,7 @@
 }
 
 .confirm-dialog p {
-  color: #6b7280;
+  color: var(--cr-text-muted);
   font-size: 0.9rem;
   margin: 0;
 }
@@ -311,37 +331,52 @@
 }
 
 .btn-danger {
-  background: #dc2626;
+  background: var(--cr-danger);
   color: #fff;
-  border: none;
+  border: 1px solid var(--cr-danger);
   padding: 10px 24px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-danger:hover {
-  background: #b91c1c;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+  background: var(--cr-danger-hover);
+  border-color: var(--cr-danger-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {
-  .config-container { padding: 1.5rem 1rem; }
+  .config-container {
+    padding: 1.5rem 1rem;
+  }
 
-  .tab-content { padding: 0 16px 16px 16px; }
+  .tab-content {
+    padding: 0 16px 16px 16px;
+  }
 
   .profile-main {
     flex-direction: column;
@@ -355,7 +390,10 @@
     max-width: 200px;
   }
 
-  .avatar-lg { width: 120px; height: 120px; }
+  .avatar-lg {
+    width: 120px;
+    height: 120px;
+  }
 
   .btn-change-photo,
   .btn-remove-photo {
@@ -364,10 +402,17 @@
     padding: 10px 16px;
   }
 
-  .form-row { grid-template-columns: 1fr; gap: 16px; }
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 
-  .actions { flex-direction: column-reverse; }
+  .actions {
+    flex-direction: column-reverse;
+  }
 
   .btn-cancel,
-  .btn-save { width: 100%; }
+  .btn-save {
+    width: 100%;
+  }
 }

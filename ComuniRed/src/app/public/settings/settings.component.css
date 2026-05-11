@@ -1,43 +1,95 @@
+:host {
+  display: block;
+}
+
 .settings-container {
-  max-width: 100%;
   width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
 }
 
 .settings-title {
-  color: var(--cr-text);
+  color: var(--cr-titulo);
   font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 20px;
+  font-weight: 700;
+  margin: 0 0 20px;
 }
 
 .settings-tabs {
   display: flex;
-  gap: 15px;
+  gap: 8px;
   margin-bottom: 20px;
+  border-bottom: 1px solid var(--cr-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.settings-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .settings-tabs button {
-  background: var(--cr-background-content);
+  background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  padding: 10px 15px;
-  font-size: 1rem;
+  padding: 12px 14px;
+  font-size: 0.98rem;
+  font-weight: 500;
   cursor: pointer;
   color: var(--cr-text);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  border-radius: 0;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.settings-tabs button:hover {
+  color: var(--cr-brand-red, #b91c1c);
+  background: color-mix(in srgb, var(--cr-brand-red, #b91c1c) 4%, transparent);
 }
 
 .settings-tabs button.active {
-  border-bottom: 2px solid #3f51b5;
-  color: #3f51b5;
+  border-bottom-color: var(--cr-brand-red, #b91c1c);
+  color: var(--cr-brand-red, #b91c1c);
   font-weight: 600;
 }
 
+.settings-tabs button:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--cr-brand-red, #b91c1c) 18%, transparent);
+  border-radius: 6px 6px 0 0;
+}
+
 .settings-content {
-  padding: 15px;
+  padding: 18px;
   background: var(--cr-background-content);
+  border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+}
+
+@media (max-width: 768px) {
+  .settings-title {
+    font-size: 1.5rem;
+  }
+
+  .settings-tabs {
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  .settings-tabs button {
+    padding: 10px 12px;
+    font-size: 0.92rem;
+  }
+
+  .settings-content {
+    padding: 14px;
+  }
 }

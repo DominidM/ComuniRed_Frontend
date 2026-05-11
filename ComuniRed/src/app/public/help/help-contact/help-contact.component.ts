@@ -8,6 +8,8 @@ import { AlertService } from '../../../shared/services/change.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './help-contact.component.html',
+    styleUrls: ['./help-contact.component.css']
+
 })
 export class HelpContactComponent {
   contactForm: FormGroup;

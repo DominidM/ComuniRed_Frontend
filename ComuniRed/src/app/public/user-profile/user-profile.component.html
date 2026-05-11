@@ -1,70 +1,75 @@
 <div class="settings-container" *ngIf="!cargando && usuario">
+
+  <!-- ========== PROFILE HEADER ========== -->
   <div class="profile-header">
+
     <div class="header-background">
+      <div class="header-bg-gradient"></div>
+      <div class="banner-overlay"></div>
+
       <div class="header-meta">
         <span class="header-date">
-          Miembro desde el {{ usuario.fecha_registro | date: 'd' }} de 
-          {{ usuario.fecha_registro | date: 'MMMM' }} de 
+          Miembro desde el {{ usuario.fecha_registro | date: 'd' }} de
+          {{ usuario.fecha_registro | date: 'MMMM' }} de
           {{ usuario.fecha_registro | date: 'yyyy' }}
         </span>
         <span class="header-role">Usuario</span>
       </div>
     </div>
-    
+
     <div class="profile-info">
-      <!-- ✅ AVATAR -->
       <div class="avatar">
         <img [src]="urlFotoPerfil" alt="Foto de perfil" class="avatar-img" />
       </div>
-    
-      <!-- ✅ CONTENIDO: IZQUIERDA (INFO) + DERECHA (STATS + BOTONES) -->
+
       <div class="profile-content">
-        <!-- ✅ IZQUIERDA: INFO DEL USUARIO -->
+        <!-- IZQUIERDA: nombre + chips igual que profile propio -->
         <div class="user-info-section">
           <h1 class="user-name">{{ usuario.nombre }} {{ usuario.apellido }}</h1>
-          <p class="user-location" *ngIf="usuario.distrito">📍 {{ usuario.distrito }}</p>
-          <p class="user-age" *ngIf="calcularEdad() as edad">🎂 {{ edad }} años</p>
+          <p class="user-location" *ngIf="usuario.distrito">
+            <i class="pi pi-map-marker"></i> {{ usuario.distrito }}
+          </p>
+          <p class="user-age" *ngIf="calcularEdad() as edad">
+            <i class="pi pi-calendar"></i> {{ edad }} años
+          </p>
+
+          <!-- Chips de seguidores/seguidos (igual que en profile propio) -->
+          <div class="user-chips">
+            <button class="chip" (click)="verSeguidores()">
+              <span class="chip-number">{{ seguidoresCount }}</span>
+              <span class="chip-label">seguidores</span>
+            </button>
+            <button class="chip" (click)="verSeguidos()">
+              <span class="chip-number">{{ seguidosCount }}</span>
+              <span class="chip-label">seguidos</span>
+            </button>
+          </div>
         </div>
 
-        <!-- ✅ DERECHA: STATS + BOTONES -->
-        <div class="right-section">
-          <!-- ✅ STATS ARRIBA -->
-          <div class="stats-row">
-            <button class="stat-item stat-clickable" (click)="verSeguidores()">
-              <span class="stat-number">{{ seguidoresCount }}</span>
-              <span class="stat-label">seguidores</span>
-            </button>
-            
-            <div class="stat-divider"></div>
-            
-            <button class="stat-item stat-clickable" (click)="verSeguidos()">
-              <span class="stat-number">{{ seguidosCount }}</span>
-              <span class="stat-label">seguidos</span>
-            </button>
-          </div>
+        <!-- DERECHA: botones de acción (solo en perfil ajeno) -->
+        <div class="action-buttons">
+          <button
+            class="btn-action btn-primary"
+            [class.btn-siguiendo]="estadoRelacion?.estaSiguiendo"
+            [class.btn-pendiente]="estadoRelacion?.solicitudEnviada"
+            [disabled]="procesando"
+            (click)="estadoRelacion?.estaSiguiendo ? dejarDeSeguir() : seguir()"
+          >
+            <span *ngIf="!procesando">{{ botonSeguir }}</span>
+            <span *ngIf="procesando">
+              <i class="pi pi-spin pi-spinner"></i> Procesando...
+            </span>
+          </button>
 
-          <!-- ✅ BOTONES ABAJO -->
-          <div class="action-buttons">
-            <button 
-              class="btn-action btn-primary"
-              [class.btn-siguiendo]="estadoRelacion?.estaSiguiendo"
-              [class.btn-pendiente]="estadoRelacion?.solicitudEnviada"
-              [disabled]="procesando"
-              (click)="estadoRelacion?.estaSiguiendo ? dejarDeSeguir() : seguir()">
-              <span *ngIf="!procesando">{{ botonSeguir }}</span>
-              <span *ngIf="procesando">⏳ Procesando...</span>
-            </button>
-            
-            <button class="btn-action btn-message" (click)="enviarMensaje()">
-              💬 Mensaje
-            </button>
-          </div>
+          <button class="btn-action btn-message" (click)="enviarMensaje()">
+            <i class="pi pi-comment"></i> Mensaje
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Stats Cards -->
+  <!-- ========== STATS CARDS ========== -->
   <div class="stats-container">
     <div class="stat-card">
       <div class="stat-number">0</div>
@@ -84,88 +89,177 @@
     </div>
   </div>
 
-  <!-- Tabs -->
+  <!-- ========== TABS SECTION ========== -->
   <div class="tabs-section">
     <div class="tabs-header">
-      <button 
-        class="tab-btn" 
+      <button
+        class="tab-btn"
         [class.active]="currentTab === 'actividad'"
-        (click)="changeTab('actividad')">
+        (click)="changeTab('actividad')"
+      >
         Actividad
       </button>
-      <button 
-        class="tab-btn" 
+      <button
+        class="tab-btn"
         [class.active]="currentTab === 'logros'"
-        (click)="changeTab('logros')">
+        (click)="changeTab('logros')"
+      >
         Logros
       </button>
-      <button 
-        class="tab-btn" 
+      <button
+        class="tab-btn"
         [class.active]="currentTab === 'estadisticas'"
-        (click)="changeTab('estadisticas')">
+        (click)="changeTab('estadisticas')"
+      >
         Estadísticas
       </button>
     </div>
 
     <div class="tab-content">
+
+      <!-- TAB ACTIVIDAD -->
       <div *ngIf="currentTab === 'actividad'" class="activity-content">
-        <div class="empty-state">
-          <div class="empty-icon">📈</div>
-          <p>La actividad de este usuario aparecerá aquí</p>
+        <div class="gallery-grid">
+          <div class="empty-activity">
+            <p>La actividad de este usuario aparecerá aquí.</p>
+          </div>
         </div>
       </div>
 
+      <!-- TAB LOGROS -->
       <div *ngIf="currentTab === 'logros'" class="logros-content">
-        <div class="empty-state">
-          <div class="empty-icon">🏆</div>
-          <p>Los logros de este usuario aparecerán aquí</p>
+        <div class="logros-grid">
+          <div class="logro-card" [class.unlocked]="true">
+            <div class="logro-icon" style="background: linear-gradient(135deg, #ff6b6b, #ff8787)">
+              <i class="pi pi-flag"></i>
+            </div>
+            <div class="logro-info">
+              <h3>Primer Reporte</h3>
+              <p>Creó su primer reporte</p>
+            </div>
+            <div class="logro-badge">
+              <i class="pi pi-check-circle"></i>
+            </div>
+          </div>
+
+          <div class="logro-card" [class.unlocked]="true">
+            <div class="logro-icon" style="background: linear-gradient(135deg, #ffd93d, #ffed4e)">
+              <i class="pi pi-star-fill"></i>
+            </div>
+            <div class="logro-info">
+              <h3>Ciudadano Activo</h3>
+              <p>Creó 5 reportes</p>
+            </div>
+            <div class="logro-badge">
+              <i class="pi pi-check-circle"></i>
+            </div>
+          </div>
+
+          <div class="logro-card" [class.unlocked]="true">
+            <div class="logro-icon" style="background: linear-gradient(135deg, #ff9f43, #ffb366)">
+              <i class="pi pi-trophy"></i>
+            </div>
+            <div class="logro-info">
+              <h3>Influencer Cívico</h3>
+              <p>Obtuvo 100 reacciones</p>
+            </div>
+            <div class="logro-badge">
+              <i class="pi pi-check-circle"></i>
+            </div>
+          </div>
+
+          <div class="logro-card" [class.unlocked]="false">
+            <div class="logro-icon" style="background: linear-gradient(135deg, #d0d0d0, #e0e0e0)">
+              <i class="pi pi-list-check"></i>
+            </div>
+            <div class="logro-info">
+              <h3>Problema Resuelto</h3>
+              <p>Un reporte suyo fue resuelto</p>
+            </div>
+            <div class="logro-badge">
+              <i class="pi pi-lock"></i>
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- TAB ESTADÍSTICAS -->
       <div *ngIf="currentTab === 'estadisticas'" class="estadisticas-content">
-        <div class="empty-state">
-          <div class="empty-icon">📊</div>
-          <p>Las estadísticas de este usuario aparecerán aquí</p>
+        <div class="estadisticas-grid">
+          <div class="estadistica-section">
+            <h3>Impacto de sus Reportes</h3>
+            <div class="estadistica-items">
+              <div class="estadistica-item">
+                <span class="estadistica-label">Total de reacciones</span>
+                <span class="estadistica-value">0</span>
+              </div>
+              <div class="estadistica-item">
+                <span class="estadistica-label">Total de comentarios</span>
+                <span class="estadistica-value">0</span>
+              </div>
+              <div class="estadistica-item">
+                <span class="estadistica-label">Tasa de resolución</span>
+                <span class="estadistica-value" style="color: #10b981">0%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="estadistica-section">
+            <h3>Participación</h3>
+            <div class="estadistica-items">
+              <div class="estadistica-item">
+                <span class="estadistica-label">Reportes totales</span>
+                <span class="estadistica-value">0</span>
+              </div>
+              <div class="estadistica-item">
+                <span class="estadistica-label">Comentarios totales</span>
+                <span class="estadistica-value">0</span>
+              </div>
+              <div class="estadistica-item">
+                <span class="estadistica-label">Racha actual</span>
+                <span class="estadistica-value" style="color: #f97316">0 días</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- Modales (sin cambios) -->
+  <!-- ========== MODAL SEGUIDORES ========== -->
   <div class="modal-overlay" *ngIf="mostrarModalSeguidores" (click)="cerrarModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Seguidores ({{ seguidoresCount }})</h2>
         <button class="modal-close" (click)="cerrarModal()">
-          <i class="bi bi-x-lg"></i>
+          <i class="pi pi-times"></i>
         </button>
       </div>
-
       <div class="modal-body">
         <div *ngIf="loadingModal" class="modal-loading">
-          <p>⏳ Cargando...</p>
+          <i class="pi pi-spin pi-spinner"></i>
+          <p>Cargando...</p>
         </div>
-
         <div *ngIf="!loadingModal && listaSeguidores.length === 0" class="modal-empty">
           <p>No tiene seguidores aún</p>
         </div>
-
         <div *ngIf="!loadingModal && listaSeguidores.length > 0" class="users-list">
           <div *ngFor="let user of listaSeguidores" class="user-item">
-            <img 
-              [src]="obtenerFoto(user.foto_perfil)" 
+            <img
+              [src]="obtenerFoto(user.foto_perfil)"
               [alt]="user.nombre"
               class="user-avatar-small"
               (click)="verPerfil(user)"
             />
-            
             <div class="user-info-modal">
               <h4>{{ user.nombre }} {{ user.apellido }}</h4>
-              <p *ngIf="user.distrito">📍 {{ user.distrito }}</p>
+              <p *ngIf="user.distrito">
+                <i class="pi pi-map-marker"></i> {{ user.distrito }}
+              </p>
             </div>
-
             <button class="btn-view-modal" (click)="verPerfil(user)">
-              <i class="bi bi-eye"></i>
+              <i class="pi pi-eye"></i>
             </button>
           </div>
         </div>
@@ -173,48 +267,49 @@
     </div>
   </div>
 
+  <!-- ========== MODAL SEGUIDOS ========== -->
   <div class="modal-overlay" *ngIf="mostrarModalSeguidos" (click)="cerrarModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Siguiendo ({{ seguidosCount }})</h2>
         <button class="modal-close" (click)="cerrarModal()">
-          <i class="bi bi-x-lg"></i>
+          <i class="pi pi-times"></i>
         </button>
       </div>
-
       <div class="modal-body">
         <div *ngIf="loadingModal" class="modal-loading">
-          <p>⏳ Cargando...</p>
+          <i class="pi pi-spin pi-spinner"></i>
+          <p>Cargando...</p>
         </div>
-
         <div *ngIf="!loadingModal && listaSeguidos.length === 0" class="modal-empty">
           <p>No sigue a nadie aún</p>
         </div>
-
         <div *ngIf="!loadingModal && listaSeguidos.length > 0" class="users-list">
           <div *ngFor="let user of listaSeguidos" class="user-item">
-            <img 
-              [src]="obtenerFoto(user.foto_perfil)" 
+            <img
+              [src]="obtenerFoto(user.foto_perfil)"
               [alt]="user.nombre"
               class="user-avatar-small"
               (click)="verPerfil(user)"
             />
-            
             <div class="user-info-modal">
               <h4>{{ user.nombre }} {{ user.apellido }}</h4>
-              <p *ngIf="user.distrito">📍 {{ user.distrito }}</p>
+              <p *ngIf="user.distrito">
+                <i class="pi pi-map-marker"></i> {{ user.distrito }}
+              </p>
             </div>
-
             <button class="btn-view-modal" (click)="verPerfil(user)">
-              <i class="bi bi-eye"></i>
+              <i class="pi pi-eye"></i>
             </button>
           </div>
         </div>
       </div>
     </div>
   </div>
+
 </div>
 
+<!-- ========== LOADING STATE ========== -->
 <div *ngIf="cargando" class="loading-container">
   <div class="loading-spinner"></div>
   <p>Cargando perfil...</p>
