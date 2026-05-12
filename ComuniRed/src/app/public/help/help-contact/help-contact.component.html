@@ -1,3 +1,11 @@
+<app-change
+  [alerts]="alerts"
+  [confirmDialog]="confirmDialog"
+  (confirm)="onConfirmSubmit()"
+  (cancel)="onCancelSubmit()"
+  (removeAlert)="removeAlert($event)">
+</app-change>
+
 <div class="contact-wrapper">
   <div class="contact-header">
     <h2>¿No encontraste lo que buscabas?</h2>
@@ -54,7 +62,7 @@
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn-save" [disabled]="contactForm.invalid || enviando">
+      <button type="submit" class="btn-save" [disabled]="enviando">
         <span *ngIf="!enviando">Enviar Mensaje</span>
         <span *ngIf="enviando" class="loading-text">
           <span class="spinner-small"></span> Enviando...

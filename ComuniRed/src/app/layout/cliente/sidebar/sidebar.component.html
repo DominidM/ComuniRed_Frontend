@@ -1,20 +1,31 @@
-<div class="sidebar-container" role="navigation" aria-label="Sidebar">
-  <!-- ── Botón crear ── -->
-  <button class="create-btn" (click)="onCrearPublicacion()" type="button">
+<div
+  class="sidebar-container"
+  [class.modal-dimmed]="modalActive"
+  [class.modal-blocked]="modalActive"
+  role="navigation"
+  aria-label="Sidebar"
+  [attr.aria-disabled]="modalActive"
+>
+  <button
+    class="create-btn"
+    (click)="onCrearPublicacion()"
+    type="button"
+    [disabled]="modalActive"
+  >
     <mat-icon>add</mat-icon>
     <span class="create-label">Crear publicación</span>
   </button>
 
-  <!-- ── Menú ── -->
   <nav class="sidebar-menu" aria-label="Menú principal">
-    <!-- Grupo principal -->
     <ng-container *ngFor="let item of menuPrimary">
       <a
         class="sidebar-link"
-        [routerLink]="item.route"
+        [routerLink]="null"
+        (click)="onLinkClick($event, item.route)"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: !!item.exact }"
         [title]="item.label"
+        [attr.aria-disabled]="modalActive"
       >
         <span class="icon-wrap" aria-hidden="true">
           <mat-icon>{{ item.icon }}</mat-icon>
@@ -40,23 +51,24 @@
 
     <div class="menu-separator" role="separator"></div>
 
-    <!-- Grupo secundario (social) -->
     <ng-container *ngFor="let item of menuSecondary">
       <a
         class="sidebar-link"
-        [routerLink]="item.route"
+        [routerLink]="null"
+        (click)="onLinkClick($event, item.route)"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: false }"
         [title]="item.label"
+        [attr.aria-disabled]="modalActive"
       >
         <span class="icon-wrap" aria-hidden="true">
           <mat-icon>{{ item.icon }}</mat-icon>
         </span>
         <span class="link-label">{{ item.label }}</span>
         <ng-container [ngSwitch]="item.badgeType">
-          <span *ngSwitchCase="'count'" class="badge-count">{{
-            badgeLabel(item)
-          }}</span>
+          <span *ngSwitchCase="'count'" class="badge-count">
+            {{ badgeLabel(item) }}
+          </span>
           <span *ngSwitchCase="'new'" class="badge-new">Nuevo</span>
           <span *ngSwitchCase="'dot'" class="notif-dot"></span>
         </ng-container>
@@ -65,14 +77,15 @@
 
     <div class="menu-separator" role="separator"></div>
 
-    <!-- Grupo ajustes -->
     <ng-container *ngFor="let item of menuSettings">
       <a
         class="sidebar-link"
-        [routerLink]="item.route"
+        [routerLink]="null"
+        (click)="onLinkClick($event, item.route)"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: false }"
         [title]="item.label"
+        [attr.aria-disabled]="modalActive"
       >
         <span class="icon-wrap" aria-hidden="true">
           <mat-icon>{{ item.icon }}</mat-icon>
@@ -81,7 +94,7 @@
       </a>
     </ng-container>
   </nav>
-  <!-- ── Zona de perfil ── -->
+
   <div class="profile-zone" *ngIf="user">
     <div class="cover-strip"></div>
 
@@ -93,12 +106,18 @@
           [alt]="user.name"
           class="user-avatar"
         />
-        <span *ngIf="!user.avatarUrl" class="avatar-fallback">{{
-          user.initials
-        }}</span>
+        <span *ngIf="!user.avatarUrl" class="avatar-fallback">
+          {{ user.initials }}
+        </span>
         <span class="online-dot" aria-hidden="true"></span>
       </div>
-      <button class="btn-edit" [routerLink]="['/public/profile']" type="button">
+
+      <button
+        class="btn-edit"
+        type="button"
+        (click)="onEditarPerfil()"
+        [disabled]="modalActive"
+      >
         Editar perfil
       </button>
     </div>
@@ -108,30 +127,36 @@
       <div class="profile-handle">{{ user.handle }}</div>
 
       <div class="stats-row">
-        <a class="stat" [routerLink]="['/public/profile']">
-          <span class="stat-num">{{
-            formatearContador(user.followersCount)
-          }}</span>
+        <a
+          class="stat"
+          [routerLink]="null"
+          (click)="onIrPerfil()"
+          [attr.aria-disabled]="modalActive"
+        >
+          <span class="stat-num">{{ formatearContador(user.followersCount) }}</span>
           <span class="stat-lbl">Seguidores</span>
         </a>
         <div class="stat-divider"></div>
-        <a class="stat" [routerLink]="['/public/profile']">
-          <span class="stat-num">{{
-            formatearContador(user.followingCount)
-          }}</span>
+        <a
+          class="stat"
+          [routerLink]="null"
+          (click)="onIrPerfil()"
+          [attr.aria-disabled]="modalActive"
+        >
+          <span class="stat-num">{{ formatearContador(user.followingCount) }}</span>
           <span class="stat-lbl">Siguiendo</span>
         </a>
       </div>
     </div>
   </div>
 
-  <!-- ── Footer ── -->
   <div class="sidebar-footer">
     <button
       class="logout-btn"
       (click)="onSalir()"
       type="button"
       aria-label="Cerrar sesión"
+      [disabled]="modalActive"
     >
       <mat-icon>logout</mat-icon>
       <span>Cerrar sesión</span>

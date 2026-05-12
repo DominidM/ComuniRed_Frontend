@@ -7,53 +7,43 @@ html {
 :root {
   --cr-navbar-height: 64px;
   --cr-sidebar-width: 72px;
-
   --cr-primary: #0f766e;
   --cr-primary-hover: #0b5e57;
   --cr-primary-soft: #0f766e14;
   --cr-primary-soft-2: #0f766e1f;
   --cr-primary-soft-3: #0f766e2e;
   --cr-primary-soft-4: #0f766e8c;
-
   --cr-brand-red: #b91c1c;
   --cr-brand-red-hover: #991b1b;
   --cr-brand-red-soft: #b91c1c14;
   --cr-brand-red-soft-2: #b91c1c66;
   --cr-brand-red-soft-3: #b91c1ca6;
-
   --cr-success: #16a34a;
   --cr-success-hover: #15803d;
   --cr-success-soft: #16a34a1a;
-
   --cr-danger: #dc2626;
   --cr-danger-hover: #b91c1c;
   --cr-danger-soft: #dc262614;
   --cr-danger-soft-2: #dc26261f;
-
   --cr-warning: #ea580c;
   --cr-warning-soft: #ea580c1f;
-
   --cr-badge-red: #ef4444;
   --cr-badge-red-text: #ffffff;
-
   --cr-text: #111827;
   --cr-text-muted: #6b7280;
   --cr-text-faint: #9ca3af;
   --cr-text-soft: #1118278c;
   --cr-text-soft-2: #11182799;
   --cr-text-soft-3: #11182759;
-
   --cr-background: #ffffff;
   --cr-background-content: #ffffff;
   --cr-surface: #f8fafc;
   --cr-search: #f9fafb;
-
   --cr-border: #e5e7eb;
   --cr-border-strong: #111111;
   --cr-border-soft: #1118271a;
   --cr-border-soft-2: #11182724;
   --cr-border-soft-3: #1118271f;
-
   --cr-neutral-strong: #000000;
   --cr-neutral-strong-hover: #222222;
   --cr-neutral-muted: #666666;
@@ -61,21 +51,17 @@ html {
   --cr-neutral-surface: #f9f9f9;
   --cr-neutral-surface-hover: #ffffff;
   --cr-switch-off: #cccccc;
-
   --cr-button-black: #000000;
   --cr-button-black-hover: #222222;
   --cr-button-black-text: #ffffff;
-
   --cr-avatar-accent-1: #667eea;
   --cr-avatar-accent-2: #764ba2;
-
   --cr-white: #ffffff;
   --cr-white-90: #ffffffe6;
   --cr-white-80: #ffffffcc;
   --cr-white-20: #ffffff33;
   --cr-white-18: #ffffff2e;
   --cr-white-15: #ffffff26;
-
   --cr-black: #000000;
   --cr-black-08: #00000014;
   --cr-black-10: #0000001a;
@@ -87,15 +73,11 @@ html {
   --cr-black-70: #000000b3;
   --cr-black-80: #000000cc;
   --cr-black-85: #000000d9;
-
   --cr-overlay-dark: #0000008c;
   --cr-overlay-dark-soft: #00000066;
   --cr-overlay-dark-strong: #000000cc;
-
   --cr-focus-ring: #5f5cf61f;
-
   --cr-hover-surface: #f7f8fa;
-
   --shadow-soft: 0 1px 2px #00000014;
   --shadow-medium: 0 2px 6px #0000001a;
   --shadow-strong: 0 4px 12px #0000001f;
@@ -110,46 +92,37 @@ html {
   --cr-primary-soft-2: #2aa1981f;
   --cr-primary-soft-3: #2aa1982e;
   --cr-primary-soft-4: #2aa1988c;
-
   --cr-brand-red: #dc2626;
   --cr-brand-red-hover: #b91c1c;
   --cr-brand-red-soft: #dc262614;
   --cr-brand-red-soft-2: #dc262666;
   --cr-brand-red-soft-3: #dc2626a6;
-
   --cr-success: #22c55e;
   --cr-success-hover: #16a34a;
   --cr-success-soft: #22c55e1a;
-
   --cr-danger: #ef4444;
   --cr-danger-hover: #dc2626;
   --cr-danger-soft: #ef44441f;
   --cr-danger-soft-2: #ef444426;
-
   --cr-warning: #f59e0b;
   --cr-warning-soft: #f59e0b1f;
-
   --cr-badge-red: #ef4444;
   --cr-badge-red-text: #ffffff;
-
   --cr-text: #e5e7eb;
   --cr-text-muted: #9ca3af;
   --cr-text-faint: #6b7280;
   --cr-text-soft: #e5e7eb8c;
   --cr-text-soft-2: #e5e7eb99;
   --cr-text-soft-3: #e5e7eb59;
-
   --cr-background: #161717;
   --cr-background-content: #272829;
   --cr-surface: #1f2022;
   --cr-search: #2b2d30;
-
   --cr-border: #3a3a3a;
   --cr-border-strong: #d1d5db;
   --cr-border-soft: #e5e7eb1a;
   --cr-border-soft-2: #e5e7eb24;
   --cr-border-soft-3: #e5e7eb1f;
-
   --cr-neutral-strong: #f5f5f5;
   --cr-neutral-strong-hover: #ffffff;
   --cr-neutral-muted: #a1a1aa;
@@ -157,21 +130,17 @@ html {
   --cr-neutral-surface: #232425;
   --cr-neutral-surface-hover: #2b2d2f;
   --cr-switch-off: #4b5563;
-
   --cr-button-black: #000000;
   --cr-button-black-hover: #222222;
   --cr-button-black-text: #ffffff;
-
   --cr-avatar-accent-1: #7c8cff;
   --cr-avatar-accent-2: #8b5cf6;
-
   --cr-white: #ffffff;
   --cr-white-90: #ffffffe6;
   --cr-white-80: #ffffffcc;
   --cr-white-20: #ffffff33;
   --cr-white-18: #ffffff2e;
   --cr-white-15: #ffffff26;
-
   --cr-black: #000000;
   --cr-black-08: #00000014;
   --cr-black-10: #0000001a;
@@ -183,15 +152,11 @@ html {
   --cr-black-70: #000000b3;
   --cr-black-80: #000000cc;
   --cr-black-85: #000000d9;
-
   --cr-overlay-dark: #0000008c;
   --cr-overlay-dark-soft: #00000066;
   --cr-overlay-dark-strong: #000000cc;
-
   --cr-focus-ring: #2aa1982e;
-
   --cr-hover-surface: #2d2f31;
-
   --shadow-soft: 0 1px 2px #00000014;
   --shadow-medium: 0 2px 6px #00000026;
   --shadow-strong: 0 4px 12px #00000033;
@@ -525,6 +490,35 @@ app-landing,
 .mat-drawer-content,
 .mat-sidenav-content {
   overflow: unset !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MODAL OPEN — bloqueo global de interacción
+   .modal-backdrop cubre TODO (navbar z:1100, mat-sidenav z:auto)
+   con z-index 2147483640 (máximo seguro).
+   app-change vive encima con z-index 2147483645.
+   El confirm-overlay interno tiene pointer-events:auto propio.
+───────────────────────────────────────────────────────────── */
+body.modal-open {
+  overflow: hidden;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483640;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  pointer-events: auto;
+  cursor: default;
+}
+
+app-change {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483645 !important;
+  pointer-events: none !important;
 }
 
 @media (max-width: 768px) {

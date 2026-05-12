@@ -1,3 +1,11 @@
+<app-change
+  [alerts]="alerts"
+  [confirmDialog]="confirmDialog"
+  (confirm)="onConfirmAction()"
+  (cancel)="onCancelAction()"
+  (removeAlert)="removeAlert($event)">
+</app-change>
+
 <div class="settings-container">
   <h2 class="settings-title">Configuración</h2>
 

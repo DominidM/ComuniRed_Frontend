@@ -1,7 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AlertService } from '../../../shared/services/change.service';
+import {
+  ChangeComponent,
+  Alert,
+  ConfirmDialog,
+} from '../../../shared/components/change/change.component';
+import { ModalStateService } from '../../../shared/services/modal-state.service';
 
 interface PrivacySetting {
   id: string;
@@ -13,38 +18,85 @@ interface PrivacySetting {
 @Component({
   selector: 'app-privacy',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ChangeComponent],
   templateUrl: './settings-privacy.component.html',
   styleUrl: './settings-privacy.component.css',
 })
-export class SettingsPrivacyComponent {
+export class SettingsPrivacyComponent implements OnDestroy {
   privacySettings: PrivacySetting[] = [
-    { id: 'public-profile', titulo: 'Perfil Público', descripcion: 'Permite que otros vean tu perfil', activo: true },
-    { id: 'show-email', titulo: 'Mostrar Email', descripcion: 'Muestra tu email en tu perfil público', activo: false },
-    { id: 'show-location', titulo: 'Mostrar Ubicación', descripcion: 'Permite que otros vean tu ubicación general', activo: true },
+    {
+      id: 'public-profile',
+      titulo: 'Perfil Público',
+      descripcion: 'Permite que otros vean tu perfil',
+      activo: true,
+    },
+    {
+      id: 'show-email',
+      titulo: 'Mostrar Email',
+      descripcion: 'Muestra tu email en tu perfil público',
+      activo: false,
+    },
+    {
+      id: 'show-location',
+      titulo: 'Mostrar Ubicación',
+      descripcion: 'Permite que otros vean tu ubicación general',
+      activo: true,
+    },
   ];
 
-  constructor(private alertService: AlertService) {}
+  alerts: Alert[] = [];
+  confirmDialog: ConfirmDialog | null = null;
+
+  constructor(private modalState: ModalStateService) {}
+
+  ngOnDestroy(): void {
+    this.modalState.close();
+  }
 
   togglePrivacy(id: string): void {
-    const setting = this.privacySettings.find(s => s.id === id);
+    const setting = this.privacySettings.find((s) => s.id === id);
     if (setting) setting.activo = !setting.activo;
   }
 
-  async save(): Promise<void> {
-    const confirmado = await this.alertService.confirm(
-      '¿Guardar cambios?',
-      '¿Estás seguro de que deseas actualizar tu privacidad?',
-      'Sí, guardar',
-      'Cancelar'
-    );
+  save(): void {
+    this.confirmDialog = {
+      title: '¿Guardar cambios?',
+      message: '¿Estás seguro de que deseas actualizar tu privacidad?',
+      confirmText: 'Sí, guardar',
+      cancelText: 'Cancelar',
+    };
+    this.modalState.open();
+  }
 
-    if (!confirmado) return;
+  onConfirmSave(): void {
+    this.confirmDialog = null;
+    this.modalState.close();
+    this.showAlert('success', 'Configuración de privacidad guardada');
+  }
 
-    this.alertService.success('Configuración de privacidad guardada');
+  onCancelSave(): void {
+    this.confirmDialog = null;
+    this.modalState.close();
   }
 
   cancel(): void {
-    this.alertService.info('Cambios cancelados');
+    this.showAlert('info', 'Cambios cancelados');
+  }
+
+  removeAlert(alert: Alert): void {
+    this.alerts = this.alerts.filter((a) => a !== alert);
+  }
+
+  private showAlert(
+    type: Alert['type'],
+    message: string,
+    duration = 4000
+  ): void {
+    const alert: Alert = { type, message, duration };
+    this.alerts.push(alert);
+
+    setTimeout(() => {
+      this.removeAlert(alert);
+    }, duration);
   }
 }

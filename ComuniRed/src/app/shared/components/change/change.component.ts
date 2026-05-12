@@ -1,7 +1,27 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  HostListener
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
-import { AlertService, Alert, ConfirmDialog } from '../../services/change.service';
+
+export interface Alert {
+  type: 'success' | 'error' | 'warning' | 'info';
+  message: string;
+  duration?: number;
+}
+
+export interface ConfirmDialog {
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+}
 
 @Component({
   selector: 'app-change',
@@ -10,40 +30,46 @@ import { AlertService, Alert, ConfirmDialog } from '../../services/change.servic
   templateUrl: './change.component.html',
   styleUrls: ['./change.component.css']
 })
-export class ChangeComponent implements OnInit, OnDestroy {
-  alerts: Alert[] = [];
-  confirmDialog: ConfirmDialog | null = null;
-  private subs: Subscription[] = [];
+export class ChangeComponent implements OnChanges, OnDestroy {
+  @Input() alerts: Alert[] = [];
+  @Input() confirmDialog: ConfirmDialog | null = null;
 
-  constructor(private alertService: AlertService) {}
+  @Output() confirm = new EventEmitter<void>();
+  @Output() cancel = new EventEmitter<void>();
+  @Output() removeAlert = new EventEmitter<Alert>();
 
-  ngOnInit() {
-    this.subs.push(
-      this.alertService.alerts$.subscribe(alert => {
-        this.alerts.push(alert);
-        setTimeout(() => this.remove(alert), alert.duration || 4000);
-      }),
-      this.alertService.confirm$.subscribe(dialog => {
-        this.confirmDialog = dialog;
-      })
-    );
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('confirmDialog' in changes) {
+      if (this.confirmDialog) {
+        document.body.classList.add('modal-open');
+      } else {
+        document.body.classList.remove('modal-open');
+      }
+    }
   }
 
-  remove(alert: Alert) {
-    this.alerts = this.alerts.filter(a => a !== alert);
+  ngOnDestroy(): void {
+    document.body.classList.remove('modal-open');
   }
 
-  onConfirm() {
-    this.confirmDialog?.resolve(true);
-    this.confirmDialog = null;
+  onConfirm(): void {
+    document.body.classList.remove('modal-open');
+    this.confirm.emit();
   }
 
-  onCancel() {
-    this.confirmDialog?.resolve(false);
-    this.confirmDialog = null;
+  onCancel(): void {
+    document.body.classList.remove('modal-open');
+    this.cancel.emit();
   }
 
-  ngOnDestroy() {
-    this.subs.forEach(s => s.unsubscribe());
+  onRemoveAlert(alert: Alert): void {
+    this.removeAlert.emit(alert);
+  }
+
+  @HostListener('document:keydown.escape')
+  handleEscape(): void {
+    if (this.confirmDialog) {
+      this.onCancel();
+    }
   }
 }

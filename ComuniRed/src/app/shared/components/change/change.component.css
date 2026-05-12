@@ -1,200 +1,189 @@
-/* ========================================
-   TOAST STACK
-   ======================================== */
+:host {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+}
 
 .toast-stack {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 9999;
+  top: calc(var(--cr-navbar-height, 64px) + 16px);
+  right: 20px;
+  z-index: 30010;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: min(360px, calc(100vw - 40px));
   pointer-events: none;
 }
 
 .toast {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
-  padding: 12px 14px;
-  border-radius: 12px;
+  width: 100%;
   min-width: 260px;
   max-width: 360px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  pointer-events: all;
-  animation: toastIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  font-size: 13px;
-  font-weight: 500;
-  backdrop-filter: blur(8px);
+  padding: 12px 14px;
+  border-radius: 12px;
   border: 1px solid transparent;
+  background: var(--cr-background, #ffffff);
+  color: var(--cr-text, #111827);
+  box-shadow: var(--shadow-strong, 0 4px 12px rgba(0, 0, 0, 0.12));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+  animation: toastIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* Tipos */
 .toast-success {
-  background: rgba(16, 185, 129, 0.12);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #065f46;
-}
-
-html.dark .toast-success {
-  background: rgba(16, 185, 129, 0.15);
-  border-color: rgba(16, 185, 129, 0.25);
-  color: #6ee7b7;
+  background: var(--cr-success-soft, rgba(34, 197, 94, 0.12));
+  border-color: color-mix(in srgb, var(--cr-success, #22c55e) 30%, transparent);
+  color: var(--cr-success-hover, #15803d);
 }
 
 .toast-error {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #991b1b;
-}
-
-html.dark .toast-error {
-  background: rgba(239, 68, 68, 0.15);
-  border-color: rgba(239, 68, 68, 0.25);
-  color: #fca5a5;
+  background: var(--cr-danger-soft, rgba(239, 68, 68, 0.12));
+  border-color: color-mix(in srgb, var(--cr-danger, #ef4444) 30%, transparent);
+  color: var(--cr-danger-hover, #dc2626);
 }
 
 .toast-warning {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: rgba(245, 158, 11, 0.3);
-  color: #92400e;
-}
-
-html.dark .toast-warning {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.25);
-  color: #fde68a;
+  background: var(--cr-warning-soft, rgba(245, 158, 11, 0.12));
+  border-color: color-mix(in srgb, var(--cr-warning, #f59e0b) 30%, transparent);
+  color: #b45309;
 }
 
 .toast-info {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.25);
-  color: #1e3a5f;
+  background: color-mix(in srgb, var(--cr-primary, #0f766e) 12%, transparent);
+  border-color: color-mix(in srgb, var(--cr-primary, #0f766e) 28%, transparent);
+  color: var(--cr-primary, #0f766e);
 }
 
-html.dark .toast-info {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.2);
-  color: #93c5fd;
-}
-
-/* Icono */
 .toast-icon {
   font-size: 16px;
-  flex-shrink: 0;
   line-height: 1;
+  margin-top: 1px;
+  flex-shrink: 0;
 }
 
-.toast-success .toast-icon { color: #10b981; }
-.toast-error   .toast-icon { color: #ef4444; }
-.toast-warning .toast-icon { color: #f59e0b; }
-.toast-info    .toast-icon { color: #3b82f6; }
+.toast-success .toast-icon {
+  color: var(--cr-success, #22c55e);
+}
 
-/* Mensaje */
-.toast-message {
+.toast-error .toast-icon {
+  color: var(--cr-danger, #ef4444);
+}
+
+.toast-warning .toast-icon {
+  color: var(--cr-warning, #f59e0b);
+}
+
+.toast-info .toast-icon {
+  color: var(--cr-primary, #0f766e);
+}
+
+.toast-body {
   flex: 1;
-  line-height: 1.4;
+  min-width: 0;
 }
 
-/* Botón cerrar */
+.toast-message {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
 .toast-close {
   background: transparent;
   border: none;
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 6px;
   color: inherit;
-  opacity: 0.6;
+  opacity: 0.7;
+  cursor: pointer;
   font-size: 16px;
   line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.15s ease, background 0.15s ease;
+  padding: 2px 4px;
+  border-radius: 6px;
   flex-shrink: 0;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .toast-close:hover {
   opacity: 1;
-  background: rgba(0, 0, 0, 0.08);
+  background: color-mix(in srgb, var(--cr-black, #000000) 8%, transparent);
 }
 
-/* ========================================
-   CONFIRM DIALOG
-   ======================================== */
-
+/* DESPUÉS — sube z-index para quedar encima del host de app-change */
 .confirm-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(3px);
+  z-index: 30020;
+  background: rgba(0, 0, 0, 0.6);      /* oscuro semitransparente */
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
+  padding: 20px;
   animation: fadeOverlay 0.2s ease both;
+  pointer-events: auto;                 /* ← CRÍTICO: permite clicks */
+  touch-action: none;
 }
 
 .confirm-box {
-  background: var(--bg-secondary, #ffffff);
+  width: min(100%, 380px);
+  background: var(--cr-background, #ffffff);
+  color: var(--cr-text, #111827);
+  border: 1px solid var(--cr-border, #e5e7eb);
   border-radius: 18px;
   padding: 32px 28px 24px;
-  width: 90%;
-  max-width: 380px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-modal, 0 10px 40px rgba(0, 0, 0, 0.25));
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  animation: dialogIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: dialogIn 0.25s ease both;
+  pointer-events: auto;
 }
 
-html.dark .confirm-box {
-  background: #1e1f22;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-/* Icono central */
 .confirm-icon {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(245, 158, 11, 0.12);
-  border: 2px solid rgba(245, 158, 11, 0.25);
+  background: color-mix(in srgb, var(--cr-warning, #f59e0b) 12%, transparent);
+  border: 2px solid
+    color-mix(in srgb, var(--cr-warning, #f59e0b) 24%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
 }
 
-.confirm-icon i {
+.confirm-icon .material-icons {
   font-size: 26px;
-  color: #f59e0b;
+  color: var(--cr-warning, #f59e0b);
 }
 
-/* Título */
 .confirm-title {
+  margin: 0 0 8px;
   font-size: 17px;
   font-weight: 700;
-  color: var(--text-primary, #111);
-  margin: 0 0 8px;
   line-height: 1.3;
+  color: var(--cr-text, #111827);
 }
 
-html.dark .confirm-title {
-  color: #f3f4f6;
-}
-
-/* Mensaje */
 .confirm-message {
-  font-size: 14px;
-  color: var(--text-secondary, #6b7280);
   margin: 0 0 24px;
+  font-size: 14px;
   line-height: 1.6;
+  color: var(--cr-text-muted, #6b7280);
 }
 
-/* Botones */
 .confirm-actions {
   display: flex;
   gap: 10px;
@@ -208,78 +197,60 @@ html.dark .confirm-title {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  border: none;
+  border: 1px solid transparent;
   transition: all 0.2s ease;
 }
 
 .confirm-btn-cancel {
-  background: var(--bg-primary, #f3f4f6);
-  color: var(--text-primary, #374151);
-  border: 1.5px solid var(--border-color, #e5e7eb);
+  background: var(--cr-surface, #f3f4f6);
+  color: var(--cr-text, #374151);
+  border-color: var(--cr-border, #e5e7eb);
 }
 
 .confirm-btn-cancel:hover {
-  background: var(--border-color, #e5e7eb);
-}
-
-html.dark .confirm-btn-cancel {
-  background: rgba(255, 255, 255, 0.06);
-  color: #d1d5db;
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-html.dark .confirm-btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--cr-hover-surface, #f7f8fa);
 }
 
 .confirm-btn-ok {
-  background: #111827;
-  color: white;
+  background: var(--cr-button-black, #111827);
+  color: var(--cr-button-black-text, #ffffff);
+  border-color: var(--cr-button-black, #111827);
 }
 
 .confirm-btn-ok:hover {
-  background: #1f2937;
+  background: var(--cr-button-black-hover, #1f2937);
+  border-color: var(--cr-button-black-hover, #1f2937);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-html.dark .confirm-btn-ok {
-  background: #f3f4f6;
-  color: #111827;
-}
-
-html.dark .confirm-btn-ok:hover {
-  background: #ffffff;
 }
 
 .confirm-btn:active {
   transform: scale(0.97);
 }
 
-/* ========================================
-   ANIMACIONES
-   ======================================== */
-
 @keyframes toastIn {
   from {
     opacity: 0;
-    transform: translateX(30px) scale(0.95);
+    transform: translateY(-10px) translateX(16px) scale(0.96);
   }
   to {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translateY(0) translateX(0) scale(1);
   }
 }
 
 @keyframes fadeOverlay {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes dialogIn {
   from {
     opacity: 0;
-    transform: scale(0.88) translateY(20px);
+    transform: scale(0.92) translateY(12px);
   }
   to {
     opacity: 1;
@@ -287,23 +258,23 @@ html.dark .confirm-btn-ok:hover {
   }
 }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .toast-stack {
-    bottom: 16px;
+    top: calc(var(--cr-navbar-height, 56px) + 12px);
     right: 12px;
     left: 12px;
+    width: auto;
   }
 
   .toast {
     min-width: unset;
     max-width: 100%;
   }
+}
 
+@media (max-width: 480px) {
   .confirm-box {
+    width: 100%;
     padding: 24px 20px 20px;
   }
 

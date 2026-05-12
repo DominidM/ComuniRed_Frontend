@@ -20,7 +20,7 @@
 .help-icon {
   width: 56px;
   height: 56px;
-  background: var(--cr-primary);
+  background: var(--cr-brand-red-soft-3);
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -74,13 +74,13 @@
 }
 
 .help-tabs button:hover {
-  color: var(--cr-primary);
-  background: color-mix(in srgb, var(--cr-primary) 6%, transparent);
+  color: var(--cr-brand-red);
+  background: color-mix(in srgb, var(--cr-brand-red) 6%, transparent);
 }
 
 .help-tabs button.active {
-  border-bottom-color: var(--cr-primary);
-  color: var(--cr-primary);
+  border-bottom-color: var(--cr-brand-red);
+  color: var(--cr-brand-red);
   font-weight: 600;
 }
 

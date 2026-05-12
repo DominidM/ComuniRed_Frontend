@@ -2,9 +2,9 @@ import {
   Component,
   EventEmitter,
   Output,
-  HostListener,
   OnInit,
   OnDestroy,
+  Input,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -41,6 +41,7 @@ interface SearchResult {
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   @Output() menuToggle = new EventEmitter<void>();
+  @Input() modalActive = false;
 
   query = '';
   notificationCount = 5;
@@ -61,28 +62,35 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private router: Router,
     private quejaService: QuejaService,
     private usuarioService: UsuarioService,
-    public themeService: ThemeService,
+    public themeService: ThemeService
   ) {}
 
-ngOnInit(): void {
-  const user = this.usuarioService.getUser();
-  if (user) {
-    this.currentUserId = (user as any).id;
-    
-    this.avatarUrl = this.usuarioService.obtenerFotoMiniatura(user.foto_perfil, 44);
-    this.initials = `${user.nombre?.[0] ?? ''}${user.apellido?.[0] ?? ''}`.toUpperCase() || 'CR';
+  ngOnInit(): void {
+    const user = this.usuarioService.getUser();
+    if (user) {
+      this.currentUserId = (user as any).id;
+      this.avatarUrl = this.usuarioService.obtenerFotoMiniatura(user.foto_perfil, 44);
+      this.initials =
+        `${user.nombre?.[0] ?? ''}${user.apellido?.[0] ?? ''}`.toUpperCase() || 'CR';
+    }
   }
-}
 
   ngOnDestroy(): void {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
   }
 
+  canInteract(): boolean {
+    return !this.modalActive;
+  }
+
   onMenuToggle(): void {
+    if (!this.canInteract()) return;
     this.menuToggle.emit();
   }
 
   onQueryChange(value: any): void {
+    if (!this.canInteract()) return;
+
     if (value && typeof value !== 'string' && (value as Event).target) {
       this.query = ((value as Event).target as HTMLInputElement).value;
     } else {
@@ -103,7 +111,7 @@ ngOnInit(): void {
   }
 
   performSearch(term: string): void {
-    if (!term || !this.currentUserId) return;
+    if (!this.canInteract() || !term || !this.currentUserId) return;
 
     this.searching = true;
     this.showSearchResults = true;
@@ -117,7 +125,7 @@ ngOnInit(): void {
             (q) =>
               q.titulo.toLowerCase().includes(termLower) ||
               q.descripcion.toLowerCase().includes(termLower) ||
-              q.categoria?.nombre.toLowerCase().includes(termLower),
+              q.categoria?.nombre.toLowerCase().includes(termLower)
           )
           .slice(0, 5)
           .map((q) => ({
@@ -162,6 +170,8 @@ ngOnInit(): void {
   }
 
   selectResult(result: SearchResult): void {
+    if (!this.canInteract()) return;
+
     this.showSearchResults = false;
     this.query = '';
 
@@ -177,6 +187,7 @@ ngOnInit(): void {
   }
 
   closeSearch(): void {
+    if (!this.canInteract()) return;
     this.showSearchResults = false;
   }
 
@@ -194,7 +205,7 @@ ngOnInit(): void {
 
   formatDate(dateString: string): string {
     const diffInHours = Math.floor(
-      (Date.now() - new Date(dateString).getTime()) / 3600000,
+      (Date.now() - new Date(dateString).getTime()) / 3600000
     );
     if (diffInHours < 1) return 'hace unos minutos';
     if (diffInHours < 24) return `hace ${diffInHours}h`;
@@ -203,15 +214,23 @@ ngOnInit(): void {
   }
 
   openNotifications(): void {
+    if (!this.canInteract()) return;
     this.router.navigate(['/public/notifications']);
     this.notificationCount = 0;
   }
 
+  goMessages(): void {
+    if (!this.canInteract()) return;
+    this.router.navigate(['/public/messages']);
+  }
+
   toggleTheme(): void {
+    if (!this.canInteract()) return;
     this.themeService.toggleTheme();
   }
 
   goHome(): void {
+    if (!this.canInteract()) return;
     this.router.navigate(['/public/home']);
   }
 
@@ -220,6 +239,7 @@ ngOnInit(): void {
   }
 
   goProfile(): void {
+    if (!this.canInteract()) return;
     this.router.navigate(['/public/profile']);
   }
 }

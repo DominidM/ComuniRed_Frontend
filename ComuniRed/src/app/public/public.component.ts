@@ -1,4 +1,11 @@
-import { Component, HostListener, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnInit,
+  AfterViewInit,
+  ViewChild,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../layout/cliente/sidebar/sidebar.component';
@@ -8,7 +15,8 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { filter } from 'rxjs/operators';
+import { filter, Subscription } from 'rxjs';
+import { ModalStateService } from '../shared/services/modal-state.service';
 
 @Component({
   selector: 'app-public',
@@ -22,28 +30,47 @@ import { filter } from 'rxjs/operators';
     RouterOutlet,
     MatSidenavModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './public.component.html',
-  styleUrls: ['./public.component.css']
+  styleUrls: ['./public.component.css'],
 })
-export class PublicComponent implements OnInit, AfterViewInit {
+export class PublicComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('sidenav') sidenav!: MatSidenav;
 
   isDesktop = true;
   isReelsRoute = false;
+  modalActive = false;
 
-  constructor(private router: Router) {}
+  private routerSub?: Subscription;
+  private modalSub?: Subscription;
+
+  constructor(
+    private router: Router,
+    private modalState: ModalStateService
+  ) {}
 
   ngOnInit() {
     this.checkScreenSize();
     this.isReelsRoute = this.router.url.includes('/reels');
 
-    this.router.events.pipe(
-      filter(e => e instanceof NavigationEnd)
-    ).subscribe((e: any) => {
-      this.isReelsRoute = e.url.includes('/reels');
-      if (!this.isDesktop) this.sidenav.close();
+    this.routerSub = this.router.events
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe((e: any) => {
+        this.isReelsRoute = e.url.includes('/reels');
+        if (!this.isDesktop && this.sidenav && !this.modalActive) {
+          this.sidenav.close();
+        }
+      });
+
+    this.modalSub = this.modalState.modalOpen$.subscribe((open) => {
+      this.modalActive = open;
+
+      if (open) {
+        document.body.classList.add('modal-open');
+      } else {
+        document.body.classList.remove('modal-open');
+      }
     });
   }
 
@@ -53,10 +80,16 @@ export class PublicComponent implements OnInit, AfterViewInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
+    this.modalSub?.unsubscribe();
+    document.body.classList.remove('modal-open');
+  }
+
   @HostListener('window:resize')
   onResize() {
     this.checkScreenSize();
-    if (this.sidenav) {
+    if (this.sidenav && !this.modalActive) {
       this.isDesktop ? this.sidenav.open() : this.sidenav.close();
     }
   }
@@ -66,6 +99,7 @@ export class PublicComponent implements OnInit, AfterViewInit {
   }
 
   toggleSidenav() {
+    if (this.modalActive) return;
     this.sidenav.toggle();
   }
 
@@ -76,6 +110,4 @@ export class PublicComponent implements OnInit, AfterViewInit {
   get sidenavOpened(): boolean {
     return this.isDesktop;
   }
-
-  
 }

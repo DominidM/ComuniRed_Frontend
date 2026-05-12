@@ -30,11 +30,10 @@ mat-sidenav.app-public-sidebar {
   width: var(--sidebar-w) !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  border-right: 1px solid var(--cr-border) !important;
+  border-right: none !important;
   background: var(--cr-background) !important;
   box-shadow: none !important;
 }
-
 /* ── Contenido principal: AQUÍ vive el único scroll vertical ── */
 mat-sidenav-content {
   overflow-y: auto !important;
@@ -106,3 +105,15 @@ app-rightbar {
   .feed-area { padding: 16px 12px; }
   .feed-area.reels-mode { padding: 0 !important; }
 }
+
+:host.modal-active app-navbar,
+:host.modal-active mat-sidenav-container {
+  pointer-events: none !important;
+  filter: brightness(0.4);
+  transition: filter 0.2s ease;
+}
+
+:host.modal-active app-change {
+  pointer-events: none !important;
+}
+
