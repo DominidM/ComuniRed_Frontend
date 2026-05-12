@@ -7,9 +7,6 @@
   border-radius: 12px;
   overflow: hidden;
 }
-/* ========================================
-   HEADER Y TABS
-   ======================================== */
 
 .suggestions-header {
   padding: 0.75rem 1rem;
@@ -28,7 +25,6 @@
   border: 1px solid var(--cr-border);
 }
 
-/* Override del global button reset */
 .tab {
   flex: 1;
   padding: 9px 12px;
@@ -37,7 +33,7 @@
   border-radius: 8px !important;
   font-size: 13px;
   font-weight: 600;
-  color: color-mix(in srgb, var(--cr-text) 55%, transparent) !important;
+  color: var(--cr-text-soft) !important;
   cursor: pointer;
   position: relative;
   transition: all 0.2s ease;
@@ -57,7 +53,7 @@
 .tab.active {
   color: var(--cr-text) !important;
   background: var(--cr-background) !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18) !important;
+  box-shadow: var(--shadow-medium) !important;
   border-color: transparent !important;
 }
 
@@ -65,8 +61,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #ef4444 !important;
-  color: #fff !important;
+  background: var(--cr-badge-red) !important;
+  color: var(--cr-badge-red-text) !important;
   border: none !important;
   padding: 1px 6px;
   border-radius: 999px;
@@ -77,11 +73,6 @@
   line-height: 1;
 }
 
-/* ========================================
-   BUSCADOR
-   ======================================== */
-
-/* .search-box ya tiene estilos globales en styles.css, refinamos */
 .search-box {
   display: flex !important;
   gap: 0 !important;
@@ -98,7 +89,7 @@
 
 .search-box:focus-within {
   border-color: var(--cr-primary) !important;
-  box-shadow: 0 0 0 3px rgba(95, 92, 246, 0.12) !important;
+  box-shadow: 0 0 0 3px var(--cr-focus-ring) !important;
 }
 
 .search-box input {
@@ -135,10 +126,6 @@
   border-color: transparent !important;
 }
 
-/* ========================================
-   LOADING Y EMPTY
-   ======================================== */
-
 .loading {
   display: flex;
   flex-direction: column;
@@ -153,7 +140,7 @@
 
 .loading p {
   font-size: 0.875rem;
-  color: color-mix(in srgb, var(--cr-text) 55%, transparent);
+  color: var(--cr-text-soft);
   margin: 0;
   animation: sgPulse 1.4s ease-in-out infinite;
 }
@@ -178,18 +165,14 @@
 
 .no-results i {
   font-size: 28px;
-  color: color-mix(in srgb, var(--cr-text) 35%, transparent);
+  color: var(--cr-text-soft-3);
 }
 
 .no-results p {
   font-size: 0.875rem;
-  color: color-mix(in srgb, var(--cr-text) 55%, transparent);
+  color: var(--cr-text-soft);
   margin: 0;
 }
-
-/* ========================================
-   CARDS DE USUARIO
-   ======================================== */
 
 .suggestions-grid {
   display: flex;
@@ -204,6 +187,7 @@
 .suggestions-grid::-webkit-scrollbar {
   width: 4px;
 }
+
 .suggestions-grid::-webkit-scrollbar-thumb {
   background: var(--cr-border);
   border-radius: 4px;
@@ -228,15 +212,10 @@
 }
 
 .user-card:hover {
-  background: color-mix(
-    in srgb,
-    var(--cr-background-content) 80%,
-    var(--cr-text) 5%
-  ) !important;
+  background: var(--cr-hover-surface) !important;
   border-color: transparent !important;
 }
 
-/* Avatar */
 .user-avatar {
   width: 44px;
   height: 44px;
@@ -248,7 +227,11 @@
   transition:
     transform 0.15s ease,
     border-color 0.15s ease;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(
+    135deg,
+    var(--cr-avatar-accent-1) 0%,
+    var(--cr-avatar-accent-2) 100%
+  );
 }
 
 .user-avatar:hover {
@@ -256,7 +239,6 @@
   border-color: var(--cr-primary) !important;
 }
 
-/* Info */
 .user-info {
   flex: 1;
   min-width: 0;
@@ -277,14 +259,13 @@
 
 .user-details {
   font-size: 11px;
-  color: color-mix(in srgb, var(--cr-text) 60%, transparent);
+  color: var(--cr-text-soft-2);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Acciones */
 .user-actions {
   display: flex;
   gap: 6px;
@@ -292,7 +273,6 @@
   flex-shrink: 0;
 }
 
-/* ── Botón Seguir — override total del global ── */
 .btn-primary {
   padding: 6px 16px !important;
   background: var(--cr-text) !important;
@@ -324,7 +304,6 @@
   cursor: not-allowed;
 }
 
-/* Estado: Siguiendo */
 .btn-primary.btn-siguiendo {
   background: transparent !important;
   color: var(--cr-text) !important;
@@ -332,27 +311,25 @@
 }
 
 .btn-primary.btn-siguiendo:hover:not(:disabled) {
-  border-color: #ef4444 !important;
-  color: #ef4444 !important;
-  background: rgba(239, 68, 68, 0.08) !important;
+  border-color: var(--cr-badge-red) !important;
+  color: var(--cr-badge-red) !important;
+  background: var(--cr-danger-soft) !important;
 }
 
-/* Estado: Pendiente */
 .btn-primary.btn-pendiente {
   background: transparent !important;
-  color: #f59e0b !important;
-  border-color: #f59e0b !important;
+  color: var(--cr-warning) !important;
+  border-color: var(--cr-warning) !important;
 }
 
 .btn-primary.btn-pendiente:hover:not(:disabled) {
-  background: rgba(245, 158, 11, 0.1) !important;
+  background: var(--cr-warning-soft) !important;
 }
 
-/* Botón Ver perfil */
 .btn-secondary {
   padding: 6px 12px !important;
   background: transparent !important;
-  color: color-mix(in srgb, var(--cr-text) 60%, transparent) !important;
+  color: var(--cr-text-soft-2) !important;
   border: 1.5px solid var(--cr-border) !important;
   border-radius: 8px !important;
   font-size: 12px !important;
@@ -369,10 +346,6 @@
   background: transparent !important;
 }
 
-/* ========================================
-   SOLICITUDES
-   ======================================== */
-
 .solicitudes-list {
   display: flex;
   flex-direction: column;
@@ -386,6 +359,7 @@
 .solicitudes-list::-webkit-scrollbar {
   width: 4px;
 }
+
 .solicitudes-list::-webkit-scrollbar-thumb {
   background: var(--cr-border);
   border-radius: 4px;
@@ -410,11 +384,7 @@
 }
 
 .solicitud-item:hover {
-  background: color-mix(
-    in srgb,
-    var(--cr-background-content) 80%,
-    var(--cr-text) 5%
-  ) !important;
+  background: var(--cr-hover-surface) !important;
 }
 
 .solicitud-actions {
@@ -423,7 +393,6 @@
   flex-shrink: 0;
 }
 
-/* Botones circulares — override total del global */
 .btn-accept,
 .btn-reject,
 .btn-view {
@@ -445,7 +414,6 @@
   padding: 0 !important;
 }
 
-/* Aceptar */
 .btn-accept {
   background: var(--cr-text) !important;
   color: var(--cr-background) !important;
@@ -453,13 +421,12 @@
 }
 
 .btn-accept:hover:not(:disabled) {
-  background: #16a34a !important;
-  border-color: #16a34a !important;
+  background: var(--cr-success) !important;
+  border-color: var(--cr-success) !important;
   color: #fff !important;
   transform: scale(1.1) !important;
 }
 
-/* Ver */
 .btn-view i {
   font-size: 14px;
 }
@@ -471,11 +438,10 @@
   transform: scale(1.1) !important;
 }
 
-/* Rechazar */
 .btn-reject:hover:not(:disabled) {
-  background: #ef4444 !important;
+  background: var(--cr-danger) !important;
   color: #fff !important;
-  border-color: #ef4444 !important;
+  border-color: var(--cr-danger) !important;
   transform: scale(1.1) !important;
 }
 
@@ -484,10 +450,6 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
-
-/* ========================================
-   PAGINACIÓN
-   ======================================== */
 
 .pagination {
   display: flex;
@@ -525,13 +487,9 @@
 
 .pagination span {
   font-size: 12px;
-  color: color-mix(in srgb, var(--cr-text) 60%, transparent);
+  color: var(--cr-text-soft-2);
   font-weight: 500;
 }
-
-/* ========================================
-   ANIMACIONES
-   ======================================== */
 
 @keyframes sgSlideIn {
   from {
@@ -543,10 +501,6 @@
     transform: translateX(0);
   }
 }
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
 
 @media (max-width: 768px) {
   .user-card,
@@ -564,6 +518,7 @@
   .user-info h3 {
     font-size: 12px;
   }
+
   .user-details {
     font-size: 10px;
   }

@@ -1,4 +1,7 @@
-<app-navbar (menuToggle)="toggleSidenav()"></app-navbar>
+<app-navbar
+  [modalActive]="modalActive"
+  (menuToggle)="toggleSidenav()">
+</app-navbar>
 
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav
@@ -6,7 +9,7 @@
     [mode]="sidenavMode"
     [opened]="sidenavOpened"
     class="app-public-sidebar">
-    <app-public-sidebar></app-public-sidebar>
+    <app-public-sidebar [modalActive]="modalActive"></app-public-sidebar>
   </mat-sidenav>
 
   <mat-sidenav-content>

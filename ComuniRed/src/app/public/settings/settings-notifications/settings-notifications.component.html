@@ -1,3 +1,12 @@
+<app-change
+  [alerts]="alerts"
+  [confirmDialog]="confirmDialog"
+  (confirm)="onConfirmSave()"
+  (cancel)="onCancelSave()"
+  (removeAlert)="removeAlert($event)"
+>
+</app-change>
+
 <div class="config-container">
   <div class="tab-content">
     <div class="section-header">
@@ -12,15 +21,23 @@
           <p>{{ notif.descripcion }}</p>
         </div>
         <label class="toggle-switch">
-          <input type="checkbox" [checked]="notif.activo" (change)="toggleNotification(notif.id)">
+          <input
+            type="checkbox"
+            [checked]="notif.activo"
+            (change)="toggleNotification(notif.id)"
+          />
           <span class="slider"></span>
         </label>
       </div>
     </div>
 
     <div class="actions">
-      <button type="button" class="btn-cancel" (click)="cancel()">Cancelar</button>
-      <button type="button" class="btn-save" (click)="save()">Guardar Cambios</button>
+      <button type="button" class="btn-cancel" (click)="cancel()">
+        Cancelar
+      </button>
+      <button type="button" class="btn-save" (click)="save()">
+        Guardar Cambios
+      </button>
     </div>
   </div>
 </div>

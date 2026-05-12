@@ -1,20 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormsModule,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsuarioService, Usuario } from '../../../services/usuario.service';
-import { AlertService } from '../../../shared/services/change.service';
+import {
+  ChangeComponent,
+  Alert,
+  ConfirmDialog,
+} from '../../../shared/components/change/change.component';
+import { ModalStateService } from '../../../shared/services/modal-state.service';
 
 @Component({
   selector: 'app-settings-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ChangeComponent],
   templateUrl: './settings-profile.component.html',
   styleUrls: ['./settings-profile.component.css'],
 })
-export class SettingsProfileComponent implements OnInit {
+export class SettingsProfileComponent implements OnInit, OnDestroy {
   profileForm!: FormGroup;
-  foto_perfil_url = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
+  foto_perfil_url =
+    'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
   usuario: Usuario | null = null;
   guardando = false;
   cargando = true;
@@ -24,11 +36,15 @@ export class SettingsProfileComponent implements OnInit {
   selectedFile: File | null = null;
   hoy: string = new Date().toISOString().substring(0, 10);
 
+  alerts: Alert[] = [];
+  confirmDialog: ConfirmDialog | null = null;
+  accionPendiente: 'guardar' | 'eliminarFoto' | null = null;
+
   constructor(
     private fb: FormBuilder,
     private usuarioService: UsuarioService,
     private router: Router,
-    private alertService: AlertService
+    private modalState: ModalStateService
   ) {
     this.inicializarFormularioVacio();
   }
@@ -47,14 +63,21 @@ export class SettingsProfileComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al cargar usuario:', err);
-          this.alertService.error('Error al cargar los datos del usuario');
+          this.showAlert('error', 'Error al cargar los datos del usuario');
           this.cargando = false;
-        }
+        },
       });
     } else {
-      this.alertService.warning('No hay sesión activa. Por favor inicia sesión.');
+      this.showAlert(
+        'warning',
+        'No hay sesión activa. Por favor inicia sesión.'
+      );
       this.router.navigate(['/login']);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.modalState.close();
   }
 
   private inicializarFormularioVacio(): void {
@@ -74,10 +97,14 @@ export class SettingsProfileComponent implements OnInit {
 
   private cargarDatosUsuario(usuario: Usuario): void {
     if (usuario.foto_perfil) {
-      this.foto_perfil_url = this.usuarioService.obtenerFotoMiniatura(usuario.foto_perfil, 130);
+      this.foto_perfil_url = this.usuarioService.obtenerFotoMiniatura(
+        usuario.foto_perfil,
+        130
+      );
       this.avatarPreview = usuario.foto_perfil;
     } else {
-      this.foto_perfil_url = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
+      this.foto_perfil_url =
+        'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
       this.avatarPreview = null;
     }
 
@@ -102,12 +129,15 @@ export class SettingsProfileComponent implements OnInit {
       const file = input.files[0];
 
       if (!file.type.startsWith('image/')) {
-        this.alertService.warning('Por favor selecciona una imagen válida (JPG, PNG, GIF)');
+        this.showAlert(
+          'warning',
+          'Por favor selecciona una imagen válida (JPG, PNG, GIF)'
+        );
         return;
       }
 
       if (file.size > 2 * 1024 * 1024) {
-        this.alertService.warning('La imagen no debe superar los 2MB');
+        this.showAlert('warning', 'La imagen no debe superar los 2MB');
         return;
       }
 
@@ -121,20 +151,71 @@ export class SettingsProfileComponent implements OnInit {
     }
   }
 
-  async eliminarFoto(): Promise<void> {
+  eliminarFoto(): void {
     if (!this.usuario || !this.usuario.id) {
-      this.alertService.error('Error: No se pudo identificar al usuario');
+      this.showAlert('error', 'Error: No se pudo identificar al usuario');
       return;
     }
 
-    const confirmado = await this.alertService.confirm(
-      '¿Eliminar foto de perfil?',
-      'Esta acción no se puede deshacer.',
-      'Sí, eliminar',
-      'Cancelar'
-    );
+    this.accionPendiente = 'eliminarFoto';
+    this.confirmDialog = {
+      title: '¿Eliminar foto de perfil?',
+      message: 'Esta acción no se puede deshacer.',
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+    };
+    this.modalState.open();
+  }
 
-    if (!confirmado) return;
+  save(): void {
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
+      this.showAlert(
+        'warning',
+        'Por favor, completa todos los campos requeridos correctamente.'
+      );
+      return;
+    }
+
+    if (!this.usuario || !this.usuario.id) {
+      this.showAlert('error', 'Error: No se pudo identificar al usuario');
+      return;
+    }
+
+    this.accionPendiente = 'guardar';
+    this.confirmDialog = {
+      title: '¿Guardar cambios?',
+      message: '¿Estás seguro de que deseas actualizar tu perfil?',
+      confirmText: 'Sí, guardar',
+      cancelText: 'Cancelar',
+    };
+    this.modalState.open();
+  }
+
+  onConfirmAction(): void {
+    const accion = this.accionPendiente;
+    this.confirmDialog = null;
+    this.accionPendiente = null;
+    this.modalState.close();
+
+    if (accion === 'eliminarFoto') {
+      this.ejecutarEliminarFoto();
+      return;
+    }
+
+    if (accion === 'guardar') {
+      this.ejecutarGuardado();
+    }
+  }
+
+  onCancelAction(): void {
+    this.confirmDialog = null;
+    this.accionPendiente = null;
+    this.modalState.close();
+  }
+
+  private ejecutarEliminarFoto(): void {
+    if (!this.usuario || !this.usuario.id) return;
 
     this.eliminandoFoto = true;
 
@@ -145,49 +226,43 @@ export class SettingsProfileComponent implements OnInit {
             next: (usuarioActualizado) => {
               this.usuarioService.saveUser(usuarioActualizado);
               this.usuario = usuarioActualizado;
-              this.foto_perfil_url = 'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
+              this.foto_perfil_url =
+                'https://res.cloudinary.com/da4wxtjwu/image/upload/v1762842677/61e50034-ab7c-4dc5-9d75-7c27a2265cee.png';
               this.avatarPreview = null;
               this.selectedFile = null;
               this.eliminandoFoto = false;
-              this.alertService.success('Foto de perfil eliminada correctamente');
+              this.showAlert(
+                'success',
+                'Foto de perfil eliminada correctamente'
+              );
             },
             error: (err) => {
               console.error('Error recargando usuario:', err);
               this.eliminandoFoto = false;
-            }
+              this.showAlert(
+                'error',
+                'Error al recargar los datos del usuario'
+              );
+            },
           });
         } else {
           this.eliminandoFoto = false;
-          this.alertService.error('No se pudo eliminar la foto');
+          this.showAlert('error', 'No se pudo eliminar la foto');
         }
       },
       error: (err) => {
         console.error('Error al eliminar foto:', err);
         this.eliminandoFoto = false;
-        this.alertService.error('Error al eliminar la foto. Por favor, intenta de nuevo.');
-      }
+        this.showAlert(
+          'error',
+          'Error al eliminar la foto. Por favor, intenta de nuevo.'
+        );
+      },
     });
   }
 
-  async save(): Promise<void> {
-    if (this.profileForm.invalid) {
-      this.alertService.warning('Por favor, completa todos los campos requeridos correctamente.');
-      return;
-    }
-
-    if (!this.usuario || !this.usuario.id) {
-      this.alertService.error('Error: No se pudo identificar al usuario');
-      return;
-    }
-
-    const confirmado = await this.alertService.confirm(
-      '¿Guardar cambios?',
-      '¿Estás seguro de que deseas actualizar tu perfil?',
-      'Sí, guardar',
-      'Cancelar'
-    );
-
-    if (!confirmado) return;
+  private async ejecutarGuardado(): Promise<void> {
+    if (!this.usuario || !this.usuario.id) return;
 
     this.guardando = true;
 
@@ -198,11 +273,16 @@ export class SettingsProfileComponent implements OnInit {
         this.subiendoImagen = true;
 
         try {
-          fotoUrl = await this.usuarioService.subirFotoCloudinary(this.selectedFile);
+          fotoUrl = await this.usuarioService.subirFotoCloudinary(
+            this.selectedFile
+          );
         } catch (error) {
           this.subiendoImagen = false;
           this.guardando = false;
-          this.alertService.error('Error al subir la imagen. Por favor, intenta de nuevo.');
+          this.showAlert(
+            'error',
+            'Error al subir la imagen. Por favor, intenta de nuevo.'
+          );
           return;
         }
 
@@ -224,26 +304,31 @@ export class SettingsProfileComponent implements OnInit {
         rol_id: this.usuario.rol_id,
       };
 
-      this.usuarioService.actualizarUsuario(this.usuario.id, usuarioActualizado).subscribe({
-        next: (usuarioActualizado) => {
-          this.usuarioService.saveUser(usuarioActualizado);
-          this.usuario = usuarioActualizado;
-          this.cargarDatosUsuario(usuarioActualizado);
-          this.selectedFile = null;
-          this.guardando = false;
-          this.alertService.success('Perfil actualizado correctamente');
-        },
-        error: (err) => {
-          console.error('Error al actualizar perfil:', err);
-          this.guardando = false;
-          this.alertService.error('Error al actualizar el perfil. Por favor, intenta de nuevo.');
-        }
-      });
-
+      this.usuarioService
+        .actualizarUsuario(this.usuario.id, usuarioActualizado)
+        .subscribe({
+          next: (usuarioActualizado) => {
+            this.usuarioService.saveUser(usuarioActualizado);
+            this.usuario = usuarioActualizado;
+            this.cargarDatosUsuario(usuarioActualizado);
+            this.selectedFile = null;
+            this.guardando = false;
+            this.showAlert('success', 'Perfil actualizado correctamente');
+          },
+          error: (err) => {
+            console.error('Error al actualizar perfil:', err);
+            this.guardando = false;
+            this.showAlert(
+              'error',
+              'Error al actualizar el perfil. Por favor, intenta de nuevo.'
+            );
+          },
+        });
     } catch (error) {
       console.error('Error general:', error);
       this.guardando = false;
-      this.alertService.error('Error al guardar el perfil');
+      this.subiendoImagen = false;
+      this.showAlert('error', 'Error al guardar el perfil');
     }
   }
 
@@ -251,7 +336,24 @@ export class SettingsProfileComponent implements OnInit {
     if (this.usuario) {
       this.cargarDatosUsuario(this.usuario);
       this.selectedFile = null;
-      this.alertService.info('Cambios cancelados');
+      this.showAlert('info', 'Cambios cancelados');
     }
+  }
+
+  removeAlert(alert: Alert): void {
+    this.alerts = this.alerts.filter((a) => a !== alert);
+  }
+
+  private showAlert(
+    type: Alert['type'],
+    message: string,
+    duration = 4000
+  ): void {
+    const alert: Alert = { type, message, duration };
+    this.alerts.push(alert);
+
+    setTimeout(() => {
+      this.removeAlert(alert);
+    }, duration);
   }
 }

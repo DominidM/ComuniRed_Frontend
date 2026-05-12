@@ -94,7 +94,9 @@
   border-radius: 10px;
   padding: 0 14px;
   height: 40px;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .cr-search:focus-within {
@@ -254,7 +256,7 @@
   background: var(--cr-background);
   border: 1px solid var(--cr-border);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   z-index: 1000;
   overflow: hidden;
   max-height: 360px;
@@ -280,7 +282,9 @@
   transition: background 120ms ease;
 }
 
-.search-item:hover { background: var(--cr-background-content); }
+.search-item:hover {
+  background: var(--cr-background-content);
+}
 
 .search-item-icon {
   width: 32px;
@@ -346,5 +350,25 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cr-navbar.modal-dimmed {
+  filter: brightness(0.4);
+  transition: filter 0.2s ease;
+}
+
+.cr-navbar.modal-blocked {
+  pointer-events: none;
+  user-select: none;
+}
+
+.cr-navbar.modal-blocked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  cursor: default;
 }

@@ -1,85 +1,186 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 .olvide-container {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: #eef2f7;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, #fdf0f0 0%, transparent 28%),
+    radial-gradient(circle at bottom right, #fff4f4 0%, transparent 24%),
+    #f7f9fc;
 }
 
 .olvide-card {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 20px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  width: 360px;
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 22px;
+  border: 1px solid #e6eaf0;
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.08),
+    0 8px 24px rgba(15, 23, 42, 0.04);
   text-align: center;
 }
 
-h2 {
-  color: #333;
+.olvide-card h2 {
+  color: #111827;
   margin-bottom: 10px;
+  font-size: 1.9rem;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
-p {
-  color: #666;
-  margin-bottom: 20px;
+.olvide-card p {
+  color: #6b7280;
+  margin-bottom: 22px;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-label {
+.olvide-card label {
   display: block;
   text-align: left;
-  margin: 8px 0 4px;
-  color: #444;
+  margin: 10px 0 8px;
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
-input {
+.olvide-card input {
   width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  margin-bottom: 15px;
-  transition: 0.3s;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
-input:focus {
-  border-color: #007bff;
+.olvide-card input::placeholder {
+  color: #9ca3af;
+}
+
+.olvide-card input:focus {
+  border-color: var(--cr-primary, #b91c1c);
+  box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.12);
   outline: none;
 }
 
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.3s;
+.olvide-card input:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 1;
 }
 
-button:hover {
-  background-color: #0056b3;
+.olvide-card button {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  background: var(--cr-brand-red, #b91c1c);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.98rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 10px 22px rgba(185, 28, 28, 0.22);
+}
+
+.olvide-card button:hover:not(:disabled) {
+  background: var(--cr-brand-red-hover, #a61b1b);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(185, 28, 28, 0.28);
+}
+
+.olvide-card button:active:not(:disabled) {
+  background: var(--cr-brand-red-active, #8f1717);
+  transform: translateY(0);
+}
+
+.olvide-card button:disabled {
+  background: var(--cr-brand-red-soft, #efb4b4);
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .mensaje-exito {
-  margin-top: 10px;
-  color: green;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
   font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.4;
 }
 
 .mensaje-error {
-  margin-top: 10px;
-  color: red;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
   font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.4;
 }
 
 .volver {
-  margin-top: 15px;
+  margin-top: 18px;
+  text-align: center;
 }
 
 .volver a {
-  color: #007bff;
+  color: var(--cr-brand-red, #b91c1c);
   text-decoration: none;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: color 0.2s ease;
+}
+
+.volver a:hover {
+  color: var(--cr-brand-red-hover, #a61b1b);
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .olvide-container {
+    padding: 16px;
+  }
+
+  .olvide-card {
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
+
+  .olvide-card h2 {
+    font-size: 1.65rem;
+  }
+
+  .olvide-card input,
+  .olvide-card button {
+    min-height: 44px;
+  }
 }

@@ -1,9 +1,13 @@
+:host {
+  display: block;
+}
+
 .help-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
   color: var(--cr-text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .help-header {
@@ -16,7 +20,7 @@
 .help-icon {
   width: 56px;
   height: 56px;
-  background: #3f51b5;
+  background: var(--cr-brand-red-soft-3);
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -25,17 +29,19 @@
   font-size: 1.8rem;
   font-weight: bold;
   flex-shrink: 0;
+  box-shadow: var(--shadow-soft);
 }
 
 .help-header h1 {
   font-size: 1.8rem;
   font-weight: 700;
   margin: 0 0 4px 0;
+  color: var(--cr-titulo);
 }
 
 .help-header p {
   font-size: 0.95rem;
-  color: #6b7280;
+  color: color-mix(in srgb, var(--cr-text) 65%, transparent 35%);
   margin: 0;
 }
 
@@ -47,7 +53,7 @@
 }
 
 .help-tabs button {
-  background: none;
+  background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
@@ -59,14 +65,22 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.help-tabs button:hover { color: #3f51b5; }
+.help-tabs button:hover {
+  color: var(--cr-brand-red);
+  background: color-mix(in srgb, var(--cr-brand-red) 6%, transparent);
+}
 
 .help-tabs button.active {
-  border-bottom-color: #3f51b5;
-  color: #3f51b5;
+  border-bottom-color: var(--cr-brand-red);
+  color: var(--cr-brand-red);
   font-weight: 600;
 }
 
@@ -75,6 +89,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

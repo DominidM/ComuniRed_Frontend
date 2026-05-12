@@ -5,29 +5,163 @@ html {
 }
 
 :root {
-  --cr-primary: #5f5cf6;
+  --cr-navbar-height: 64px;
+  --cr-sidebar-width: 72px;
+  --cr-primary: #0f766e;
+  --cr-primary-hover: #0b5e57;
+  --cr-primary-soft: #0f766e14;
+  --cr-primary-soft-2: #0f766e1f;
+  --cr-primary-soft-3: #0f766e2e;
+  --cr-primary-soft-4: #0f766e8c;
+  --cr-brand-red: #b91c1c;
+  --cr-brand-red-hover: #991b1b;
+  --cr-brand-red-soft: #b91c1c14;
+  --cr-brand-red-soft-2: #b91c1c66;
+  --cr-brand-red-soft-3: #b91c1ca6;
+  --cr-success: #16a34a;
+  --cr-success-hover: #15803d;
+  --cr-success-soft: #16a34a1a;
+  --cr-danger: #dc2626;
+  --cr-danger-hover: #b91c1c;
+  --cr-danger-soft: #dc262614;
+  --cr-danger-soft-2: #dc26261f;
+  --cr-warning: #ea580c;
+  --cr-warning-soft: #ea580c1f;
+  --cr-badge-red: #ef4444;
+  --cr-badge-red-text: #ffffff;
+  --cr-text: #111827;
+  --cr-text-muted: #6b7280;
+  --cr-text-faint: #9ca3af;
+  --cr-text-soft: #1118278c;
+  --cr-text-soft-2: #11182799;
+  --cr-text-soft-3: #11182759;
   --cr-background: #ffffff;
-  --cr-text: #1f2937;
-  --cr-surface: #f8fafc;
   --cr-background-content: #ffffff;
-  --cr-border: #e5e7eb;
+  --cr-surface: #f8fafc;
   --cr-search: #f9fafb;
-  --cr-titulo: #0f1724;
-  --cr-navbar-height: 72px;
-  --cr-sidebar-width: 240px;
+  --cr-border: #e5e7eb;
+  --cr-border-strong: #111111;
+  --cr-border-soft: #1118271a;
+  --cr-border-soft-2: #11182724;
+  --cr-border-soft-3: #1118271f;
+  --cr-neutral-strong: #000000;
+  --cr-neutral-strong-hover: #222222;
+  --cr-neutral-muted: #666666;
+  --cr-neutral-border: #e0e0e0;
+  --cr-neutral-surface: #f9f9f9;
+  --cr-neutral-surface-hover: #ffffff;
+  --cr-switch-off: #cccccc;
+  --cr-button-black: #000000;
+  --cr-button-black-hover: #222222;
+  --cr-button-black-text: #ffffff;
+  --cr-avatar-accent-1: #667eea;
+  --cr-avatar-accent-2: #764ba2;
+  --cr-white: #ffffff;
+  --cr-white-90: #ffffffe6;
+  --cr-white-80: #ffffffcc;
+  --cr-white-20: #ffffff33;
+  --cr-white-18: #ffffff2e;
+  --cr-white-15: #ffffff26;
+  --cr-black: #000000;
+  --cr-black-08: #00000014;
+  --cr-black-10: #0000001a;
+  --cr-black-20: #00000033;
+  --cr-black-40: #00000066;
+  --cr-black-50: #00000080;
+  --cr-black-55: #0000008c;
+  --cr-black-60: #00000099;
+  --cr-black-70: #000000b3;
+  --cr-black-80: #000000cc;
+  --cr-black-85: #000000d9;
+  --cr-overlay-dark: #0000008c;
+  --cr-overlay-dark-soft: #00000066;
+  --cr-overlay-dark-strong: #000000cc;
+  --cr-focus-ring: #5f5cf61f;
+  --cr-hover-surface: #f7f8fa;
+  --shadow-soft: 0 1px 2px #00000014;
+  --shadow-medium: 0 2px 6px #0000001a;
+  --shadow-strong: 0 4px 12px #0000001f;
+  --shadow-modal: 0 10px 40px #00000080;
+  --shadow-ring-primary: 0 0 0 3px #0f766e2e;
 }
 
 .dark-theme {
-  --cr-primary: #5f5cf6;
+  --cr-primary: #2aa198;
+  --cr-primary-hover: #1d847c;
+  --cr-primary-soft: #2aa19814;
+  --cr-primary-soft-2: #2aa1981f;
+  --cr-primary-soft-3: #2aa1982e;
+  --cr-primary-soft-4: #2aa1988c;
+  --cr-brand-red: #dc2626;
+  --cr-brand-red-hover: #b91c1c;
+  --cr-brand-red-soft: #dc262614;
+  --cr-brand-red-soft-2: #dc262666;
+  --cr-brand-red-soft-3: #dc2626a6;
+  --cr-success: #22c55e;
+  --cr-success-hover: #16a34a;
+  --cr-success-soft: #22c55e1a;
+  --cr-danger: #ef4444;
+  --cr-danger-hover: #dc2626;
+  --cr-danger-soft: #ef44441f;
+  --cr-danger-soft-2: #ef444426;
+  --cr-warning: #f59e0b;
+  --cr-warning-soft: #f59e0b1f;
+  --cr-badge-red: #ef4444;
+  --cr-badge-red-text: #ffffff;
+  --cr-text: #e5e7eb;
+  --cr-text-muted: #9ca3af;
+  --cr-text-faint: #6b7280;
+  --cr-text-soft: #e5e7eb8c;
+  --cr-text-soft-2: #e5e7eb99;
+  --cr-text-soft-3: #e5e7eb59;
   --cr-background: #161717;
-  --cr-text: #e6eef8;
-  --cr-surface: #0b1220;
   --cr-background-content: #272829;
+  --cr-surface: #1f2022;
+  --cr-search: #2b2d30;
   --cr-border: #3a3a3a;
-  --cr-search: #333334;
-  --cr-titulo: #e4e6eb;
-  --cr-background-content: #272829;
-  --cr-surface: #cc2e2e48;
+  --cr-border-strong: #d1d5db;
+  --cr-border-soft: #e5e7eb1a;
+  --cr-border-soft-2: #e5e7eb24;
+  --cr-border-soft-3: #e5e7eb1f;
+  --cr-neutral-strong: #f5f5f5;
+  --cr-neutral-strong-hover: #ffffff;
+  --cr-neutral-muted: #a1a1aa;
+  --cr-neutral-border: #3a3a3a;
+  --cr-neutral-surface: #232425;
+  --cr-neutral-surface-hover: #2b2d2f;
+  --cr-switch-off: #4b5563;
+  --cr-button-black: #000000;
+  --cr-button-black-hover: #222222;
+  --cr-button-black-text: #ffffff;
+  --cr-avatar-accent-1: #7c8cff;
+  --cr-avatar-accent-2: #8b5cf6;
+  --cr-white: #ffffff;
+  --cr-white-90: #ffffffe6;
+  --cr-white-80: #ffffffcc;
+  --cr-white-20: #ffffff33;
+  --cr-white-18: #ffffff2e;
+  --cr-white-15: #ffffff26;
+  --cr-black: #000000;
+  --cr-black-08: #00000014;
+  --cr-black-10: #0000001a;
+  --cr-black-20: #00000033;
+  --cr-black-40: #00000066;
+  --cr-black-50: #00000080;
+  --cr-black-55: #0000008c;
+  --cr-black-60: #00000099;
+  --cr-black-70: #000000b3;
+  --cr-black-80: #000000cc;
+  --cr-black-85: #000000d9;
+  --cr-overlay-dark: #0000008c;
+  --cr-overlay-dark-soft: #00000066;
+  --cr-overlay-dark-strong: #000000cc;
+  --cr-focus-ring: #2aa1982e;
+  --cr-hover-surface: #2d2f31;
+  --shadow-soft: 0 1px 2px #00000014;
+  --shadow-medium: 0 2px 6px #00000026;
+  --shadow-strong: 0 4px 12px #00000033;
+  --shadow-modal: 0 10px 40px #00000080;
+  --shadow-ring-primary: 0 0 0 3px #2aa1982e;
 }
 
 html,
@@ -52,7 +186,6 @@ app-root {
   background: var(--cr-background-content);
 }
 
-/* ── Navbar global ── */
 .cr-navbar {
   background: var(--cr-background);
   color: var(--cr-text);
@@ -74,24 +207,24 @@ app-root {
   color: var(--cr-text);
 }
 
-/* ── Search global ── */
 .cr-search {
   background: var(--cr-search);
   color: var(--cr-text);
   border-radius: 6px;
   border: 1px solid var(--cr-border);
 }
+
 .cr-search input {
   background: transparent;
   color: var(--cr-text);
   border: none;
   box-shadow: none;
 }
+
 .cr-search input::placeholder {
   color: color-mix(in srgb, var(--cr-text) 50%, transparent 50%);
 }
 
-/* ── Inputs globales ── */
 input,
 textarea,
 select {
@@ -100,18 +233,19 @@ select {
   border: 1px solid var(--cr-border);
   border-radius: 6px;
 }
+
 input:focus,
 textarea:focus,
 select:focus {
   outline: none;
   border-color: var(--cr-primary);
-  box-shadow: 0 0 0 3px rgba(95, 92, 246, 0.1);
+  box-shadow: 0 0 0 3px var(--cr-focus-ring);
 }
+
 ::placeholder {
   color: color-mix(in srgb, var(--cr-text) 50%, transparent 50%);
 }
 
-/* ── Cards globales ── */
 .card,
 .box,
 .panel,
@@ -128,7 +262,6 @@ select:focus {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* ── Botones globales ── */
 button,
 .btn,
 .action-btn,
@@ -141,6 +274,7 @@ button,
   cursor: pointer;
   transition: all 200ms ease;
 }
+
 button:hover,
 .btn:hover,
 .action-btn:hover,
@@ -149,31 +283,34 @@ button:hover,
   border-color: var(--cr-primary);
   color: var(--cr-primary);
 }
+
 button:active {
   transform: scale(0.98);
 }
 
-/* ── Scrollbar global ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--cr-border);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--cr-border), var(--cr-text) 30%);
 }
+
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--cr-border) transparent;
 }
 
-/* ── Páginas de auth ── */
 app-login,
 app-register,
 app-landing,
@@ -185,22 +322,11 @@ app-landing,
   padding: 0;
 }
 
-/* ── Responsive ── */
-@media (max-width: 768px) {
-  :root {
-    --cr-navbar-height: 56px;
-    --cr-sidebar-width: 60px;
-  }
-}
-
-/* ── IMPORTANTE: .feed-area NO tiene height ni overflow aquí ──
-   El scroll lo maneja mat-sidenav-content en public.component.css */
 .feed-area {
   background: var(--cr-background-content);
   box-sizing: border-box;
 }
 
-/* ── Toast ── */
 .toast-notification {
   position: fixed;
   top: 20px;
@@ -213,6 +339,7 @@ app-landing,
   z-index: 10000;
   animation: slideIn 0.3s ease;
 }
+
 @keyframes slideIn {
   from {
     transform: translateX(400px);
@@ -224,7 +351,6 @@ app-landing,
   }
 }
 
-/* ── Loading overlay ── */
 .loading-overlay {
   position: fixed;
   inset: 0;
@@ -234,6 +360,7 @@ app-landing,
   justify-content: center;
   z-index: 9999;
 }
+
 .spinner {
   border: 4px solid rgba(255, 255, 255, 0.3);
   border-top: 4px solid white;
@@ -242,13 +369,13 @@ app-landing,
   height: 50px;
   animation: spin 1s linear infinite;
 }
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* ── Modal ── */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -258,6 +385,7 @@ app-landing,
   justify-content: center;
   z-index: 9999;
 }
+
 .modal-container {
   background: var(--cr-background);
   color: var(--cr-text);
@@ -268,15 +396,18 @@ app-landing,
   display: flex;
   flex-direction: column;
 }
+
 .modal-header {
   padding: 1.5rem;
   border-bottom: 1px solid var(--cr-border);
 }
+
 .modal-body {
   flex: 1;
   overflow-y: auto;
   padding: 1.5rem;
 }
+
 .modal-footer {
   padding: 1.5rem;
   border-top: 1px solid var(--cr-border);
@@ -285,13 +416,13 @@ app-landing,
   gap: 1rem;
 }
 
-/* ── Create card ── */
 .create-card {
   background: var(--cr-background);
   border: 1px solid var(--cr-border);
   border-radius: 12px;
   padding: 1.5rem;
 }
+
 .create-input {
   background: var(--cr-search);
   color: var(--cr-text);
@@ -299,9 +430,11 @@ app-landing,
   border-radius: 24px;
   padding: 1rem 1.5rem;
 }
+
 .create-input:focus {
   border-color: var(--cr-primary);
 }
+
 .create-action {
   background: var(--cr-surface);
   border: 1px solid var(--cr-border);
@@ -310,11 +443,13 @@ app-landing,
   padding: 0.75rem;
   transition: all 200ms ease;
 }
+
 .create-action:hover {
   background: color-mix(in srgb, var(--cr-primary), var(--cr-background) 85%);
   border-color: var(--cr-primary);
   color: var(--cr-primary);
 }
+
 .dark-theme .create-card {
   background: var(--cr-background-content) !important;
   border-color: var(--cr-border) !important;
@@ -325,7 +460,7 @@ app-landing,
   border-color: var(--cr-border) !important;
   color: var(--cr-text) !important;
 }
-/* ── Ocultar splitters ── */
+
 .splitter,
 .gutter,
 .col-divider,
@@ -338,7 +473,6 @@ app-landing,
   display: none !important;
 }
 
-/* ── Dark theme para Material ── */
 .dark-theme .mat-drawer-container,
 .dark-theme mat-sidenav-container,
 .dark-theme .mat-drawer,
@@ -346,14 +480,50 @@ app-landing,
   background: var(--cr-background) !important;
   color: var(--cr-text) !important;
 }
+
 .dark-theme .mat-drawer-content,
 .dark-theme mat-sidenav-content {
   background: var(--cr-background-content) !important;
   color: var(--cr-text) !important;
 }
 
-/* ── Material drawer: deja que public.component.css maneje el overflow ── */
 .mat-drawer-content,
 .mat-sidenav-content {
   overflow: unset !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MODAL OPEN — bloqueo global de interacción
+   .modal-backdrop cubre TODO (navbar z:1100, mat-sidenav z:auto)
+   con z-index 2147483640 (máximo seguro).
+   app-change vive encima con z-index 2147483645.
+   El confirm-overlay interno tiene pointer-events:auto propio.
+───────────────────────────────────────────────────────────── */
+body.modal-open {
+  overflow: hidden;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483640;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  pointer-events: auto;
+  cursor: default;
+}
+
+app-change {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483645 !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --cr-navbar-height: 56px;
+    --cr-sidebar-width: 60px;
+  }
 }

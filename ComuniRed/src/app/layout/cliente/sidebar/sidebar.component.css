@@ -367,8 +367,8 @@ mat-sidenav.app-public-sidebar {
   width: var(--sidebar-width) !important;
   height: 100% !important;
   overflow: hidden !important;
-  border-right: 1px solid var(--cr-border);
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+  border-right: none;
+  box-shadow: none;
   background: var(--cr-background) !important;
 }
 
@@ -377,4 +377,22 @@ mat-sidenav.app-public-sidebar .mat-drawer-inner-container {
   height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
+}
+
+.sidebar-container.modal-dimmed {
+  filter: brightness(0.4);
+  transition: filter 0.2s ease;
+}
+
+.sidebar-container.modal-blocked {
+  pointer-events: none;
+  user-select: none;
+}
+
+.sidebar-container.modal-blocked::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  cursor: default;
 }

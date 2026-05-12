@@ -1,61 +1,26 @@
+:host {
+  display: block;
+}
+
 .config-container {
   margin: 0 auto;
   padding: 2rem 2rem;
   background: var(--cr-background);
   color: var(--cr-text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-
-
-
-.tabs-section {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 0 24px;
-  margin-bottom: 24px;
-}
-
-.tab-btn {
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
-  padding: 16px 20px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #666;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.tab-btn:hover {
-  color: #000;
-}
-
-.tab-btn.active {
-  color: #000;
-  border-bottom-color: #000;
-  font-weight: 600;
+  box-shadow: var(--shadow-strong);
 }
 
 .tab-content {
   padding: 0 24px 24px 24px;
   animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .section-header {
@@ -66,47 +31,47 @@
   font-size: 1.3rem;
   font-weight: 600;
   margin: 0 0 4px 0;
+  color: var(--cr-titulo);
 }
 
 .section-header p {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--cr-neutral-muted);
   margin: 0;
 }
 
-.notifications-list {
+.privacy-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-bottom: 24px;
 }
 
-.notification-item {
+.privacy-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--cr-border);
   border-radius: 6px;
-  background: #f9f9f9;
-  transition: all 0.3s ease;
+  background: var(--cr-background-content);
 }
 
-.notification-item:hover {
-  background: #fff;
-  border-color: #d0d0d0;
+.privacy-item:hover {
+  background: var(--cr-background);
+  border-color: var(--cr-border);
 }
 
-.notification-info h3 {
+.privacy-info h3 {
   font-size: 0.95rem;
   font-weight: 600;
   margin: 0 0 4px 0;
-  color: #000;
+  color: var(--cr-text);
 }
 
-.notification-info p {
+.privacy-info p {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--cr-neutral-muted);
   margin: 0;
 }
 
@@ -126,12 +91,9 @@
 
 .slider {
   position: absolute;
+  inset: 0;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
+  background-color: var(--cr-switch-off);
   transition: 0.3s;
   border-radius: 28px;
 }
@@ -149,7 +111,7 @@
 }
 
 input:checked + .slider {
-  background-color: #000;
+  background-color: var(--cr-neutral-strong);
 }
 
 input:checked + .slider:before {
@@ -160,30 +122,32 @@ input:checked + .slider:before {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding-top: 24px;
-  border-top: 1px solid #e0e0e0;
+  margin-top: 32px;
+  padding-top: 20px;
+  padding-bottom: 8px;
+  border-top: 1px solid var(--cr-neutral-border);
 }
 
 .btn-cancel {
-  background: transparent;
-  color: #000;
-  border: 1px solid #000;
+  background: var(--cr-background);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border-strong);
   padding: 10px 24px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-cancel:hover {
-  background: #f0f0f0;
+  background: color-mix(in srgb, var(--cr-neutral-strong) 6%, transparent);
 }
 
 .btn-save {
-  background: #000;
+  background: var(--cr-brand-red);
   color: #fff;
-  border: 1px solid #000;
+  border: 1px solid var(--cr-brand-red);
   padding: 10px 24px;
   border-radius: 6px;
   cursor: pointer;
@@ -193,28 +157,29 @@ input:checked + .slider:before {
 }
 
 .btn-save:hover {
-  background: #333;
+  background: var(--cr-brand-red-hover);
+  border-color: var(--cr-brand-red-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-strong);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px) {
-  .tabs-section {
-    padding: 0 16px;
-    overflow-x: auto;
-  }
-
-  .tab-btn {
-    padding: 12px 16px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-  }
-
   .tab-content {
     padding: 0 16px 16px 16px;
   }
 
-  .notifications-list {
+  .privacy-list {
     gap: 12px;
   }
 

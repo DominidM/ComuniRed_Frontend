@@ -1,3 +1,11 @@
+<app-change
+  [alerts]="alerts"
+  [confirmDialog]="confirmDialog"
+  (confirm)="onConfirmSave()"
+  (cancel)="onCancelSave()"
+  (removeAlert)="removeAlert($event)">
+</app-change>
+
 <div class="config-container">
   <div class="tab-content">
     <div class="section-header">

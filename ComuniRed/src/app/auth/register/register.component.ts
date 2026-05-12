@@ -1,18 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { UsuarioService, UsuarioInput } from '../../services/usuario.service';
+import { CatalogoService } from '../../shared/models/catalogo.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  styleUrls: ['./register.component.css'],
 })
-
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
+  sexos: { value: string; label: string }[] = [];
+  distritos: { value: string; label: string }[] = [];
 
   usuarioData: UsuarioInput = {
     nombre: '',
@@ -26,13 +28,11 @@ export class RegisterComponent {
     email: '',
     password: '',
     rol_id: '',
-    fecha_nacimiento: '', // ✅ NUEVO: en lugar de edad
+    fecha_nacimiento: '',
     foto_perfil: '',
   };
 
-  // ✅ NUEVO: Para el max del input date
   hoy: string = new Date().toISOString().substring(0, 10);
-
   errors: { [key: string]: string } = {};
 
   showSuccess = false;
@@ -41,14 +41,19 @@ export class RegisterComponent {
 
   constructor(
     private usuarioService: UsuarioService,
-    private router: Router
+    private catalogoService: CatalogoService,
+    private router: Router,
   ) {}
+
+  ngOnInit(): void {
+    this.sexos = this.catalogoService.getSexos();
+    this.distritos = this.catalogoService.getDistritosLima();
+  }
 
   private trim(value: unknown): string {
     return (value ?? '').toString().trim();
   }
 
-  
   validateNombre() {
     const value = this.trim(this.usuarioData.nombre);
     if (!value) {
@@ -84,7 +89,11 @@ export class RegisterComponent {
       delete this.errors['dni'];
       return;
     }
-    this.usuarioData.dni = (this.usuarioData.dni ?? '').toString().replace(/[^0-9]/g, '');
+
+    this.usuarioData.dni = (this.usuarioData.dni ?? '')
+      .toString()
+      .replace(/[^0-9]/g, '');
+
     if (this.usuarioData.dni.length > 8) {
       this.usuarioData.dni = this.usuarioData.dni.substring(0, 8);
     }
@@ -101,27 +110,37 @@ export class RegisterComponent {
       delete this.errors['numero_telefono'];
       return;
     }
-    this.usuarioData.numero_telefono = (this.usuarioData.numero_telefono ?? '').toString().replace(/[^0-9+]/g, '');
+
+    this.usuarioData.numero_telefono = (this.usuarioData.numero_telefono ?? '')
+      .toString()
+      .replace(/[^0-9+]/g, '');
+
     if (this.usuarioData.numero_telefono.length > 15) {
-      this.usuarioData.numero_telefono = this.usuarioData.numero_telefono.substring(0, 15);
+      this.usuarioData.numero_telefono =
+        this.usuarioData.numero_telefono.substring(0, 15);
     }
 
-    if (this.usuarioData.numero_telefono.length > 0 && this.usuarioData.numero_telefono.length < 9) {
-      this.errors['numero_telefono'] = 'El teléfono debe tener al menos 9 dígitos';
+    if (
+      this.usuarioData.numero_telefono.length > 0 &&
+      this.usuarioData.numero_telefono.length < 9
+    ) {
+      this.errors['numero_telefono'] =
+        'El teléfono debe tener al menos 9 dígitos';
     } else {
       delete this.errors['numero_telefono'];
     }
   }
 
-  // ✅ NUEVO: Validar fecha de nacimiento
   validateFechaNacimiento() {
     if (!this.usuarioData.fecha_nacimiento) {
       delete this.errors['fecha_nacimiento'];
       return;
     }
 
-    const edad = this.usuarioService.calcularEdad(this.usuarioData.fecha_nacimiento);
-    
+    const edad = this.usuarioService.calcularEdad(
+      this.usuarioData.fecha_nacimiento,
+    );
+
     if (edad !== null && edad < 18) {
       this.errors['fecha_nacimiento'] = 'Debes ser mayor de 18 años';
     } else if (edad !== null && edad > 120) {
@@ -136,12 +155,22 @@ export class RegisterComponent {
       delete this.errors['codigo_postal'];
       return;
     }
-    this.usuarioData.codigo_postal = (this.usuarioData.codigo_postal ?? '').toString().replace(/[^0-9]/g, '');
+
+    this.usuarioData.codigo_postal = (this.usuarioData.codigo_postal ?? '')
+      .toString()
+      .replace(/[^0-9]/g, '');
+
     if (this.usuarioData.codigo_postal.length > 5) {
-      this.usuarioData.codigo_postal = this.usuarioData.codigo_postal.substring(0, 5);
+      this.usuarioData.codigo_postal = this.usuarioData.codigo_postal.substring(
+        0,
+        5,
+      );
     }
 
-    if (this.usuarioData.codigo_postal.length > 0 && this.usuarioData.codigo_postal.length !== 5) {
+    if (
+      this.usuarioData.codigo_postal.length > 0 &&
+      this.usuarioData.codigo_postal.length !== 5
+    ) {
       this.errors['codigo_postal'] = 'El código postal debe tener 5 dígitos';
     } else {
       delete this.errors['codigo_postal'];
@@ -164,7 +193,8 @@ export class RegisterComponent {
     if (!pwd) {
       this.errors['password'] = 'La contraseña es obligatoria';
     } else if (pwd.length < 6) {
-      this.errors['password'] = 'La contraseña debe tener al menos 6 caracteres';
+      this.errors['password'] =
+        'La contraseña debe tener al menos 6 caracteres';
     } else if (pwd.length > 50) {
       this.errors['password'] = 'La contraseña no puede exceder 50 caracteres';
     } else {
@@ -182,7 +212,7 @@ export class RegisterComponent {
   }
 
   validateDistrito() {
-    const dist = this.usuarioData.distrito ?? '';
+    const dist = this.trim(this.usuarioData.distrito);
     if (dist && dist.length > 100) {
       this.errors['distrito'] = 'El distrito no puede exceder 100 caracteres';
     } else {
@@ -191,22 +221,23 @@ export class RegisterComponent {
   }
 
   isFormValid(): boolean {
-    return Object.keys(this.errors).length === 0 &&
-           this.trim(this.usuarioData.nombre) !== '' &&
-           this.trim(this.usuarioData.apellido) !== '' &&
-           this.trim(this.usuarioData.email) !== '' &&
-           this.trim(this.usuarioData.password) !== '';
+    return (
+      Object.keys(this.errors).length === 0 &&
+      this.trim(this.usuarioData.nombre) !== '' &&
+      this.trim(this.usuarioData.apellido) !== '' &&
+      this.trim(this.usuarioData.email) !== '' &&
+      this.trim(this.usuarioData.password) !== ''
+    );
   }
 
   register() {
     if (this.isLoading) return;
 
-    // Validar todos los campos
     this.validateNombre();
     this.validateApellido();
     this.validateDni();
     this.validateTelefono();
-    this.validateFechaNacimiento(); // ✅ NUEVO
+    this.validateFechaNacimiento();
     this.validateCodigoPostal();
     this.validateEmail();
     this.validatePassword();
@@ -224,11 +255,11 @@ export class RegisterComponent {
     this.isLoading = true;
     this.showError = null;
 
-    this.usuarioData.rol_id = this.usuarioData.rol_id && this.trim(this.usuarioData.rol_id) !== ''
-      ? this.usuarioData.rol_id
-      : '68ca68b40bc4d9ca3267b663';
+    this.usuarioData.rol_id =
+      this.usuarioData.rol_id && this.trim(this.usuarioData.rol_id) !== ''
+        ? this.usuarioData.rol_id
+        : '68ca68b40bc4d9ca3267b663';
 
-    // ✅ PAYLOAD ACTUALIZADO: sin edad
     const payload: UsuarioInput = {
       nombre: this.trim(this.usuarioData.nombre),
       apellido: this.trim(this.usuarioData.apellido),
@@ -242,11 +273,11 @@ export class RegisterComponent {
       password: this.trim(this.usuarioData.password),
       rol_id: this.usuarioData.rol_id,
       fecha_nacimiento: this.usuarioData.fecha_nacimiento ?? undefined,
-      foto_perfil: this.usuarioData.foto_perfil || undefined
+      foto_perfil: this.usuarioData.foto_perfil || undefined,
     };
 
     this.usuarioService.crearUsuario(payload).subscribe({
-      next: (usuario) => {
+      next: () => {
         this.showSuccess = true;
         setTimeout(() => {
           this.showSuccess = false;
@@ -262,11 +293,13 @@ export class RegisterComponent {
         } else {
           this.showError = 'Hubo un error al crear el usuario.';
         }
+
         this.isLoading = false;
+
         setTimeout(() => {
           this.showError = null;
         }, 3000);
-      }
+      },
     });
   }
 }
