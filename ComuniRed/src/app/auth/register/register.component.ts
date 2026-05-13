@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { UsuarioService, UsuarioInput } from '../../services/usuario.service';
-import { CatalogoService } from '../../shared/models/catalogo.service';
+import { SEXOS, DISTRITOS_LIMA } from '../../shared/data/catalogo.data';
 
 @Component({
   selector: 'app-register',
@@ -12,9 +12,9 @@ import { CatalogoService } from '../../shared/models/catalogo.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })
-export class RegisterComponent implements OnInit {
-  sexos: { value: string; label: string }[] = [];
-  distritos: { value: string; label: string }[] = [];
+export class RegisterComponent {
+  sexos = SEXOS;
+  distritos = DISTRITOS_LIMA;
 
   usuarioData: UsuarioInput = {
     nombre: '',
@@ -41,14 +41,8 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private usuarioService: UsuarioService,
-    private catalogoService: CatalogoService,
     private router: Router,
   ) {}
-
-  ngOnInit(): void {
-    this.sexos = this.catalogoService.getSexos();
-    this.distritos = this.catalogoService.getDistritosLima();
-  }
 
   private trim(value: unknown): string {
     return (value ?? '').toString().trim();
@@ -295,7 +289,6 @@ export class RegisterComponent implements OnInit {
         }
 
         this.isLoading = false;
-
         setTimeout(() => {
           this.showError = null;
         }, 3000);
