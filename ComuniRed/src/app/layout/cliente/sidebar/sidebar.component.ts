@@ -101,6 +101,25 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  get isAdmin(): boolean {
+    const roles = this.usuarioService.getRoles() || [];
+    return roles.some(
+      (r) =>
+        String(r).toLowerCase().includes('admin') ||
+        String(r).toLowerCase() === 'rol_admin' ||
+        String(r) === '68ca68c40bc4d9ca3267b667',
+    );
+  }
+
+  get isSoporte(): boolean {
+    const roles = this.usuarioService.getRoles() || [];
+    return roles.some(
+      (r) =>
+        /soporte|support/i.test(String(r)) ||
+        String(r) === '68ca68bb0bc4d9ca3267b665',
+    );
+  }
+
   private actualizarVistaUsuario(usuario: Usuario): void {
     const nombre = usuario.nombre?.trim() ?? '';
     const apellido = usuario.apellido?.trim() ?? '';
@@ -200,6 +219,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
   onIrPerfil(): void {
     if (!this.canInteract()) return;
     this.router.navigate(['/public/profile']).catch(console.error);
+  }
+
+  onVolverAdmin(): void {
+    if (!this.canInteract()) return;
+    this.router.navigate(['/admin/dashboard']).catch(console.error);
+  }
+
+  onVolverSoporte(): void {
+    if (!this.canInteract()) return;
+    this.router.navigate(['/soporte/clasificacion']).catch(console.error);
   }
 
   onSalir(): void {

@@ -264,99 +264,9 @@
   animation: spin 0.8s linear infinite;
 }
 
-.snackbar {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 10000;
-  min-width: 280px;
-  max-width: 400px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 15px 20px;
-  border-radius: 14px;
-  color: #ffffff;
-  font-size: 0.95rem;
-  font-weight: 600;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
-  background: #10b981;
-  animation:
-    slideInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    fadeOut 0.3s ease-in 2.7s forwards;
-}
-
-.snackbar.error {
-  background: #ef4444;
-  animation:
-    slideInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    shake 0.5s ease-in-out 0.2s,
-    fadeOut 0.3s ease-in 2.7s forwards;
-}
-
-.snackbar-icon {
-  width: 20px;
-  height: 20px;
-  font-size: 1.1rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.snackbar-icon i {
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@keyframes slideInDown {
-  from {
-    transform: translateY(-100px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-18px) scale(0.96);
-  }
-}
-
-@keyframes shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  15%, 45%, 75% {
-    transform: translateX(-4px);
-  }
-  30%, 60%, 90% {
-    transform: translateX(4px);
   }
 }
 
@@ -393,14 +303,6 @@
   .form-row {
     grid-template-columns: 1fr;
     gap: 0;
-  }
-
-  .snackbar {
-    top: 16px;
-    right: 16px;
-    left: 16px;
-    min-width: auto;
-    max-width: none;
   }
 }
 

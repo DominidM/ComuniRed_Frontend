@@ -1,4 +1,3 @@
-/* Reset global para Angular */
 *,
 *::before,
 *::after {
@@ -14,59 +13,45 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Resetear los contenedores de Angular */
 app-root,
 app-login {
   display: block;
-  height: 100vh;
   width: 100vw;
-  margin: 0;
-  padding: 0;
+  height: 100vh;
   overflow: hidden;
 }
 
 :host {
   display: block;
-  height: 100vh;
-  width: 100vw;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
   position: fixed;
   inset: 0;
-  max-height: 100vh;
-  max-width: 100vw;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .login-page {
   display: flex;
-  height: 100vh;
   width: 100vw;
+  height: 100vh;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
   background:
     radial-gradient(circle at top left, #fdf0f0 0%, transparent 28%),
     radial-gradient(circle at bottom right, #fff4f4 0%, transparent 24%),
     #f8f9fa;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  position: absolute;
-  inset: 0;
 }
 
 .login-left {
   flex: 1.2;
-  width: 60%;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  margin: 0;
-  padding: 0;
   min-width: 0;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
 }
 
 .login-left img {
@@ -75,29 +60,24 @@ app-login {
   object-fit: cover;
   object-position: center;
   display: block;
-  margin: 0;
-  padding: 0;
 }
 
 .login-form {
   flex: 1;
-  width: 40%;
   min-width: 0;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: transparent;
-  height: 100vh;
-  overflow: hidden;
   position: relative;
-  margin: 0;
+  overflow: hidden;
+  background: transparent;
 }
 
 .login-form form {
   width: 100%;
   max-width: 500px;
-  margin: 0;
   padding: 60px;
   background: #ffffff;
   border: 1px solid #e6eaf0;
@@ -105,82 +85,81 @@ app-login {
   box-shadow:
     0 24px 60px rgba(15, 23, 42, 0.08),
     0 8px 24px rgba(15, 23, 42, 0.04);
-  position: relative;
 }
 
 .login-form form h2 {
-  margin: 0 0 8px 0;
+  margin-bottom: 8px;
   font-size: 28px;
   font-weight: 700;
   line-height: 1.1;
+  letter-spacing: -0.03em;
   color: #111827;
   text-align: left;
-  letter-spacing: -0.03em;
 }
 
 .login-form form p {
-  margin: 0 0 28px 0;
-  color: #6b7280;
+  margin-bottom: 28px;
   font-size: 14px;
   line-height: 1.5;
+  color: #6b7280;
 }
 
 .login-form form label {
   display: block;
-  margin: 0 0 8px 0;
-  font-weight: 600;
+  margin-bottom: 8px;
   font-size: 14px;
+  font-weight: 600;
   color: #374151;
 }
 
-.login-form form input[type="email"],
-.login-form form input[type="password"] {
+.login-form form input[type='email'],
+.login-form form input[type='password'] {
   width: 100%;
-  padding: 12px 16px;
   margin-bottom: 16px;
+  padding: 12px 16px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
-  font-size: 14px;
-  color: #111827;
   background: #ffffff;
+  color: #111827;
+  font-size: 14px;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
     background-color 0.2s ease;
 }
 
-.login-form form input[type="email"]::placeholder,
-.login-form form input[type="password"]::placeholder {
+.login-form form input[type='email']::placeholder,
+.login-form form input[type='password']::placeholder {
   color: #9ca3af;
 }
 
-.login-form form input[type="email"]:focus,
-.login-form form input[type="password"]:focus {
+.login-form form input[type='email']:focus,
+.login-form form input[type='password']:focus {
   outline: none;
   border-color: var(--cr-primary, #b91c1c);
   box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.12);
 }
 
-.login-form form input[type="email"]:disabled,
-.login-form form input[type="password"]:disabled {
-  background-color: #f5f5f5;
+.login-form form input[type='email']:disabled,
+.login-form form input[type='password']:disabled {
+  background: #f5f5f5;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
 .login-options {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 16px 0 24px 0;
-  font-size: 14px;
+  justify-content: space-between;
   gap: 12px;
+  margin: 16px 0 24px;
+  font-size: 14px;
 }
 
 .login-options a {
   color: var(--cr-brand-red, #b91c1c);
-  text-decoration: none;
   font-weight: 600;
+  text-decoration: none;
   transition: color 0.2s ease;
 }
 
@@ -192,24 +171,24 @@ app-login {
 .login-form form button {
   width: 100%;
   min-height: 50px;
-  background: var(--cr-brand-red, #b91c1c);
-  color: #ffffff;
-  font-weight: 700;
-  border: none;
-  padding: 14px;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    transform 0.1s ease,
-    box-shadow 0.2s ease;
-  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  margin: 0;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--cr-brand-red, #b91c1c);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
   box-shadow: 0 10px 22px rgba(185, 28, 28, 0.22);
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
 }
 
 .login-form form button:hover:not(:disabled) {
@@ -219,14 +198,13 @@ app-login {
 }
 
 .login-form form button:active:not(:disabled) {
-  background: var(--cr-brand-red-active, #8f1717);
   transform: translateY(0);
 }
 
 .login-form form button:disabled {
   background: var(--cr-brand-red-soft, #efb4b4);
-  cursor: not-allowed;
   box-shadow: none;
+  cursor: not-allowed;
 }
 
 .spinner {
@@ -244,95 +222,6 @@ app-login {
   }
 }
 
-/* Snackbar */
-.snackbar {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  background: #10b981;
-  color: white;
-  padding: 16px 24px;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 600;
-  font-size: 15px;
-  z-index: 10000;
-  min-width: 280px;
-  max-width: 400px;
-  backdrop-filter: blur(10px);
-  animation:
-    slideInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    fadeOut 0.3s ease-in 2.7s forwards;
-}
-
-.snackbar.error {
-  background: #ef4444;
-  animation:
-    slideInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    shake 0.5s ease-in-out 0.2s,
-    fadeOut 0.3s ease-in 2.7s forwards;
-}
-
-.snackbar-icon {
-  width: 20px;
-  height: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.snackbar-icon i {
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-@keyframes slideInDown {
-  from {
-    transform: translateY(-100px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-}
-
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  10%,
-  30%,
-  50%,
-  70%,
-  90% {
-    transform: translateX(-4px);
-  }
-  20%,
-  40%,
-  60%,
-  80% {
-    transform: translateX(4px);
-  }
-}
-
-/* Responsive */
 @media (max-width: 768px) {
   .login-page {
     flex-direction: column;
@@ -353,15 +242,7 @@ app-login {
   }
 
   .login-form form {
+    max-width: none;
     padding: 32px 24px;
-    max-width: none;
-  }
-
-  .snackbar {
-    top: 16px;
-    right: 16px;
-    left: 16px;
-    min-width: auto;
-    max-width: none;
   }
 }

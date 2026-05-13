@@ -1,0 +1,69 @@
+<aside class="cr-sidebar" role="navigation" aria-label="Menú lateral ComuniRed">
+  <div class="cr-logo">ComuniRed</div>
+
+  <nav class="cr-nav" aria-label="Principal">
+    <ng-container
+      *ngFor="
+        let section of menuSections;
+        let last = last;
+        trackBy: trackBySection
+      "
+    >
+      <section class="cr-section" *ngIf="canShowSection(section)">
+        <h6 class="cr-section-title">{{ section.title }}</h6>
+
+        <ul class="cr-list">
+          <ng-container
+            *ngFor="let item of section.items; trackBy: trackByItem"
+          >
+            <li *ngIf="canShowItem(item)">
+              <a class="menu-link" href="" (click)="onNavigate(item, $event)">
+                <span class="icon" aria-hidden="true">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    [innerHTML]="getSafeIconSvg(item.icon)"
+                  ></svg>
+                </span>
+
+                <span class="label">{{ item.label }}</span>
+                <span class="chev" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ng-container>
+        </ul>
+      </section>
+
+      <hr class="cr-sep" *ngIf="!last && canShowSection(section)" />
+    </ng-container>
+
+    <div class="cr-footer-spacer" aria-hidden="true"></div>
+
+    <div class="cr-cta">
+      <button class="btn-export" type="button" (click)="onExportPdf()">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Exportar reporte PDF
+      </button>
+    </div>
+  </nav>
+</aside>

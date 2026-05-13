@@ -1,10 +1,21 @@
-import { Component, ViewChild, ElementRef, AfterViewChecked, AfterViewInit, OnInit, OnDestroy, Renderer2 } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  AfterViewChecked,
+  OnInit,
+  OnDestroy
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+
 import { UsuarioService } from '../services/usuario.service';
 import { ThemeService } from '../services/theme.service';
 
+import { AdminNavbarComponent } from '../layout/admin/admin-navbar/admin-navbar.component';
+import { AdminSidebarComponent } from '../layout/admin/admin-sidebar/admin-sidebar.component';
+  
 interface ChatMessage {
   content: string;
   isUser: boolean;
@@ -17,12 +28,14 @@ interface ChatMessage {
   imports: [
     CommonModule,
     FormsModule,
-    RouterModule
+    RouterModule,
+    AdminNavbarComponent,
+    AdminSidebarComponent
   ],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })
-export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
+export class AdminComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('chatMessagesDiv') chatMessagesElement!: ElementRef<HTMLDivElement>;
   @ViewChild('chatInput') chatInputElement!: ElementRef<HTMLInputElement>;
 
@@ -31,14 +44,9 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
   chatMessages: ChatMessage[] = [];
   private shouldScrollToBottom = false;
 
-  // Theme toggle
   isDarkMode = false;
 
-  // Gestión DB and tools toggles
-  gestionOpen = false;
-  toolsOpen = false;
-
-  private botResponses = [
+  private readonly botResponses = [
     'Gracias por tu mensaje. ¿En qué más puedo ayudarte?',
     'Entiendo tu consulta. Te recomiendo revisar la sección correspondiente en el menú.',
     '¡Excelente pregunta! Para más información específica, contacta al administrador.',
@@ -48,52 +56,20 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
     '¡Perfecto! ¿Necesitas ayuda con alguna otra funcionalidad del sistema?'
   ];
 
-  // reference to the nested group-list element used for animated collapse
-  private groupListEl: HTMLElement | null = null;
-  private toolsListEl: HTMLElement | null = null;
   private windowStorageListener = (e: StorageEvent) => this.onStorageEvent(e);
 
   constructor(
     private router: Router,
     private usuarioService: UsuarioService,
-    private renderer: Renderer2,
-    private host: ElementRef,
     private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
-    // listen for storage changes (login/logout in other tabs)
     window.addEventListener('storage', this.windowStorageListener);
-    
-    // Cargar preferencia de tema
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      this.isDarkMode = true;
-      document.documentElement.classList.add('dark-mode');
-    }
+    this.isDarkMode = this.themeService.isDarkTheme();
   }
 
-  ngAfterViewInit(): void {
-    // lazy-query the lists for animation control
-    this.groupListEl = this.host.nativeElement.querySelector('.menu-group .group-list');
-    this.toolsListEl = this.host.nativeElement.querySelectorAll('.menu-group')[1]?.querySelector('.group-list') || null;
-
-    // if initial state open, set maxHeight to show smoothly
-    if (this.gestionOpen && this.groupListEl) {
-      this.renderer.setStyle(this.groupListEl, 'maxHeight', `${this.groupListEl.scrollHeight}px`);
-      setTimeout(() => {
-        try { this.renderer.setStyle(this.groupListEl, 'maxHeight', 'none'); } catch {}
-      }, 350);
-    }
-    if (this.toolsOpen && this.toolsListEl) {
-      this.renderer.setStyle(this.toolsListEl, 'maxHeight', `${this.toolsListEl.scrollHeight}px`);
-      setTimeout(() => {
-        try { this.renderer.setStyle(this.toolsListEl, 'maxHeight', 'none'); } catch {}
-      }, 350);
-    }
-  }
-
-  ngAfterViewChecked() {
+  ngAfterViewChecked(): void {
     if (this.shouldScrollToBottom) {
       this.scrollToBottom();
       this.shouldScrollToBottom = false;
@@ -104,35 +80,22 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
     window.removeEventListener('storage', this.windowStorageListener);
   }
 
-  // Toggle theme (dark/light mode)
-  /*toggleTheme() {
-    this.isDarkMode = !this.isDarkMode;
-    
-    if (this.isDarkMode) {
-      document.documentElement.classList.add('dark-mode');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark-mode');
-      localStorage.setItem('theme', 'light');
-    }
-  }*/
   toggleTheme(): void {
     this.themeService.toggleTheme();
     this.isDarkMode = this.themeService.isDarkTheme();
   }
 
-
-  // Mostrar el email o nombre del usuario guardado en localStorage por UsuarioService
   get userDisplay(): string {
     const u = this.usuarioService.getUser();
     if (!u) return 'Invitado';
+
     const nombre = (u as any).nombre ?? '';
     const apellido = (u as any).apellido ?? '';
     const email = (u as any).email ?? '';
+
     return (nombre || apellido) ? `${nombre} ${apellido}`.trim() : email;
   }
 
-  // ROL checks (ajusta si usas ids o nombres diferentes)
   private rolesCache(): string[] {
     return this.usuarioService.getRoles() || [];
   }
@@ -154,153 +117,109 @@ export class AdminComponent implements OnInit, AfterViewInit, AfterViewChecked, 
     );
   }
 
-  // Toggle Gestión DB with simple CSS max-height animation
-  toggleGestion() {
-    this.gestionOpen = !this.gestionOpen;
-    this.animateList(this.groupListEl, this.gestionOpen);
-  }
-
-  // Toggle Tools group
-  toggleTools() {
-    this.toolsOpen = !this.toolsOpen;
-    this.animateList(this.toolsListEl, this.toolsOpen);
-  }
-
-  private animateList(el: HTMLElement | null, open: boolean) {
-    if (!el) {
-      // attempt to query again if not yet available
-      el = this.host.nativeElement.querySelector('.menu-group .group-list');
-      if (!el) return;
-    }
-
-    if (open) {
-      const sh = el.scrollHeight;
-      this.renderer.setStyle(el, 'maxHeight', `${sh}px`);
-      this.renderer.setStyle(el, 'opacity', `1`);
-      this.renderer.setStyle(el, 'transform', `translateY(0)`);
-      setTimeout(() => {
-        try { this.renderer.setStyle(el, 'maxHeight', 'none'); } catch {}
-      }, 350);
-    } else {
-      const current = el.scrollHeight;
-      this.renderer.setStyle(el, 'maxHeight', `${current}px`);
-      // force reflow
-      // tslint:disable-next-line:no-unused-expression
-      el.offsetHeight;
-      this.renderer.setStyle(el, 'maxHeight', '0px');
-      this.renderer.setStyle(el, 'opacity', '0');
-      this.renderer.setStyle(el, 'transform', 'translateY(-6px)');
-    }
-  }
-
-  // Logout usando UsuarioService para limpiar token + Apollo cache
-  logout() {
+  logout(): void {
     this.usuarioService.logout();
     this.chatbotOpen = false;
-    // close admin-only menus
-    this.gestionOpen = false;
-    this.toolsOpen = false;
-    try {
-      if (this.groupListEl) {
-        this.renderer.setStyle(this.groupListEl, 'maxHeight', '0px');
-        this.renderer.setStyle(this.groupListEl, 'opacity', '0');
-      }
-      if (this.toolsListEl) {
-        this.renderer.setStyle(this.toolsListEl, 'maxHeight', '0px');
-        this.renderer.setStyle(this.toolsListEl, 'opacity', '0');
-      }
-    } catch {}
     this.router.navigate(['/login']);
   }
 
-  toggleChatbot() {
+  exportPdf(): void {
+    this.router.navigate(['/admin/report-export']);
+  }
+
+  toggleChatbot(): void {
     this.chatbotOpen = !this.chatbotOpen;
+
     if (this.chatbotOpen) {
       setTimeout(() => {
         try {
           this.chatInputElement?.nativeElement.focus();
-        } catch { /* ignore */ }
-      }, 300);
+        } catch {}
+      }, 250);
     }
   }
 
-  closeChatbot() {
+  closeChatbot(): void {
     this.chatbotOpen = false;
   }
 
-  sendMessage() {
-    if (this.chatMessage.trim() === '') return;
+  sendMessage(): void {
+    const message = this.chatMessage.trim();
+    if (!message) return;
+
     this.chatMessages.push({
-      content: this.chatMessage,
+      content: message,
       isUser: true,
       timestamp: new Date()
     });
-    const userMessage = this.chatMessage;
+
     this.chatMessage = '';
     this.shouldScrollToBottom = true;
+
     setTimeout(() => {
-      const botResponse = this.generateBotResponse(userMessage);
+      const botResponse = this.generateBotResponse(message);
+
       this.chatMessages.push({
         content: botResponse,
         isUser: false,
         timestamp: new Date()
       });
+
       this.shouldScrollToBottom = true;
     }, 800 + Math.random() * 800);
   }
 
   private generateBotResponse(userMessage: string): string {
     const message = userMessage.toLowerCase();
+
     if (message.includes('usuario') || message.includes('user')) {
-      return 'Para gestionar usuarios, dirígete a la sección "Gestión Usuarios" en el menú lateral.';
+      return 'Para gestionar usuarios, dirígete a la sección "Usuarios" del menú lateral.';
     }
+
     if (message.includes('queja') || message.includes('reporte')) {
-      return 'Las quejas se pueden gestionar desde "Gestión Quejas". También puedes revisar los estados en "Gestión Estados Queja".';
+      return 'Las quejas se gestionan desde la sección "Quejas" y sus estados desde "Estados de Queja".';
     }
+
     if (message.includes('rol') || message.includes('permiso')) {
-      return 'Los roles y permisos se configuran en la sección "Gestión Roles".';
+      return 'Los roles y permisos se administran desde la sección "Roles".';
     }
+
     if (message.includes('export') || message.includes('pdf') || message.includes('csv')) {
-      return 'Puedes generar reportes desde Exportar / Generar PDFs o Exportar CSV en el menú.';
+      return 'Puedes generar reportes desde el botón "Exportar reporte PDF" en el menú lateral.';
     }
+
     if (message.includes('ayuda') || message.includes('help')) {
-      return 'Estoy aquí para ayudarte. ¿Sobre qué tema necesitas información?';
+      return 'Estoy aquí para ayudarte. ¿Sobre qué módulo necesitas información?';
     }
+
     if (message.includes('hola') || message.includes('buenos dias') || message.includes('buenas tardes')) {
       return '¡Hola! ¿En qué puedo ayudarte hoy?';
     }
-    if (message.includes('gracias') || message.includes('muchas gracias')) {
-      return '¡De nada! Si tienes más preguntas, no dudes en preguntar.';
+
+    if (message.includes('gracias')) {
+      return '¡De nada! Si tienes otra consulta, aquí estaré.';
     }
+
     if (message.includes('adios') || message.includes('hasta luego')) {
-      return '¡Hasta luego! Que tengas un buen día.';
+      return '¡Hasta luego! Que tengas un excelente día.';
     }
+
     return this.botResponses[Math.floor(Math.random() * this.botResponses.length)];
   }
 
-  private scrollToBottom() {
+  private scrollToBottom(): void {
     try {
       const el = this.chatMessagesElement?.nativeElement;
       if (!el) return;
       el.scrollTop = el.scrollHeight;
-    } catch (err) { /* ignore */ }
+    } catch {}
   }
 
-  // optional: reacts to storage changes (login/logout in another tab)
-  private onStorageEvent(e: StorageEvent) {
-    if (!e) return;
-    if (e.key === null) return;
+  private onStorageEvent(e: StorageEvent): void {
+    if (!e || e.key === null) return;
+
     if (e.key === 'comunired_user' || e.key === 'comunired_token') {
-      // refresh element refs in case DOM changed or roles changed
-      setTimeout(() => {
-        this.groupListEl = this.host.nativeElement.querySelector('.menu-group .group-list');
-        this.toolsListEl = this.host.nativeElement.querySelectorAll('.menu-group')[1]?.querySelector('.group-list') || null;
-      }, 50);
+      this.isDarkMode = this.themeService.isDarkTheme();
     }
-  }
-
-  exportPdf(): void {
-    // Navigate to the export/report page (adjust route if different)
-    this.router.navigate(['/admin/reporte-export']);
   }
 }
