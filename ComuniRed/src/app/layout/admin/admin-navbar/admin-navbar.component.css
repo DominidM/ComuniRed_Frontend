@@ -1,0 +1,239 @@
+:host {
+  display: block;
+}
+
+.admin-navbar {
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 28px;
+  background: var(--cr-background);
+  border-bottom: 1px solid var(--cr-border);
+  box-shadow: var(--shadow-soft);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-sizing: border-box;
+}
+
+.navbar-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-wrap {
+  position: relative;
+  width: min(460px, 100%);
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cr-text-muted);
+  pointer-events: none;
+}
+
+.admin-search {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px 0 42px;
+  border-radius: 12px;
+  border: 1px solid var(--cr-border);
+  background: var(--cr-search);
+  color: var(--cr-text);
+  font-size: 0.94rem;
+  box-sizing: border-box;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.admin-search::placeholder {
+  color: var(--cr-text-muted);
+}
+
+.admin-search:focus {
+  outline: none;
+  border-color: var(--cr-primary);
+  box-shadow: var(--shadow-ring-primary);
+  background: var(--cr-background);
+}
+
+.admin-user-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 6px 10px 6px 6px;
+  border: 1px solid var(--cr-border);
+  border-radius: 999px;
+  background: var(--cr-background);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--cr-primary) 0%, color-mix(in srgb, var(--cr-primary) 72%, white 28%) 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-soft);
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.user-greeting {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cr-text-muted);
+}
+
+.user-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--cr-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.admin-theme-toggle,
+.admin-logout {
+  height: 44px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+}
+
+.admin-theme-toggle {
+  width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cr-background);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.admin-theme-toggle:hover {
+  background: var(--cr-hover-surface);
+  border-color: var(--cr-primary);
+  color: var(--cr-primary);
+  transform: translateY(-1px);
+}
+
+.admin-theme-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-ring-primary);
+}
+
+.admin-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, var(--cr-brand-red) 0%, var(--cr-danger) 100%);
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(185, 28, 28, 0.18);
+}
+
+.admin-logout:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, var(--cr-brand-red-hover) 0%, var(--cr-brand-red) 100%);
+  box-shadow: 0 10px 20px rgba(185, 28, 28, 0.24);
+}
+
+.admin-logout:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cr-brand-red) 22%, transparent);
+}
+
+.admin-logout svg,
+.admin-theme-toggle svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 920px) {
+  .admin-navbar {
+    padding: 14px 18px;
+    gap: 12px;
+  }
+
+  .user-meta {
+    display: none;
+  }
+
+  .user-chip {
+    padding-right: 6px;
+  }
+
+  .admin-logout span {
+    display: none;
+  }
+
+  .admin-logout {
+    width: 44px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-navbar {
+    height: auto;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .navbar-left,
+  .search-wrap {
+    width: 100%;
+  }
+
+  .admin-user-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .user-name {
+    max-width: 120px;
+  }
+}
