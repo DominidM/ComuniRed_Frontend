@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { UsuarioService } from '../../services/usuario.service';
+import { ChangeComponent, Alert } from '../../shared/components/change/change.component';
 
 @Component({
   selector: 'app-olvide-clave',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ChangeComponent],
   templateUrl: './olvide-clave.component.html',
   styleUrls: ['./olvide-clave.component.css']
 })
@@ -19,85 +20,100 @@ export class OlvideClaveComponent {
   confirmarClave = '';
 
   isLoading = false;
-  mensaje = '';
-  error = '';
+  alerts: Alert[] = [];
 
   constructor(
     private usuarioService: UsuarioService,
     private router: Router
   ) {}
 
-  enviarCodigo(form: NgForm) {
+  pushAlert(type: Alert['type'], message: string, duration = 3500): void {
+    const alert: Alert = { type, message, duration };
+    this.alerts = [...this.alerts, alert];
+
+    setTimeout(() => {
+      this.removeAlert(alert);
+    }, duration);
+  }
+
+  removeAlert(alert: Alert): void {
+    this.alerts = this.alerts.filter(a => a !== alert);
+  }
+
+  enviarCodigo(form: NgForm): void {
     if (form.invalid || this.isLoading) return;
 
     this.isLoading = true;
-    this.mensaje = '';
-    this.error = '';
+    this.alerts = [];
 
     this.usuarioService.solicitarCodigoRecuperacion(this.correo).subscribe({
       next: (enviado) => {
         this.isLoading = false;
 
         if (enviado) {
-          this.mensaje = `Se envió un código de verificación a ${this.correo}. Revisa tu bandeja de entrada.`;
+          this.pushAlert(
+            'success',
+            `Se envió un código de verificación a ${this.correo}. Revisa tu bandeja de entrada.`,
+            5000
+          );
           this.pasoActual = 2;
-
-          setTimeout(() => {
-            this.mensaje = '';
-          }, 5000);
         } else {
-          this.error = 'No se pudo enviar el código. Intenta nuevamente.';
+          this.pushAlert('error', 'No se pudo enviar el código. Intenta nuevamente.');
         }
       },
       error: () => {
         this.isLoading = false;
-        this.error = 'Ocurrió un error al enviar el código. Verifica tu conexión e intenta nuevamente.';
+        this.pushAlert(
+          'error',
+          'Ocurrió un error al enviar el código. Verifica tu conexión e intenta nuevamente.'
+        );
       }
     });
   }
 
-  verificarCodigo(form: NgForm) {
+  verificarCodigo(form: NgForm): void {
     if (form.invalid || this.isLoading) return;
 
     this.isLoading = true;
-    this.mensaje = '';
-    this.error = '';
+    this.alerts = [];
 
     this.usuarioService.verificarCodigoRecuperacion(this.correo, this.codigo).subscribe({
       next: (valido) => {
         this.isLoading = false;
 
         if (valido) {
-          this.mensaje = 'Código verificado correctamente. Ahora puedes cambiar tu contraseña.';
+          this.pushAlert(
+            'success',
+            'Código verificado correctamente. Ahora puedes cambiar tu contraseña.',
+            3000
+          );
           this.pasoActual = 3;
-
-          setTimeout(() => {
-            this.mensaje = '';
-          }, 3000);
         } else {
-          this.error = 'El código ingresado no es válido o ha expirado. Verifica e intenta nuevamente.';
+          this.pushAlert(
+            'error',
+            'El código ingresado no es válido o ha expirado. Verifica e intenta nuevamente.'
+          );
         }
       },
       error: () => {
         this.isLoading = false;
-        this.error = 'Ocurrió un error al verificar el código. Intenta nuevamente.';
+        this.pushAlert('error', 'Ocurrió un error al verificar el código. Intenta nuevamente.');
       }
     });
   }
 
-  cambiarClave(form: NgForm) {
+  cambiarClave(form: NgForm): void {
     if (form.invalid || this.isLoading) return;
 
-    this.mensaje = '';
-    this.error = '';
+    this.alerts = [];
 
     if (this.nuevaClave !== this.confirmarClave) {
-      this.error = 'Las contraseñas no coinciden. Verifica e intenta nuevamente.';
+      this.pushAlert('error', 'Las contraseñas no coinciden. Verifica e intenta nuevamente.');
       return;
     }
 
     if (this.nuevaClave.trim().length < 6) {
-      this.error = 'La contraseña debe tener al menos 6 caracteres.';
+      this.pushAlert('error', 'La contraseña debe tener al menos 6 caracteres.');
       return;
     }
 
@@ -108,37 +124,42 @@ export class OlvideClaveComponent {
         this.isLoading = false;
 
         if (cambiado) {
-          this.mensaje = '¡Contraseña actualizada correctamente! Redirigiendo al login...';
+          this.pushAlert(
+            'success',
+            '¡Contraseña actualizada correctamente! Redirigiendo al login...',
+            2000
+          );
 
           setTimeout(() => {
             this.limpiarFormulario();
             this.router.navigate(['/login']);
           }, 2000);
         } else {
-          this.error = 'No se pudo cambiar la contraseña. El código puede haber expirado. Solicita uno nuevo.';
+          this.pushAlert(
+            'error',
+            'No se pudo cambiar la contraseña. El código puede haber expirado. Solicita uno nuevo.'
+          );
         }
       },
       error: () => {
         this.isLoading = false;
-        this.error = 'Ocurrió un error al cambiar la contraseña. Intenta nuevamente.';
+        this.pushAlert('error', 'Ocurrió un error al cambiar la contraseña. Intenta nuevamente.');
       }
     });
   }
 
-  volverPaso(paso: number) {
+  volverPaso(paso: number): void {
     this.pasoActual = paso;
-    this.mensaje = '';
-    this.error = '';
+    this.alerts = [];
   }
 
-  private limpiarFormulario() {
+  private limpiarFormulario(): void {
     this.pasoActual = 1;
     this.correo = '';
     this.codigo = '';
     this.nuevaClave = '';
     this.confirmarClave = '';
-    this.mensaje = '';
-    this.error = '';
+    this.alerts = [];
     this.isLoading = false;
   }
 }

@@ -32,7 +32,7 @@
 }
 
 .cover-strip::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(
@@ -102,7 +102,9 @@
   border-radius: 20px;
   padding: 4px 12px;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
   margin-top: 4px;
   white-space: nowrap;
 }
@@ -146,9 +148,13 @@
   border-radius: 8px;
   transition: background 120ms ease;
   text-decoration: none;
+  border: none;
+  background: transparent;
 }
 
-.stat:hover { background: var(--cr-background-content); }
+.stat:hover {
+  background: var(--cr-background-content);
+}
 
 .stat-num {
   font-size: 14px;
@@ -184,12 +190,19 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 120ms ease, transform 80ms ease;
+  transition:
+    background 120ms ease,
+    transform 80ms ease;
   flex-shrink: 0;
 }
 
-.create-btn:hover { background: #cc2e2e; }
-.create-btn:active { transform: scale(0.98); }
+.create-btn:hover {
+  background: #cc2e2e;
+}
+
+.create-btn:active {
+  transform: scale(0.98);
+}
 
 .create-btn mat-icon {
   font-size: 18px;
@@ -211,8 +224,14 @@
   min-height: 0;
 }
 
-.sidebar-menu::-webkit-scrollbar { width: 3px; }
-.sidebar-menu::-webkit-scrollbar-track { background: transparent; }
+.sidebar-menu::-webkit-scrollbar {
+  width: 3px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .sidebar-menu::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.15);
   border-radius: 2px;
@@ -233,7 +252,9 @@
   border-radius: 10px;
   color: var(--cr-text-secondary);
   text-decoration: none;
-  transition: background 120ms ease, color 120ms ease;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
   min-height: 38px;
   box-sizing: border-box;
   font-size: 14px;
@@ -272,7 +293,9 @@
 }
 
 .sidebar-link.active .icon-wrap,
-.sidebar-link:hover .icon-wrap { opacity: 1; }
+.sidebar-link:hover .icon-wrap {
+  opacity: 1;
+}
 
 .sidebar-link mat-icon,
 .icon-wrap mat-icon {
@@ -307,8 +330,8 @@
 
 .badge-new {
   margin-left: auto;
-  background: #EEEDFE;
-  color: #534AB7;
+  background: #eeedfe;
+  color: #534ab7;
   font-size: 10px;
   font-weight: 600;
   border-radius: 10px;
@@ -331,6 +354,64 @@
   border-top: 1px solid var(--cr-border);
   background: var(--cr-background);
   z-index: 200;
+  display: flex;
+  flex-direction: column;
+}
+
+.back-panel-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--cr-black-20);
+  background: var(--cr-black);
+  color: var(--cr-white);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box;
+  box-shadow: var(--shadow-soft);
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 80ms ease;
+}
+
+.back-panel-btn:hover {
+  background: #1a1a1a;
+  border-color: var(--cr-black-40);
+  color: var(--cr-white);
+  box-shadow: var(--shadow-medium);
+}
+
+.back-panel-btn:active {
+  transform: scale(0.98);
+}
+
+.back-panel-btn:focus-visible {
+  box-shadow:
+    var(--shadow-soft),
+    0 0 0 3px var(--cr-black-20);
+}
+
+.back-panel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.back-panel-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: inherit;
+  flex-shrink: 0;
 }
 
 .logout-btn {
@@ -347,7 +428,9 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
   outline: none;
 }
 
@@ -390,7 +473,7 @@ mat-sidenav.app-public-sidebar .mat-drawer-inner-container {
 }
 
 .sidebar-container.modal-blocked::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   z-index: 9999;

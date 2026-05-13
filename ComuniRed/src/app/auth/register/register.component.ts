@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { UsuarioService, UsuarioInput } from '../../services/usuario.service';
 import { SEXOS, DISTRITOS_LIMA } from '../../shared/data/catalogo.data';
+import { ChangeComponent, Alert } from '../../shared/components/change/change.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ChangeComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })
@@ -34,10 +35,8 @@ export class RegisterComponent {
 
   hoy: string = new Date().toISOString().substring(0, 10);
   errors: { [key: string]: string } = {};
-
-  showSuccess = false;
-  showError: string | null = null;
   isLoading = false;
+  alerts: Alert[] = [];
 
   constructor(
     private usuarioService: UsuarioService,
@@ -46,6 +45,19 @@ export class RegisterComponent {
 
   private trim(value: unknown): string {
     return (value ?? '').toString().trim();
+  }
+
+  pushAlert(type: Alert['type'], message: string, duration = 3000): void {
+    const alert: Alert = { type, message, duration };
+    this.alerts = [...this.alerts, alert];
+
+    setTimeout(() => {
+      this.removeAlert(alert);
+    }, duration);
+  }
+
+  removeAlert(alert: Alert): void {
+    this.alerts = this.alerts.filter(a => a !== alert);
   }
 
   validateNombre() {
@@ -155,10 +167,7 @@ export class RegisterComponent {
       .replace(/[^0-9]/g, '');
 
     if (this.usuarioData.codigo_postal.length > 5) {
-      this.usuarioData.codigo_postal = this.usuarioData.codigo_postal.substring(
-        0,
-        5,
-      );
+      this.usuarioData.codigo_postal = this.usuarioData.codigo_postal.substring(0, 5);
     }
 
     if (
@@ -187,8 +196,7 @@ export class RegisterComponent {
     if (!pwd) {
       this.errors['password'] = 'La contraseña es obligatoria';
     } else if (pwd.length < 6) {
-      this.errors['password'] =
-        'La contraseña debe tener al menos 6 caracteres';
+      this.errors['password'] = 'La contraseña debe tener al menos 6 caracteres';
     } else if (pwd.length > 50) {
       this.errors['password'] = 'La contraseña no puede exceder 50 caracteres';
     } else {
@@ -224,7 +232,7 @@ export class RegisterComponent {
     );
   }
 
-  register() {
+  register(): void {
     if (this.isLoading) return;
 
     this.validateNombre();
@@ -239,15 +247,12 @@ export class RegisterComponent {
     this.validateDistrito();
 
     if (!this.isFormValid()) {
-      this.showError = 'Por favor, corrige los errores en el formulario';
-      setTimeout(() => {
-        this.showError = null;
-      }, 3000);
+      this.pushAlert('error', 'Por favor, corrige los errores en el formulario');
       return;
     }
 
     this.isLoading = true;
-    this.showError = null;
+    this.alerts = [];
 
     this.usuarioData.rol_id =
       this.usuarioData.rol_id && this.trim(this.usuarioData.rol_id) !== ''
@@ -272,26 +277,25 @@ export class RegisterComponent {
 
     this.usuarioService.crearUsuario(payload).subscribe({
       next: () => {
-        this.showSuccess = true;
+        this.isLoading = false;
+        this.pushAlert('success', '¡Usuario creado exitosamente!');
+
         setTimeout(() => {
-          this.showSuccess = false;
-          this.isLoading = false;
           this.router.navigate(['/login']);
         }, 1200);
       },
       error: (err) => {
-        if (err?.error?.message?.includes('email')) {
-          this.showError = 'Este email ya está registrado.';
-        } else if (err?.error?.message?.includes('dni')) {
-          this.showError = 'Este DNI ya está registrado.';
-        } else {
-          this.showError = 'Hubo un error al crear el usuario.';
-        }
-
         this.isLoading = false;
-        setTimeout(() => {
-          this.showError = null;
-        }, 3000);
+
+        const message = err?.error?.message || err?.message || '';
+
+        if (message.includes('email')) {
+          this.pushAlert('error', 'Este email ya está registrado.');
+        } else if (message.includes('dni')) {
+          this.pushAlert('error', 'Este DNI ya está registrado.');
+        } else {
+          this.pushAlert('error', 'Hubo un error al crear el usuario.');
+        }
       },
     });
   }

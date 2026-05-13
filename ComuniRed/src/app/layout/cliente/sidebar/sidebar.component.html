@@ -18,14 +18,12 @@
 
   <nav class="sidebar-menu" aria-label="Menú principal">
     <ng-container *ngFor="let item of menuPrimary">
-      <a
+      <button
         class="sidebar-link"
-        [routerLink]="null"
+        type="button"
         (click)="onLinkClick($event, item.route)"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: !!item.exact }"
         [title]="item.label"
-        [attr.aria-disabled]="modalActive"
+        [disabled]="modalActive"
       >
         <span class="icon-wrap" aria-hidden="true">
           <mat-icon>{{ item.icon }}</mat-icon>
@@ -46,20 +44,18 @@
             aria-label="Nuevas notificaciones"
           ></span>
         </ng-container>
-      </a>
+      </button>
     </ng-container>
 
     <div class="menu-separator" role="separator"></div>
 
     <ng-container *ngFor="let item of menuSecondary">
-      <a
+      <button
         class="sidebar-link"
-        [routerLink]="null"
+        type="button"
         (click)="onLinkClick($event, item.route)"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: false }"
         [title]="item.label"
-        [attr.aria-disabled]="modalActive"
+        [disabled]="modalActive"
       >
         <span class="icon-wrap" aria-hidden="true">
           <mat-icon>{{ item.icon }}</mat-icon>
@@ -72,26 +68,24 @@
           <span *ngSwitchCase="'new'" class="badge-new">Nuevo</span>
           <span *ngSwitchCase="'dot'" class="notif-dot"></span>
         </ng-container>
-      </a>
+      </button>
     </ng-container>
 
     <div class="menu-separator" role="separator"></div>
 
     <ng-container *ngFor="let item of menuSettings">
-      <a
+      <button
         class="sidebar-link"
-        [routerLink]="null"
+        type="button"
         (click)="onLinkClick($event, item.route)"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: false }"
         [title]="item.label"
-        [attr.aria-disabled]="modalActive"
+        [disabled]="modalActive"
       >
         <span class="icon-wrap" aria-hidden="true">
           <mat-icon>{{ item.icon }}</mat-icon>
         </span>
         <span class="link-label">{{ item.label }}</span>
-      </a>
+      </button>
     </ng-container>
   </nav>
 
@@ -127,30 +121,47 @@
       <div class="profile-handle">{{ user.handle }}</div>
 
       <div class="stats-row">
-        <a
+        <button
           class="stat"
-          [routerLink]="null"
+          type="button"
           (click)="onIrPerfil()"
-          [attr.aria-disabled]="modalActive"
+          [disabled]="modalActive"
         >
-          <span class="stat-num">{{ formatearContador(user.followersCount) }}</span>
+          <span class="stat-num">{{
+            formatearContador(user.followersCount)
+          }}</span>
           <span class="stat-lbl">Seguidores</span>
-        </a>
+        </button>
+
         <div class="stat-divider"></div>
-        <a
+
+        <button
           class="stat"
-          [routerLink]="null"
+          type="button"
           (click)="onIrPerfil()"
-          [attr.aria-disabled]="modalActive"
+          [disabled]="modalActive"
         >
-          <span class="stat-num">{{ formatearContador(user.followingCount) }}</span>
+          <span class="stat-num">{{
+            formatearContador(user.followingCount)
+          }}</span>
           <span class="stat-lbl">Siguiendo</span>
-        </a>
+        </button>
       </div>
     </div>
   </div>
 
   <div class="sidebar-footer">
+    <button
+      *ngIf="isAdmin"
+      class="back-panel-btn"
+      type="button"
+      (click)="onVolverAdmin()"
+      [disabled]="modalActive"
+    >
+      <mat-icon>admin_panel_settings</mat-icon>
+      <span>Volver a panel admin</span>
+    </button>
+
     <button
       class="logout-btn"
       (click)="onSalir()"

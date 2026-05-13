@@ -223,19 +223,11 @@
       </div>
     </form>
 
-    <div class="snackbar" *ngIf="showSuccess">
-      <span class="snackbar-icon" aria-hidden="true">
-        <i class="pi pi-check-circle"></i>
-      </span>
-      <span>¡Usuario creado exitosamente!</span>
-    </div>
-
-    <div class="snackbar error" *ngIf="showError">
-      <span class="snackbar-icon" aria-hidden="true">
-        <i class="pi pi-times-circle"></i>
-      </span>
-      <span>{{ showError }}</span>
-    </div>
+    <app-change
+      [alerts]="alerts"
+      [confirmDialog]="null"
+      (removeAlert)="removeAlert($event)"
+    ></app-change>
   </div>
 
   <div class="register-left">

@@ -27,6 +27,7 @@
     0 24px 60px rgba(15, 23, 42, 0.08),
     0 8px 24px rgba(15, 23, 42, 0.04);
   text-align: center;
+  position: relative;
 }
 
 .olvide-card h2 {
@@ -120,30 +121,6 @@
   background: var(--cr-brand-red-soft, #efb4b4);
   box-shadow: none;
   cursor: not-allowed;
-}
-
-.mensaje-exito {
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #047857;
-  font-weight: 600;
-  font-size: 0.92rem;
-  line-height: 1.4;
-}
-
-.mensaje-error {
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #b91c1c;
-  font-weight: 600;
-  font-size: 0.92rem;
-  line-height: 1.4;
 }
 
 .volver {

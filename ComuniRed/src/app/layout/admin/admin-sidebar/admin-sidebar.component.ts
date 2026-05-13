@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 interface AdminMenuItem {
   label: string;
@@ -8,6 +9,7 @@ interface AdminMenuItem {
   exact?: boolean;
   icon: string;
   roles?: ('admin' | 'soporte')[];
+  externalNav?: boolean;
 }
 
 interface AdminMenuSection {
@@ -29,6 +31,11 @@ export class AdminSidebarComponent {
 
   @Output() exportPdfClick = new EventEmitter<void>();
 
+  constructor(
+    private sanitizer: DomSanitizer,
+    private router: Router,
+  ) {}
+
   readonly menuSections: AdminMenuSection[] = [
     {
       title: 'Principal',
@@ -48,6 +55,7 @@ export class AdminSidebarComponent {
           label: 'Vista pública',
           route: '/public/home',
           icon: 'public',
+          externalNav: true,
         },
       ],
     },
@@ -131,6 +139,18 @@ export class AdminSidebarComponent {
     this.exportPdfClick.emit();
   }
 
+  onNavigate(item: AdminMenuItem, event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    if (item.externalNav) {
+      window.location.href = item.route;
+      return;
+    }
+
+    this.router.navigateByUrl(item.route).catch(console.error);
+  }
+
   canShowSection(section: AdminMenuSection): boolean {
     if (!section.roles || section.roles.length === 0) return true;
     return section.roles.some((role) => this.hasRole(role));
@@ -155,7 +175,11 @@ export class AdminSidebarComponent {
     return `${item.label}-${item.route}`;
   }
 
-  getIconSvg(icon: string): string {
+  getSafeIconSvg(icon: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(this.getIconSvgRaw(icon));
+  }
+
+  private getIconSvgRaw(icon: string): string {
     const icons: Record<string, string> = {
       dashboard: `
         <rect x="3" y="3" width="7" height="7"></rect>
@@ -171,9 +195,7 @@ export class AdminSidebarComponent {
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
         <circle cx="12" cy="12" r="3"></circle>
       `,
-      quejas: `
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-      `,
+      quejas: `<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>`,
       asignaciones: `
         <polyline points="16 3 21 3 21 8"></polyline>
         <line x1="4" y1="20" x2="21" y2="3"></line>
@@ -185,9 +207,7 @@ export class AdminSidebarComponent {
         <path d="M9 11l3 3L22 4"></path>
         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
       `,
-      categoria: `
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-      `,
+      categoria: `<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>`,
       estado: `
         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
         <line x1="7" y1="7" x2="7.01" y2="7"></line>
@@ -198,26 +218,7 @@ export class AdminSidebarComponent {
         <line x1="9" y1="9" x2="9.01" y2="9"></line>
         <line x1="15" y1="9" x2="15.01" y2="9"></line>
       `,
-      config: `
-        <circle cx="12" cy="12" r="3"></circle>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33
-        1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51
-        1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06
-        a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3
-        a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1
-        1.65 1.65 0 0 0-.33-1.82l-.06-.06
-        a2 2 0 1 1 2.83-2.83l.06.06
-        a1.65 1.65 0 0 0 1.82.33h.01
-        a1.65 1.65 0 0 0 1-1.51V3
-        a2 2 0 1 1 4 0v.09
-        a1.65 1.65 0 0 0 1 1.51
-        a1.65 1.65 0 0 0 1.82-.33l.06-.06
-        a2 2 0 1 1 2.83 2.83l-.06.06
-        a1.65 1.65 0 0 0-.33 1.82v.01
-        a1.65 1.65 0 0 0 1.51 1H21
-        a2 2 0 1 1 0 4h-.09
-        a1.65 1.65 0 0 0-1.51 1z"></path>
-      `,
+      config: `<circle cx="12" cy="12" r="3"></circle>`,
       usuarios: `
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
         <circle cx="9" cy="7" r="4"></circle>

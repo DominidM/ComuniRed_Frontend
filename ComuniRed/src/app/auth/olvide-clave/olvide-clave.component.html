@@ -12,7 +12,6 @@
       Crea tu nueva contraseña.
     </p>
 
-    <!-- Paso 1 -->
     <form
       *ngIf="pasoActual === 1"
       #formCorreo="ngForm"
@@ -40,7 +39,6 @@
       </div>
     </form>
 
-    <!-- Paso 2 -->
     <form
       *ngIf="pasoActual === 2"
       #formCodigo="ngForm"
@@ -69,7 +67,6 @@
       </div>
     </form>
 
-    <!-- Paso 3 -->
     <form
       *ngIf="pasoActual === 3"
       #formClave="ngForm"
@@ -111,12 +108,10 @@
       </div>
     </form>
 
-    <div class="mensaje-exito" *ngIf="mensaje">
-      {{ mensaje }}
-    </div>
-
-    <div class="mensaje-error" *ngIf="error">
-      {{ error }}
-    </div>
+    <app-change
+      [alerts]="alerts"
+      [confirmDialog]="null"
+      (removeAlert)="removeAlert($event)"
+    ></app-change>
   </div>
 </div>
