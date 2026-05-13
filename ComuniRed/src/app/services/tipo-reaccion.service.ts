@@ -22,13 +22,22 @@ export interface TiposReaccionPage {
 export class TipoReaccionService {
   constructor(private apollo: Apollo) {}
 
-  obtenerTipoReaccionPage(page: number, size: number): Observable<TiposReaccionPage> {
+  obtenerTipoReaccionPage(
+    page: number,
+    size: number,
+  ): Observable<TiposReaccionPage> {
     return this.apollo
       .watchQuery<{ obtenerTipo_reaccion: TiposReaccionPage }>({
         query: gql`
           query ($page: Int!, $size: Int!) {
             obtenerTipo_reaccion(page: $page, size: $size) {
-              content { id key label activo orden }
+              content {
+                id
+                key
+                label
+                activo
+                orden
+              }
               totalElements
               totalPages
               number
@@ -37,11 +46,13 @@ export class TipoReaccionService {
           }
         `,
         variables: { page, size },
-        fetchPolicy: 'network-only'  // 👈 Agrega esta línea
+        fetchPolicy: 'network-only', // 👈 Agrega esta línea
       })
-      .valueChanges.pipe(map((r: any) => r), map(result => result.data.obtenerTipo_reaccion));
+      .valueChanges.pipe(
+        map((r: any) => r),
+        map((result: any) => result.data?.obtenerTipo_reaccion ?? []),
+      );
   }
-
 
   buscarPorLabel(label: string): Observable<TipoReaccion | null> {
     return this.apollo
@@ -49,23 +60,48 @@ export class TipoReaccionService {
         query: gql`
           query ($label: String!) {
             buscarTipoReaccionPorLabel(label: $label) {
-              id key label activo orden
+              id
+              key
+              label
+              activo
+              orden
             }
           }
         `,
         variables: { label },
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(map((r: any) => r), map(result => result.data.buscarTipoReaccionPorLabel));
+      .valueChanges.pipe(
+        map((r: any) => r),
+        map((result) => result.data.buscarTipoReaccionPorLabel),
+      );
   }
 
-  crearTipoReaccion(tipo: Partial<TipoReaccion>, page: number, size: number): Observable<TipoReaccion> {
+  crearTipoReaccion(
+    tipo: Partial<TipoReaccion>,
+    page: number,
+    size: number,
+  ): Observable<TipoReaccion> {
     return this.apollo
       .mutate<{ crearTipoReaccion: TipoReaccion }>({
         mutation: gql`
-          mutation($key: String!, $label: String!, $activo: Boolean!, $orden: Int!) {
-            crearTipoReaccion(key: $key, label: $label, activo: $activo, orden: $orden) {
-              id key label activo orden
+          mutation (
+            $key: String!
+            $label: String!
+            $activo: Boolean!
+            $orden: Int!
+          ) {
+            crearTipoReaccion(
+              key: $key
+              label: $label
+              activo: $activo
+              orden: $orden
+            ) {
+              id
+              key
+              label
+              activo
+              orden
             }
           }
         `,
@@ -73,14 +109,20 @@ export class TipoReaccionService {
           key: tipo.key!,
           label: tipo.label!,
           activo: tipo.activo ?? true,
-          orden: tipo.orden ?? 1
+          orden: tipo.orden ?? 1,
         },
         refetchQueries: [
           {
             query: gql`
               query ($page: Int!, $size: Int!) {
                 obtenerTipo_reaccion(page: $page, size: $size) {
-                  content { id key label activo orden }
+                  content {
+                    id
+                    key
+                    label
+                    activo
+                    orden
+                  }
                   totalElements
                   totalPages
                   number
@@ -88,20 +130,41 @@ export class TipoReaccionService {
                 }
               }
             `,
-            variables: { page, size }
-          }
-        ]
+            variables: { page, size },
+          },
+        ],
       })
-      .pipe(map(result => result.data!.crearTipoReaccion));
+      .pipe(map((result) => result.data!.crearTipoReaccion));
   }
 
-  actualizarTipoReaccion(id: string, tipo: Partial<TipoReaccion>, page: number, size: number): Observable<TipoReaccion> {
+  actualizarTipoReaccion(
+    id: string,
+    tipo: Partial<TipoReaccion>,
+    page: number,
+    size: number,
+  ): Observable<TipoReaccion> {
     return this.apollo
       .mutate<{ actualizarTipoReaccion: TipoReaccion }>({
         mutation: gql`
-          mutation($id: ID!, $key: String!, $label: String!, $activo: Boolean!, $orden: Int!) {
-            actualizarTipoReaccion(id: $id, key: $key, label: $label, activo: $activo, orden: $orden) {
-              id key label activo orden
+          mutation (
+            $id: ID!
+            $key: String!
+            $label: String!
+            $activo: Boolean!
+            $orden: Int!
+          ) {
+            actualizarTipoReaccion(
+              id: $id
+              key: $key
+              label: $label
+              activo: $activo
+              orden: $orden
+            ) {
+              id
+              key
+              label
+              activo
+              orden
             }
           }
         `,
@@ -110,14 +173,20 @@ export class TipoReaccionService {
           key: tipo.key!,
           label: tipo.label!,
           activo: tipo.activo ?? true,
-          orden: tipo.orden ?? 1
+          orden: tipo.orden ?? 1,
         },
         refetchQueries: [
           {
             query: gql`
               query ($page: Int!, $size: Int!) {
                 obtenerTipo_reaccion(page: $page, size: $size) {
-                  content { id key label activo orden }
+                  content {
+                    id
+                    key
+                    label
+                    activo
+                    orden
+                  }
                   totalElements
                   totalPages
                   number
@@ -125,18 +194,22 @@ export class TipoReaccionService {
                 }
               }
             `,
-            variables: { page, size }
-          }
-        ]
+            variables: { page, size },
+          },
+        ],
       })
-      .pipe(map(result => result.data!.actualizarTipoReaccion));
+      .pipe(map((result) => result.data!.actualizarTipoReaccion));
   }
 
-  eliminarTipoReaccion(id: string, page: number, size: number): Observable<boolean> {
+  eliminarTipoReaccion(
+    id: string,
+    page: number,
+    size: number,
+  ): Observable<boolean> {
     return this.apollo
       .mutate<{ eliminarTipoReaccion: boolean }>({
         mutation: gql`
-          mutation($id: ID!) {
+          mutation ($id: ID!) {
             eliminarTipoReaccion(id: $id)
           }
         `,
@@ -146,7 +219,13 @@ export class TipoReaccionService {
             query: gql`
               query ($page: Int!, $size: Int!) {
                 obtenerTipo_reaccion(page: $page, size: $size) {
-                  content { id key label activo orden }
+                  content {
+                    id
+                    key
+                    label
+                    activo
+                    orden
+                  }
                   totalElements
                   totalPages
                   number
@@ -154,10 +233,10 @@ export class TipoReaccionService {
                 }
               }
             `,
-            variables: { page, size }
-          }
-        ]
+            variables: { page, size },
+          },
+        ],
       })
-      .pipe(map(result => result.data?.eliminarTipoReaccion ?? false));
+      .pipe(map((result) => result.data?.eliminarTipoReaccion ?? false));
   }
 }

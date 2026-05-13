@@ -378,45 +378,48 @@
   font-size: 0.85rem;
 }
 
-/* Estilos para cambio de estado */
+/* ── Select de estado — dark mode aware ── */
 .estado-select {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--cr-border);
   border-radius: 6px;
-  background: white;
+  background: var(--cr-background-content);
+  color: var(--cr-text);
   cursor: pointer;
   font-size: 0.875rem;
-  transition: all 0.3s ease;
+  transition: all 0.2s;
+  appearance: auto;
 }
 
 .estado-select:hover {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 15%, transparent);
 }
 
 .estado-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--primary-color);
 }
 
-/* Modal de cambio de estado */
-.modal-estado {
-  max-width: 500px !important;
+.estado-select option {
+  background: var(--cr-background-content);
+  color: var(--cr-text);
 }
 
+/* ── Modal estado — dark mode aware ── */
 .modal-estado-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--cr-border);
 }
 
 .modal-estado-header h3 {
   margin: 0;
   font-size: 1.25rem;
-  color: #2d3748;
+  color: var(--cr-text);
 }
 
 .btn-close-modal {
@@ -424,7 +427,7 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #718096;
+  color: var(--muted);
   padding: 0;
   width: 30px;
   height: 30px;
@@ -435,8 +438,8 @@
 }
 
 .btn-close-modal:hover {
-  background: #f7fafc;
-  color: #2d3748;
+  background: var(--cr-search);
+  color: var(--cr-text);
 }
 
 .modal-estado-body {
@@ -444,19 +447,74 @@
 }
 
 .estado-preview {
-  background: #f7fafc;
+  background: var(--cr-search);
   padding: 1.5rem;
   border-radius: 8px;
   margin-bottom: 1rem;
+  border: 1px solid var(--cr-border);
 }
 
-.estado-preview-item {
-  margin-bottom: 1rem;
+.estado-preview-item label {
+  font-size: 0.875rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.modal-estado-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--cr-border);
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  justify-content: flex-end;
+  gap: 1rem;
 }
 
+/* ── Paginación — dark mode aware ── */
+.pagination button {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  background: var(--cr-background-content);
+  color: var(--cr-text);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary-color) 15%, var(--cr-background-content));
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.pagination button.active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.pagination button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.page-info {
+  margin-left: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ── Badges de estado — mejor contraste en dark ── */
+.estado-pendiente  { background: color-mix(in srgb, #f39c12 15%, transparent); color: #f39c12; }
+.estado-aprobado   { background: color-mix(in srgb, #4caf50 15%, transparent); color: #4caf50; }
+.estado-votacion   { background: color-mix(in srgb, #2196f3 15%, transparent); color: #2196f3; }
+.estado-proceso    { background: color-mix(in srgb, #ff9800 15%, transparent); color: #ff9800; }
+.estado-resuelto   { background: color-mix(in srgb, #4caf50 15%, transparent); color: #4caf50; }
+.estado-rechazado  { background: color-mix(in srgb, #f44336 15%, transparent); color: #f44336; }
+.estado-default    { background: color-mix(in srgb, var(--muted) 15%, transparent); color: var(--muted); }
 .estado-preview-item:last-child {
   margin-bottom: 0;
 }
@@ -546,4 +604,50 @@
 .estado-default {
   background: #f7fafc;
   color: #718096;
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px 0 8px;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #444;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #e8f0fe;
+  border-color: #4285f4;
+  color: #4285f4;
+}
+
+.pagination button.active {
+  background: #050100;
+  border-color: #000000;
+  color: #fff;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.pagination button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.page-info {
+  margin-left: 10px;
+  font-size: 13px;
+  color: #888;
 }

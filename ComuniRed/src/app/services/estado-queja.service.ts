@@ -19,153 +19,248 @@ export interface EstadoQuejaPage {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EstadosQuejaService {
-  
   private estadoCountSubject = new BehaviorSubject<number>(0);
   public estadoCount$ = this.estadoCountSubject.asObservable();
 
   constructor(private apollo: Apollo) {
-
     this.refreshEstadoCount();
   }
 
-
   refreshEstadoCount(): void {
-    this.apollo.query<{ contarEstadosQueja: number }>({
-      query: gql`
-        query {
-          contarEstadosQueja
-        }
-      `,
-      fetchPolicy: 'network-only'
-    }).subscribe({
-      next: (result) => {
-        const count = result.data?.contarEstadosQueja ?? 0;
-        this.estadoCountSubject.next(count);
-        console.debug('[EstadosQuejaService] estadoCount refreshed:', count);
-      },
-      error: (err) => console.error('Error al contar estados de queja:', err)
-    });
+    this.apollo
+      .query<{ contarEstadosQueja: number }>({
+        query: gql`
+          query {
+            contarEstadosQueja
+          }
+        `,
+        fetchPolicy: 'network-only',
+      })
+      .subscribe({
+        next: (result) => {
+          const count = result.data?.contarEstadosQueja ?? 0;
+          this.estadoCountSubject.next(count);
+          console.debug('[EstadosQuejaService] estadoCount refreshed:', count);
+        },
+        error: (err) => console.error('Error al contar estados de queja:', err),
+      });
   }
-
 
   obtenerEstadosQueja(page: number, size: number): Observable<EstadoQuejaPage> {
-    return this.apollo.watchQuery<{ obtenerEstados_queja: EstadoQuejaPage }>({
-      query: gql`
-        query ($page: Int!, $size: Int!) {
-          obtenerEstados_queja(page: $page, size: $size) {
-            content {
-              id clave nombre descripcion orden
+    return this.apollo
+      .watchQuery<{ obtenerEstados_queja: EstadoQuejaPage }>({
+        query: gql`
+          query ($page: Int!, $size: Int!) {
+            obtenerEstados_queja(page: $page, size: $size) {
+              content {
+                id
+                clave
+                nombre
+                descripcion
+                orden
+              }
+              totalElements
+              totalPages
+              number
+              size
             }
-            totalElements totalPages number size
           }
-        }
-      `,
-      variables: { page, size }
-    }).valueChanges.pipe(map((r: any) => r), 
-      map(result => result.data.obtenerEstados_queja)
-    );
+        `,
+        variables: { page, size },
+      })
+      .valueChanges.pipe(
+        map((result: any) => result.data?.obtenerEstados_queja ?? []),
+      );
   }
 
-  crearEstadoQueja(clave: string, nombre: string, descripcion: string, orden: number, page: number, size: number): Observable<EstadoQueja> {
-    return this.apollo.mutate<{ crearEstado: EstadoQueja }>({
-      mutation: gql`
-        mutation ($clave: String!, $nombre: String!, $descripcion: String, $orden: Int!) {
-          crearEstado(clave: $clave, nombre: $nombre, descripcion: $descripcion, orden: $orden) {
-            id clave nombre descripcion orden
-          }
-        }
-      `,
-      variables: { clave, nombre, descripcion, orden },
-      refetchQueries: [
-        {
-          query: gql`
-            query ($page: Int!, $size: Int!) {
-              obtenerEstados_queja(page: $page, size: $size) {
-                content { id clave nombre descripcion orden }
-                totalElements totalPages number size
-              }
+  crearEstadoQueja(
+    clave: string,
+    nombre: string,
+    descripcion: string,
+    orden: number,
+    page: number,
+    size: number,
+  ): Observable<EstadoQueja> {
+    return this.apollo
+      .mutate<{ crearEstado: EstadoQueja }>({
+        mutation: gql`
+          mutation (
+            $clave: String!
+            $nombre: String!
+            $descripcion: String
+            $orden: Int!
+          ) {
+            crearEstado(
+              clave: $clave
+              nombre: $nombre
+              descripcion: $descripcion
+              orden: $orden
+            ) {
+              id
+              clave
+              nombre
+              descripcion
+              orden
             }
-          `,
-          variables: { page, size }
-        }
-      ]
-    }).pipe(
-      tap(() => this.refreshEstadoCount()),
-      map(result => result.data!.crearEstado)
-    );
+          }
+        `,
+        variables: { clave, nombre, descripcion, orden },
+        refetchQueries: [
+          {
+            query: gql`
+              query ($page: Int!, $size: Int!) {
+                obtenerEstados_queja(page: $page, size: $size) {
+                  content {
+                    id
+                    clave
+                    nombre
+                    descripcion
+                    orden
+                  }
+                  totalElements
+                  totalPages
+                  number
+                  size
+                }
+              }
+            `,
+            variables: { page, size },
+          },
+        ],
+      })
+      .pipe(
+        tap(() => this.refreshEstadoCount()),
+        map((result) => result.data!.crearEstado),
+      );
   }
 
-  actualizarEstadoQueja(id: string, clave: string, nombre: string, descripcion: string, orden: number, page: number, size: number): Observable<EstadoQueja> {
-    return this.apollo.mutate<{ actualizarEstado: EstadoQueja }>({
-      mutation: gql`
-        mutation ($id: ID!, $clave: String!, $nombre: String!, $descripcion: String, $orden: Int!) {
-          actualizarEstado(id: $id, clave: $clave, nombre: $nombre, descripcion: $descripcion, orden: $orden) {
-            id clave nombre descripcion orden
-          }
-        }
-      `,
-      variables: { id, clave, nombre, descripcion, orden },
-      refetchQueries: [
-        {
-          query: gql`
-            query ($page: Int!, $size: Int!) {
-              obtenerEstados_queja(page: $page, size: $size) {
-                content { id clave nombre descripcion orden }
-                totalElements totalPages number size
-              }
+  actualizarEstadoQueja(
+    id: string,
+    clave: string,
+    nombre: string,
+    descripcion: string,
+    orden: number,
+    page: number,
+    size: number,
+  ): Observable<EstadoQueja> {
+    return this.apollo
+      .mutate<{ actualizarEstado: EstadoQueja }>({
+        mutation: gql`
+          mutation (
+            $id: ID!
+            $clave: String!
+            $nombre: String!
+            $descripcion: String
+            $orden: Int!
+          ) {
+            actualizarEstado(
+              id: $id
+              clave: $clave
+              nombre: $nombre
+              descripcion: $descripcion
+              orden: $orden
+            ) {
+              id
+              clave
+              nombre
+              descripcion
+              orden
             }
-          `,
-          variables: { page, size }
-        }
-      ]
-    }).pipe(
-      tap(() => this.refreshEstadoCount()),
-      map(result => result.data!.actualizarEstado)
-    );
+          }
+        `,
+        variables: { id, clave, nombre, descripcion, orden },
+        refetchQueries: [
+          {
+            query: gql`
+              query ($page: Int!, $size: Int!) {
+                obtenerEstados_queja(page: $page, size: $size) {
+                  content {
+                    id
+                    clave
+                    nombre
+                    descripcion
+                    orden
+                  }
+                  totalElements
+                  totalPages
+                  number
+                  size
+                }
+              }
+            `,
+            variables: { page, size },
+          },
+        ],
+      })
+      .pipe(
+        tap(() => this.refreshEstadoCount()),
+        map((result) => result.data!.actualizarEstado),
+      );
   }
 
-  eliminarEstadoQueja(id: string, page: number, size: number): Observable<boolean> {
-    return this.apollo.mutate<{ eliminarEstado: boolean }>({
-      mutation: gql`
-        mutation ($id: ID!) {
-          eliminarEstado(id: $id)
-        }
-      `,
-      variables: { id },
-      refetchQueries: [
-        {
-          query: gql`
-            query ($page: Int!, $size: Int!) {
-              obtenerEstados_queja(page: $page, size: $size) {
-                content { id clave nombre descripcion orden }
-                totalElements totalPages number size
+  eliminarEstadoQueja(
+    id: string,
+    page: number,
+    size: number,
+  ): Observable<boolean> {
+    return this.apollo
+      .mutate<{ eliminarEstado: boolean }>({
+        mutation: gql`
+          mutation ($id: ID!) {
+            eliminarEstado(id: $id)
+          }
+        `,
+        variables: { id },
+        refetchQueries: [
+          {
+            query: gql`
+              query ($page: Int!, $size: Int!) {
+                obtenerEstados_queja(page: $page, size: $size) {
+                  content {
+                    id
+                    clave
+                    nombre
+                    descripcion
+                    orden
+                  }
+                  totalElements
+                  totalPages
+                  number
+                  size
+                }
               }
-            }
-          `,
-          variables: { page, size }
-        }
-      ]
-    }).pipe(
-      tap(() => this.refreshEstadoCount()),
-      map(result => result.data!.eliminarEstado)
-    );
+            `,
+            variables: { page, size },
+          },
+        ],
+      })
+      .pipe(
+        tap(() => this.refreshEstadoCount()),
+        map((result) => result.data!.eliminarEstado),
+      );
   }
 
   buscarEstadoPorNombre(nombre: string): Observable<EstadoQueja | null> {
-    return this.apollo.watchQuery<{ buscarEstadoPorNombre: EstadoQueja }>({
-      query: gql`
-        query ($nombre: String!) {
-          buscarEstadoPorNombre(nombre: $nombre) {
-            id clave nombre descripcion orden
+    return this.apollo
+      .watchQuery<{ buscarEstadoPorNombre: EstadoQueja }>({
+        query: gql`
+          query ($nombre: String!) {
+            buscarEstadoPorNombre(nombre: $nombre) {
+              id
+              clave
+              nombre
+              descripcion
+              orden
+            }
           }
-        }
-      `,
-      variables: { nombre }
-    }).valueChanges.pipe(map((r: any) => r), 
-      map(result => result.data.buscarEstadoPorNombre)
-    );
+        `,
+        variables: { nombre },
+      })
+      .valueChanges.pipe(
+        map((result: any) => result.data?.buscarEstadoPorNombre ?? null),
+      );
   }
 }

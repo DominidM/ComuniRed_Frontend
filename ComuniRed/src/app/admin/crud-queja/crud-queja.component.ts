@@ -32,7 +32,7 @@ interface EstadoQueja {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './crud-queja.component.html',
-  styleUrls: ['./crud-queja.component.css']
+  styleUrls: ['./crud-queja.component.css'],
 })
 export class CrudQuejaComponent implements OnInit {
   quejas: Queja[] = [];
@@ -43,11 +43,17 @@ export class CrudQuejaComponent implements OnInit {
   quejaData: Partial<Queja> = {};
   loading = false;
 
+  // Paginado
+  page = 0;
+  pageSize = 5;
+  totalElements = 0;
+  totalPages = 0;
+
   showModalCambioEstado = false;
   quejaSeleccionada: Queja | null = null;
-  nuevoEstadoId: string = '';
-  nuevoEstadoNombre: string = '';
-  observacionEstado: string = '';
+  nuevoEstadoId = '';
+  nuevoEstadoNombre = '';
+  observacionEstado = '';
 
   private ACTUALIZAR_QUEJA = gql`
     mutation ActualizarQueja($id: ID!, $imagen_url: String) {
@@ -62,7 +68,7 @@ export class CrudQuejaComponent implements OnInit {
     private apollo: Apollo,
     private quejaService: QuejaService,
     private usuarioService: UsuarioService,
-    private estadosQuejaService: EstadosQuejaService
+    private estadosQuejaService: EstadosQuejaService,
   ) {}
 
   ngOnInit(): void {
@@ -71,126 +77,100 @@ export class CrudQuejaComponent implements OnInit {
     this.loadQuejas();
   }
 
+  // ── Paginado ──────────────────────────────────────────────────
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
+  goToPage(p: number): void {
+    if (p < 0 || p >= this.totalPages || p === this.page) return;
+    this.page = p;
+    this.loadQuejas();
+  }
+
+  // ── Carga de datos ────────────────────────────────────────────
   loadQuejas(): void {
     this.loading = true;
     const adminUser = this.usuarioService.getUser();
     const usuarioActualId = adminUser ? (adminUser as any).id : '';
 
-    this.quejaService.obtenerQuejas(usuarioActualId).subscribe({
-      next: (data) => {
-        this.quejas = (data || []).map((q: any) => ({
-          id: q.id,
-          titulo: q.titulo || '',
-          descripcion: q.descripcion,
-          fecha_creacion: q.fecha_creacion,
-          usuario_id: q.usuario?.id || '',
-          usuario_nombre: `${q.usuario?.nombre || ''} ${q.usuario?.apellido || ''}`.trim(),
-          estado_id: q.estado?.id || '',
-          estado_nombre: q.estado?.nombre || '',
-          imagen_url: q.imagen_url || '',
-          categoria_id: q.categoria?.id || '',
-          categoria_nombre: q.categoria?.nombre || ''
-        }));
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('❌ Error cargando quejas:', err);
-        this.loading = false;
-        this.quejas = [];
-      }
-    });
+    this.quejaService
+      .obtenerQuejasAdminPaginadas(usuarioActualId, this.page, this.pageSize)
+      .subscribe({
+        next: (pageData: any) => {
+          this.quejas = (pageData?.content || []).map((q: any) => ({
+            id: q.id,
+            titulo: q.titulo || '',
+            descripcion: q.descripcion,
+            fecha_creacion: q.fecha_creacion,
+            usuario_id: q.usuario?.id || '',
+            usuario_nombre:
+              `${q.usuario?.nombre || ''} ${q.usuario?.apellido || ''}`.trim(),
+            estado_id: q.estado?.id || '',
+            estado_nombre: q.estado?.nombre || '',
+            imagen_url: q.imagen_url || '',
+            categoria_id: q.categoria?.id || '',
+            categoria_nombre: q.categoria?.nombre || '',
+          }));
+          this.totalElements = pageData?.totalElements || 0;
+          this.totalPages = pageData?.totalPages || 0;
+          this.loading = false;
+        },
+        error: (err: any) => {
+          console.error('❌ Error cargando quejas:', err);
+          this.loading = false;
+          this.quejas = [];
+        },
+      });
   }
 
   loadUsuarios(): void {
-    if (this.usuarioService && typeof (this.usuarioService as any).obtenerTodosLosUsuarios === 'function') {
+    if (
+      typeof (this.usuarioService as any).obtenerTodosLosUsuarios === 'function'
+    ) {
       (this.usuarioService as any).obtenerTodosLosUsuarios().subscribe({
         next: (users: any) => {
           this.usuarios = users;
-          console.log('✅ Usuarios cargados:', this.usuarios.length);
         },
-        error: (err: any) => {
-          console.error('❌ Error cargando usuarios:', err);
+        error: () => {
           this.usuarios = [];
-        }
+        },
       });
-    } else {
-      console.warn('⚠️ obtenerTodosLosUsuarios no disponible');
-      this.usuarios = [];
     }
   }
 
   loadEstados(): void {
-    if (this.estadosQuejaService && typeof (this.estadosQuejaService as any).obtenerEstadosQueja === 'function') {
-      (this.estadosQuejaService as any).obtenerEstadosQueja(0, 100).subscribe({
-        next: (page: any) => {
-          this.estados = (page?.content || []).map((e: any) => ({
-            id: e.id,
-            nombre: e.nombre,
-            clave: e.clave
-          }));
-          console.log('✅ Estados cargados:', this.estados);
-          
-          if (this.estados.length === 0) {
-            console.warn('⚠️ No hay estados disponibles en el backend');
-          }
-        },
-        error: (err: any) => {
-          console.error('❌ Error cargando estados:', err);
-          this.estados = [];
-        }
-      });
-    } else {
-      console.error('❌ EstadosQuejaService.obtenerEstadosQueja no disponible');
-      this.estados = [];
-    }
+    this.estadosQuejaService.obtenerEstadosQueja(0, 100).subscribe({
+      next: (page: any) => {
+        this.estados = (page?.content || []).map((e: any) => ({
+          id: e.id,
+          nombre: e.nombre,
+          clave: e.clave,
+        }));
+      },
+      error: () => {
+        this.estados = [];
+      },
+    });
   }
 
-  // ✅ Este método ya no se usa si mostramos todos los estados
-  getEstadosDisponibles(queja: Queja): EstadoQueja[] {
-    return this.estados.filter(e => e.id !== queja.estado_id);
-  }
-
+  // ── Cambio de estado ──────────────────────────────────────────
   iniciarCambioEstado(queja: Queja, event: any): void {
     const nuevoEstadoId = event.target.value;
+    if (!nuevoEstadoId || nuevoEstadoId === queja.estado_id) return;
 
-    console.log('🔍 Cambio detectado:', {
-      quejaId: queja.id,
-      estadoActual: queja.estado_id,
-      nuevoEstado: nuevoEstadoId
-    });
-
-    // Si no hay valor seleccionado, salir
-    if (!nuevoEstadoId || nuevoEstadoId === '') {
-      return;
-    }
-
-    // Si seleccionó el mismo estado, no hacer nada
-    if (nuevoEstadoId === queja.estado_id) {
-      console.log('⚠️ Mismo estado seleccionado, no se abre modal');
-      return;
-    }
-
-    const estadoEncontrado = this.estados.find(e => e.id === nuevoEstadoId);
-
-    if (!estadoEncontrado) {
-      console.error('❌ Estado no encontrado:', nuevoEstadoId);
-      return;
-    }
+    const estadoEncontrado = this.estados.find((e) => e.id === nuevoEstadoId);
+    if (!estadoEncontrado) return;
 
     this.quejaSeleccionada = queja;
     this.nuevoEstadoId = nuevoEstadoId;
     this.nuevoEstadoNombre = estadoEncontrado.nombre;
     this.observacionEstado = '';
     this.showModalCambioEstado = true;
-
-    console.log('✅ Modal abierto para cambiar estado');
   }
 
   confirmarCambioEstado(): void {
-    if (!this.quejaSeleccionada || !this.nuevoEstadoId) {
-      console.error('❌ Datos incompletos para cambiar estado');
-      return;
-    }
+    if (!this.quejaSeleccionada || !this.nuevoEstadoId) return;
 
     const adminUser = this.usuarioService.getUser();
     if (!adminUser) {
@@ -199,60 +179,41 @@ export class CrudQuejaComponent implements OnInit {
     }
 
     this.loading = true;
+    const estadoEncontrado = this.estados.find(
+      (e) => e.id === this.nuevoEstadoId,
+    );
+    const claveEstado = estadoEncontrado?.clave || this.nuevoEstadoId;
 
-    const estadoEncontrado = this.estados.find(e => e.id === this.nuevoEstadoId);
-    const claveEstado = estadoEncontrado?.clave || estadoEncontrado?.nombre || this.nuevoEstadoId;
-
-    console.log('🔄 Enviando cambio de estado al backend:', {
-      quejaId: this.quejaSeleccionada.id,
-      usuarioId: (adminUser as any).id,
-      estadoActual: this.quejaSeleccionada.estado_nombre,
-      nuevoEstado: this.nuevoEstadoNombre,
-      claveEstado: claveEstado,
-      observacion: this.observacionEstado
-    });
-
-    this.quejaService.cambiarEstadoQueja(
-      this.quejaSeleccionada.id,
-      (adminUser as any).id,
-      claveEstado,
-      this.observacionEstado || undefined
-    ).subscribe({
-      next: (quejaActualizada) => {
-        console.log('✅ Estado cambiado exitosamente en backend:', quejaActualizada);
-
-        // Actualizar en la lista local
-        const index = this.quejas.findIndex(q => q.id === quejaActualizada.id);
-        if (index !== -1) {
-          this.quejas[index] = {
-            ...this.quejas[index],
-            estado_id: quejaActualizada.estado?.id || '',
-            estado_nombre: quejaActualizada.estado?.nombre || ''
-          };
-          console.log('✅ Queja actualizada en la lista local');
-        }
-
-        this.loading = false;
-        this.cerrarModalEstado();
-        alert(`✅ Estado cambiado a: ${quejaActualizada.estado?.nombre}`);
-      },
-      error: (err) => {
-        console.error('❌ Error cambiando estado:', err);
-        console.error('Detalles:', {
-          message: err.message,
-          graphQLErrors: err.graphQLErrors,
-          networkError: err.networkError
-        });
-        this.loading = false;
-        
-        let errorMsg = 'Error al cambiar el estado.';
-        if (err.graphQLErrors && err.graphQLErrors.length > 0) {
-          errorMsg = err.graphQLErrors[0].message;
-        }
-        
-        alert(`❌ ${errorMsg}`);
-      }
-    });
+    this.quejaService
+      .cambiarEstadoQueja(
+        this.quejaSeleccionada.id,
+        (adminUser as any).id,
+        claveEstado,
+        this.observacionEstado || undefined,
+      )
+      .subscribe({
+        next: (quejaActualizada) => {
+          const index = this.quejas.findIndex(
+            (q) => q.id === quejaActualizada.id,
+          );
+          if (index !== -1) {
+            this.quejas[index] = {
+              ...this.quejas[index],
+              estado_id: quejaActualizada.estado?.id || '',
+              estado_nombre: quejaActualizada.estado?.nombre || '',
+            };
+          }
+          this.loading = false;
+          this.cerrarModalEstado();
+          alert(`✅ Estado cambiado a: ${quejaActualizada.estado?.nombre}`);
+        },
+        error: (err) => {
+          this.loading = false;
+          const msg =
+            err.graphQLErrors?.[0]?.message || 'Error al cambiar el estado.';
+          alert(`❌ ${msg}`);
+        },
+      });
   }
 
   cerrarModalEstado(): void {
@@ -261,23 +222,23 @@ export class CrudQuejaComponent implements OnInit {
     this.nuevoEstadoId = '';
     this.nuevoEstadoNombre = '';
     this.observacionEstado = '';
-    
-    // Recargar quejas para asegurar que el estado se refleja correctamente
-    this.loadQuejas();
+  }
+
+  // ── CRUD ──────────────────────────────────────────────────────
+  getEstadosDisponibles(queja: Queja): EstadoQueja[] {
+    return this.estados.filter((e) => e.id !== queja.estado_id);
   }
 
   getEstadoClass(estadoNombre?: string): string {
     if (!estadoNombre) return 'estado-default';
-
-    const nombre = estadoNombre.toLowerCase();
-
-    if (nombre.includes('pendiente')) return 'estado-pendiente';
-    if (nombre.includes('aprobado') || nombre.includes('espera')) return 'estado-aprobado';
-    if (nombre.includes('votación') || nombre.includes('votacion')) return 'estado-votacion';
-    if (nombre.includes('proceso')) return 'estado-proceso';
-    if (nombre.includes('resuel')) return 'estado-resuelto';
-    if (nombre.includes('rechaz')) return 'estado-rechazado';
-
+    const n = estadoNombre.toLowerCase();
+    if (n.includes('pendiente')) return 'estado-pendiente';
+    if (n.includes('aprobado') || n.includes('espera'))
+      return 'estado-aprobado';
+    if (n.includes('votaci')) return 'estado-votacion';
+    if (n.includes('proceso')) return 'estado-proceso';
+    if (n.includes('resuel')) return 'estado-resuelto';
+    if (n.includes('rechaz')) return 'estado-rechazado';
     return 'estado-default';
   }
 
@@ -294,42 +255,57 @@ export class CrudQuejaComponent implements OnInit {
   }
 
   saveQueja(): void {
-    if (!this.quejaData.descripcion || !this.quejaData.usuario_id || !this.quejaData.estado_id) {
-      alert('Por favor completa: descripción, usuario y estado');
+    if (!this.quejaData.descripcion) {
+      alert('Por favor completa la descripción');
       return;
     }
-
     this.loading = true;
+    if (!this.editingQueja) return;
 
-    if (this.editingQueja) {
-      this.quejaService.actualizarQueja(
-        this.editingQueja.id,
-        this.quejaData.titulo,
-        this.quejaData.descripcion,
-        this.quejaData.categoria_id,
-        this.quejaData.estado_id,
-        this.quejaData.ubicacion,
-        ''
-      ).subscribe({
-        next: (updated) => {
-          if (this.quejaData.imagen_url) {
-            this.updateImagenUrl(updated.id, this.quejaData.imagen_url as string)
-              .then(() => this.finalizeSave())
-              .catch((err) => { 
-                console.error('Error actualizando imagen:', err); 
-                this.finalizeSave(); 
-              });
-          } else {
-            this.finalizeSave();
-          }
-        },
-        error: (err) => {
-          console.error('Error actualizando queja:', err);
-          this.loading = false;
-          alert('Error al actualizar la queja');
+    // Llamada REST en vez de GraphQL
+    const body = {
+      titulo: this.quejaData.titulo,
+      descripcion: this.quejaData.descripcion,
+      categoriaId: this.quejaData.categoria_id,
+      ubicacion: this.quejaData.ubicacion,
+      imagenUrl: this.quejaData.imagen_url,
+    };
+
+    fetch(`http://localhost:8080/api/quejas/${this.editingQueja.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Error HTTP: ' + res.status);
+        return res.json();
+      })
+      .then(() => {
+        // Si el estado cambió, usar cambiarEstadoQueja GraphQL
+        if (this.quejaData.estado_id !== this.editingQueja!.estado_id) {
+          const adminUser = this.usuarioService.getUser();
+          const estadoEncontrado = this.estados.find(
+            (e) => e.id === this.quejaData.estado_id,
+          );
+          const claveEstado = estadoEncontrado?.clave || '';
+          this.quejaService
+            .cambiarEstadoQueja(
+              this.editingQueja!.id,
+              (adminUser as any).id,
+              claveEstado,
+            )
+            .subscribe({
+              next: () => this.finalizeSave(),
+              error: () => this.finalizeSave(),
+            });
+        } else {
+          this.finalizeSave();
         }
+      })
+      .catch((err) => {
+        this.loading = false;
+        alert('Error al actualizar: ' + err.message);
       });
-    }
   }
 
   private finalizeSave(): void {
@@ -340,55 +316,38 @@ export class CrudQuejaComponent implements OnInit {
   }
 
   deleteQueja(queja: Queja): void {
-    if (!confirm(`¿Estás seguro de eliminar la queja "${queja.titulo || queja.descripcion.substring(0, 30)}"?`)) {
+    if (
+      !confirm(
+        `¿Eliminar "${queja.titulo || queja.descripcion.substring(0, 30)}"?`,
+      )
+    )
       return;
-    }
-
     this.loading = true;
-    
     this.quejaService.eliminarQueja(queja.id, '').subscribe({
       next: (ok) => {
-        if (ok) {
-          console.log('✅ Queja eliminada:', queja.id);
-          this.loadQuejas();
-          alert('✅ Queja eliminada correctamente');
-        }
+        if (ok) this.loadQuejas();
         this.loading = false;
       },
       error: (err) => {
-        console.error('❌ Error eliminando queja:', err);
         this.loading = false;
-        alert('Error al eliminar la queja');
-      }
+        console.error('❌ GraphQL errors:', err?.graphQLErrors);
+        console.error('❌ Network error:', err?.networkError?.error);
+        console.error('❌ Message:', err?.message);
+        const msg =
+          err?.graphQLErrors?.[0]?.message ||
+          err?.message ||
+          'Error desconocido';
+        alert(`Error: ${msg}`);
+      },
     });
   }
 
   private updateImagenUrl(id: string, imagenUrl: string): Promise<any> {
-    return this.apollo.mutate({
-      mutation: this.ACTUALIZAR_QUEJA,
-      variables: { id, imagen_url: imagenUrl },
-      refetchQueries: [{
-        query: gql`
-          query ObtenerQuejas($usuarioActualId: ID!) {
-            obtenerQuejas(usuarioActualId: $usuarioActualId) {
-              id 
-              titulo 
-              descripcion 
-              ubicacion 
-              imagen_url 
-              usuario { 
-                id 
-                nombre 
-                apellido 
-              } 
-              estado { 
-                id 
-                nombre 
-              }
-            }
-          }`,
-        variables: { usuarioActualId: '' }
-      }]
-    }).toPromise();
+    return this.apollo
+      .mutate({
+        mutation: this.ACTUALIZAR_QUEJA,
+        variables: { id, imagen_url: imagenUrl },
+      })
+      .toPromise();
   }
 }

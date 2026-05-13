@@ -31,23 +31,15 @@ export class CrudRolComponent implements AfterViewChecked {
   }
 
   trackByRolId(index: number, rol: Rol): any {
-    console.log('trackBy - index:', index, 'rol:', rol, 'rol.id:', rol.id);
     return rol.id || index; // Fallback al index si no hay ID
   }
 
   loadRoles() {
-    console.log('=== DEBUG LOADROLES ===');
-    console.log('Cargando roles - page:', this.page, 'size:', this.size);
-    
+
     this.rolService.obtenerRoles(this.page, this.size).subscribe({
       next: (data) => {
-        console.log('Datos recibidos del backend:', data);
-        console.log('Roles content:', data.content);
         
-        // Debug cada rol individual
         data.content.forEach((rol, index) => {
-          console.log(`Rol ${index}:`, rol);
-          console.log(`Rol ${index} ID:`, rol.id, 'tipo:', typeof rol.id);
         });
         
         this.roles = data.content;
@@ -110,25 +102,11 @@ export class CrudRolComponent implements AfterViewChecked {
   }
 
   deleteRol(rol: Rol) {
-    console.log('=== DEBUG DELETEROL ===');
-    console.log('1. Objeto rol recibido:', rol);
-    console.log('2. Tipo del objeto rol:', typeof rol);
-    console.log('3. rol.id:', rol.id);
-    console.log('4. Tipo de rol.id:', typeof rol.id);
-    console.log('5. rol.id === undefined?', rol.id === undefined);
-    console.log('6. rol.id === null?', rol.id === null);
-    console.log('7. rol.id === ""?', rol.id === "");
-    console.log('8. JSON.stringify(rol):', JSON.stringify(rol));
-    console.log('9. Object.keys(rol):', Object.keys(rol));
-    console.log('10. rol.hasOwnProperty("id"):', rol.hasOwnProperty('id'));
-    
+
+   
     if (confirm('¿Estás seguro de que quieres eliminar este rol?')) {
       const id = rol.id;
-      console.log('11. ID extraído:', id);
-      console.log('12. Tipo del ID extraído:', typeof id);
-      console.log('13. ID convertido a string:', String(id));
-      console.log('14. ID length:', id ? id.length : 'N/A');
-      
+
       // Validación adicional
       if (!id || id === undefined || id === null || id === '') {
         alert('Error: ID del rol no válido');
@@ -138,9 +116,7 @@ export class CrudRolComponent implements AfterViewChecked {
       
       this.rolService.eliminarRol(String(id)).subscribe({
         next: (result) => {
-          console.log('Resultado de eliminación:', result);
           if (result) {
-            console.log('Rol eliminado exitosamente');
             this.loadRoles();
           }
         },

@@ -80,10 +80,8 @@ export class CrudUsuarioComponent implements OnInit {
           this.totalPages = pageData.totalPages ?? 1;
           this.totalElements = pageData.totalElements ?? this.allUsuarios.length;
 
-          console.log('✅ [Usuarios] cargados correctamente:', this.usuarios.length, 'usuarios');
         },
         error: (err: any) => {
-          console.error('❌ Error al cargar usuarios:', err);
           this.errorMessage = 'Error al cargar usuarios. Ver consola para detalles.';
           this.usuarios = [];
           this.allUsuarios = [];
@@ -127,7 +125,6 @@ export class CrudUsuarioComponent implements OnInit {
           this.roles.forEach((r) => {
             if (r && r.id) this.rolesMap.set(String(r.id), r.nombre);
           });
-          console.log('[Roles] cargados:', this.roles);
           resolve();
         },
         error: (err: any) => {
@@ -302,13 +299,10 @@ export class CrudUsuarioComponent implements OnInit {
       
       if (this.archivoSeleccionado) {
         this.subiendoImagen = true;
-        console.log('📤 Subiendo imagen a Cloudinary...');
         
         try {
           fotoUrl = await this.usuarioService.subirFotoCloudinary(this.archivoSeleccionado);
-          console.log('✅ Imagen subida:', fotoUrl);
         } catch (error) {
-          console.error('❌ Error subiendo imagen:', error);
           alert('Error al subir la imagen. Intenta de nuevo.');
           this.saving = false;
           this.subiendoImagen = false;
@@ -347,12 +341,10 @@ export class CrudUsuarioComponent implements OnInit {
           .pipe(finalize(() => (this.saving = false)))
           .subscribe({
             next: (usuario) => {
-              console.log('✅ Usuario actualizado correctamente:', usuario);
               this.loadUsuarios();
               this.closeModal();
             },
             error: (err: any) => {
-              console.error('❌ Error actualizando usuario:', err);
               this.errorMessage = 'Error al actualizar el usuario.';
               alert(this.errorMessage);
             },
@@ -364,12 +356,10 @@ export class CrudUsuarioComponent implements OnInit {
           .pipe(finalize(() => (this.saving = false)))
           .subscribe({
             next: (usuario) => {
-              console.log('✅ Usuario creado correctamente:', usuario);
               this.loadUsuarios();
               this.closeModal();
             },
             error: (err: any) => {
-              console.error('❌ Error creando usuario:', err);
               this.errorMessage = 'Error al crear el usuario.';
               alert(this.errorMessage);
             },
@@ -393,7 +383,6 @@ export class CrudUsuarioComponent implements OnInit {
       .pipe(finalize(() => (this.deleting = false)))
       .subscribe({
         next: () => {
-          console.log('✅ Usuario eliminado correctamente');
           if (this.usuarios.length === 1 && this.page > 0) {
             this.page = Math.max(0, this.page - 1);
           }

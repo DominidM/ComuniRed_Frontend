@@ -32,11 +32,6 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     const token = this.usuarioService.getToken();
     const tokenExpired = this.isTokenExpired(token);
 
-    // LOGGING de depuración (elimina o reduce en producción)
-    console.log('[AuthGuard] checking route:', state.url);
-    console.log('[AuthGuard] token:', token ? 'PRESENT' : 'MISSING', tokenExpired ? '(expired)' : '(valid)');
-    console.log('[AuthGuard] user roles from service:', this.usuarioService.getRoles());
-
     if (!token || tokenExpired) {
       // Si está expirado o no existe: log out y redirigir a login con returnUrl
       console.warn('[AuthGuard] token inválido/expirado. Redirigiendo a /login');
@@ -48,7 +43,6 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     if (requiredRoles.length > 0) {
       const userRoles = this.usuarioService.getRoles() || [];
       const hasRole = requiredRoles.some(rr => userRoles.some(ur => String(ur).toLowerCase() === String(rr).toLowerCase()));
-      console.log('[AuthGuard] requiredRoles=', requiredRoles, 'hasRole=', hasRole);
       if (!hasRole) {
         console.warn('[AuthGuard] usuario no autorizado (roles insuficientes). Redirigiendo a /login');
         return this.router.createUrlTree(['/login']);

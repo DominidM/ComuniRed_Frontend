@@ -151,10 +151,6 @@ export class FeedComponent implements OnInit, OnDestroy {
       .obtenerQuejasPaginadas(this.user?.id || '', this.page, this.pageSize)
       .subscribe({
         next: (pageData) => {
-          console.log('📥 Respuesta del backend:', pageData);
-          console.log('📥 Content:', pageData?.content);
-          console.log('📥 Total:', pageData?.totalElements);
-
           if (!pageData || !pageData.content) {
             console.warn('⚠️ pageData vacío o sin content');
             this.loadingMore = false;
@@ -185,8 +181,6 @@ export class FeedComponent implements OnInit, OnDestroy {
             comments: [],
             commentsCount: q.commentsCount || 0,
           }));
-
-          console.log('✅ Posts mapeados:', newPosts.length);
 
           this.posts = [...this.posts, ...newPosts];
           this.allLoaded = pageData.last === true || newPosts.length === 0;
@@ -301,11 +295,11 @@ export class FeedComponent implements OnInit, OnDestroy {
     post.showComments = !post.showComments;
 
     if (post.showComments && post.comments.length === 0) {
-      // Siempre recarga — el paginado no trae comments
       this.quejaService
         .obtenerQuejaPorId(post.id, this.user?.id || '')
         .subscribe({
           next: (u) => {
+            if (!u) return; // ← guard contra null
             const found = this.posts.find((p) => p.id === post.id);
             if (found) {
               found.comments = u.comments || [];

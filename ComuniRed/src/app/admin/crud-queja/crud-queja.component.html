@@ -97,7 +97,18 @@
       </table>
     </div>
   </div>
-
+<!-- Al final de la tabla, antes de cerrar crud-queja-root -->
+<div class="pagination" *ngIf="totalPages > 1">
+  <button (click)="goToPage(page - 1)" [disabled]="page === 0">‹</button>
+  <button
+    *ngFor="let p of pages"
+    (click)="goToPage(p)"
+    [class.active]="p === page">
+    {{ p + 1 }}
+  </button>
+  <button (click)="goToPage(page + 1)" [disabled]="page === totalPages - 1">›</button>
+  <span class="page-info">{{ totalElements }} registros · Página {{ page + 1 }} de {{ totalPages }}</span>
+</div>
   <ng-template #noQuejas>
     <div class="crud-queja-empty">
       No hay quejas registradas.
