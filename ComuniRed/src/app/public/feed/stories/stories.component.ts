@@ -114,21 +114,36 @@ export class StoriesComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (stories) => {
-          const mapped = (stories ?? []).map((s: any) => ({
-            ...s,
+          const raw = stories ?? [];
+
+          const normalized = raw.map((s: any) => ({
+            id: s.id,
+            userId: s.userId ?? s.usuarioId,
             userName: s.userName ?? 'Sin nombre',
             userAvatar: s.userAvatar ?? 'assets/img/default-avatar.png',
             text: s.text ?? s.texto ?? '',
             imageUrl: s.imageUrl ?? s.imagenUrl ?? '',
             bgColor: s.bgColor ?? s.colorFondo ?? '',
+            timeAgo: s.timeAgo ?? s.fechaCreacion ?? '',
+            seen: s.seen ?? s.vistaPorMi ?? false,
             categoryName: s.categoryName ?? '',
             categoryEmoji: s.categoryEmoji ?? '',
+            duration: s.duration ?? s.duracion ?? 5,
           }));
 
-          // Separar mi historia de las de otros
+          const seen = new Set<string>();
+          const deduped = normalized.filter((s: Story) => {
+            const key = `${s.userId}|${s.text}|${s.imageUrl}|${s.bgColor}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+
           this.myActiveStory =
-            mapped.find((s) => s.userId === this.user?.id) ?? null;
-          this.stories = mapped.filter((s) => s.userId !== this.user?.id);
+            deduped.find((s: Story) => s.userId === this.user?.id) ?? null;
+          this.stories = deduped.filter(
+            (s: Story) => s.userId !== this.user?.id,
+          );
 
           setTimeout(() => this.onTrackScroll(), 100);
         },

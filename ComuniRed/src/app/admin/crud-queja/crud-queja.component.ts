@@ -5,6 +5,7 @@ import { Apollo, gql } from 'apollo-angular';
 import { QuejaService } from '../../services/queja.service';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
 import { EstadosQuejaService } from '../../services/estado-queja.service';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 
 interface Queja {
   id: string;
@@ -30,7 +31,7 @@ interface EstadoQueja {
 @Component({
   selector: 'app-crud-queja',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
   templateUrl: './crud-queja.component.html',
   styleUrls: ['./crud-queja.component.css'],
 })

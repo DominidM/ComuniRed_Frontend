@@ -30,88 +30,89 @@
       </div>
     </div>
 
-    <div *ngIf="usuarios && usuarios.length > 0; else noUsuarios">
-      <table class="crud-usuario-table">
-        <thead>
-          <tr>
-            <th style="display: none;">ID</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Rol</th>
-            <th>DNI</th>
-            <th>Edad</th>
-            <th>Distrito</th>
-            <th>Fecha Nacimiento</th>
-            <th>Fecha Registro</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let usuario of usuarios; trackBy: trackByUsuarioId">
-            <td style="display: none;">{{ usuario.id }}</td>
-            <td><div class="user-name">{{ usuario.nombre }}</div></td>
-            <td><div class="user-lastname">{{ usuario.apellido }}</div></td>
-            <td><div class="user-role">{{ getRolNombre(usuario.rol_id) }}</div></td>
-            <td><div class="user-dni">{{ usuario.dni }}</div></td>
-            <td>
-              <ng-container *ngIf="calcularEdad(usuario.fecha_nacimiento) as edad; else sinEdad">
-                <span style="color: #000;">{{ edad }} años</span>
-              </ng-container>
-              <ng-template #sinEdad>
-                <span style="color: #9ca3af;">—</span>
-              </ng-template>
-            </td>
-            <td><div class="user-district">{{ usuario.distrito }}</div></td>
-            <td>
-              <ng-container *ngIf="usuario.fecha_nacimiento; else sinFechaNac">
-                {{ usuario.fecha_nacimiento | date:'dd/MM/yyyy' }}
-              </ng-container>
-              <ng-template #sinFechaNac>
-                <span style="color: #9ca3af;">—</span>
-              </ng-template>
-            </td>
-            <td>
-              <ng-container *ngIf="usuario.fecha_registro; else sinFechaReg">
-                {{ usuario.fecha_registro | date:'dd/MM/yyyy HH:mm' }}
-              </ng-container>
-              <ng-template #sinFechaReg>
-                <span style="color: #9ca3af;">—</span>
-              </ng-template>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <button class="btn-edit" (click)="openEditModal(usuario)" title="Editar usuario">Editar</button>
-                <button class="btn-delete" (click)="deleteUsuario(usuario)" title="Eliminar usuario">Eliminar</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <ng-template #noUsuarios>
-      <div class="crud-usuario-empty">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #000000;">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <p>No hay usuarios registrados</p>
-        <button class="btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">Crear primer usuario</button>
+    <app-loading-overlay [loading]="loading" text="Cargando usuarios...">
+      <div *ngIf="usuarios && usuarios.length > 0; else noUsuarios">
+        <table class="crud-usuario-table">
+          <thead>
+            <tr>
+              <th style="display: none;">ID</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Rol</th>
+              <th>DNI</th>
+              <th>Edad</th>
+              <th>Distrito</th>
+              <th>Fecha Nacimiento</th>
+              <th>Fecha Registro</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let usuario of usuarios; trackBy: trackByUsuarioId">
+              <td style="display: none;">{{ usuario.id }}</td>
+              <td><div class="user-name">{{ usuario.nombre }}</div></td>
+              <td><div class="user-lastname">{{ usuario.apellido }}</div></td>
+              <td><div class="user-role">{{ getRolNombre(usuario.rol_id) }}</div></td>
+              <td><div class="user-dni">{{ usuario.dni }}</div></td>
+              <td>
+                <ng-container *ngIf="calcularEdad(usuario.fecha_nacimiento) as edad; else sinEdad">
+                  <span style="color: #000;">{{ edad }} años</span>
+                </ng-container>
+                <ng-template #sinEdad>
+                  <span style="color: #9ca3af;">—</span>
+                </ng-template>
+              </td>
+              <td><div class="user-district">{{ usuario.distrito }}</div></td>
+              <td>
+                <ng-container *ngIf="usuario.fecha_nacimiento; else sinFechaNac">
+                  {{ usuario.fecha_nacimiento | date:'dd/MM/yyyy' }}
+                </ng-container>
+                <ng-template #sinFechaNac>
+                  <span style="color: #9ca3af;">—</span>
+                </ng-template>
+              </td>
+              <td>
+                <ng-container *ngIf="usuario.fecha_registro; else sinFechaReg">
+                  {{ usuario.fecha_registro | date:'dd/MM/yyyy HH:mm' }}
+                </ng-container>
+                <ng-template #sinFechaReg>
+                  <span style="color: #9ca3af;">—</span>
+                </ng-template>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-edit" (click)="openEditModal(usuario)" title="Editar usuario">Editar</button>
+                  <button class="btn-delete" (click)="deleteUsuario(usuario)" title="Eliminar usuario">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </ng-template>
 
-    <div class="crud-usuario-pagination-row" *ngIf="totalElements > 0">
-      <div class="crud-usuario-pagination">
-        <button class="crud-usuario-pagination-btn" (click)="prevPage()" [disabled]="page === 0"><b>&lt; Anterior</b></button>
-        <span class="crud-usuario-pagination-info"><b>Página {{ page + 1 }} de {{ totalPages }}</b></span>
-        <button class="crud-usuario-pagination-btn" (click)="nextPage()" [disabled]="page >= totalPages - 1"><b>Siguiente &gt;</b></button>
-      </div>
-      <div class="crud-usuario-pagination-count">
-        <span>Mostrando {{ usuarios.length }} de {{ totalElements }} datos.</span>
-      </div>
-    </div>
+      <ng-template #noUsuarios>
+        <div class="crud-usuario-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #000000;">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <p>No hay usuarios registrados</p>
+          <button class="btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">Crear primer usuario</button>
+        </div>
+      </ng-template>
 
-    <!-- Modal Formulario -->
+      <div class="crud-usuario-pagination-row" *ngIf="totalElements > 0">
+        <div class="crud-usuario-pagination">
+          <button class="crud-usuario-pagination-btn" (click)="prevPage()" [disabled]="page === 0"><b>&lt; Anterior</b></button>
+          <span class="crud-usuario-pagination-info"><b>Página {{ page + 1 }} de {{ totalPages }}</b></span>
+          <button class="crud-usuario-pagination-btn" (click)="nextPage()" [disabled]="page >= totalPages - 1"><b>Siguiente &gt;</b></button>
+        </div>
+        <div class="crud-usuario-pagination-count">
+          <span>Mostrando {{ usuarios.length }} de {{ totalElements }} datos.</span>
+        </div>
+      </div>
+    </app-loading-overlay>
+
     <div class="crud-usuario-modal" *ngIf="showModal" (click)="closeModal()">
       <div class="crud-usuario-modal-content" (click)="$event.stopPropagation()">
         <h3>{{ editingUsuario ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>

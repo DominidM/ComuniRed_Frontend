@@ -11,7 +11,7 @@
 
     <div *ngIf="!loadingConversaciones" class="conversations-list">
       <div 
-        *ngFor="let conversacion of conversaciones" 
+        *ngFor="let conversacion of conversaciones; trackBy: trackByConversacionId" 
         class="conversation-item"
         [class.active]="conversacionSeleccionada?.id === conversacion.id"
         [class.user-online]="estaEnLinea(conversacion.otroUsuario)"

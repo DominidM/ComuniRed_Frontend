@@ -73,6 +73,11 @@ export class AdminSidebarComponent {
           icon: 'asignaciones',
         },
         {
+          label: 'Reels',
+          route: '/admin/reel',
+          icon: 'reel',
+        },
+        {
           label: 'Auditoría',
           route: '/admin/auditoria',
           icon: 'auditoria',
@@ -228,6 +233,10 @@ export class AdminSidebarComponent {
       roles: `
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      `,
+      reel: `
+        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
       `,
       soporte: `
         <path d="M18 10c0-3.31-2.69-6-6-6s-6 2.69-6 6"></path>
