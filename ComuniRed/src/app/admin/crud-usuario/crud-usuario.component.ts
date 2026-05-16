@@ -4,11 +4,12 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { UsuarioService, Usuario, UsuarioPage, UsuarioInput } from '../../services/usuario.service';
 import { RolService, Rol } from '../../services/rol.service';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-crud-usuario',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
   templateUrl: './crud-usuario.component.html',
   styleUrls: ['./crud-usuario.component.css'],
 })

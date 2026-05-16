@@ -22,71 +22,73 @@
       </div>
     </div>
 
-    <div *ngIf="tipos.length > 0; else noTipos">
-      <table class="crud-tipo-reaccion-table">
-        <thead>
-          <tr>
-            <th style="display: none;">ID</th>
-            <th>Clave (Key)</th>
-            <th>Nombre (Label)</th>
-            <th>Estado</th>
-            <th>Orden</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let tipo of tipos; trackBy: trackByTipoId">
-            <td style="display: none;">{{ tipo.id }}</td>
-            <td><div class="tipo-key"><span class="badge-key">{{ tipo.key }}</span></div></td>
-            <td><div class="tipo-nombre">{{ tipo.label }}</div></td>
-            <td>
-              <span class="status-badge" [class.status-active]="tipo.activo" [class.status-inactive]="!tipo.activo">
-                {{ tipo.activo ? 'Activo' : 'Inactivo' }}
-              </span>
-            </td>
-            <td><span class="orden-badge">{{ tipo.orden }}</span></td>
-            <td>
-              <div class="action-buttons">
-                <button class="btn-edit" (click)="openEditModal(tipo)" title="Editar tipo">Editar</button>
-                <button class="btn-delete" (click)="deleteTipo(tipo)" title="Eliminar tipo">Eliminar</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <app-loading-overlay [loading]="loading" text="Cargando tipos de reacción...">
+      <div *ngIf="tipos.length > 0; else noTipos">
+        <table class="crud-tipo-reaccion-table">
+          <thead>
+            <tr>
+              <th style="display: none;">ID</th>
+              <th>Clave (Key)</th>
+              <th>Nombre (Label)</th>
+              <th>Estado</th>
+              <th>Orden</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tipo of tipos; trackBy: trackByTipoId">
+              <td style="display: none;">{{ tipo.id }}</td>
+              <td><div class="tipo-key"><span class="badge-key">{{ tipo.key }}</span></div></td>
+              <td><div class="tipo-nombre">{{ tipo.label }}</div></td>
+              <td>
+                <span class="status-badge" [class.status-active]="tipo.activo" [class.status-inactive]="!tipo.activo">
+                  {{ tipo.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td><span class="orden-badge">{{ tipo.orden }}</span></td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-edit" (click)="openEditModal(tipo)" title="Editar tipo">Editar</button>
+                  <button class="btn-delete" (click)="deleteTipo(tipo)" title="Eliminar tipo">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <ng-template #noTipos>
-      <div class="crud-tipo-reaccion-empty">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-          <line x1="9" y1="9" x2="9.01" y2="9"></line>
-          <line x1="15" y1="9" x2="15.01" y2="9"></line>
-        </svg>
-        <p>No hay tipos de reacción registrados</p>
-        <button class="btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">
-          Crear primer tipo
-        </button>
-      </div>
-    </ng-template>
+      <ng-template #noTipos>
+        <div class="crud-tipo-reaccion-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+          </svg>
+          <p>No hay tipos de reacción registrados</p>
+          <button class="btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">
+            Crear primer tipo
+          </button>
+        </div>
+      </ng-template>
 
-    <div class="crud-tipo-reaccion-pagination-row" *ngIf="totalTipos > 0">
-      <div class="crud-tipo-reaccion-pagination">
-        <button class="crud-tipo-reaccion-pagination-btn" (click)="cambiarPagina(currentPage - 1)" [disabled]="currentPage === 1">
-          &lt; Anterior
-        </button>
-        <span class="crud-tipo-reaccion-pagination-info">
-          Página {{ currentPage }} de {{ totalPages }}
-        </span>
-        <button class="crud-tipo-reaccion-pagination-btn" (click)="cambiarPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
-          Siguiente &gt;
-        </button>
+      <div class="crud-tipo-reaccion-pagination-row" *ngIf="totalTipos > 0">
+        <div class="crud-tipo-reaccion-pagination">
+          <button class="crud-tipo-reaccion-pagination-btn" (click)="cambiarPagina(currentPage - 1)" [disabled]="currentPage === 1">
+            &lt; Anterior
+          </button>
+          <span class="crud-tipo-reaccion-pagination-info">
+            Página {{ currentPage }} de {{ totalPages }}
+          </span>
+          <button class="crud-tipo-reaccion-pagination-btn" (click)="cambiarPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
+            Siguiente &gt;
+          </button>
+        </div>
+        <div class="crud-tipo-reaccion-pagination-count">
+          <span>Mostrando {{ tipos.length }} de {{ totalTipos }} datos.</span>
+        </div>
       </div>
-      <div class="crud-tipo-reaccion-pagination-count">
-        <span>Mostrando {{ tipos.length }} de {{ totalTipos }} datos.</span>
-      </div>
-    </div>
+    </app-loading-overlay>
 
     <div class="crud-tipo-reaccion-modal" *ngIf="showModal" (click)="closeModal()">
       <div class="crud-tipo-reaccion-modal-content" (click)="$event.stopPropagation()">

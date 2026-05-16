@@ -5,12 +5,14 @@ import {
   AfterViewInit,
   HostListener,
   OnDestroy,
-  Input,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ReelService, ReelResponse, ReelComentario } from '../../services/reel.service';
+import { UsuarioService } from '../../services/usuario.service';
 
-interface Reel {
-  id: number;
+export interface Reel {
+  id: string;
   videoUrl: string;
   title: string;
   author: string;
@@ -26,7 +28,7 @@ interface Reel {
 @Component({
   selector: 'app-reels',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './reels.component.html',
   styleUrls: ['./reels.component.css'],
 })
@@ -34,40 +36,69 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   @ViewChild('videoPlayer', { static: false })
   videoPlayer!: ElementRef<HTMLVideoElement>;
 
-  /** Recibe el modo oscuro del padre: <app-reels [isDarkMode]="isDarkMode"> */
-  @Input() isDarkMode = true;
-
   currentIndex = 0;
   isPlaying = false;
   isMuted = false;
   isLoading = true;
   hasError = false;
   showComments = false;
+  commentText = '';
+  comentarios: ReelComentario[] = [];
+  loadingComments = false;
+  sendingComment = false;
 
-  /** Progreso del video 0-100 para la barra */
   videoProgress = 0;
+  isDarkMode = true;
   private isSeeking = false;
-
-  /** Throttle del scroll para evitar saltos múltiples */
   private scrollThrottle = false;
 
-  reels: Reel[] = [
-    { id: 1, videoUrl: 'assets/videos/reel1.mp4', title: 'ByPass las torres', author: 'Municipalidad de Lima', likes: 1234, comments: 89, shares: 45, description: 'Obras en construcción para mejorar el tráfico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png', liked: false, saved: false },
-    { id: 2, videoUrl: 'assets/videos/reel2.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de SJL', likes: 856, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png', liked: false, saved: false },
-    { id: 3, videoUrl: 'assets/videos/reel3.mp4', title: 'bailecito', author: 'Jose Jeri', likes: 46, comments: 34, shares: 21, description: 'Baile popular', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745297/imagen_2025-11-09_222811177_easpfs.png', liked: false, saved: false },
-    { id: 4, videoUrl: 'assets/videos/reel4.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de SJL', likes: 86, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png', liked: false, saved: false },
-    { id: 5, videoUrl: 'assets/videos/reel5.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de Lima', likes: 836, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png', liked: false, saved: false },
-    { id: 6, videoUrl: 'assets/videos/reel6.mp4', title: 'Trabajando para ustedes', author: 'Municipalidad de Lima', likes: 53, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745360/35e70a0b-c03f-4625-a392-a128d2fc0c7c.png', liked: false, saved: false },
-    { id: 7, videoUrl: 'assets/videos/reel7.mp4', title: 'Via rapida Wiesse', author: 'Municipalidad de SJL', likes: 1, comments: 34, shares: 21, description: 'Falta de iluminación #AlumbradoPúblico', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png', liked: false, saved: false },
-    { id: 8, videoUrl: 'assets/videos/reel8.mp4', title: 'Parque las Flores', author: 'Municipalidad de SJL', likes: 32, comments: 12, shares: 8, description: 'Manteniendo nuestros espacios verdes limpios y seguros', avatarUrl: 'https://res.cloudinary.com/dxuk9bogw/image/upload/v1762745354/6d60a8ca-45a9-4529-83aa-dfe7e0f19403.png', liked: false, saved: false },
-  ];
+  reels: Reel[] = [];
+
+  private usuarioId = '';
+  private usuarioNombre = '';
+  private usuarioAvatar = '';
+
+  constructor(
+    private reelService: ReelService,
+    private usuarioService: UsuarioService,
+  ) {}
 
   ngAfterViewInit() {
     try {
       const m = localStorage.getItem('reelsMuted');
       if (m !== null) this.isMuted = m === 'true';
     } catch {}
-    setTimeout(() => this.loadVideo(), 50);
+    this.cargarReels();
+  }
+
+  private cargarReels(): void {
+    const user = this.usuarioService.getUser() as any;
+    if (user) {
+      this.usuarioId = user.id || user._id || '';
+      this.usuarioNombre = (user.nombre || '') + ' ' + (user.apellido || '');
+      this.usuarioAvatar = user.foto_perfil || '';
+    }
+    this.reelService.obtenerActivos(this.usuarioId).subscribe({
+      next: (res) => {
+        this.reels = res.map((r: ReelResponse) => ({
+          id: r.id,
+          videoUrl: r.videoUrl,
+          title: r.title,
+          author: r.author,
+          likes: r.likes,
+          comments: r.comentariosCount,
+          shares: r.shares,
+          description: r.description,
+          avatarUrl: r.avatarUrl,
+          liked: r.liked,
+          saved: r.saved,
+        }));
+        setTimeout(() => this.loadVideo(), 50);
+      },
+      error: () => {
+        this.isLoading = false;
+      },
+    });
   }
 
   ngOnDestroy() {
@@ -78,6 +109,8 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
+    const tag = (event.target as HTMLElement)?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || (event.target as HTMLElement)?.isContentEditable) return;
     if (event.key === 'ArrowDown') { event.preventDefault(); this.nextReel(); }
     else if (event.key === 'ArrowUp') { event.preventDefault(); this.previousReel(); }
     else if (event.key === ' ') { event.preventDefault(); this.togglePlayPause(); }
@@ -162,11 +195,18 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   }
 
   nextReel() {
-    if (this.currentIndex < this.reels.length - 1) { this.currentIndex++; this.resetVideo(); }
+    if (this.currentIndex < this.reels.length - 1) {
+      this.currentIndex++;
+      this.resetVideo();
+      this.reelService.incrementarVista(this.reels[this.currentIndex].id).subscribe();
+    }
   }
 
   previousReel() {
-    if (this.currentIndex > 0) { this.currentIndex--; this.resetVideo(); }
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+      this.resetVideo();
+    }
   }
 
   onVideoEnd() {
@@ -236,10 +276,24 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   // ── Acciones ─────────────────────────────────────────
   likeReel() {
     const r = this.reels[this.currentIndex];
-    r.liked ? (r.likes--, r.liked = false) : (r.likes++, r.liked = true);
+    if (!this.usuarioId) return;
+    this.reelService.marcarLike(r.id, this.usuarioId).subscribe({
+      next: (res) => {
+        r.likes = res.likes;
+        r.liked = res.liked;
+      },
+    });
   }
 
-  saveReel() { this.reels[this.currentIndex].saved = !this.reels[this.currentIndex].saved; }
+  saveReel() {
+    const r = this.reels[this.currentIndex];
+    if (!this.usuarioId) return;
+    this.reelService.marcarSave(r.id, this.usuarioId).subscribe({
+      next: (res) => {
+        r.saved = res.saved;
+      },
+    });
+  }
 
   shareReel() {
     if (navigator.share) {
@@ -249,7 +303,39 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  toggleComments() { this.showComments = !this.showComments; }
+  toggleComments() {
+    this.showComments = !this.showComments;
+    if (this.showComments) {
+      this.cargarComentarios();
+    }
+  }
+
+  cargarComentarios() {
+    const reelId = this.reels[this.currentIndex]?.id;
+    if (!reelId) return;
+    this.loadingComments = true;
+    this.reelService.obtenerComentarios(reelId).subscribe({
+      next: (res) => { this.comentarios = res; this.loadingComments = false; },
+      error: () => { this.loadingComments = false; },
+    });
+  }
+
+  enviarComentario() {
+    const texto = this.commentText.trim();
+    if (!texto || !this.usuarioId) return;
+    const reelId = this.reels[this.currentIndex]?.id;
+    if (!reelId) return;
+    this.sendingComment = true;
+    this.reelService.comentar(reelId, this.usuarioId, this.usuarioNombre, this.usuarioAvatar, texto).subscribe({
+      next: (res) => {
+        this.comentarios.push(res);
+        this.commentText = '';
+        this.sendingComment = false;
+        this.currentReel.comments = this.comentarios.length;
+      },
+      error: () => { this.sendingComment = false; },
+    });
+  }
 
   formatNumber(num: number): string {
     if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';

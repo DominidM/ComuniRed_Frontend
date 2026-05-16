@@ -40,6 +40,7 @@ export class PublicComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isDesktop = true;
   isReelsRoute = false;
+  isMessagesRoute = false;
   modalActive = false;
 
   private routerSub?: Subscription;
@@ -53,11 +54,13 @@ export class PublicComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.checkScreenSize();
     this.isReelsRoute = this.router.url.includes('/reels');
+    this.isMessagesRoute = this.router.url.includes('/messages');
 
     this.routerSub = this.router.events
       .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe((e: any) => {
         this.isReelsRoute = e.url.includes('/reels');
+        this.isMessagesRoute = e.url.includes('/messages');
         if (!this.isDesktop && this.sidenav && !this.modalActive) {
           this.sidenav.close();
         }

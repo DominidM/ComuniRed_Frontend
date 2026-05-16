@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { CategoriaService, Categoria, CategoriaPage } from '../../services/categoria.service';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-crud-categoria',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
   templateUrl: './crud-categoria.component.html',
   styleUrls: ['./crud-categoria.component.css']
 })

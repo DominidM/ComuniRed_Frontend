@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { TipoReaccionService, TipoReaccion, TiposReaccionPage } from '../../services/tipo-reaccion.service';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-crud-tipo-reaccion',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
   templateUrl: './crud-tipo-reaccion.component.html',
   styleUrls: ['./crud-tipo-reaccion.component.css']
 })

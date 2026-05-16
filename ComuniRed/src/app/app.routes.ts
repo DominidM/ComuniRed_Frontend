@@ -46,6 +46,7 @@ import { ConfiguracionComponent } from './admin/configuracion/configuracion.comp
 
 import { MapaGeneralComponent } from './admin/mapa-general/mapa-general.component';
 import { CrudEvidenciaComponent } from './admin/crud-evidencia/crud-evidencia.component';
+import { CrudReelComponent } from './admin/crud-reel/crud-reel.component';
 
 import { AuthGuard } from './guards/auth.guard';
 import { publicRedirectGuard } from './guards/public-redirect.guard';
@@ -97,6 +98,7 @@ export const routes: Routes = [
 
       { path: 'auditoria', component: AuditoriaComponent },
       { path: 'configuracion', component: ConfiguracionComponent },
+      { path: 'reel', component: CrudReelComponent },
 
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

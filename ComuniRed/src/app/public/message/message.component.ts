@@ -196,6 +196,7 @@ export class MessageComponent implements OnInit, OnDestroy {
             const existente = this.conversaciones.find((c) => c.id === conv.id);
 
             if (existente) {
+              const fechaAnterior = existente.fechaUltimaActividad;
               existente.fechaUltimaActividad = conv.fechaUltimaActividad;
               existente.ultimoMensaje = conv.ultimoMensaje;
 
@@ -210,7 +211,6 @@ export class MessageComponent implements OnInit, OnDestroy {
                 }
               }
 
-              // Solo actualizar si el id del usuario es válido
               if (existente.otroUsuario?.id) {
                 try {
                   const usuarioActualizado = await this.usuarioService
@@ -223,8 +223,15 @@ export class MessageComponent implements OnInit, OnDestroy {
                   console.error('Error actualizando usuario:', error);
                 }
               } else if (!existente.otroUsuario) {
-                // Si todavía no tiene usuario cargado, intentar cargarlo ahora
                 this.cargarInfoUsuarioConversacion(existente);
+              }
+
+              if (conv.fechaUltimaActividad !== fechaAnterior) {
+                const idx = this.conversaciones.indexOf(existente);
+                if (idx > 0) {
+                  this.conversaciones.splice(idx, 1);
+                  this.conversaciones.unshift(existente);
+                }
               }
             } else {
               const nuevaConv = { ...conv };
@@ -232,12 +239,6 @@ export class MessageComponent implements OnInit, OnDestroy {
               this.cargarInfoUsuarioConversacion(nuevaConv);
             }
           }
-
-          this.conversaciones.sort(
-            (a, b) =>
-              new Date(b.fechaUltimaActividad).getTime() -
-              new Date(a.fechaUltimaActividad).getTime(),
-          );
         },
         error: (error) => {
           console.error('Error actualizando conversaciones:', error);
@@ -483,6 +484,10 @@ export class MessageComponent implements OnInit, OnDestroy {
     if (this.usuarioChat) {
       this.router.navigate(['/user-profile', this.usuarioChat.id]);
     }
+  }
+
+  trackByConversacionId(index: number, item: ConversacionConUsuario): string {
+    return item.id;
   }
 
   handleKeyPress(event: KeyboardEvent): void {

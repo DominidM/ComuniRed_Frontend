@@ -651,3 +651,7 @@
   font-size: 13px;
   color: #888;
 }
+
+.pagination button:last-child {
+  margin-right: 0;
+}

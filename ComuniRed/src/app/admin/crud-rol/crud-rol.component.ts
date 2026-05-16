@@ -1,12 +1,14 @@
 import { Component, Renderer2, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 import { RolService, Rol, RolPage } from '../../services/rol.service';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-crud-rol',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
   templateUrl: './crud-rol.component.html',
   styleUrls: ['./crud-rol.component.css'],
 })
@@ -23,6 +25,7 @@ export class CrudRolComponent implements AfterViewChecked {
   totalElements = 0;
   pageSizes = [5, 10, 20, 50];
   searchText: string = '';
+  loading = false;
 
   constructor(private renderer: Renderer2, private rolService: RolService) {}
 
@@ -35,8 +38,10 @@ export class CrudRolComponent implements AfterViewChecked {
   }
 
   loadRoles() {
-
-    this.rolService.obtenerRoles(this.page, this.size).subscribe({
+    this.loading = true;
+    this.rolService.obtenerRoles(this.page, this.size)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
       next: (data) => {
         
         data.content.forEach((rol, index) => {

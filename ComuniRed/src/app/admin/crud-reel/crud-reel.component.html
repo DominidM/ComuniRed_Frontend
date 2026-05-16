@@ -1,0 +1,149 @@
+<div class="crud-reel-root">
+  <div class="crud-reel-card">
+    <div class="crud-reel-header">
+      <h2>Gestión de Reels</h2>
+      <button class="btn-create" (click)="openCreateModal()">+ Nuevo Reel</button>
+    </div>
+
+    <div class="crud-reel-controls-row">
+      <div class="crud-reel-search-box">
+        <input type="text" [(ngModel)]="searchText" (keyup.enter)="buscarReel()" placeholder="Buscar por título, autor o descripción..." />
+        <button class="crud-reel-search-btn" (click)="buscarReel()" aria-label="Buscar reel">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </div>
+      <div class="crud-reel-count">
+        <span>Total: {{ filteredReels.length }} reels</span>
+      </div>
+    </div>
+
+    <app-loading-overlay [loading]="loading" text="Cargando reels...">
+      <div *ngIf="filteredReels.length > 0; else noReels">
+        <table class="crud-reel-table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Descripción</th>
+              <th>Likes</th>
+              <th>Comentarios</th>
+              <th>Compartidos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let reel of filteredReels; trackBy: trackByReelId">
+              <td><div class="reel-title">{{ reel.title }}</div></td>
+              <td><div class="reel-author">{{ reel.author }}</div></td>
+              <td><div class="reel-desc">{{ reel.description }}</div></td>
+              <td><span class="reel-stat">{{ reel.likes }}</span></td>
+              <td><span class="reel-stat">{{ reel.comments }}</span></td>
+              <td><span class="reel-stat">{{ reel.shares }}</span></td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-view" (click)="openViewModal(reel)" title="Ver">Ver</button>
+                  <button class="btn-edit" (click)="openEditModal(reel)" title="Editar">Editar</button>
+                  <button class="btn-delete" (click)="eliminar(reel)" title="Eliminar">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #noReels>
+        <div class="crud-reel-empty">
+          <p>No hay reels registrados</p>
+        </div>
+      </ng-template>
+    </app-loading-overlay>
+  </div>
+
+  <!-- Modal crear/editar -->
+  <div class="crud-reel-modal" *ngIf="showModal" (click)="closeModal()">
+    <div class="crud-reel-modal-content" (click)="$event.stopPropagation()">
+      <div class="crud-reel-modal-header">
+        <h3>{{ editingReel ? 'Editar Reel' : 'Nuevo Reel' }}</h3>
+        <button class="btn-close-modal" (click)="closeModal()">×</button>
+      </div>
+      <div class="crud-reel-modal-body">
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" class="form-input" [(ngModel)]="formTitle" placeholder="Título del reel" />
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea class="form-input form-textarea" [(ngModel)]="formDescription" placeholder="Descripción del reel"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Autor</label>
+          <input type="text" class="form-input" [(ngModel)]="formAuthor" placeholder="Nombre del autor" />
+        </div>
+        <div class="form-group">
+          <label>URL del avatar (opcional)</label>
+          <input type="text" class="form-input" [(ngModel)]="formAvatarUrl" placeholder="https://..." />
+        </div>
+        <div class="form-group">
+          <label>Video {{ editingReel ? '(dejar vacío para mantener el actual)' : '' }}</label>
+          <input type="file" class="form-input" accept="video/*" (change)="onFileSelected($event)" />
+        </div>
+      </div>
+      <div class="crud-reel-modal-footer">
+        <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+        <button class="btn-save" (click)="guardar()" [disabled]="submitting">
+          {{ submitting ? 'Guardando...' : (editingReel ? 'Actualizar' : 'Crear') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal ver detalle -->
+  <div class="crud-reel-modal" *ngIf="showViewModal" (click)="closeViewModal()">
+    <div class="crud-reel-modal-content" (click)="$event.stopPropagation()">
+      <div class="crud-reel-modal-header">
+        <h3>{{ selectedReel?.title }}</h3>
+        <button class="btn-close-modal" (click)="closeViewModal()">×</button>
+      </div>
+      <div class="crud-reel-modal-body">
+        <div class="reel-video-preview">
+          <video controls preload="metadata" width="100%" style="max-height:400px;border-radius:8px;background:#000;">
+            <source [src]="selectedReel?.videoUrl" type="video/mp4" />
+          </video>
+        </div>
+        <div class="reel-detail-grid">
+          <div class="reel-detail-item">
+            <label>Autor</label>
+            <div class="reel-detail-author">
+              <img *ngIf="selectedReel?.avatarUrl" [src]="selectedReel?.avatarUrl" alt="Avatar" class="reel-avatar" />
+              <span>{{ selectedReel?.author }}</span>
+            </div>
+          </div>
+          <div class="reel-detail-item">
+            <label>Descripción</label>
+            <p>{{ selectedReel?.description }}</p>
+          </div>
+        </div>
+        <div class="reel-stats-row">
+          <div class="reel-stat-card">
+            <span class="stat-value">{{ selectedReel?.likes }}</span>
+            <span class="stat-label">Likes</span>
+          </div>
+          <div class="reel-stat-card">
+            <span class="stat-value">{{ selectedReel?.comments }}</span>
+            <span class="stat-label">Comentarios</span>
+          </div>
+          <div class="reel-stat-card">
+            <span class="stat-value">{{ selectedReel?.shares }}</span>
+            <span class="stat-label">Compartidos</span>
+          </div>
+        </div>
+      </div>
+      <div class="crud-reel-modal-footer">
+        <button class="btn-cancel" (click)="closeViewModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

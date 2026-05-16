@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { EstadosQuejaService, EstadoQueja, EstadoQuejaPage } from '../../services/estado-queja.service';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-crud-estado-queja',
   templateUrl: './crud-estado-queja.component.html',
   styleUrls: ['./crud-estado-queja.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent]
 })
 export class CrudEstadoQuejaComponent implements OnInit {
 
