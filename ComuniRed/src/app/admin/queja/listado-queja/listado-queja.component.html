@@ -8,7 +8,6 @@
     ]"
     [count]="totalElements"
     countLabel="reportes"
-    [loading]="loading"
   />
 
   <app-loading-overlay [loading]="loading" text="Cargando quejas...">
@@ -115,21 +114,25 @@
     </app-data-table>
   </app-loading-overlay>
 
-  <!-- ── Modal cambio de estado ───────────────────────────────── -->
+  <!-- ── Modal cambio de estado ── -->
   <div
-    class="queja-modal-overlay"
+    class="listado-queja-modal-overlay"
     *ngIf="showModalCambioEstado"
     (click)="cerrarModalEstado()"
   >
-    <div class="queja-modal" (click)="$event.stopPropagation()">
-      <div class="queja-modal-header">
+    <div class="listado-queja-modal" (click)="$event.stopPropagation()">
+      <div class="listado-queja-modal-header">
         <h3>Confirmar cambio de estado</h3>
-        <button type="button" class="btn-close" (click)="cerrarModalEstado()">
+        <button
+          type="button"
+          class="btn-close-modal"
+          (click)="cerrarModalEstado()"
+        >
           ×
         </button>
       </div>
 
-      <div class="queja-modal-body">
+      <div class="listado-queja-modal-body">
         <div class="estado-preview">
           <div class="estado-preview-item">
             <label>Reporte</label>
@@ -173,7 +176,7 @@
         </div>
       </div>
 
-      <div class="queja-modal-footer">
+      <div class="listado-queja-modal-footer">
         <button type="button" class="btn-cancel" (click)="cerrarModalEstado()">
           Cancelar
         </button>
