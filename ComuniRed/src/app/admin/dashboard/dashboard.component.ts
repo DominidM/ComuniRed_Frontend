@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { UsuarioService } from '../../services/usuario.service';
-
+import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
 
 
 interface PieSegment {
@@ -17,7 +17,7 @@ interface PieSegment {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, WorkspaceHeaderComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })

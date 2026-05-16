@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
 import * as L from 'leaflet';
 
 interface Queja {
@@ -27,7 +28,7 @@ interface Estado {
 @Component({
   selector: 'app-mapa-general',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, WorkspaceHeaderComponent],
   templateUrl: './mapa-general.component.html',
   styleUrls: ['./mapa-general.component.css']
 })

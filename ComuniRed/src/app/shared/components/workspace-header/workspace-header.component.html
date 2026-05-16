@@ -1,0 +1,76 @@
+<div class="workspace-header">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb" aria-label="Breadcrumb" *ngIf="breadcrumbs.length">
+    <ol>
+      <li *ngFor="let crumb of breadcrumbs; let last = last">
+        <a
+          *ngIf="crumb.route && !last"
+          [routerLink]="crumb.route"
+          class="crumb-link"
+        >
+          {{ crumb.label }}
+        </a>
+        <span
+          *ngIf="!crumb.route || last"
+          class="crumb-current"
+          [class.active]="last"
+        >
+          {{ crumb.label }}
+        </span>
+        <svg
+          *ngIf="!last"
+          class="crumb-sep"
+          width="12" height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Main row -->
+  <div class="header-main">
+
+    <!-- Left -->
+    <div class="header-left">
+      <h1 class="header-title">{{ title }}</h1>
+      <div class="header-meta">
+        <span class="header-subtitle" *ngIf="subtitle && !loading">{{ subtitle }}</span>
+        <span class="header-count" *ngIf="count !== null && !loading">
+          {{ count | number }} {{ countLabel }}
+        </span>
+        <span class="header-count-skeleton" *ngIf="loading"></span>
+      </div>
+    </div>
+
+    <!-- Right: actions -->
+    <div class="header-actions" *ngIf="actionLabel || secondaryActionLabel">
+      <button
+        *ngIf="secondaryActionLabel"
+        type="button"
+        class="btn-secondary"
+        (click)="secondaryActionClick.emit()"
+      >
+        <span *ngIf="secondaryActionIcon" class="btn-icon">{{ secondaryActionIcon }}</span>
+        {{ secondaryActionLabel }}
+      </button>
+      <button
+        *ngIf="actionLabel"
+        type="button"
+        class="btn-primary"
+        (click)="actionClick.emit()"
+      >
+        <span class="btn-icon">{{ actionIcon }}</span>
+        {{ actionLabel }}
+      </button>
+    </div>
+
+  </div>
+
+</div>

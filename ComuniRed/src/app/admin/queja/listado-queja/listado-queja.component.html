@@ -1,0 +1,191 @@
+<div class="listado-queja-root">
+  <app-workspace-header
+    title="Listado de Quejas"
+    subtitle="Administra y monitorea todos los reportes ciudadanos"
+    [breadcrumbs]="[
+      { label: 'Admin', route: '/admin/dashboard' },
+      { label: 'Quejas' },
+    ]"
+    [count]="totalElements"
+    countLabel="reportes"
+    [loading]="loading"
+  />
+
+  <app-loading-overlay [loading]="loading" text="Cargando quejas...">
+    <app-data-table
+      [columns]="columns"
+      [rows]="quejas"
+      [page]="page"
+      [pages]="pages"
+      [totalPages]="totalPages"
+      [totalElements]="totalElements"
+      [loading]="loading"
+      [rowTrackBy]="trackByQueja"
+      [emptyMessage]="'No hay quejas registradas.'"
+      [minWidth]="'1100px'"
+      (pageChange)="goToPage($event)"
+    >
+      <ng-template dataTableCell="descripcion_custom" let-row>
+        <div class="cell-inner">
+          <div class="desc-title">{{ row.titulo || "(Sin título)" }}</div>
+          <div class="desc-text">{{ row.descripcion }}</div>
+        </div>
+      </ng-template>
+
+      <ng-template dataTableCell="fecha_creacion" let-row>
+        <div class="cell-inner">
+          <span class="meta">{{
+            row.fecha_creacion | date: "dd/MM/yy HH:mm"
+          }}</span>
+        </div>
+      </ng-template>
+
+      <ng-template dataTableCell="usuario_nombre" let-row>
+        <div class="cell-inner">
+          <span class="meta">{{ row.usuario_nombre || "—" }}</span>
+        </div>
+      </ng-template>
+
+      <ng-template dataTableCell="estado_nombre" let-row>
+        <div class="cell-inner">
+          <span
+            class="status-badge"
+            [ngClass]="getEstadoClass(row.estado_nombre)"
+          >
+            {{ row.estado_nombre || "—" }}
+          </span>
+        </div>
+      </ng-template>
+
+      <ng-template dataTableCell="estado_select" let-row>
+        <div class="cell-inner">
+          <select
+            class="estado-select"
+            [value]="row.estado_id"
+            (change)="iniciarCambioEstado(row, $event)"
+          >
+            <option *ngFor="let estado of estados" [value]="estado.id">
+              {{ estado.nombre }}
+            </option>
+          </select>
+        </div>
+      </ng-template>
+
+      <ng-template dataTableCell="imagen_custom" let-row>
+        <div class="cell-inner image-wrap">
+          <ng-container *ngIf="row.imagen_url; else noImage">
+            <a [href]="row.imagen_url" target="_blank" rel="noreferrer">
+              <img [src]="row.imagen_url" alt="Imagen" class="thumb" />
+            </a>
+          </ng-container>
+          <ng-template #noImage>
+            <span class="small-muted">—</span>
+          </ng-template>
+        </div>
+      </ng-template>
+
+      <ng-template dataTableCell="acciones" let-row>
+        <div class="cell-inner">
+          <button
+            type="button"
+            class="btn-detail"
+            title="Ver / Editar detalle"
+            (click)="verDetalle(row)"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path
+                d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+              />
+              <path
+                d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+              />
+            </svg>
+            Detalle
+          </button>
+        </div>
+      </ng-template>
+    </app-data-table>
+  </app-loading-overlay>
+
+  <!-- ── Modal cambio de estado ───────────────────────────────── -->
+  <div
+    class="queja-modal-overlay"
+    *ngIf="showModalCambioEstado"
+    (click)="cerrarModalEstado()"
+  >
+    <div class="queja-modal" (click)="$event.stopPropagation()">
+      <div class="queja-modal-header">
+        <h3>Confirmar cambio de estado</h3>
+        <button type="button" class="btn-close" (click)="cerrarModalEstado()">
+          ×
+        </button>
+      </div>
+
+      <div class="queja-modal-body">
+        <div class="estado-preview">
+          <div class="estado-preview-item">
+            <label>Reporte</label>
+            <strong>{{
+              quejaSeleccionada?.titulo ||
+                quejaSeleccionada?.descripcion?.substring(0, 50)
+            }}</strong>
+          </div>
+
+          <div class="estado-preview-item">
+            <label>Estado actual</label>
+            <span
+              class="status-badge"
+              [ngClass]="getEstadoClass(quejaSeleccionada?.estado_nombre)"
+            >
+              {{ quejaSeleccionada?.estado_nombre }}
+            </span>
+          </div>
+
+          <div class="arrow-transition">↓</div>
+
+          <div class="estado-preview-item">
+            <label>Nuevo estado</label>
+            <span
+              class="status-badge"
+              [ngClass]="getEstadoClass(nuevoEstadoNombre)"
+            >
+              {{ nuevoEstadoNombre }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="observacionEstado">Observación (opcional)</label>
+          <textarea
+            id="observacionEstado"
+            [(ngModel)]="observacionEstado"
+            placeholder="Escribe una nota sobre este cambio..."
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="queja-modal-footer">
+        <button type="button" class="btn-cancel" (click)="cerrarModalEstado()">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn-confirm"
+          (click)="confirmarCambioEstado()"
+          [disabled]="loading"
+        >
+          {{ loading ? "Cambiando..." : "Confirmar cambio" }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

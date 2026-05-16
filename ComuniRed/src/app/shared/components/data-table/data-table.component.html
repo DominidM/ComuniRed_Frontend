@@ -1,0 +1,144 @@
+<div class="dt-wrapper">
+
+  <!-- Toolbar con toggle de vista -->
+  <div class="dt-toolbar">
+    <div class="dt-view-toggle">
+      <button
+        type="button"
+        class="dt-toggle-btn"
+        [class.active]="viewMode === 'table'"
+        (click)="setViewMode('table')"
+        title="Vista tabla"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M3 9h18M3 15h18M9 3v18"/>
+        </svg>
+        Tabla
+      </button>
+      <button
+        type="button"
+        class="dt-toggle-btn"
+        [class.active]="viewMode === 'card'"
+        (click)="setViewMode('card')"
+        title="Vista tarjetas"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        Tarjetas
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== MODO TABLA ===== -->
+  <ng-container *ngIf="viewMode === 'table'">
+    <div class="dt-scroll" [style.min-width]="minWidth">
+      <table class="dt-table" [class]="tableClass">
+        <colgroup *ngIf="columns.length">
+          <col *ngFor="let column of columns" [style.width]="column.width || null" />
+        </colgroup>
+
+        <thead>
+          <tr>
+            <th *ngFor="let column of columns" [class]="getHeaderClass(column)">
+              {{ column.label }}
+            </th>
+          </tr>
+        </thead>
+
+        <tbody *ngIf="rows?.length; else emptyStateTable">
+          <tr *ngFor="let row of rows; let rowIndex = index; trackBy: trackByRow">
+            <td *ngFor="let column of columns" [class]="getCellClass(column)">
+              <ng-container *ngIf="hasTemplate(column.key); else defaultCell">
+                <ng-container
+                  [ngTemplateOutlet]="templateMap.get(column.key) || null"
+                  [ngTemplateOutletContext]="{
+                    $implicit: row,
+                    row: row,
+                    value: getCellValue(row, column.key),
+                    column: column,
+                    rowIndex: rowIndex
+                  }"
+                ></ng-container>
+              </ng-container>
+              <ng-template #defaultCell>
+                {{ getCellValue(row, column.key) ?? '—' }}
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #emptyStateTable>
+      <div class="dt-empty">
+        {{ loading ? 'Cargando...' : emptyMessage }}
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <!-- ===== MODO CARTA ===== -->
+  <ng-container *ngIf="viewMode === 'card'">
+    <div class="dt-card-grid" *ngIf="rows?.length; else emptyStateCard">
+      <div
+        class="dt-card"
+        *ngFor="let row of rows; let rowIndex = index; trackBy: trackByRow"
+      >
+        <ng-container *ngFor="let column of columns">
+          <div class="dt-card-field">
+            <span class="dt-card-label">{{ column.label }}</span>
+            <span class="dt-card-value">
+              <ng-container *ngIf="hasTemplate(column.key); else defaultCardCell">
+                <ng-container
+                  [ngTemplateOutlet]="templateMap.get(column.key) || null"
+                  [ngTemplateOutletContext]="{
+                    $implicit: row,
+                    row: row,
+                    value: getCellValue(row, column.key),
+                    column: column,
+                    rowIndex: rowIndex
+                  }"
+                ></ng-container>
+              </ng-container>
+              <ng-template #defaultCardCell>
+                {{ getCellValue(row, column.key) ?? '—' }}
+              </ng-template>
+            </span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <ng-template #emptyStateCard>
+      <div class="dt-empty">
+        {{ loading ? 'Cargando...' : emptyMessage }}
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <!-- Paginación (compartida) -->
+  <div class="dt-pagination" *ngIf="showPagination && totalPages > 1">
+    <button type="button" (click)="goToPage(page - 1)" [disabled]="page === 0">‹</button>
+
+    <button
+      type="button"
+      *ngFor="let p of pages"
+      (click)="goToPage(p)"
+      [class.active]="p === page"
+    >
+      {{ p + 1 }}
+    </button>
+
+    <button type="button" (click)="goToPage(page + 1)" [disabled]="page === totalPages - 1">›</button>
+
+    <span class="dt-page-info">
+      {{ totalElements }} registros · Página {{ page + 1 }} de {{ totalPages }}
+    </span>
+  </div>
+</div>
+
+<ng-content></ng-content>
