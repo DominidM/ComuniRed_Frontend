@@ -1,38 +1,44 @@
 :host {
   display: block;
+  position: relative;
 }
 
 .loading-container {
   position: relative;
-  min-height: 120px;
 }
 
+/* Overlay sobre el contenido proyectado */
 .loading-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(245, 247, 250, 0.85);
+  background: color-mix(in srgb, var(--cr-background) 80%, transparent);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 50;
   border-radius: inherit;
+  min-height: 120px;
+  gap: 12px;
 }
 
+/* Spinner usando el color primario del sistema */
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #d1d5db;
-  border-top-color: #2563eb;
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--cr-border);
+  border-top-color: var(--cr-primary);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
 
-.loading-overlay p {
-  margin-top: 12px;
-  color: #374151;
-  font-size: 14px;
+.loading-text {
+  color: var(--cr-text-muted);
+  font-size: 13px;
   font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 @keyframes spin {

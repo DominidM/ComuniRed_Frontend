@@ -1,0 +1,387 @@
+<div class="detalle-root">
+
+  <app-workspace-header
+    title="Detalle de Quejas"
+    subtitle="Visualización detallada de la queja seleccionada"
+    [breadcrumbs]="[
+      { label: 'Admin', route: '/admin/dashboard' },
+      { label: 'Quejas', route: '/admin/quejas' },
+      { label: 'Detalle' }
+    ]"
+  />
+
+  <app-loading-overlay [loading]="loading" text="Cargando queja...">
+
+    <!-- Tabs -->
+    <div class="detalle-tabs" *ngIf="queja">
+      <button type="button" class="tab-btn"
+        [class.active]="activeTab === 'info'"
+        (click)="setTab('info')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4M12 8h.01"/>
+        </svg>
+        Información
+      </button>
+
+      <button type="button" class="tab-btn"
+        [class.active]="activeTab === 'editar'"
+        (click)="setTab('editar')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Editar
+      </button>
+
+      <button type="button" class="tab-btn"
+        [class.active]="activeTab === 'estado'"
+        (click)="setTab('estado')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Cambiar Estado
+      </button>
+
+      <button type="button" class="tab-btn"
+        [class.active]="activeTab === 'evidencias'"
+        (click)="setTab('evidencias')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        Evidencias
+        <span class="tab-count" *ngIf="queja?.evidence?.length">
+          {{ queja?.evidence?.length }}
+        </span>
+      </button>
+
+      <button type="button" class="tab-btn"
+        [class.active]="activeTab === 'comentarios'"
+        (click)="setTab('comentarios')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        Comentarios
+        <span class="tab-count" *ngIf="queja?.commentsCount">
+          {{ queja?.commentsCount }}
+        </span>
+      </button>
+
+      <button type="button" class="tab-btn"
+        [class.active]="activeTab === 'historial'"
+        (click)="setTab('historial')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5M12 7v5l4 2"/>
+        </svg>
+        Historial
+      </button>
+    </div>
+
+    <!-- Contenido tabs -->
+    <div class="detalle-body" *ngIf="queja">
+
+      <!-- TAB: Información -->
+      <div class="tab-panel" *ngIf="activeTab === 'info'">
+        <div class="info-grid">
+
+          <div class="info-card image-card" *ngIf="queja.imagen_url">
+            <img [src]="queja.imagen_url" alt="Imagen de la queja" class="queja-img"/>
+          </div>
+
+          <div class="info-card">
+            <h3 class="card-title">Datos del reporte</h3>
+            <div class="info-field">
+              <label>Título</label>
+              <span>{{ queja.titulo || "(Sin título)" }}</span>
+            </div>
+            <div class="info-field">
+              <label>Descripción</label>
+              <p class="info-desc">{{ queja.descripcion }}</p>
+            </div>
+            <div class="info-field" *ngIf="queja.ubicacion">
+              <label>Ubicación</label>
+              <span>{{ queja.ubicacion }}</span>
+            </div>
+            <div class="info-field">
+              <label>Categoría</label>
+              <span class="tag-pill">{{ queja.categoria?.nombre || "—" }}</span>
+            </div>
+            <div class="info-field">
+              <label>Estado</label>
+              <span class="status-badge" [ngClass]="getEstadoClass(queja.estado?.clave)">
+                {{ queja.estado?.nombre || "—" }}
+              </span>
+            </div>
+            <div class="info-field" *ngIf="queja.nivel_riesgo">
+              <label>Nivel de riesgo</label>
+              <span class="riesgo-badge" [ngClass]="getRiesgoClass(queja.nivel_riesgo)">
+                {{ queja.nivel_riesgo }}
+              </span>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h3 class="card-title">Usuario</h3>
+            <div class="user-preview">
+              <div class="user-avatar">
+                <img *ngIf="queja.usuario?.foto_perfil"
+                  [src]="queja.usuario.foto_perfil" alt="Avatar"/>
+                <span *ngIf="!queja.usuario?.foto_perfil">
+                  {{ queja.usuario?.nombre?.charAt(0) }}
+                </span>
+              </div>
+              <div class="user-info">
+                <strong>{{ queja.usuario?.nombre }} {{ queja.usuario?.apellido }}</strong>
+                <span class="meta-text">{{ queja.usuario?.email || "" }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h3 class="card-title">Votos</h3>
+            <div class="votes-row">
+              <div class="vote-item vote-yes">
+                <span class="vote-num">{{ queja.votes?.yes ?? 0 }}</span>
+                <span class="vote-label">A favor</span>
+              </div>
+              <div class="vote-divider"></div>
+              <div class="vote-item vote-no">
+                <span class="vote-num">{{ queja.votes?.no ?? 0 }}</span>
+                <span class="vote-label">En contra</span>
+              </div>
+              <div class="vote-divider"></div>
+              <div class="vote-item">
+                <span class="vote-num">{{ queja.votes?.total ?? 0 }}</span>
+                <span class="vote-label">Total</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h3 class="card-title">Fechas</h3>
+            <div class="info-field">
+              <label>Creación</label>
+              <span>{{ queja.fecha_creacion | date:"dd/MM/yyyy HH:mm" }}</span>
+            </div>
+            <div class="info-field" *ngIf="queja.fecha_actualizacion">
+              <label>Última actualización</label>
+              <span>{{ queja.fecha_actualizacion | date:"dd/MM/yyyy HH:mm" }}</span>
+            </div>
+            <div class="info-field" *ngIf="queja.fecha_clasificacion">
+              <label>Clasificación</label>
+              <span>{{ queja.fecha_clasificacion | date:"dd/MM/yyyy HH:mm" }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB: Editar -->
+      <div class="tab-panel" *ngIf="activeTab === 'editar'">
+        <div class="form-card">
+          <h3 class="card-title">Editar reporte</h3>
+
+          <div class="form-group">
+            <label for="edit-titulo">Título</label>
+            <input id="edit-titulo" type="text"
+              [(ngModel)]="editData.titulo"
+              placeholder="Título del reporte"/>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-desc">Descripción <span class="required">*</span></label>
+            <textarea id="edit-desc" rows="5"
+              [(ngModel)]="editData.descripcion"
+              placeholder="Descripción detallada..."
+              required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-ubicacion">Ubicación</label>
+            <input id="edit-ubicacion" type="text"
+              [(ngModel)]="editData.ubicacion"
+              placeholder="Ej: Calle 5, Barrio Centro"/>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-imagen">URL de imagen</label>
+            <input id="edit-imagen" type="url"
+              [(ngModel)]="editData.imagen_url"
+              placeholder="https://..."/>
+            <div class="img-preview" *ngIf="editData.imagen_url">
+              <img [src]="editData.imagen_url" alt="Preview"/>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="cancelEdit()">
+              Cancelar
+            </button>
+            <button type="button" class="btn-primary"
+              (click)="saveEdit()" [disabled]="savingEdit">
+              {{ savingEdit ? "Guardando..." : "Guardar cambios" }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Cambiar Estado -->
+      <div class="tab-panel" *ngIf="activeTab === 'estado'">
+        <div class="form-card">
+          <h3 class="card-title">Cambiar estado del reporte</h3>
+
+          <div class="estado-actual">
+            <label>Estado actual</label>
+            <span class="status-badge" [ngClass]="getEstadoClass(queja.estado?.clave)">
+              {{ queja.estado?.nombre || "—" }}
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="nuevo-estado">Nuevo estado <span class="required">*</span></label>
+            <select id="nuevo-estado"
+              (change)="onEstadoSelect($event)"
+              [value]="nuevoEstadoId">
+              <option value="">-- Selecciona un estado --</option>
+              <option *ngFor="let estado of estados" [value]="estado.id"
+                [disabled]="estado.id === queja.estado?.id">
+                {{ estado.nombre }}{{ estado.id === queja.estado?.id ? " (actual)" : "" }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="observacion">Observación (opcional)</label>
+            <textarea id="observacion" rows="3"
+              [(ngModel)]="observacionEstado"
+              placeholder="Nota sobre este cambio de estado..."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="setTab('info')">
+              Cancelar
+            </button>
+            <button type="button" class="btn-primary"
+              (click)="saveEstado()"
+              [disabled]="savingEstado || !nuevoEstadoId">
+              {{ savingEstado ? "Cambiando..." : "Confirmar cambio" }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Evidencias -->
+      <div class="tab-panel" *ngIf="activeTab === 'evidencias'">
+        <div class="evidence-grid" *ngIf="queja.evidence?.length; else noEvidencias">
+          <div class="evidence-card" *ngFor="let ev of queja.evidence">
+            <div class="evidence-icon">{{ getTipoEvidenciaIcon(ev.tipo) }}</div>
+            <div class="evidence-info">
+              <span class="evidence-tipo">{{ ev.tipo }}</span>
+              <span class="evidence-fecha" *ngIf="ev.fecha_subida">
+                {{ ev.fecha_subida | date:"dd/MM/yyyy" }}
+              </span>
+            </div>
+            <a [href]="ev.url" target="_blank" rel="noreferrer" class="evidence-link">
+              Ver
+            </a>
+          </div>
+        </div>
+        <ng-template #noEvidencias>
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <p>No hay evidencias adjuntas</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- TAB: Comentarios -->
+      <div class="tab-panel" *ngIf="activeTab === 'comentarios'">
+        <div class="comments-list" *ngIf="queja.comments?.length; else noComentarios">
+          <div class="comment-card" *ngFor="let c of queja.comments">
+            <div class="comment-avatar">
+              <img *ngIf="c.author?.foto_perfil"
+                [src]="c.author.foto_perfil" alt="Avatar"/>
+              <span *ngIf="!c.author?.foto_perfil">
+                {{ c.author?.nombre?.charAt(0) }}
+              </span>
+            </div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <strong>{{ c.author?.nombre }} {{ c.author?.apellido }}</strong>
+                <span class="meta-text">
+                  {{ c.fecha_creacion | date:"dd/MM/yyyy HH:mm" }}
+                </span>
+              </div>
+              <p class="comment-text">{{ c.texto }}</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noComentarios>
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <p>No hay comentarios aún</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- TAB: Historial -->
+      <div class="tab-panel" *ngIf="activeTab === 'historial'">
+        <app-loading-overlay [loading]="loadingHistorial" text="Cargando historial...">
+          <div class="historial-timeline" *ngIf="historial.length; else noHistorial">
+            <div class="timeline-item" *ngFor="let h of historial">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <span class="timeline-tipo">{{ h.tipo_evento }}</span>
+                  <span class="meta-text">
+                    {{ h.fecha_evento | date:"dd/MM/yyyy HH:mm" }}
+                  </span>
+                </div>
+                <p class="timeline-desc">{{ h.descripcion }}</p>
+                <div class="timeline-estados"
+                  *ngIf="h.estado_anterior || h.estado_nuevo">
+                  <span class="estado-from">{{ h.estado_anterior || "—" }}</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                  <span class="estado-to">{{ h.estado_nuevo || "—" }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #noHistorial>
+            <div class="empty-state" *ngIf="!loadingHistorial">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5M12 7v5l4 2"/>
+              </svg>
+              <p>Sin historial registrado</p>
+            </div>
+          </ng-template>
+        </app-loading-overlay>
+      </div>
+
+    </div>
+
+  </app-loading-overlay>
+
+</div>

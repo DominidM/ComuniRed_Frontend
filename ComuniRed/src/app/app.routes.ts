@@ -8,7 +8,9 @@ import { DashboardComponent } from './admin/dashboard/dashboard.component';
 import { CrudRolComponent } from './admin/crud-rol/crud-rol.component';
 import { CrudUsuarioComponent } from './admin/crud-usuario/crud-usuario.component';
 import { CrudEstadoQuejaComponent } from './admin/crud-estado-queja/crud-estado-queja.component';
-import { CrudQuejaComponent } from './admin/crud-queja/crud-queja.component';
+import { ListadoQuejaComponent } from './admin/queja/listado-queja/listado-queja.component';
+import { DetalleQuejaComponent } from './admin/queja/detalle-queja/detalle-queja.component';
+
 import { CrudAsignacionComponent } from './admin/crud-asignacion/crud-asignacion.component';
 import { CrudTipoReaccionComponent } from './admin/crud-tipo-reaccion/crud-tipo-reaccion.component';
 import { CrudReaccionComponent } from './admin/crud-reaccion/crud-reaccion.component';
@@ -74,7 +76,8 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'mapa', component: MapaGeneralComponent },
 
-      { path: 'queja', component: CrudQuejaComponent },
+      { path: 'queja', component: ListadoQuejaComponent },
+      { path: 'queja/:id', component: DetalleQuejaComponent },
       { path: 'asignacion', component: CrudAsignacionComponent },
       { path: 'comentarios', component: CrudComentarioComponent },
       { path: 'evidencias', component: CrudEvidenciaComponent },

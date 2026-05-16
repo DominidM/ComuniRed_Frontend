@@ -1,0 +1,222 @@
+.dt-wrapper {
+  width: 100%;
+}
+
+/* ── Toolbar ── */
+.dt-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.dt-view-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--cr-search);
+  border: 1px solid var(--cr-border);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.dt-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: var(--cr-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.dt-toggle-btn:hover {
+  color: var(--cr-text);
+}
+
+.dt-toggle-btn.active {
+  background: var(--cr-button-black);
+  color: var(--cr-button-black-text);
+}
+
+/* ── Tabla ── */
+.dt-scroll {
+  overflow-x: auto;
+}
+
+.dt-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--cr-background);
+  border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.dt-table thead th {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  white-space: nowrap;
+  background: var(--cr-button-black);
+  color: var(--cr-button-black-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--cr-black-40);
+  border-right: 1px solid var(--cr-black-20);
+}
+
+.dt-table thead th:last-child {
+  border-right: none;
+}
+
+.dt-table tbody td {
+  padding: 0.75rem;
+  vertical-align: middle;
+  font-size: 0.875rem;
+  color: var(--cr-text);
+  background: var(--cr-background);
+  border-bottom: 1px solid var(--cr-border);
+  border-right: 1px solid var(--cr-border);
+}
+
+.dt-table tbody td:last-child {
+  border-right: none;
+}
+
+.dt-table tbody tr:nth-child(even) td {
+  background: var(--cr-search);
+}
+
+.dt-table tbody tr:nth-child(odd) td {
+  background: var(--cr-background);
+}
+
+.dt-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--cr-primary) 8%, var(--cr-background)) !important;
+}
+
+.dt-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Cards ── */
+.dt-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  gap: 16px;
+}
+
+.dt-card {
+  background: var(--cr-background);
+  border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+.dt-card:hover {
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--cr-primary) 12%, transparent);
+  transform: translateY(-2px);
+}
+
+.dt-card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dt-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cr-text-muted);
+}
+
+.dt-card-value {
+  font-size: 14px;
+  color: var(--cr-text);
+}
+
+/* ── Empty ── */
+.dt-empty {
+  margin-top: 12px;
+  padding: 24px;
+  text-align: center;
+  color: var(--cr-text-muted);
+  background: var(--cr-background);
+  border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+}
+
+/* ── Paginación ── */
+.dt-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 20px 0 8px;
+}
+
+.dt-pagination button {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  background: var(--cr-background);
+  color: var(--cr-text);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 120ms ease;
+}
+
+.dt-pagination button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--cr-primary) 14%, var(--cr-background));
+  border-color: var(--cr-primary);
+  color: var(--cr-primary);
+}
+
+.dt-pagination button.active {
+  background: var(--cr-button-black);
+  border-color: var(--cr-button-black);
+  color: var(--cr-button-black-text);
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.dt-pagination button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.dt-pagination button:active {
+  transform: scale(0.98);
+}
+
+.dt-page-info {
+  margin-left: 10px;
+  font-size: 13px;
+  color: var(--cr-text-muted);
+}
+
+/* ── Alineación ── */
+.align-left   { text-align: left; }
+.align-center { text-align: center; }
+.align-right  { text-align: right; }
+
+@media (max-width: 768px) {
+  .dt-scroll { min-width: 100%; }
+  .dt-card-grid { grid-template-columns: 1fr; }
+}

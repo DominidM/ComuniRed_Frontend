@@ -1,10 +1,10 @@
 <div class="mapa-container">
-  <div class="mapa-header">
-    <div>
-      <h1 class="mapa-title">Mapa General</h1>
-      <p class="mapa-subtitle">Visualización geográfica de todas las quejas</p>
-    </div>
-  </div>
+
+  <app-workspace-header
+    title="Mapa General"
+    subtitle="Visualización geográfica de todas las quejas"
+    [breadcrumbs]="[{ label: 'Admin' }, { label: 'Mapa General' }]"
+  />
 
   <div class="mapa-content">
     <aside class="filtros-sidebar">

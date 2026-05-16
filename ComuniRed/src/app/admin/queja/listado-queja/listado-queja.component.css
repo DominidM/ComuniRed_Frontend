@@ -1,0 +1,405 @@
+/* ── Root ─────────────────────────────────────────────── */
+.listado-queja-root {
+  width: 100%;
+  padding: 0 32px 48px;
+  background: var(--cr-background-content);
+  color: var(--cr-text);
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  box-sizing: border-box;
+}
+
+/* ── Celdas tabla ─────────────────────────────────────── */
+.cell-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 72px;
+}
+
+.desc-title {
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cr-text);
+}
+
+.desc-text {
+  max-height: 64px;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--cr-text-muted);
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--cr-text-muted);
+}
+
+.image-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumb {
+  width: 160px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--cr-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.small-muted {
+  color: var(--cr-text-muted);
+  font-size: 0.85rem;
+}
+
+/* ── Select de estado ─────────────────────────────────── */
+.estado-select {
+  width: 100%;
+  min-width: 160px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--cr-text);
+  background: var(--cr-background-content);
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  cursor: pointer;
+  appearance: auto;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.estado-select:hover {
+  border-color: var(--cr-primary);
+}
+
+.estado-select:focus {
+  outline: none;
+  border-color: var(--cr-primary);
+  box-shadow: 0 0 0 3px var(--cr-focus-ring);
+}
+
+.estado-select option {
+  background: var(--cr-background-content);
+  color: var(--cr-text);
+}
+
+/* ── Botón detalle ────────────────────────────────────── */
+.btn-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.55rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--cr-primary-soft);
+  color: var(--cr-primary);
+  border: 1px solid color-mix(in srgb, var(--cr-primary) 24%, var(--cr-border));
+  box-shadow: var(--shadow-soft);
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    transform 120ms ease;
+}
+
+.btn-detail:hover {
+  background: color-mix(in srgb, var(--cr-primary) 12%, var(--cr-background));
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-detail:active {
+  transform: scale(0.98);
+}
+
+/* ── Botones generales ────────────────────────────────── */
+.btn-cancel,
+.btn-confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 120ms ease,
+    box-shadow 180ms ease;
+}
+
+.btn-cancel {
+  background: var(--cr-background);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
+}
+
+.btn-cancel:hover {
+  background: var(--cr-hover-surface);
+  color: var(--cr-text);
+}
+
+.btn-confirm {
+  background: var(--cr-primary);
+  color: var(--cr-white);
+  border: 1px solid var(--cr-primary);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-confirm:hover:not(:disabled) {
+  background: var(--cr-primary-hover);
+  border-color: var(--cr-primary-hover);
+  color: var(--cr-white);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-cancel:active,
+.btn-confirm:active {
+  transform: scale(0.98);
+}
+
+.btn-confirm:disabled,
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ── Status badges ────────────────────────────────────── */
+.status-badge {
+  display: inline-block;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.estado-pendiente {
+  background: color-mix(in srgb, #f39c12 16%, transparent);
+  color: #f39c12;
+}
+.estado-aprobado {
+  background: color-mix(in srgb, #4caf50 16%, transparent);
+  color: #4caf50;
+}
+.estado-votacion {
+  background: color-mix(in srgb, #2196f3 16%, transparent);
+  color: #2196f3;
+}
+.estado-proceso {
+  background: color-mix(in srgb, #ff9800 16%, transparent);
+  color: #ff9800;
+}
+.estado-resuelto {
+  background: color-mix(in srgb, #4caf50 16%, transparent);
+  color: #4caf50;
+}
+.estado-rechazado {
+  background: color-mix(in srgb, #f44336 16%, transparent);
+  color: #f44336;
+}
+.estado-default {
+  background: color-mix(in srgb, var(--cr-text-muted) 14%, transparent);
+  color: var(--cr-text-muted);
+}
+
+/* ── Modal overlay ────────────────────────────────────── */
+.listado-queja-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cr-overlay-dark-soft);
+}
+
+.listado-queja-modal {
+  position: relative;
+  z-index: 1150;
+  width: 620px;
+  max-width: calc(100% - 40px);
+  background: var(--cr-background);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-modal);
+  animation: modalEnter 160ms ease-out;
+  overflow: hidden;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Modal header ─────────────────────────────────────── */
+.listado-queja-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--cr-border);
+}
+
+.listado-queja-modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--cr-text);
+}
+
+.btn-close-modal {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--cr-text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.btn-close-modal:hover {
+  background: var(--cr-hover-surface);
+  color: var(--cr-text);
+}
+
+/* ── Modal body ───────────────────────────────────────── */
+.listado-queja-modal-body {
+  padding: 20px 24px;
+}
+
+.estado-preview {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--cr-search);
+  border: 1px solid var(--cr-border);
+  border-radius: 10px;
+}
+
+.estado-preview-item {
+  margin-bottom: 12px;
+}
+
+.estado-preview-item:last-child {
+  margin-bottom: 0;
+}
+
+.estado-preview-item label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cr-text-muted);
+}
+
+.arrow-transition {
+  margin: 8px 0;
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--cr-primary);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cr-text);
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--cr-text);
+  background: var(--cr-background-content);
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  resize: vertical;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+  box-sizing: border-box;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--cr-primary);
+  box-shadow: 0 0 0 3px var(--cr-focus-ring);
+}
+
+/* ── Modal footer ─────────────────────────────────────── */
+.listado-queja-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--cr-border);
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 1280px) {
+  .listado-queja-root {
+    padding: 0 24px 48px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .listado-queja-root {
+    padding: 0 20px 40px;
+  }
+}
+
+@media (max-width: 860px) {
+  .listado-queja-root {
+    padding: 0 16px 32px;
+  }
+  .thumb {
+    width: 120px;
+    height: 70px;
+  }
+  .listado-queja-modal {
+    max-width: calc(100% - 24px);
+  }
+}
