@@ -8,12 +8,33 @@
   font-family: "Segoe UI", sans-serif;
 }
 
-.notifications-container h2 {
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 10px;
-  font-size: 1.3rem;
-  color: var(--cr-text);
   border-bottom: 1px solid var(--cr-border);
   padding-bottom: 8px;
+}
+
+.notifications-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--cr-text);
+}
+
+.mark-all-btn {
+  background: none;
+  border: none;
+  color: var(--cr-primary, #1976d2);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.mark-all-btn:hover {
+  background: var(--cr-background-content);
 }
 
 .notification-card {
@@ -23,30 +44,105 @@
   padding: 12px;
   border-radius: 8px;
   cursor: pointer;
+  position: relative;
 }
 
-.notification-card:hover {
+.notification-card.unread {
   background: var(--cr-background-content);
 }
 
-.notification-icon img {
+.notification-card:hover {
+  background: var(--cr-border);
+}
+
+.notification-icon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-icon mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  color: #fff;
+}
+
+.notification-icon.QUEJA_ESTADO_CAMBIADO {
+  background: #1976d2;
+}
+
+.notification-icon.QUEJA_CLASIFICADA {
+  background: #f57c00;
+}
+
+.notification-icon.NUEVO_MENSAJE {
+  background: #388e3c;
+}
+
+.notification-icon.notifications {
+  background: #7b1fa2;
 }
 
 .notification-content {
   flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--cr-text);
+  margin: 0 0 2px;
 }
 
 .notification-text {
-  font-size: 0.95rem;
-  color: var(--cr-text);
-  margin: 0;
+  font-size: 0.85rem;
+  color: var(--cr-text-secondary, #555);
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .notification-time {
-  font-size: 0.8rem;
-  color: #777;
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cr-primary, #1976d2);
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+}
+
+.empty-state mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 1rem;
 }

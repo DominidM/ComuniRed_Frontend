@@ -29,6 +29,15 @@ export interface Story {
   duration: number;
 }
 
+export interface UserStoryGroup {
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  stories: Story[];
+  allSeen: boolean;
+  latestTime: string;
+}
+
 @Component({
   selector: 'app-stories',
   standalone: true,
@@ -41,9 +50,9 @@ export class StoriesComponent implements OnInit, OnDestroy {
   @Output() storyPublished = new EventEmitter<void>();
 
   @ViewChild('storiesTrack') storiesTrack!: ElementRef<HTMLDivElement>;
-  myActiveStory: Story | null = null;
+  myActiveStories: UserStoryGroup | null = null;
 
-  stories: Story[] = [];
+  storyGroups: UserStoryGroup[] = [];
   loadingStories = false;
   skeletonItems = [1, 2, 3];
 
@@ -78,7 +87,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
 
   // Modal visor
   showViewerModal = false;
-  activeStory: Story | null = null;
+  activeGroup: UserStoryGroup | null = null;
   currentStoryIndex = 0;
   storyProgress = 0;
   storyAutoPlay = true;
@@ -100,7 +109,19 @@ export class StoriesComponent implements OnInit, OnDestroy {
     this.clearProgressInterval();
   }
 
-  // ─── Carga inicial ─────────────────────────────────────────────
+  get activeStory(): Story | null {
+    if (!this.activeGroup) return null;
+    return this.activeGroup.stories[this.currentStoryIndex] ?? null;
+  }
+
+  get hasMyStory(): boolean {
+    return this.myActiveStories !== null;
+  }
+
+  get myLatestStory(): Story | null {
+    return this.myActiveStories?.stories[0] ?? null;
+  }
+
   private cargarHistorias(): void {
     if (!this.user?.id) return;
     this.loadingStories = true;
@@ -131,18 +152,13 @@ export class StoriesComponent implements OnInit, OnDestroy {
             duration: s.duration ?? s.duracion ?? 5,
           }));
 
-          const seen = new Set<string>();
-          const deduped = normalized.filter((s: Story) => {
-            const key = `${s.userId}|${s.text}|${s.imageUrl}|${s.bgColor}`;
-            if (seen.has(key)) return false;
-            seen.add(key);
-            return true;
-          });
+          const groups = this.agruparPorUsuario(normalized);
 
-          this.myActiveStory =
-            deduped.find((s: Story) => s.userId === this.user?.id) ?? null;
-          this.stories = deduped.filter(
-            (s: Story) => s.userId !== this.user?.id,
+          this.myActiveStories =
+            groups.find((g) => g.userId === this.user?.id) ?? null;
+
+          this.storyGroups = groups.filter(
+            (g) => g.userId !== this.user?.id,
           );
 
           setTimeout(() => this.onTrackScroll(), 100);
@@ -151,11 +167,40 @@ export class StoriesComponent implements OnInit, OnDestroy {
       });
   }
 
+  private agruparPorUsuario(stories: Story[]): UserStoryGroup[] {
+    const map = new Map<string, Story[]>();
+    for (const s of stories) {
+      if (!map.has(s.userId)) map.set(s.userId, []);
+      map.get(s.userId)!.push(s);
+    }
+
+    const groups: UserStoryGroup[] = [];
+    for (const [userId, userStories] of map) {
+      const first = userStories[0];
+      groups.push({
+        userId,
+        userName: first.userName,
+        userAvatar: first.userAvatar,
+        stories: userStories.sort(
+          (a, b) =>
+            new Date(b.timeAgo).getTime() - new Date(a.timeAgo).getTime(),
+        ),
+        allSeen: userStories.every((s) => s.seen),
+        latestTime: userStories.reduce((latest, s) => {
+          const t = new Date(s.timeAgo).getTime();
+          return t > new Date(latest).getTime() ? s.timeAgo : latest;
+        }, userStories[0].timeAgo),
+      });
+    }
+
+    return groups;
+  }
+
   truncateName(name: string | undefined): string {
     if (!name) return '';
     return name.length > 10 ? name.slice(0, 10) + '…' : name;
   }
-  // ─── Scroll ────────────────────────────────────────────────────
+
   onTrackScroll(): void {
     const el = this.storiesTrack?.nativeElement;
     if (!el) return;
@@ -179,7 +224,6 @@ export class StoriesComponent implements OnInit, OnDestroy {
     setTimeout(() => this.onTrackScroll(), 300);
   }
 
-  // ─── Crear historia ────────────────────────────────────────────
   openCreateStory(): void {
     this.showCreateModal = true;
   }
@@ -210,7 +254,6 @@ export class StoriesComponent implements OnInit, OnDestroy {
   removeStoryFile(event: Event): void {
     event.stopPropagation();
     this.storyImageFile = null;
-
     this.storyImagePreview = null;
   }
 
@@ -238,7 +281,20 @@ export class StoriesComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (newStory) => {
-          this.myActiveStory = newStory;
+          const existing = this.myActiveStories;
+          if (existing) {
+            existing.stories.unshift(newStory);
+            existing.latestTime = newStory.timeAgo;
+          } else {
+            this.myActiveStories = {
+              userId: this.user!.id!,
+              userName: this.user!.name,
+              userAvatar: this.user!.avatarUrl,
+              stories: [newStory],
+              allSeen: false,
+              latestTime: newStory.timeAgo,
+            };
+          }
           this.closeCreateModal();
           this.storyPublished.emit();
         },
@@ -246,11 +302,10 @@ export class StoriesComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Agrega este método para abrir tu propia historia
   openMyStory(): void {
-    if (this.myActiveStory) {
-      this.activeStory = this.myActiveStory;
-      this.currentStoryIndex = -1; // índice especial: es mi historia
+    if (this.myActiveStories) {
+      this.activeGroup = this.myActiveStories;
+      this.currentStoryIndex = 0;
       this.showViewerModal = true;
       this.storyProgress = 0;
       this.storyAutoPlay = true;
@@ -259,44 +314,46 @@ export class StoriesComponent implements OnInit, OnDestroy {
       this.openCreateStory();
     }
   }
-  // ─── Visor ─────────────────────────────────────────────────────
-  openStory(story: Story): void {
-    this.currentStoryIndex = this.stories.findIndex((s) => s.id === story.id);
-    this.activeStory = story;
+
+  openStory(group: UserStoryGroup): void {
+    this.activeGroup = group;
+    this.currentStoryIndex = 0;
     this.showViewerModal = true;
     this.storyProgress = 0;
     this.storyAutoPlay = true;
     this.startProgress();
 
-    if (!story.seen && this.user?.id) {
+    this.marcarVistasPendientes();
+  }
+
+  private marcarVistasPendientes(): void {
+    if (!this.activeGroup || !this.user?.id) return;
+    const unviewed = this.activeGroup.stories.filter((s) => !s.seen);
+    for (const story of unviewed) {
       story.seen = true;
       this.historiaService
         .marcarVista(story.id, this.user.id)
-        .subscribe({ error: (e) => console.warn('marcarVista error:', e) });
+        .subscribe({ error: () => {} });
     }
+    this.activeGroup.allSeen = this.activeGroup.stories.every((s) => s.seen);
   }
 
   closeViewer(): void {
     this.showViewerModal = false;
-    this.activeStory = null;
+    this.activeGroup = null;
+    this.currentStoryIndex = 0;
     this.storyReplyText = '';
     this.clearProgressInterval();
   }
 
   nextStory(event?: Event): void {
     event?.stopPropagation();
-    if (this.currentStoryIndex < this.stories.length - 1) {
+    if (!this.activeGroup) return;
+
+    if (this.currentStoryIndex < this.activeGroup.stories.length - 1) {
       this.currentStoryIndex++;
-      this.activeStory = this.stories[this.currentStoryIndex];
       this.storyProgress = 0;
       this.startProgress();
-      // Marcar vista
-      if (!this.activeStory.seen && this.user?.id) {
-        this.activeStory.seen = true;
-        this.historiaService
-          .marcarVista(this.activeStory.id, this.user.id)
-          .subscribe();
-      }
     } else {
       this.closeViewer();
     }
@@ -306,7 +363,6 @@ export class StoriesComponent implements OnInit, OnDestroy {
     event?.stopPropagation();
     if (this.currentStoryIndex > 0) {
       this.currentStoryIndex--;
-      this.activeStory = this.stories[this.currentStoryIndex];
       this.storyProgress = 0;
       this.startProgress();
     }
@@ -345,19 +401,24 @@ export class StoriesComponent implements OnInit, OnDestroy {
 
   sendStoryReply(): void {
     if (!this.storyReplyText.trim()) return;
-    // TODO: integrar con servicio de mensajes cuando esté disponible
     this.storyReplyText = '';
   }
 
-  sendQuickReaction(emoji: string): void {
+  sendQuickReaction(emoji: string): void {}
+
+  formatTime(fecha: string): string {
+    if (!fecha) return '';
+    const diff = (Date.now() - new Date(fecha).getTime()) / 1000;
+    if (diff < 60) return 'ahora';
+    if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`;
+    if (diff < 86400) return `hace ${Math.floor(diff / 3600)}h`;
+    return new Date(fecha).toLocaleDateString('es-PE', {
+      day: 'numeric',
+      month: 'short',
+    });
   }
 
-  trackByStoryId(_index: number, story: Story): string {
-    return story.id;
-  }
-
-  // Reemplaza el bloque "Tu historia" en el HTML — en el TS agrega este getter
-  get hasMyStory(): boolean {
-    return this.myActiveStory !== null;
+  trackByGroupId(_index: number, group: UserStoryGroup): string {
+    return group.userId;
   }
 }
