@@ -37,7 +37,7 @@
     *ngIf="showCreateModal"
     [user]="user"
     [categorias]="categorias"
-    (created)="onReportCreated()"
+    (created)="onReportCreated($event)"
     (cancelled)="showCreateModal = false">
   </app-create-report>
 

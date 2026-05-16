@@ -447,9 +447,13 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
   // ── Crear reporte ─────────────────────────────────────────────
-  onReportCreated(): void {
+  onReportCreated(queja?: Queja): void {
     this.showCreateModal = false;
-    this.loadPosts(true);
+    if (queja) {
+      this.posts = [queja, ...this.posts];
+    } else {
+      this.loadPosts(true);
+    }
     this.toast('¡Reporte publicado!');
   }
 
