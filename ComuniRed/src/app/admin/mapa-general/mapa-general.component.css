@@ -385,3 +385,27 @@
 .cat-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
 .filtro-counter { margin-top: 12px; text-align:center; padding:8px; background:var(--cr-background); border-radius:8px; border: 1px solid var(--cr-border);}
 .mapa-info { margin-top: 28px; display:flex; gap:1px; align-items:center; color:#6b7280; }
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.85);
+  z-index: 999;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--cr-text-muted);
+}
+.loading-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--cr-border);
+  border-top-color: var(--cr-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.map-loading { opacity: 0.4; pointer-events: none; }

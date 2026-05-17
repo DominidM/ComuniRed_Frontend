@@ -7,11 +7,12 @@ import { ReaccionService } from '../../services/reaccion.service';
 import { ComentarioService, Comentario } from '../../services/comentario.service';
 import { CategoriaService, Categoria } from '../../services/categoria.service';
 import { UsuarioService } from '../../services/usuario.service';
+import { MapComponent } from '../../shared/map/map.component';
 
 @Component({
   selector: 'app-trending',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MapComponent],
   templateUrl: './trending.component.html',
   styleUrls: ['./trending.component.css']
 })
@@ -259,18 +260,26 @@ export class TrendingComponent implements OnInit {
   isQuejaPendiente(post: Queja): boolean { return post.estado?.clave === 'pendiente' || post.estado?.clave === 'aprobada'; }
 
   // ── Reacciones ────────────────────────────────────
+  reactionHideTimers: { [id: string]: any } = {};
   closeAllReactionMenus(): void { this.showReactionMenu = {}; }
 
-  toggleReactionMenu(postId: string, event: Event): void {
-    event.stopPropagation();
+  onReactionHover(postId: string): void {
+    if (this.reactionHideTimers[postId]) clearTimeout(this.reactionHideTimers[postId]);
     Object.keys(this.showReactionMenu).forEach(k => { if (k !== postId) this.showReactionMenu[k] = false; });
-    this.showReactionMenu[postId] = !this.showReactionMenu[postId];
+    this.showReactionMenu[postId] = true;
+  }
+
+  onReactionLeave(postId: string): void {
+    this.reactionHideTimers[postId] = setTimeout(() => {
+      this.showReactionMenu[postId] = false;
+    }, 300);
   }
 
   selectReaction(post: Queja, type: string, event: Event): void {
     event.stopPropagation();
     this.toggleReaction(post, type);
     this.showReactionMenu[post.id] = false;
+    if (this.reactionHideTimers[post.id]) clearTimeout(this.reactionHideTimers[post.id]);
   }
 
   toggleReaction(post: Queja, type: string): void {

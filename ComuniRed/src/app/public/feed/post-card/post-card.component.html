@@ -20,6 +20,10 @@
               <i class="pi pi-map-marker meta-icon"></i>
               <span class="post-location">{{ post.ubicacion }}</span>
             </ng-container>
+            <ng-container *ngIf="post.lat && post.lng">
+              <span class="dot-sep">•</span>
+              <app-map [lat]="post.lat" [lng]="post.lng"></app-map>
+            </ng-container>
           </div>
         </div>
 
@@ -143,24 +147,27 @@
 
   <!-- Reacciones -->
   <div class="reactions-bar">
-    <div class="reaction-picker-container">
+    <div class="reaction-picker-container"
+      (mouseenter)="onReactionHover()"
+      (mouseleave)="onReactionLeave()">
       <button class="reaction-btn"
-        [class.active]="post.reactions?.userReaction"
-        (click)="toggleReactionMenu($event)">
+        [class.active]="post.reactions?.userReaction">
         <i class="pi pi-heart"></i>
         <span class="count">{{ post.reactions?.total || 0 }}</span>
       </button>
 
       <div *ngIf="showReactionMenu"
-        class="reactions-menu"
-        (click)="$event.stopPropagation()">
+        class="reactions-menu-horizontal"
+        (click)="$event.stopPropagation()"
+        (mouseenter)="onReactionHover()"
+        (mouseleave)="onReactionLeave()">
         <button *ngFor="let r of reactions"
-          class="reaction-option"
+          class="reaction-option-h"
           [class.selected]="post.reactions?.userReaction === r.type"
+          [title]="r.label"
           (click)="selectReaction(r.type, $event)">
           <i [class]="r.icon"></i>
-          <span class="label">{{ r.label }}</span>
-          <span class="count-small">{{ getReactionCount(r.type) }}</span>
+          <span class="reaction-label-hint">{{ r.label }}</span>
         </button>
       </div>
     </div>

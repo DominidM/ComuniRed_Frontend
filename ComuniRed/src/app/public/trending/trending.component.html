@@ -132,6 +132,10 @@
                     <i class="bi bi-geo-alt"></i>
                     <span>{{ reporte.ubicacion }}</span>
                   </ng-container>
+                  <ng-container *ngIf="reporte.lat && reporte.lng">
+                    <span class="dot-sep">·</span>
+                    <app-map [lat]="reporte.lat" [lng]="reporte.lng"></app-map>
+                  </ng-container>
                 </div>
               </div>
 
@@ -234,28 +238,53 @@
 
         <!-- REACCIONES -->
         <div class="reactions-bar">
-          <div class="reaction-picker-container">
+          <div class="reaction-picker-container"
+            (mouseenter)="onReactionHover(reporte.id)"
+            (mouseleave)="onReactionLeave(reporte.id)">
             <button class="reaction-btn main-reaction"
-              [class.active]="reporte.reactions.userReaction"
-              (click)="toggleReactionMenu(reporte.id, $event)">
-              <span class="reaction-emoji">{{ reporte.reactions.userReaction ? getReactionIcon(reporte.reactions.userReaction) : '👍' }}</span>
+              [class.active]="reporte.reactions.userReaction">
+              <i class="bi bi-heart"></i>
               <span class="count">{{ reporte.reactions.total || 0 }}</span>
             </button>
-            <div *ngIf="showReactionMenu[reporte.id]" class="reactions-menu" (click)="$event.stopPropagation()">
-              <button class="reaction-option" (click)="selectReaction(reporte, 'like', $event)" [class.selected]="reporte.reactions.userReaction === 'like'">
-                <span class="emoji">❤️</span><span class="label">Me gusta</span><span class="count-small">{{ getReactionCount(reporte, 'like') }}</span>
+            <div *ngIf="showReactionMenu[reporte.id]"
+              class="reactions-menu-horizontal"
+              (click)="$event.stopPropagation()"
+              (mouseenter)="onReactionHover(reporte.id)"
+              (mouseleave)="onReactionLeave(reporte.id)">
+              <button class="reaction-option-h"
+                [class.selected]="reporte.reactions.userReaction === 'like'"
+                title="Me gusta"
+                (click)="selectReaction(reporte, 'like', $event)">
+                <i class="bi bi-heart"></i>
+                <span class="reaction-label-hint">Me gusta</span>
               </button>
-              <button class="reaction-option" (click)="selectReaction(reporte, 'love', $event)" [class.selected]="reporte.reactions.userReaction === 'love'">
-                <span class="emoji">😍</span><span class="label">Me encanta</span><span class="count-small">{{ getReactionCount(reporte, 'love') }}</span>
+              <button class="reaction-option-h"
+                [class.selected]="reporte.reactions.userReaction === 'love'"
+                title="Me encanta"
+                (click)="selectReaction(reporte, 'love', $event)">
+                <i class="bi bi-star-fill"></i>
+                <span class="reaction-label-hint">Me encanta</span>
               </button>
-              <button class="reaction-option" (click)="selectReaction(reporte, 'wow', $event)" [class.selected]="reporte.reactions.userReaction === 'wow'">
-                <span class="emoji">😮</span><span class="label">Me asombra</span><span class="count-small">{{ getReactionCount(reporte, 'wow') }}</span>
+              <button class="reaction-option-h"
+                [class.selected]="reporte.reactions.userReaction === 'wow'"
+                title="Me asombra"
+                (click)="selectReaction(reporte, 'wow', $event)">
+                <i class="bi bi-emoji-astonished"></i>
+                <span class="reaction-label-hint">Me asombra</span>
               </button>
-              <button class="reaction-option" (click)="selectReaction(reporte, 'helpful', $event)" [class.selected]="reporte.reactions.userReaction === 'helpful'">
-                <span class="emoji">👍</span><span class="label">Útil</span><span class="count-small">{{ getReactionCount(reporte, 'helpful') }}</span>
+              <button class="reaction-option-h"
+                [class.selected]="reporte.reactions.userReaction === 'helpful'"
+                title="Util"
+                (click)="selectReaction(reporte, 'helpful', $event)">
+                <i class="bi bi-hand-thumbs-up"></i>
+                <span class="reaction-label-hint">Util</span>
               </button>
-              <button class="reaction-option" (click)="selectReaction(reporte, 'dislike', $event)" [class.selected]="reporte.reactions.userReaction === 'dislike'">
-                <span class="emoji">👎</span><span class="label">No me gusta</span><span class="count-small">{{ getReactionCount(reporte, 'dislike') }}</span>
+              <button class="reaction-option-h"
+                [class.selected]="reporte.reactions.userReaction === 'dislike'"
+                title="No me gusta"
+                (click)="selectReaction(reporte, 'dislike', $event)">
+                <i class="bi bi-hand-thumbs-down"></i>
+                <span class="reaction-label-hint">No me gusta</span>
               </button>
             </div>
           </div>

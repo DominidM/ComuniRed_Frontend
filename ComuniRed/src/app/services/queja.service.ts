@@ -128,6 +128,8 @@ const OBTENER_QUEJAS_PAGINADAS = gql`
         titulo
         descripcion
         ubicacion
+        lat
+        lng
         imagen_url
         fecha_creacion
         nivel_riesgo
@@ -188,6 +190,8 @@ const OBTENER_QUEJAS = gql`
       titulo
       descripcion
       ubicacion
+      lat
+      lng
       imagen_url
       fecha_creacion
       nivel_riesgo
@@ -254,6 +258,8 @@ const OBTENER_QUEJA_POR_ID = gql`
       titulo
       descripcion
       ubicacion
+      lat
+      lng
       imagen_url
       fecha_creacion
       nivel_riesgo
@@ -323,6 +329,8 @@ const QUEJAS_POR_USUARIO = gql`
       titulo
       descripcion
       ubicacion
+      lat
+      lng
       imagen_url
       fecha_creacion
       fecha_actualizacion
@@ -379,6 +387,8 @@ const QUEJAS_APROBADAS = gql`
       titulo
       descripcion
       ubicacion
+      lat
+      lng
       imagen_url
       fecha_creacion
       nivel_riesgo

@@ -5,11 +5,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Queja, Usuario } from '../../../services/queja.service';
 import { CommentsComponent } from '../comments/comments.component';
+import { MapComponent } from '../../../shared/map/map.component';
 
 @Component({
   selector: 'app-post-card',
   standalone: true,
-  imports: [CommonModule, FormsModule, CommentsComponent],
+  imports: [CommonModule, FormsModule, CommentsComponent, MapComponent],
   templateUrl: './post-card.component.html',
   styleUrls: ['./post-card.component.css']
 })
@@ -40,29 +41,32 @@ export class PostCardComponent {
   @Output() editingTextChange = new EventEmitter<string>();
 
   showReactionMenu = false;
+  hideTimeout: any = null;
 
   reactions = [
     { type: 'like',    icon: 'pi pi-heart',     label: 'Me gusta' },
     { type: 'love',    icon: 'pi pi-star-fill',  label: 'Me encanta' },
     { type: 'wow',     icon: 'pi pi-eye',        label: 'Me asombra' },
-    { type: 'helpful', icon: 'pi pi-thumbs-up',  label: 'Útil' },
+    { type: 'helpful', icon: 'pi pi-thumbs-up',  label: 'Util' },
     { type: 'dislike', icon: 'pi pi-thumbs-down', label: 'No me gusta' },
   ];
 
-  @HostListener('document:click')
-  onDocumentClick(): void {
-    this.showReactionMenu = false;
+  onReactionHover(): void {
+    if (this.hideTimeout) clearTimeout(this.hideTimeout);
+    this.showReactionMenu = true;
   }
 
-  toggleReactionMenu(event: Event): void {
-    event.stopPropagation();
-    this.showReactionMenu = !this.showReactionMenu;
+  onReactionLeave(): void {
+    this.hideTimeout = setTimeout(() => {
+      this.showReactionMenu = false;
+    }, 300);
   }
 
   selectReaction(type: string, event: Event): void {
     event.stopPropagation();
     this.reactionToggled.emit({ post: this.post, type });
     this.showReactionMenu = false;
+    if (this.hideTimeout) clearTimeout(this.hideTimeout);
   }
 
   getAvatarUrl(): string {
