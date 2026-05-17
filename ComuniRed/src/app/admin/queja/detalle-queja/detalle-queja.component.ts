@@ -2,7 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { QuejaService, Queja, HistorialEvento } from '../../../services/queja.service';
+import {
+  QuejaService,
+  Queja,
+  HistorialEvento,
+} from '../../../services/queja.service';
 import { UsuarioService } from '../../../services/usuario.service';
 import { EstadosQuejaService } from '../../../services/estado-queja.service';
 import { LoadingOverlayComponent } from '../../../shared/components/loading/loading.component';
@@ -14,12 +18,23 @@ interface EstadoQueja {
   clave?: string;
 }
 
-type Tab = 'info' | 'editar' | 'estado' | 'evidencias' | 'comentarios' | 'historial';
+type Tab =
+  | 'info'
+  | 'editar'
+  | 'estado'
+  | 'evidencias'
+  | 'comentarios'
+  | 'historial';
 
 @Component({
   selector: 'app-detalle-queja',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent, WorkspaceHeaderComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    LoadingOverlayComponent,
+    WorkspaceHeaderComponent,
+  ],
   templateUrl: './detalle-queja.component.html',
   styleUrls: ['./detalle-queja.component.css'],
 })
@@ -35,7 +50,6 @@ export class DetalleQuejaComponent implements OnInit {
 
   activeTab: Tab = 'info';
 
-  // Edición
   editData = {
     titulo: '',
     descripcion: '',
@@ -43,7 +57,6 @@ export class DetalleQuejaComponent implements OnInit {
     imagen_url: '',
   };
 
-  // Cambio de estado
   nuevoEstadoId = '';
   nuevoEstadoClave = '';
   observacionEstado = '';
@@ -60,36 +73,47 @@ export class DetalleQuejaComponent implements OnInit {
 
   ngOnInit(): void {
     this.quejaId = this.route.snapshot.paramMap.get('id') || '';
+
     if (!this.quejaId) {
       this.router.navigate(['/admin/queja']);
       return;
     }
+
     this.loadEstados();
     this.loadQueja();
   }
 
-  // ── Tabs ──────────────────────────────────────────────────────────
   setTab(tab: Tab): void {
     this.activeTab = tab;
+
     if (tab === 'historial' && this.historial.length === 0) {
       this.loadHistorial();
     }
   }
 
-  // ── Carga ─────────────────────────────────────────────────────────
   loadQueja(): void {
     this.loading = true;
+
     const user = this.usuarioService.getUser();
     const userId = user ? (user as any).id : '';
 
     this.quejaService.obtenerQuejaPorId(this.quejaId, userId).subscribe({
-      next: (q) => {
+      next: (q: Queja | null) => {
+        if (!q) {
+          console.warn('No se encontró la queja con id:', this.quejaId);
+          this.queja = null;
+          this.loading = false;
+          this.router.navigate(['/admin/queja']);
+          return;
+        }
+
         this.queja = q;
         this.resetEditData(q);
         this.loading = false;
       },
       error: (err) => {
         console.error('Error cargando queja:', err);
+        this.queja = null;
         this.loading = false;
       },
     });
@@ -104,28 +128,32 @@ export class DetalleQuejaComponent implements OnInit {
           clave: e.clave,
         }));
       },
-      error: () => { this.estados = []; },
+      error: () => {
+        this.estados = [];
+      },
     });
   }
 
   loadHistorial(): void {
     this.loadingHistorial = true;
+
     this.quejaService.obtenerHistorialPorQueja(this.quejaId).subscribe({
       next: (h) => {
         this.historial = h;
         this.loadingHistorial = false;
       },
-      error: () => { this.loadingHistorial = false; },
+      error: () => {
+        this.loadingHistorial = false;
+      },
     });
   }
 
-  // ── Edición ───────────────────────────────────────────────────────
-  private resetEditData(q: Queja): void {
+  private resetEditData(q: Queja | null | undefined): void {
     this.editData = {
-      titulo:      q.titulo      || '',
-      descripcion: q.descripcion || '',
-      ubicacion:   q.ubicacion   || '',
-      imagen_url:  q.imagen_url  || '',
+      titulo: q?.titulo || '',
+      descripcion: q?.descripcion || '',
+      ubicacion: q?.ubicacion || '',
+      imagen_url: q?.imagen_url || '',
     };
   }
 
@@ -138,10 +166,10 @@ export class DetalleQuejaComponent implements OnInit {
     this.savingEdit = true;
 
     const body = {
-      titulo:      this.editData.titulo,
+      titulo: this.editData.titulo,
       descripcion: this.editData.descripcion,
-      ubicacion:   this.editData.ubicacion,
-      imagenUrl:   this.editData.imagen_url,
+      ubicacion: this.editData.ubicacion,
+      imagenUrl: this.editData.imagen_url,
     };
 
     fetch(`http://localhost:8080/api/quejas/${this.quejaId}`, {
@@ -166,16 +194,18 @@ export class DetalleQuejaComponent implements OnInit {
   }
 
   cancelEdit(): void {
-    if (this.queja) this.resetEditData(this.queja);
+    if (this.queja) {
+      this.resetEditData(this.queja);
+    }
     this.setTab('info');
   }
 
-  // ── Cambio de estado ──────────────────────────────────────────────
   onEstadoSelect(event: Event): void {
     const target = event.target as HTMLSelectElement;
     const estadoId = target.value;
     const encontrado = this.estados.find((e) => e.id === estadoId);
-    this.nuevoEstadoId    = estadoId;
+
+    this.nuevoEstadoId = estadoId;
     this.nuevoEstadoClave = encontrado?.clave || '';
   }
 
@@ -184,13 +214,19 @@ export class DetalleQuejaComponent implements OnInit {
       alert('Selecciona un estado');
       return;
     }
+
     if (this.nuevoEstadoId === this.queja?.estado?.id) {
       alert('El estado seleccionado es el mismo que el actual');
       return;
     }
 
-    this.savingEstado = true;
     const user = this.usuarioService.getUser();
+    if (!user) {
+      alert('No hay usuario autenticado');
+      return;
+    }
+
+    this.savingEstado = true;
 
     this.quejaService
       .cambiarEstadoQueja(
@@ -207,22 +243,24 @@ export class DetalleQuejaComponent implements OnInit {
               estado: quejaActualizada.estado,
             };
           }
-          this.savingEstado    = false;
-          this.nuevoEstadoId   = '';
+
+          this.savingEstado = false;
+          this.nuevoEstadoId = '';
           this.nuevoEstadoClave = '';
           this.observacionEstado = '';
+
           alert(`Estado cambiado a: ${quejaActualizada.estado?.nombre}`);
           this.setTab('info');
         },
         error: (err) => {
           this.savingEstado = false;
-          const msg = err?.graphQLErrors?.[0]?.message || 'Error al cambiar estado';
+          const msg =
+            err?.graphQLErrors?.[0]?.message || 'Error al cambiar estado';
           alert(msg);
         },
       });
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────
   volver(): void {
     this.router.navigate(['/admin/queja']);
   }
@@ -230,29 +268,29 @@ export class DetalleQuejaComponent implements OnInit {
   getEstadoClass(clave?: string): string {
     if (!clave) return 'estado-default';
     const c = clave.toLowerCase();
-    if (c.includes('pendiente'))                        return 'estado-pendiente';
+    if (c.includes('pendiente')) return 'estado-pendiente';
     if (c.includes('aprobado') || c.includes('espera')) return 'estado-aprobado';
-    if (c.includes('votaci'))                           return 'estado-votacion';
-    if (c.includes('proceso'))                          return 'estado-proceso';
-    if (c.includes('resuel'))                           return 'estado-resuelto';
-    if (c.includes('rechaz'))                           return 'estado-rechazado';
+    if (c.includes('votaci')) return 'estado-votacion';
+    if (c.includes('proceso')) return 'estado-proceso';
+    if (c.includes('resuel')) return 'estado-resuelto';
+    if (c.includes('rechaz')) return 'estado-rechazado';
     return 'estado-default';
   }
 
   getRiesgoClass(nivel?: string): string {
     if (!nivel) return 'riesgo-default';
     const n = nivel.toLowerCase();
-    if (n === 'alto')   return 'riesgo-alto';
-    if (n === 'medio')  return 'riesgo-medio';
-    if (n === 'bajo')   return 'riesgo-bajo';
+    if (n === 'alto') return 'riesgo-alto';
+    if (n === 'medio') return 'riesgo-medio';
+    if (n === 'bajo') return 'riesgo-bajo';
     return 'riesgo-default';
   }
 
   getTipoEvidenciaIcon(tipo: string): string {
     const t = tipo?.toLowerCase() || '';
-    if (t.includes('video'))  return '🎥';
-    if (t.includes('audio'))  return '🎵';
-    if (t.includes('pdf'))    return '📄';
+    if (t.includes('video')) return '🎥';
+    if (t.includes('audio')) return '🎵';
+    if (t.includes('pdf')) return '📄';
     return '🖼️';
   }
 }

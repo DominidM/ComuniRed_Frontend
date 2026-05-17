@@ -7,31 +7,84 @@
   position: relative;
 }
 
-/* Overlay sobre el contenido proyectado */
 .loading-overlay {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--cr-background) 80%, transparent);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  background: color-mix(in srgb, var(--cr-background) 82%, transparent);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 14px;
   z-index: 50;
   border-radius: inherit;
   min-height: 120px;
-  gap: 12px;
 }
 
-/* Spinner usando el color primario del sistema */
-.spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid var(--cr-border);
-  border-top-color: var(--cr-primary);
+.comunired-loader {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-ring {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cr-brand-red) 18%, transparent);
+  animation: pulseRing 1.8s ease-out infinite;
+}
+
+.map-pin {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  background: var(--cr-brand-red);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--cr-brand-red) 35%, transparent);
+  animation: pinFloat 1.6s ease-in-out infinite;
+}
+
+.pin-core {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--cr-background);
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  top: 11px;
+  left: 11px;
+}
+
+.loader-road {
+  position: absolute;
+  bottom: -8px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-road span {
+  width: 10px;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cr-primary) 65%, var(--cr-border));
+  animation: roadMove 1.2s infinite ease-in-out;
+}
+
+.loader-road span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.loader-road span:nth-child(3) {
+  animation-delay: 0.3s;
 }
 
 .loading-text {
@@ -41,8 +94,37 @@
   letter-spacing: 0.01em;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.72);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.18);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.18);
+    opacity: 0;
+  }
+}
+
+@keyframes pinFloat {
+  0%, 100% {
+    transform: rotate(-45deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-45deg) translateY(-4px);
+  }
+}
+
+@keyframes roadMove {
+  0%, 100% {
+    transform: scaleX(0.85);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scaleX(1.2);
+    opacity: 1;
   }
 }

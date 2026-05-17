@@ -1,7 +1,21 @@
 <div class="loading-container">
   <ng-content></ng-content>
+
   <div class="loading-overlay" *ngIf="loading">
-    <div class="spinner"></div>
+    <div class="comunired-loader" aria-hidden="true">
+      <div class="pulse-ring"></div>
+
+      <div class="map-pin">
+        <div class="pin-core"></div>
+      </div>
+
+      <div class="loader-road">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
     <span class="loading-text">{{ text }}</span>
   </div>
 </div>

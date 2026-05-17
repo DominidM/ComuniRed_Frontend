@@ -254,6 +254,7 @@ const OBTENER_QUEJA_POR_ID = gql`
       ubicacion
       imagen_url
       fecha_creacion
+      fecha_actualizacion
       nivel_riesgo
       fecha_clasificacion
       clasificado_por_id
@@ -273,12 +274,6 @@ const OBTENER_QUEJA_POR_ID = gql`
         clave
         nombre
       }
-      evidence {
-        id
-        url
-        tipo
-        fecha_subida
-      }
       votes {
         yes
         no
@@ -287,25 +282,6 @@ const OBTENER_QUEJA_POR_ID = gql`
       reactions {
         total
         userReaction
-        counts {
-          like
-          love
-          wow
-          helpful
-          dislike
-          report
-        }
-      }
-      comments {
-        id
-        texto
-        fecha_creacion
-        author {
-          id
-          nombre
-          apellido
-          foto_perfil
-        }
       }
       commentsCount
       canVote
@@ -659,7 +635,7 @@ export class QuejaService {
       })
       .pipe(map((result) => result.data?.obtenerQuejasPaginadas as QuejasPage));
   }
-  
+
   obtenerQuejasAdminPaginadas(
     usuarioActualId: string,
     page: number,
@@ -691,15 +667,25 @@ export class QuejaService {
       );
   }
 
-  obtenerQuejaPorId(id: string, usuarioActualId: string): Observable<Queja> {
+  obtenerQuejaPorId(
+    id: string,
+    usuarioActualId: string,
+  ): Observable<Queja | null> {
     return this.apollo
-      .watchQuery<{ obtenerQuejaPorId: Queja }>({
+      .query<any, { id: string; usuarioActualId: string }>({
         query: OBTENER_QUEJA_POR_ID,
         variables: { id, usuarioActualId },
         fetchPolicy: 'network-only',
+        errorPolicy: 'all',
       })
-      .valueChanges.pipe(
-        map((result) => result.data?.obtenerQuejaPorId as Queja),
+      .pipe(
+        map((result) => {
+          console.log('GraphQL result obtenerQuejaPorId:', result);
+          console.log('GraphQL data:', result.data);
+          console.log('GraphQL errors:', result.error);
+
+          return result.data?.obtenerQuejaPorId ?? null;
+        }),
       );
   }
 
