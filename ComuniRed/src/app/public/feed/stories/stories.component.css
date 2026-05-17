@@ -566,16 +566,37 @@ html[data-bs-theme="dark"] {
   display: flex; flex-direction: column;
 }
 
-.story-progress-bar {
+.story-progress-container {
   position: absolute;
   top: 10px; left: 12px; right: 12px;
   height: 3px;
-  background: rgba(255,255,255,0.25);
-  border-radius: 2px; z-index: 10; overflow: hidden;
+  display: flex;
+  gap: 3px;
+  z-index: 10;
 }
-.story-progress-fill {
-  height: 100%; background: #fff;
-  border-radius: 2px; transition: width 0.1s linear;
+
+.story-progress-segment {
+  flex: 1;
+  height: 100%;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.story-progress-segment .story-progress-fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+.story-progress-segment .story-progress-fill.done {
+  width: 100% !important;
+  background: rgba(255,255,255,0.7);
+}
+
+.story-progress-segment .story-progress-fill.active {
+  background: #fff;
 }
 
 .story-viewer-header {

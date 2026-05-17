@@ -7,6 +7,8 @@ export interface Queja {
   titulo: string;
   descripcion: string;
   ubicacion?: string;
+  lat?: number;
+  lng?: number;
   imagen_url?: string;
   fecha_creacion: string;
   fecha_actualizacion?: string;
@@ -126,6 +128,8 @@ const OBTENER_QUEJAS_PAGINADAS = gql`
         titulo
         descripcion
         ubicacion
+        lat
+        lng
         imagen_url
         fecha_creacion
         nivel_riesgo
@@ -186,6 +190,8 @@ const OBTENER_QUEJAS = gql`
       titulo
       descripcion
       ubicacion
+      lat
+      lng
       imagen_url
       fecha_creacion
       nivel_riesgo
@@ -252,6 +258,8 @@ const OBTENER_QUEJA_POR_ID = gql`
       titulo
       descripcion
       ubicacion
+      lat
+      lng
       imagen_url
       fecha_creacion
       fecha_actualizacion
@@ -297,6 +305,8 @@ const QUEJAS_POR_USUARIO = gql`
       titulo
       descripcion
       ubicacion
+      lat
+      lng
       imagen_url
       fecha_creacion
       fecha_actualizacion
@@ -353,6 +363,8 @@ const QUEJAS_APROBADAS = gql`
       titulo
       descripcion
       ubicacion
+      lat
+      lng
       imagen_url
       fecha_creacion
       nivel_riesgo
@@ -432,6 +444,8 @@ const CREAR_QUEJA = gql`
     $descripcion: String!
     $categoriaId: ID!
     $ubicacion: String
+    $lat: Float
+    $lng: Float
     $usuarioId: ID!
   ) {
     crearQueja(
@@ -439,17 +453,22 @@ const CREAR_QUEJA = gql`
       descripcion: $descripcion
       categoriaId: $categoriaId
       ubicacion: $ubicacion
+      lat: $lat
+      lng: $lng
       usuarioId: $usuarioId
     ) {
       id
       titulo
       descripcion
       ubicacion
+      lat
+      lng
       imagen_url
       usuario {
         id
         nombre
         apellido
+        foto_perfil
       }
       categoria {
         id
@@ -460,6 +479,26 @@ const CREAR_QUEJA = gql`
         nombre
         clave
       }
+      votes {
+        yes
+        no
+        total
+      }
+      reactions {
+        total
+        userReaction
+        counts {
+          like
+          love
+          wow
+          helpful
+          dislike
+          report
+        }
+      }
+      commentsCount
+      canVote
+      userVote
     }
   }
 `;
@@ -492,6 +531,7 @@ const ACTUALIZAR_QUEJA = gql`
         id
         nombre
         apellido
+        foto_perfil
       }
       categoria {
         id
@@ -502,6 +542,26 @@ const ACTUALIZAR_QUEJA = gql`
         clave
         nombre
       }
+      votes {
+        yes
+        no
+        total
+      }
+      reactions {
+        total
+        userReaction
+        counts {
+          like
+          love
+          wow
+          helpful
+          dislike
+          report
+        }
+      }
+      commentsCount
+      canVote
+      userVote
     }
   }
 `;
@@ -739,23 +799,25 @@ export class QuejaService {
     usuarioId: string,
     ubicacion?: string,
     imagen?: File,
+    lat?: number,
+    lng?: number,
   ): Observable<Queja> {
+    const buildVars = (): any => {
+      const v: any = { titulo, descripcion, categoriaId, usuarioId };
+      if (ubicacion) v.ubicacion = ubicacion;
+      if (lat != null) v.lat = lat;
+      if (lng != null) v.lng = lng;
+      return v;
+    };
+
     if (imagen) {
       return new Observable<Queja>((observer) => {
         this.subirImagenCloudinary(imagen)
-          .then((imagenUrl) => {
-            const createVars: any = {
-              titulo,
-              descripcion,
-              categoriaId,
-              usuarioId,
-            };
-            if (ubicacion) createVars.ubicacion = ubicacion;
-
-            return this.apollo
+          .then((imagenUrl) =>
+            this.apollo
               .mutate<{ crearQueja: Queja }>({
                 mutation: CREAR_QUEJA,
-                variables: createVars,
+                variables: buildVars(),
               })
               .toPromise()
               .then((result) => {
@@ -767,8 +829,8 @@ export class QuejaService {
                     variables: { id: queja.id, imagen_url: imagenUrl },
                   })
                   .toPromise();
-              });
-          })
+              })
+          )
           .then((result) => {
             const quejaFinal = result?.data?.actualizarQueja;
             if (!quejaFinal) throw new Error('No se pudo actualizar la imagen');
@@ -779,11 +841,8 @@ export class QuejaService {
       });
     }
 
-    const variables: any = { titulo, descripcion, categoriaId, usuarioId };
-    if (ubicacion) variables.ubicacion = ubicacion;
-
     return this.apollo
-      .mutate<{ crearQueja: Queja }>({ mutation: CREAR_QUEJA, variables })
+      .mutate<{ crearQueja: Queja }>({ mutation: CREAR_QUEJA, variables: buildVars() })
       .pipe(map((result) => result.data!.crearQueja as Queja));
   }
 

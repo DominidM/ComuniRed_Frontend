@@ -50,8 +50,13 @@
         </div>
 
         <div class="mapa-canvas">
-          <!-- Contenedor definitivo para Leaflet -->
-          <div #mapaCanvas class="leaflet-map"></div>
+          @if (loading) {
+            <div class="loading-overlay">
+              <div class="loading-spinner"></div>
+              <span>Cargando quejas...</span>
+            </div>
+          }
+          <div #mapaCanvas class="leaflet-map" [class.map-loading]="loading"></div>
         </div>
       </div>
     </div>

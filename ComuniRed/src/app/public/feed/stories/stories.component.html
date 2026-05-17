@@ -1,6 +1,4 @@
-<!-- Componente de Historias -->
 <div class="stories-container">
-  <!-- Scroll izquierda -->
   <button
     class="scroll-btn scroll-left"
     *ngIf="showLeftArrow"
@@ -12,10 +10,10 @@
 
   <div class="stories-track" #storiesTrack (scroll)="onTrackScroll()">
 
-    <!-- Tu historia: anillo rojo si tienes historia, sin anillo si no -->
+    <!-- Tu historia -->
     <div class="story-item create-story" (click)="openMyStory()">
       <div class="story-avatar-wrapper">
-        <div class="story-ring" [class.unseen-ring]="myActiveStory">
+        <div class="story-ring" [class.unseen-ring]="hasMyStory">
           <img
             [src]="user?.avatarUrl || 'assets/img/default-avatar.png'"
             [alt]="user?.name"
@@ -29,30 +27,33 @@
       <span class="story-label">Tu historia</span>
     </div>
 
-    <!-- Historias de otros usuarios -->
+    <!-- Una burbuja por usuario con todas sus historias -->
     <div
-      *ngFor="let story of stories; trackBy: trackByStoryId"
+      *ngFor="let group of storyGroups; trackBy: trackByGroupId"
       class="story-item"
-      [class.unseen]="!story.seen"
-      [class.seen]="story.seen"
-      (click)="openStory(story)"
+      [class.unseen]="!group.allSeen"
+      [class.seen]="group.allSeen"
+      (click)="openStory(group)"
     >
       <div class="story-avatar-wrapper">
-        <div class="story-ring" [class.unseen-ring]="!story.seen">
+        <div class="story-ring" [class.unseen-ring]="!group.allSeen">
           <img
-            [src]="story.userAvatar || 'assets/img/default-avatar.png'"
-            [alt]="story.userName"
+            [src]="group.userAvatar || 'assets/img/default-avatar.png'"
+            [alt]="group.userName"
             class="story-avatar"
           />
         </div>
-        <div *ngIf="story.categoryEmoji" class="story-category-badge">
-          {{ story.categoryEmoji }}
+        <div
+          *ngIf="group.stories[0]?.categoryEmoji"
+          class="story-category-badge"
+        >
+          {{ group.stories[0]?.categoryEmoji }}
         </div>
       </div>
-      <span class="story-label">{{ truncateName(story.userName) }}</span>
+      <span class="story-label">{{ truncateName(group.userName) }}</span>
     </div>
 
-    <!-- Skeleton loaders mientras carga -->
+    <!-- Skeleton -->
     <ng-container *ngIf="loadingStories">
       <div *ngFor="let i of skeletonItems" class="story-item skeleton-story">
         <div class="story-avatar-wrapper">
@@ -65,7 +66,6 @@
     </ng-container>
   </div>
 
-  <!-- Scroll derecha -->
   <button
     class="scroll-btn scroll-right"
     *ngIf="showRightArrow"
@@ -76,7 +76,7 @@
   </button>
 </div>
 
-<!-- Modal Crear Historia -->
+<!-- Modal Crear -->
 <div
   *ngIf="showCreateModal"
   class="story-modal-overlay"
@@ -190,27 +190,35 @@
   </div>
 </div>
 
-<!-- Modal Ver Historia (Visor) -->
+<!-- Visor -->
 <div
-  *ngIf="showViewerModal && activeStory"
+  *ngIf="showViewerModal && activeGroup"
   class="story-viewer-overlay"
   (click)="closeViewer()"
 >
   <div class="story-viewer" (click)="$event.stopPropagation()">
-    <div class="story-progress-bar">
+
+    <!-- Barras de progreso: una por historia del usuario -->
+    <div class="story-progress-container">
       <div
-        class="story-progress-fill"
-        [style.width.%]="storyProgress"
-        [class.animating]="storyAutoPlay"
-      ></div>
+        *ngFor="let s of activeGroup.stories; let i = index"
+        class="story-progress-segment"
+      >
+        <div
+          class="story-progress-fill"
+          [class.active]="i === currentStoryIndex"
+          [class.done]="i < currentStoryIndex"
+          [style.width.%]="i === currentStoryIndex ? storyProgress : i < currentStoryIndex ? 100 : 0"
+        ></div>
+      </div>
     </div>
 
     <div class="story-viewer-header">
       <div class="story-viewer-user">
-        <img [src]="activeStory.userAvatar" class="viewer-avatar" />
+        <img [src]="activeGroup.userAvatar" class="viewer-avatar" />
         <div class="viewer-user-info">
-          <span class="viewer-name">{{ activeStory.userName }}</span>
-          <span class="viewer-time">{{ activeStory.timeAgo }}</span>
+          <span class="viewer-name">{{ activeGroup.userName }}</span>
+          <span class="viewer-time">{{ formatTime(activeGroup.stories[currentStoryIndex]?.timeAgo) }}</span>
         </div>
       </div>
       <div class="viewer-actions">
@@ -229,22 +237,18 @@
 
     <div
       class="story-viewer-content"
-      [style.background]="activeStory.bgColor || '#1a1a2e'"
+      [style.background]="activeGroup.stories[currentStoryIndex]?.bgColor || '#1a1a2e'"
     >
       <img
-        *ngIf="activeStory.imageUrl"
-        [src]="activeStory.imageUrl"
+        *ngIf="activeGroup.stories[currentStoryIndex]?.imageUrl"
+        [src]="activeGroup.stories[currentStoryIndex]?.imageUrl"
         class="story-viewer-img"
       />
-      <p *ngIf="activeStory.text" class="story-viewer-text">
-        {{ activeStory.text }}
+      <p *ngIf="activeGroup.stories[currentStoryIndex]?.text" class="story-viewer-text">
+        {{ activeGroup.stories[currentStoryIndex]?.text }}
       </p>
-      <div *ngIf="activeStory.categoryEmoji" class="story-viewer-badge">
-        {{ activeStory.categoryEmoji }} {{ activeStory.categoryName }}
-      </div>
     </div>
 
-    <!-- prev: no mostrar si es mi historia (índice -1) ni si es la primera -->
     <button
       class="story-nav prev"
       (click)="prevStory($event)"
@@ -253,11 +257,10 @@
       <i class="bi bi-chevron-left"></i>
     </button>
 
-    <!-- next: no mostrar si es mi historia (índice -1) ni si es la última -->
     <button
       class="story-nav next"
       (click)="nextStory($event)"
-      *ngIf="currentStoryIndex >= 0 && currentStoryIndex < stories.length - 1"
+      *ngIf="currentStoryIndex < activeGroup.stories.length - 1"
     >
       <i class="bi bi-chevron-right"></i>
     </button>

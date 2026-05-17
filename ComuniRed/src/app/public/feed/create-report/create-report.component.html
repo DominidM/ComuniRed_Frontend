@@ -1,77 +1,115 @@
 <div class="modal-overlay" (click)="cancelled.emit()">
   <div class="modal-container" (click)="$event.stopPropagation()">
 
-    <div class="modal-header">
-      <h2 class="modal-title">Crear Reporte</h2>
-      <button class="modal-close" (click)="cancelled.emit()">✕</button>
+    <!-- Success state -->
+    <div *ngIf="showSuccess" class="success-state">
+      <div class="success-icon">&#10003;</div>
+      <h2 class="success-title">¡Reporte Publicado!</h2>
+      <p class="success-text">Tu reporte ha sido enviado y está en votación ciudadana.</p>
+      <div class="success-loader"></div>
     </div>
 
-    <div class="modal-body">
-      <div class="modal-user">
-        <img [src]="user?.avatarUrl" class="modal-avatar"/>
-        <span class="modal-username">{{ user?.name }}</span>
+    <!-- Form -->
+    <ng-container *ngIf="!showSuccess">
+      <div class="modal-header">
+        <h2 class="modal-title">Crear Reporte</h2>
+        <button class="modal-close" (click)="cancelled.emit()">
+          <i class="pi pi-times"></i>
+        </button>
       </div>
 
-      <div class="create-form">
-        <div class="form-group">
-          <label class="form-label">Título del problema</label>
-          <input type="text" class="form-input"
-            [(ngModel)]="form.titulo"
-            placeholder="Ej: Bache peligroso en la avenida principal"
-            maxlength="100"/>
+      <div class="modal-body">
+        <div class="modal-user">
+          <img [src]="user?.avatarUrl" class="modal-avatar"/>
+          <span class="modal-username">{{ user?.name }}</span>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Descripción detallada</label>
-          <textarea class="form-textarea" rows="4"
-            [(ngModel)]="form.descripcion"
-            placeholder="Describe el problema de infraestructura..."></textarea>
-        </div>
+        <div class="create-form">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="pi pi-pencil form-label-icon"></i>
+              Título del problema
+            </label>
+            <input type="text" class="form-input"
+              [(ngModel)]="form.titulo"
+              placeholder="Ej: Bache peligroso en la avenida principal"
+              maxlength="100"/>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Categoría</label>
-          <select class="form-select" [(ngModel)]="form.categoriaId">
-            <option value="">Selecciona una categoría</option>
-            <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label class="form-label">
+              <i class="pi pi-align-left form-label-icon"></i>
+              Descripción detallada
+            </label>
+            <textarea class="form-textarea" rows="4"
+              [(ngModel)]="form.descripcion"
+              placeholder="Describe el problema de infraestructura..."></textarea>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">📍 Ubicación</label>
-          <input type="text" class="form-input"
-            [(ngModel)]="form.ubicacion"
-            placeholder="Ej: Av. Principal 123, San Isidro"/>
-        </div>
+          <div class="form-group">
+            <label class="form-label">
+              <i class="pi pi-tag form-label-icon"></i>
+              Categoría
+            </label>
+            <select class="form-select" [(ngModel)]="form.categoriaId">
+              <option value="">Selecciona una categoría</option>
+              <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">🖼️ Foto del problema (opcional, máx 5MB)</label>
-          <div class="upload-area" (click)="fileInput.click()">
-            <input #fileInput type="file" accept="image/*"
-              (change)="onFileSelected($event)"
-              style="display:none"/>
-
-            <div *ngIf="!form.imagenPreview" class="upload-placeholder">
-              <span class="upload-icon">📷</span>
-              <span class="upload-text">Click para subir una foto</span>
+          <div class="form-group">
+            <label class="form-label">
+              <i class="pi pi-map-marker form-label-icon"></i>
+              Ubicación en el mapa
+            </label>
+            <div #mapContainer class="map-picker"></div>
+            <div class="map-hint" *ngIf="!form.lat">
+              <i class="pi pi-info-circle"></i>
+              Haz clic en el mapa para marcar la ubicación exacta
             </div>
+            <div class="map-coords" *ngIf="form.lat">
+              <i class="pi pi-check-circle coords-icon"></i>
+              Punto seleccionado: {{ form.lat?.toFixed(6) }}, {{ form.lng?.toFixed(6) }}
+            </div>
+          </div>
 
-            <div *ngIf="form.imagenPreview" class="image-preview">
-              <img [src]="form.imagenPreview" alt="Preview"/>
-              <button type="button" class="remove-image" (click)="removeImage($event)">✕</button>
+          <div class="form-group">
+            <label class="form-label">
+              <i class="pi pi-image form-label-icon"></i>
+              Foto del problema <span class="label-optional">(opcional, máx 5MB)</span>
+            </label>
+            <div class="upload-area" (click)="fileInput.click()">
+              <input #fileInput type="file" accept="image/*"
+                (change)="onFileSelected($event)"
+                style="display:none"/>
+
+              <div *ngIf="!form.imagenPreview" class="upload-placeholder">
+                <i class="pi pi-camera upload-icon"></i>
+                <span class="upload-text">Click para subir una foto</span>
+              </div>
+
+              <div *ngIf="form.imagenPreview" class="image-preview">
+                <img [src]="form.imagenPreview" alt="Preview"/>
+                <button type="button" class="remove-image" (click)="removeImage($event)">
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-cancel" (click)="cancelled.emit()">Cancelar</button>
-      <button class="btn btn-primary"
-        (click)="submit()"
-        [disabled]="!isValid() || loading">
-        {{ loading ? 'Publicando...' : 'Publicar Reporte' }}
-      </button>
-    </div>
+      <div class="modal-footer">
+        <button class="btn btn-cancel" (click)="cancelled.emit()">Cancelar</button>
+        <button class="btn btn-primary"
+          (click)="submit()"
+          [disabled]="!isValid() || loading">
+          <i class="pi pi-send btn-icon" *ngIf="!loading"></i>
+          <i class="pi pi-spin pi-spinner btn-icon" *ngIf="loading"></i>
+          {{ loading ? 'Publicando...' : 'Publicar Reporte' }}
+        </button>
+      </div>
+    </ng-container>
 
   </div>
 </div>

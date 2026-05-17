@@ -362,3 +362,46 @@
     height: 340px;
   }
 }
+
+
+.mapa-container { padding: 18px; font-family: Inter, Roboto, Arial, sans-serif; color: var(--cr-text); background: var(--cr-background-content); min-height: 100vh; }
+.mapa-content { display: flex; gap: 18px; align-items: flex-start; }
+.filtros-sidebar { width: 260px; background: var(--cr-background); padding: 16px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.mapa-principal { flex: 1; }
+.mapa-card { background: var(--cr-background); border-radius: 8px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04);  }
+.mapa-card-header { margin-bottom: 12px; }
+.mapa-canvas { background: linear-gradient(180deg,#f8fafc,#f1f5f9); border-radius: 8px; padding: 2px; min-height: 220px; display:flex; align-items:stretch; }
+.leaflet-map { width: 100%; height: 620px; border-radius: 6px; }
+
+/* filtros */
+.filtro-section { margin-bottom: 12px; }
+.filtro-label { font-size: 12px; color: #6b7280; display:block; margin-bottom:8px; text-transform:uppercase; }
+.filtro-option { display:flex; align-items:center; gap:8px; width:100%; padding:8px 10px; border-radius:8px; border: none; background: var(--cr-background); margin-bottom:6px; cursor:pointer; text-align:left; }
+.filtro-option.active { outline: 2px solid #6366f1; background: var(--cr-background-content); }
+.cat-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
+.filtro-counter { margin-top: 12px; text-align:center; padding:8px; background:var(--cr-background); border-radius:8px; border: 1px solid var(--cr-border);}
+.mapa-info { margin-top: 28px; display:flex; gap:1px; align-items:center; color:#6b7280; }
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.85);
+  z-index: 999;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--cr-text-muted);
+}
+.loading-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--cr-border);
+  border-top-color: var(--cr-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.map-loading { opacity: 0.4; pointer-events: none; }

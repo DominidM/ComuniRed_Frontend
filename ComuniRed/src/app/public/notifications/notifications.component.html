@@ -1,12 +1,38 @@
 <div class="notifications-container">
-  <h2>Notificaciones</h2>
-  <div class="notification-card" *ngFor="let n of notifications">
-    <div class="notification-icon">
-      <img [src]="n.icon" alt="icono">
+  <div class="notifications-header">
+    <h2>Notificaciones</h2>
+    <button
+      class="mark-all-btn"
+      *ngIf="notifications.length > 0"
+      (click)="marcarTodasLeidas()"
+    >
+      Marcar todas como leídas
+    </button>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    Cargando notificaciones...
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && notifications.length === 0">
+    <mat-icon>notifications_none</mat-icon>
+    <p>No tienes notificaciones</p>
+  </div>
+
+  <div
+    class="notification-card"
+    *ngFor="let n of notifications"
+    [class.unread]="!n.leida"
+    (click)="marcarLeida(n)"
+  >
+    <div class="notification-icon" [class]="n.tipo">
+      <mat-icon>{{ getIcon(n.tipo) }}</mat-icon>
     </div>
     <div class="notification-content">
-      <p class="notification-text">{{ n.text }}</p>
-      <span class="notification-time">{{ n.time }}</span>
+      <p class="notification-title">{{ n.titulo }}</p>
+      <p class="notification-text">{{ n.cuerpo }}</p>
+      <span class="notification-time">{{ formatTime(n.fechaCreacion) }}</span>
     </div>
+    <div class="unread-dot" *ngIf="!n.leida"></div>
   </div>
 </div>

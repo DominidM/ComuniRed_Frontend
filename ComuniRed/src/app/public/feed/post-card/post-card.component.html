@@ -1,6 +1,6 @@
 <div class="post-card">
 
-  <!-- ── Header ── -->
+  <!-- Header -->
   <div class="post-header">
     <div class="avatar-container" (click)="profileClicked.emit(post.usuario)">
       <img [src]="getAvatarUrl()" [alt]="getAuthorName()"
@@ -17,38 +17,42 @@
             <span class="post-date">{{ formatDate(post.fecha_creacion) }}</span>
             <ng-container *ngIf="hasLocation()">
               <span class="dot-sep">•</span>
-              <span class="post-location">📍 {{ post.ubicacion }}</span>
+              <i class="pi pi-map-marker meta-icon"></i>
+              <span class="post-location">{{ post.ubicacion }}</span>
+            </ng-container>
+            <ng-container *ngIf="post.lat && post.lng">
+              <span class="dot-sep">•</span>
+              <app-map [lat]="post.lat" [lng]="post.lng"></app-map>
             </ng-container>
           </div>
         </div>
 
-        <!-- Menú 3 puntos -->
         <div class="post-menu-container">
           <button class="post-menu"
             (click)="$event.stopPropagation(); post.showMenu = !post.showMenu">
-            ⋯
+            <i class="pi pi-ellipsis-h"></i>
           </button>
           <div *ngIf="post.showMenu" class="post-menu-dropdown"
             (click)="$event.stopPropagation()">
             <button *ngIf="canEdit()" class="menu-item"
               (click)="editPost.emit(post); post.showMenu = false">
-              ✏️ Editar
+              <i class="pi pi-pencil menu-item-icon"></i> Editar
             </button>
-            <button *ngIf="canEdit()" class="menu-item danger"
+            <button *ngIf="canEdit()" class="menu-item menu-item-danger"
               (click)="deletePost.emit(post); post.showMenu = false">
-              🗑️ Eliminar
+              <i class="pi pi-trash menu-item-icon"></i> Eliminar
             </button>
             <button class="menu-item"
               (click)="sharePost.emit(post); post.showMenu = false">
-              📤 Compartir
+              <i class="pi pi-share-alt menu-item-icon"></i> Compartir
             </button>
             <button class="menu-item"
               (click)="bookmarkToggled.emit(post); post.showMenu = false">
-              {{ getBookmarkEmoji() }} {{ getBookmarkText() }}
+              <i [class]="getBookmarkIcon() + ' menu-item-icon'"></i> {{ getBookmarkText() }}
             </button>
             <button *ngIf="hasHistorial()" class="menu-item"
               (click)="openHistorial.emit(post); post.showMenu = false">
-              📜 Ver Historial
+              <i class="pi pi-history menu-item-icon"></i> Ver Historial
             </button>
           </div>
         </div>
@@ -62,14 +66,15 @@
         <span *ngIf="post.estado" [class]="getEstadoBadgeClass()">
           {{ post.estado?.nombre }}
         </span>
-        <span *ngIf="hasRiesgo()" [class]="getRiesgoBadgeClass()">
-          {{ getRiesgoIcon() }} {{ getRiesgoTexto() }}
+        <span *ngIf="hasRiesgo()" class="risk-badge" [class]="getRiesgoBadgeClass()">
+          <span class="risk-dot" [class]="'risk-dot-' + (post.nivel_riesgo?.toLowerCase() || '')"></span>
+          {{ getRiesgoTexto() }}
         </span>
       </div>
     </div>
   </div>
 
-  <!-- ── Imagen ── -->
+  <!-- Imagen -->
   <div class="post-image-wrapper">
     <ng-container *ngIf="hasEvidence() || post.imagen_url; else imgPlaceholder">
       <img [src]="getFirstEvidenceUrl()" [alt]="post.titulo"
@@ -77,12 +82,12 @@
     </ng-container>
     <ng-template #imgPlaceholder>
       <div class="image-placeholder">
-        <div class="image-placeholder-icon">🖼️</div>
+        <i class="pi pi-image image-placeholder-icon"></i>
       </div>
     </ng-template>
   </div>
 
-  <!-- ── Votación ── -->
+  <!-- Votación -->
   <div *ngIf="isEnVotacion() && hasVotes()" class="vote-section">
     <div class="vote-header">
       <div class="vote-question">¿Estás de acuerdo con este reporte?</div>
@@ -96,108 +101,108 @@
         </div>
       </div>
       <span *ngIf="needsMoreVotes()" class="votes-needed-text">
+        <i class="pi pi-info-circle"></i>
         Faltan {{ getVotesNeeded() }} votos para aprobar
       </span>
       <span *ngIf="getTotalVotes() >= 5" class="votes-complete-text">
-        ✅ Votos requeridos alcanzados
+        <i class="pi pi-check-circle"></i>
+        Votos requeridos alcanzados
       </span>
     </div>
     <div class="vote-buttons">
-      <button class="vote-btn accept"
+      <button class="vote-btn vote-accept"
         [class.voted]="post.userVote === 'YES'"
         [disabled]="!canVote()"
         (click)="voted.emit({ post, choice: 'accept' })">
-        <span class="vote-icon">✅</span>
+        <i class="pi pi-check-circle vote-btn-icon"></i>
         <span class="vote-label">Sí</span>
         <span class="vote-count-badge">{{ getYesVotes() }}</span>
       </button>
-      <button class="vote-btn reject"
+      <button class="vote-btn vote-reject"
         [class.voted]="post.userVote === 'NO'"
         [disabled]="!canVote()"
         (click)="voted.emit({ post, choice: 'reject' })">
-        <span class="vote-icon">❌</span>
+        <i class="pi pi-times-circle vote-btn-icon"></i>
         <span class="vote-label">No</span>
         <span class="vote-count-badge">{{ getNoVotes() }}</span>
       </button>
     </div>
   </div>
 
-  <!-- ── Estado (no votación) ── -->
+  <!-- Estado (no votación) -->
   <div *ngIf="!isEnVotacion()" class="status-info-section">
     <div class="status-info-item" *ngIf="isEnProceso()">
-      <i class="bi bi-hourglass-split"></i>
+      <i class="pi pi-hourglass status-icon"></i>
       <span>Este reporte está siendo atendido</span>
     </div>
-    <div class="status-info-item success" *ngIf="isResuelta()">
-      <i class="bi bi-check-circle-fill"></i>
+    <div class="status-info-item status-success" *ngIf="isResuelta()">
+      <i class="pi pi-check-circle status-icon"></i>
       <span>Este reporte ha sido resuelto</span>
     </div>
     <div class="status-info-item" *ngIf="isPendiente()">
-      <i class="bi bi-clock-fill"></i>
+      <i class="pi pi-clock status-icon"></i>
       <span>Reporte aprobado - En espera de asignación</span>
     </div>
   </div>
 
-  <!-- ── Reacciones ── -->
+  <!-- Reacciones -->
   <div class="reactions-bar">
-    <div class="reaction-picker-container">
-
-      <button class="reaction-btn main-reaction"
-        [class.active]="post.reactions?.userReaction"
-        (click)="toggleReactionMenu($event)">
-        <i [class]="post.reactions?.userReaction === 'like'
-          ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+    <div class="reaction-picker-container"
+      (mouseenter)="onReactionHover()"
+      (mouseleave)="onReactionLeave()">
+      <button class="reaction-btn"
+        [class.active]="post.reactions?.userReaction">
+        <i class="pi pi-heart"></i>
         <span class="count">{{ post.reactions?.total || 0 }}</span>
       </button>
 
-      <!-- Menú desplegable de reacciones -->
       <div *ngIf="showReactionMenu"
-        class="reactions-menu"
-        (click)="$event.stopPropagation()">
+        class="reactions-menu-horizontal"
+        (click)="$event.stopPropagation()"
+        (mouseenter)="onReactionHover()"
+        (mouseleave)="onReactionLeave()">
         <button *ngFor="let r of reactions"
-          class="reaction-option"
+          class="reaction-option-h"
           [class.selected]="post.reactions?.userReaction === r.type"
+          [title]="r.label"
           (click)="selectReaction(r.type, $event)">
-          <span class="emoji">{{ r.emoji }}</span>
-          <span class="label">{{ r.label }}</span>
-          <span class="count-small">{{ getReactionCount(r.type) }}</span>
+          <i [class]="r.icon"></i>
+          <span class="reaction-label-hint">{{ r.label }}</span>
         </button>
       </div>
-
     </div>
 
     <button class="reaction-btn" (click)="commentsToggled.emit(post)">
-      <i class="bi bi-chat-left-text"></i>
+      <i class="pi pi-comment"></i>
       <span class="count">{{ getCommentsCount() }}</span>
     </button>
   </div>
 
-  <!-- ── Acciones ── -->
+  <!-- Acciones -->
   <div class="post-actions">
     <div class="left-actions">
       <button class="action-btn" (click)="commentsToggled.emit(post)">
-        <span class="action-emoji">💬</span>
+        <i class="pi pi-comment action-btn-icon"></i>
         <span class="action-text">Comentar</span>
       </button>
     </div>
     <div class="right-actions">
       <button class="action-btn" (click)="bookmarkToggled.emit(post)">
-        <span class="action-emoji">{{ getBookmarkEmoji() }}</span>
-        <span class="action-text">Guardar</span>
+        <i [class]="getBookmarkIcon() + ' action-btn-icon'"></i>
+        <span class="action-text">{{ getBookmarkText() }}</span>
       </button>
       <button class="action-btn" (click)="sharePost.emit(post)">
-        <span class="action-emoji">📤</span>
+        <i class="pi pi-share-alt action-btn-icon"></i>
         <span class="action-text">Compartir</span>
       </button>
       <button *ngIf="hasHistorial()" class="action-btn"
         (click)="openHistorial.emit(post)">
-        <span class="action-emoji">📜</span>
+        <i class="pi pi-history action-btn-icon"></i>
         <span class="action-text">Historial</span>
       </button>
     </div>
   </div>
 
-  <!-- ── Comentarios inline ── -->
   <app-comments
     *ngIf="post.showComments"
     [post]="post"

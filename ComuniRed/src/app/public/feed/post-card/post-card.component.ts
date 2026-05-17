@@ -3,14 +3,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
 import { Queja, Usuario } from '../../../services/queja.service';
 import { CommentsComponent } from '../comments/comments.component';
+import { MapComponent } from '../../../shared/map/map.component';
 
 @Component({
   selector: 'app-post-card',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, CommentsComponent],
+  imports: [CommonModule, FormsModule, CommentsComponent, MapComponent],
   templateUrl: './post-card.component.html',
   styleUrls: ['./post-card.component.css']
 })
@@ -26,7 +26,7 @@ export class PostCardComponent {
   @Output() voted             = new EventEmitter<{ post: Queja; choice: 'accept' | 'reject' }>();
   @Output() commentsToggled   = new EventEmitter<Queja>();
   @Output() commentAdded      = new EventEmitter<{ post: Queja; text: string }>();
-  @Output() openCommentsModal = new EventEmitter<Queja>();
+  @Output() openCommentsModal  = new EventEmitter<Queja>();
   @Output() openHistorial     = new EventEmitter<Queja>();
   @Output() editPost          = new EventEmitter<Queja>();
   @Output() deletePost        = new EventEmitter<Queja>();
@@ -40,35 +40,35 @@ export class PostCardComponent {
   @Output() commentMenuToggle = new EventEmitter<{ commentId: string }>();
   @Output() editingTextChange = new EventEmitter<string>();
 
-  // ── Estado local del menú de reacciones ──
   showReactionMenu = false;
+  hideTimeout: any = null;
 
   reactions = [
-    { type: 'like',    emoji: '❤️', label: 'Me gusta' },
-    { type: 'love',    emoji: '😍', label: 'Me encanta' },
-    { type: 'wow',     emoji: '😮', label: 'Me asombra' },
-    { type: 'helpful', emoji: '👍', label: 'Útil' },
-    { type: 'dislike', emoji: '👎', label: 'No me gusta' },
+    { type: 'like',    icon: 'pi pi-heart',     label: 'Me gusta' },
+    { type: 'love',    icon: 'pi pi-star-fill',  label: 'Me encanta' },
+    { type: 'wow',     icon: 'pi pi-eye',        label: 'Me asombra' },
+    { type: 'helpful', icon: 'pi pi-thumbs-up',  label: 'Util' },
+    { type: 'dislike', icon: 'pi pi-thumbs-down', label: 'No me gusta' },
   ];
 
-  // Cierra el menú al hacer click fuera
-  @HostListener('document:click')
-  onDocumentClick(): void {
-    this.showReactionMenu = false;
+  onReactionHover(): void {
+    if (this.hideTimeout) clearTimeout(this.hideTimeout);
+    this.showReactionMenu = true;
   }
 
-  toggleReactionMenu(event: Event): void {
-    event.stopPropagation();
-    this.showReactionMenu = !this.showReactionMenu;
+  onReactionLeave(): void {
+    this.hideTimeout = setTimeout(() => {
+      this.showReactionMenu = false;
+    }, 300);
   }
 
   selectReaction(type: string, event: Event): void {
     event.stopPropagation();
     this.reactionToggled.emit({ post: this.post, type });
     this.showReactionMenu = false;
+    if (this.hideTimeout) clearTimeout(this.hideTimeout);
   }
 
-  // ── Helpers ──────────────────────────────────────────────────
   getAvatarUrl(): string {
     return this.post.usuario?.foto_perfil || 'assets/img/default-avatar.png';
   }
@@ -94,10 +94,10 @@ export class PostCardComponent {
     return !!this.post.canVote && !this.post.userVote && this.isEnVotacion();
   }
 
-  isEnVotacion(): boolean { return this.post.estado?.clave === 'votacion'; }
-  isResuelta(): boolean   { return this.post.estado?.clave === 'resuelto'; }
-  isEnProceso(): boolean  { return ['en_proceso','asignada'].includes(this.post.estado?.clave || ''); }
-  isPendiente(): boolean  { return ['pendiente','aprobada'].includes(this.post.estado?.clave || ''); }
+  isEnVotacion(): boolean { return this.post.estado?.clave?.toLowerCase() === 'votacion'; }
+  isResuelta(): boolean   { return this.post.estado?.clave?.toLowerCase() === 'resuelto'; }
+  isEnProceso(): boolean  { return ['en_proceso','asignada'].includes(this.post.estado?.clave?.toLowerCase() || ''); }
+  isPendiente(): boolean  { return ['pendiente','aprobada'].includes(this.post.estado?.clave?.toLowerCase() || ''); }
 
   hasVotes(): boolean     { return !!this.post.votes; }
   getTotalVotes(): number { return (this.post.votes?.yes || 0) + (this.post.votes?.no || 0); }
@@ -130,41 +130,39 @@ export class PostCardComponent {
 
   hasRiesgo(): boolean { return !!this.post.nivel_riesgo; }
 
-  getBookmarkEmoji(): string { return (this.post as any).meta?.saved ? '🔖' : '📑'; }
-  getBookmarkText(): string  { return (this.post as any).meta?.saved ? 'Quitar' : 'Guardar'; }
+  getBookmarkIcon(): string {
+    return (this.post as any).meta?.saved ? 'pi pi-bookmark-fill' : 'pi pi-bookmark';
+  }
+
+  getBookmarkText(): string {
+    return (this.post as any).meta?.saved ? 'Quitar' : 'Guardar';
+  }
 
   getEstadoBadgeClass(): string {
     const map: { [k: string]: string } = {
-      nulo: 'badge bg-secondary',    votacion: 'badge bg-primary',
-      pendiente: 'badge bg-warning', aprobada: 'badge bg-success',
-      asignada: 'badge bg-info',     clasificada: 'badge bg-purple',
-      en_proceso: 'badge bg-info',   observado: 'badge bg-warning',
-      resuelto: 'badge bg-success',  cancelado: 'badge bg-danger',
+      nulo: 'badge badge-secondary',    votacion: 'badge badge-primary',
+      pendiente: 'badge badge-warning', aprobada: 'badge badge-success',
+      asignada: 'badge badge-info',     clasificada: 'badge badge-purple',
+      en_proceso: 'badge badge-info',   observado: 'badge badge-warning',
+      resuelto: 'badge badge-success',  cancelado: 'badge badge-danger',
     };
-    return map[this.post.estado?.clave || ''] || 'badge bg-secondary';
+    return map[this.post.estado?.clave?.toLowerCase() || ''] || 'badge badge-secondary';
   }
 
   getRiesgoBadgeClass(): string {
     const map: { [k: string]: string } = {
-      BAJO: 'badge bg-success', MEDIO: 'badge bg-warning',
-      ALTO: 'badge bg-orange',  CRITICO: 'badge bg-danger',
+      BAJO: 'badge badge-success', MEDIO: 'badge badge-warning',
+      ALTO: 'badge badge-orange',  CRITICO: 'badge badge-danger',
     };
-    return map[this.post.nivel_riesgo?.toUpperCase() || ''] || 'badge bg-secondary';
+    return map[this.post.nivel_riesgo?.toUpperCase() || ''] || 'badge badge-secondary';
   }
 
   getRiesgoTexto(): string {
     const map: { [k: string]: string } = {
       BAJO: 'Riesgo Bajo', MEDIO: 'Riesgo Medio',
-      ALTO: 'Riesgo Alto', CRITICO: '⚠️ Crítico',
+      ALTO: 'Riesgo Alto', CRITICO: 'Crítico',
     };
     return map[this.post.nivel_riesgo?.toUpperCase() || ''] || this.post.nivel_riesgo || '';
-  }
-
-  getRiesgoIcon(): string {
-    const map: { [k: string]: string } = {
-      BAJO: '🟢', MEDIO: '🟡', ALTO: '🟠', CRITICO: '🔴'
-    };
-    return map[this.post.nivel_riesgo?.toUpperCase() || ''] || '⚪';
   }
 
   formatDate(d: string): string {

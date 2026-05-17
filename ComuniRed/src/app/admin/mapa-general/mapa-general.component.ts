@@ -1,9 +1,10 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
+import { QuejaService, Queja } from '../../services/queja.service';
 import * as L from 'leaflet';
 
-interface Queja {
+interface MapaQueja {
   id: string;
   titulo: string;
   ubicacion: string;
@@ -11,8 +12,6 @@ interface Queja {
   estado: string;
   lat: number;
   lng: number;
-  posX?: number;
-  posY?: number;
 }
 
 interface Categoria {
@@ -38,43 +37,65 @@ export class MapaGeneralComponent implements OnInit, AfterViewInit, OnDestroy {
   private map!: L.Map;
   private markersLayer!: L.LayerGroup;
 
-  categorias: Categoria[] = [
-    { nombre: 'Baches', color: '#ef4444' },
-    { nombre: 'Alumbrado Público', color: '#f59e0b' },
-    { nombre: 'Alcantarillado', color: '#3b82f6' },
-    { nombre: 'Basura', color: '#10b981' },
-    { nombre: 'Señalización', color: '#8b5cf6' }
+  private readonly COLORES = [
+    '#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6',
+    '#ec4899', '#14b8a6', '#f97316', '#06b6d4', '#84cc16'
   ];
 
-  estados: Estado[] = [
-    { nombre: 'Pendiente', color: '#f59e0b' },
-    { nombre: 'En Proceso', color: '#3b82f6' },
-    { nombre: 'Resuelta', color: '#10b981' },
-    { nombre: 'Rechazada', color: '#ef4444' }
-  ];
-
-  quejas: Queja[] = [
-    { id: '1', titulo: 'Bache gigante en Av. Principal', ubicacion: 'Av. Principal #123, Cercado de Lima', categoria: 'Baches', estado: 'En Proceso', lat: -12.0464, lng: -77.0428 },
-    { id: '2', titulo: 'Falta de iluminación en parque', ubicacion: 'Parque Central, Col. Roma', categoria: 'Alumbrado Público', estado: 'Pendiente', lat: -12.0750, lng: -77.0250 },
-    { id: '3', titulo: 'Fuga de agua en la calle', ubicacion: 'Calle Insurgentes #456', categoria: 'Alcantarillado', estado: 'Resuelta', lat: -12.0500, lng: -77.0450 },
-    { id: '4', titulo: 'Señal de alto vandalizada', ubicacion: 'Esquina Reforma y Juárez', categoria: 'Señalización', estado: 'Pendiente', lat: -12.0400, lng: -77.0500 },
-    { id: '5', titulo: 'Acumulación de basura', ubicacion: 'Col. Condesa (sim), Calle Ámsterdam', categoria: 'Basura', estado: 'En Proceso', lat: -12.1191, lng: -77.0349 },
-    { id: '6', titulo: 'Poste de luz caído', ubicacion: 'Av. Arequipa, Miraflores', categoria: 'Alumbrado Público', estado: 'Pendiente', lat: -12.1200, lng: -77.0300 },
-    { id: '7', titulo: 'Basura acumulada', ubicacion: 'Jr. Lampa, Cercado de Lima', categoria: 'Basura', estado: 'Resuelta', lat: -12.0450, lng: -77.0330 }
-  ];
+  categorias: Categoria[] = [];
+  estados: Estado[] = [];
+  quejas: MapaQueja[] = [];
+  quejasFiltradas: MapaQueja[] = [];
+  quejasTotal: number = 0;
+  loading = true;
 
   selectedCategoria: string = 'todas';
   selectedEstado: string = 'todos';
-  quejasFiltradas: Queja[] = [];
-  quejasTotal: number = 0;
+
+  constructor(private quejaService: QuejaService) {}
 
   ngOnInit(): void {
-    this.quejasTotal = this.quejas.length;
-    this.quejasFiltradas = [...this.quejas];
+    this.cargarQuejas();
+  }
+
+  private mapReady = false;
+
+  private cargarQuejas(): void {
+    this.loading = true;
+    this.quejaService.obtenerQuejas('').subscribe({
+      next: (data) => {
+        const conCoordenadas = data.filter(q => q.lat != null && q.lng != null);
+        this.quejas = conCoordenadas.map(q => ({
+          id: q.id,
+          titulo: q.titulo,
+          ubicacion: q.ubicacion || '',
+          categoria: q.categoria?.nombre || 'Sin categoria',
+          estado: q.estado?.nombre || 'Pendiente',
+          lat: q.lat!,
+          lng: q.lng!
+        }));
+        this.quejasTotal = this.quejas.length;
+        this.quejasFiltradas = [...this.quejas];
+        this.categorias = this.extrarLista('categoria');
+        this.estados = this.extrarLista('estado');
+        this.loading = false;
+        if (this.mapReady) this.updateMapMarkers();
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  private extrarLista(tipo: 'categoria' | 'estado'): { nombre: string; color: string }[] {
+    const nombres = [...new Set(this.quejas.map(q => q[tipo]))].sort();
+    return nombres.map((nombre, i) => ({
+      nombre,
+      color: this.COLORES[i % this.COLORES.length]
+    }));
   }
 
   ngAfterViewInit(): void {
-    // Inicializa el mapa Leaflet
     this.map = L.map(this.mapContainer.nativeElement, {
       center: [-12.0464, -77.0428],
       zoom: 12,
@@ -86,7 +107,8 @@ export class MapaGeneralComponent implements OnInit, AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     this.markersLayer = L.layerGroup().addTo(this.map);
-    this.updateMapMarkers();
+    this.mapReady = true;
+    if (!this.loading) this.updateMapMarkers();
   }
 
   ngOnDestroy(): void {
@@ -163,5 +185,6 @@ export class MapaGeneralComponent implements OnInit, AfterViewInit, OnDestroy {
       const bounds = L.latLngBounds(this.quejasFiltradas.map(q => [q.lat, q.lng] as [number, number]));
       this.map.fitBounds(bounds.pad(0.2));
     }
+    setTimeout(() => this.map.invalidateSize(), 100);
   }
 }
