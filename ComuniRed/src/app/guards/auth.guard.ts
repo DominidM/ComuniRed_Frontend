@@ -30,12 +30,27 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     }
   }
 
+  private getRolesFromToken(token: string): string[] {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Ajusta las keys según lo que tu backend mete en el JWT
+      if (payload.roles && Array.isArray(payload.roles)) return payload.roles;
+      if (payload.rol_id) return [payload.rol_id];
+      if (payload.role) return [payload.role];
+      return [];
+    } catch {
+      return [];
+    }
+  }
+
   private getRequiredRoles(route: ActivatedRouteSnapshot): string[] {
-    // Chequea roles en el child; si no hay, mira en el parent (útil cuando canActivateChild se aplica en el padre)
-    const childRoles: string[] = route.data?.['roles'] || [];
-    if (childRoles.length > 0) return childRoles;
-    const parentRoles: string[] = route.parent?.data?.['roles'] || [];
-    return parentRoles;
+    let current: ActivatedRouteSnapshot | null = route;
+    while (current) {
+      const roles: string[] = current.data?.['roles'] || [];
+      if (roles.length > 0) return roles;
+      current = current.parent;
+    }
+    return [];
   }
 
   private check(
@@ -45,16 +60,22 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     const token = this.usuarioService.getToken();
     const tokenExpired = this.isTokenExpired(token);
     const requiredRoles: string[] = this.getRequiredRoles(route) || [];
-    const userRoles = this.usuarioService.getRoles() || [];
+
+    // Roles desde el servicio; si están vacíos los saca directo del JWT
+    const serviceRoles = this.usuarioService.getRoles() || [];
+    const userRoles =
+      serviceRoles.length > 0
+        ? serviceRoles
+        : token
+          ? this.getRolesFromToken(token)
+          : [];
 
     console.log('==============================');
     console.log('[AuthGuard] URL:', state.url);
     console.log('[AuthGuard] token:', token);
     console.log('[AuthGuard] tokenExpired:', tokenExpired);
-    console.log('[AuthGuard] route.data:', route.data);
-    console.log('[AuthGuard] parent.data:', route.parent?.data);
     console.log('[AuthGuard] requiredRoles:', requiredRoles);
-    console.log('[AuthGuard] userRoles:', userRoles);
+    console.log('[AuthGuard] userRoles (final):', userRoles);
 
     if (!token || tokenExpired) {
       console.warn('[AuthGuard] token inválido o expirado');
