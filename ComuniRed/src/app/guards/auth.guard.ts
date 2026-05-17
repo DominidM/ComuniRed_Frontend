@@ -1,12 +1,22 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, CanActivateChild, ActivatedRouteSnapshot, RouterStateSnapshot, Router, UrlTree } from '@angular/router';
+import {
+  CanActivate,
+  CanActivateChild,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  Router,
+  UrlTree,
+} from '@angular/router';
 import { UsuarioService } from '../services/usuario.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthGuard implements CanActivate, CanActivateChild {
-  constructor(private usuarioService: UsuarioService, private router: Router) {}
+  constructor(
+    private usuarioService: UsuarioService,
+    private router: Router,
+  ) {}
 
   private isTokenExpired(token: string | null): boolean {
     if (!token) return true;
@@ -20,43 +30,91 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     }
   }
 
-  private getRequiredRoles(route: ActivatedRouteSnapshot): string[] {
-    // Chequea roles en el child; si no hay, mira en el parent (útil cuando canActivateChild se aplica en el padre)
-    const childRoles: string[] = route.data?.['roles'] || [];
-    if (childRoles.length > 0) return childRoles;
-    const parentRoles: string[] = route.parent?.data?.['roles'] || [];
-    return parentRoles;
+  private getRolesFromToken(token: string): string[] {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Ajusta las keys según lo que tu backend mete en el JWT
+      if (payload.roles && Array.isArray(payload.roles)) return payload.roles;
+      if (payload.rol_id) return [payload.rol_id];
+      if (payload.role) return [payload.role];
+      return [];
+    } catch {
+      return [];
+    }
   }
 
-  private check(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
+  private getRequiredRoles(route: ActivatedRouteSnapshot): string[] {
+    let current: ActivatedRouteSnapshot | null = route;
+    while (current) {
+      const roles: string[] = current.data?.['roles'] || [];
+      if (roles.length > 0) return roles;
+      current = current.parent;
+    }
+    return [];
+  }
+
+  private check(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot,
+  ): boolean | UrlTree {
     const token = this.usuarioService.getToken();
     const tokenExpired = this.isTokenExpired(token);
+    const requiredRoles: string[] = this.getRequiredRoles(route) || [];
+
+    // Roles desde el servicio; si están vacíos los saca directo del JWT
+    const serviceRoles = this.usuarioService.getRoles() || [];
+    const userRoles =
+      serviceRoles.length > 0
+        ? serviceRoles
+        : token
+          ? this.getRolesFromToken(token)
+          : [];
+
+    console.log('==============================');
+    console.log('[AuthGuard] URL:', state.url);
+    console.log('[AuthGuard] token:', token);
+    console.log('[AuthGuard] tokenExpired:', tokenExpired);
+    console.log('[AuthGuard] requiredRoles:', requiredRoles);
+    console.log('[AuthGuard] userRoles (final):', userRoles);
 
     if (!token || tokenExpired) {
-      // Si está expirado o no existe: log out y redirigir a login con returnUrl
-      console.warn('[AuthGuard] token inválido/expirado. Redirigiendo a /login');
+      console.warn('[AuthGuard] token inválido o expirado');
       this.usuarioService.logout();
-      return this.router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url }});
+      return this.router.createUrlTree(['/login'], {
+        queryParams: { returnUrl: state.url },
+      });
     }
 
-    const requiredRoles: string[] = this.getRequiredRoles(route) || [];
     if (requiredRoles.length > 0) {
-      const userRoles = this.usuarioService.getRoles() || [];
-      const hasRole = requiredRoles.some(rr => userRoles.some(ur => String(ur).toLowerCase() === String(rr).toLowerCase()));
+      const hasRole = requiredRoles.some((rr) =>
+        userRoles.some(
+          (ur) => String(ur).toLowerCase() === String(rr).toLowerCase(),
+        ),
+      );
+
+      console.log('[AuthGuard] hasRole:', hasRole);
+
       if (!hasRole) {
-        console.warn('[AuthGuard] usuario no autorizado (roles insuficientes). Redirigiendo a /login');
+        console.warn('[AuthGuard] roles insuficientes');
         return this.router.createUrlTree(['/login']);
       }
     }
 
+    console.log('[AuthGuard] acceso permitido');
     return true;
   }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot,
+  ): boolean | UrlTree {
     return this.check(route, state);
   }
 
-  canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
+  canActivateChild(
+    childRoute: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot,
+  ): boolean | UrlTree {
     return this.check(childRoute, state);
   }
 }

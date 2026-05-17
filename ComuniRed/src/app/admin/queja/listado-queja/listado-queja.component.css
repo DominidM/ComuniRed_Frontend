@@ -1,7 +1,7 @@
 /* ── Root ─────────────────────────────────────────────── */
 .listado-queja-root {
   width: 100%;
-  padding: 0 32px 48px;
+  padding: 14px;
   background: var(--cr-background-content);
   color: var(--cr-text);
   font-family:
@@ -60,16 +60,16 @@
 }
 
 .small-muted {
+  font-size: 13px;
   color: var(--cr-text-muted);
-  font-size: 0.85rem;
 }
 
 /* ── Select de estado ─────────────────────────────────── */
 .estado-select {
   width: 100%;
   min-width: 160px;
-  padding: 0.55rem 0.75rem;
-  font-size: 0.875rem;
+  padding: 10px 12px;
+  font-size: 14px;
   color: var(--cr-text);
   background: var(--cr-background-content);
   border: 1px solid var(--cr-border);
@@ -102,9 +102,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0.55rem 0.9rem;
+  padding: 10px 12px;
   border-radius: 8px;
-  font-size: 0.78rem;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   background: var(--cr-primary-soft);
@@ -133,10 +133,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  padding: 0.65rem 1rem;
+  gap: 6px;
+  padding: 10px 20px;
   border-radius: 8px;
-  font-size: 0.78rem;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -148,8 +148,8 @@
 }
 
 .btn-cancel {
-  background: var(--cr-background);
-  color: var(--cr-text);
+  background: transparent;
+  color: var(--cr-text-muted);
   border: 1px solid var(--cr-border);
 }
 
@@ -160,7 +160,7 @@
 
 .btn-confirm {
   background: var(--cr-primary);
-  color: var(--cr-white);
+  color: #fff;
   border: 1px solid var(--cr-primary);
   box-shadow: var(--shadow-soft);
 }
@@ -168,7 +168,6 @@
 .btn-confirm:hover:not(:disabled) {
   background: var(--cr-primary-hover);
   border-color: var(--cr-primary-hover);
-  color: var(--cr-white);
   box-shadow: var(--shadow-medium);
 }
 
@@ -179,7 +178,7 @@
 
 .btn-confirm:disabled,
 .btn-cancel:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -187,9 +186,9 @@
 /* ── Status badges ────────────────────────────────────── */
 .status-badge {
   display: inline-block;
-  padding: 0.4rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.82rem;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -270,7 +269,7 @@
 
 .listado-queja-modal-header h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 16px;
   font-weight: 700;
   color: var(--cr-text);
 }
@@ -282,7 +281,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 20px;
   color: var(--cr-text-muted);
   background: transparent;
   border: none;
@@ -332,10 +331,11 @@
 .arrow-transition {
   margin: 8px 0;
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 22px;
   color: var(--cr-primary);
 }
 
+/* ── Form group ───────────────────────────────────────── */
 .form-group {
   display: flex;
   flex-direction: column;

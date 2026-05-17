@@ -101,35 +101,37 @@ export class ListadoQuejaComponent implements OnInit {
 
   loadQuejas(): void {
     this.loading = true;
-    const adminUser = this.usuarioService.getUser();
-    const usuarioActualId = adminUser ? (adminUser as any).id : '';
+
+    const user = this.usuarioService.getUser();
+    const userId = user ? (user as any).id : '';
 
     this.quejaService
-      .obtenerQuejasAdminPaginadas(usuarioActualId, this.page, this.pageSize)
+      .obtenerQuejasAdminPaginadas(userId, this.page, this.pageSize)
       .subscribe({
-        next: (pageData: any) => {
-          this.quejas = (pageData?.content || []).map((q: any) => ({
+        next: (resp: any) => {
+          this.quejas = (resp?.content || []).map((q: any) => ({
             id: q.id,
-            titulo: q.titulo || '',
+            titulo: q.titulo,
             descripcion: q.descripcion,
             fecha_creacion: q.fecha_creacion,
             usuario_id: q.usuario?.id || '',
-            usuario_nombre:
-              `${q.usuario?.nombre || ''} ${q.usuario?.apellido || ''}`.trim(),
+            usuario_nombre: q.usuario
+              ? `${q.usuario.nombre || ''} ${q.usuario.apellido || ''}`.trim()
+              : '—',
             estado_id: q.estado?.id || '',
             estado_nombre: q.estado?.nombre || '',
             imagen_url: q.imagen_url || '',
-            categoria_id: q.categoria?.id || '',
-            categoria_nombre: q.categoria?.nombre || '',
-            ubicacion: q.ubicacion || '',
           }));
-          this.totalElements = pageData?.totalElements || 0;
-          this.totalPages = pageData?.totalPages || 0;
+
+          this.totalElements = resp?.totalElements || 0;
+          this.totalPages = resp?.totalPages || 0;
           this.loading = false;
         },
-        error: (err: any) => {
+        error: (err) => {
           console.error('Error cargando quejas:', err);
           this.quejas = [];
+          this.totalElements = 0;
+          this.totalPages = 0;
           this.loading = false;
         },
       });
@@ -150,7 +152,6 @@ export class ListadoQuejaComponent implements OnInit {
     });
   }
 
-  // ── Cambio de estado ──────────────────────────────────────────────
   iniciarCambioEstado(queja: Queja, event: Event): void {
     const target = event.target as HTMLSelectElement;
     const nuevoEstadoId = target.value;
@@ -221,12 +222,16 @@ export class ListadoQuejaComponent implements OnInit {
     this.observacionEstado = '';
   }
 
-  // ── Navegación ───────────────────────────────────────────────────
-  verDetalle(queja: Queja): void {
+  verDetalle(queja: Queja, event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    console.log('Detalle click:', queja);
+    console.log('Navegando a:', ['/admin/queja', queja.id]);
+
     this.router.navigate(['/admin/queja', queja.id]);
   }
 
-  // ── CSS helpers ──────────────────────────────────────────────────
   getEstadoClass(estadoNombre?: string): string {
     if (!estadoNombre) return 'estado-default';
     const n = estadoNombre.toLowerCase();

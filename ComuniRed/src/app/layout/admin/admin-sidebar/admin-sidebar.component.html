@@ -17,7 +17,13 @@
             *ngFor="let item of section.items; trackBy: trackByItem"
           >
             <li *ngIf="canShowItem(item)">
-              <a class="menu-link" href="" (click)="onNavigate(item, $event)">
+              <!-- Enlace externo -->
+              <a
+                *ngIf="item.externalNav"
+                class="menu-link"
+                [href]="item.route"
+                target="_self"
+              >
                 <span class="icon" aria-hidden="true">
                   <svg
                     width="16"
@@ -31,7 +37,31 @@
                     [innerHTML]="getSafeIconSvg(item.icon)"
                   ></svg>
                 </span>
+                <span class="label">{{ item.label }}</span>
+                <span class="chev" aria-hidden="true">›</span>
+              </a>
 
+              <!-- Enlace interno -->
+              <a
+                *ngIf="!item.externalNav"
+                class="menu-link"
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+              >
+                <span class="icon" aria-hidden="true">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    [innerHTML]="getSafeIconSvg(item.icon)"
+                  ></svg>
+                </span>
                 <span class="label">{{ item.label }}</span>
                 <span class="chev" aria-hidden="true">›</span>
               </a>

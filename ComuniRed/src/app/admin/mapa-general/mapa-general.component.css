@@ -1,45 +1,36 @@
+/* ── Root ─────────────────────────────────────────────── */
 .mapa-container {
-  padding: 0;
+  width: 100%;
+  padding: 14px;
   background: var(--cr-background-content);
-  min-height: 100vh;
+  color: var(--cr-text);
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  box-sizing: border-box;
 }
 
-/* Header */
-.mapa-header {
-  padding: 20px 32px;
-  background: var(--cr-background);
-  border-bottom: 1px solid var(--cr-border);
-}
-
-.mapa-title {
-  font-size: 1.5em;
-  font-weight: 800;
-  color: var(--cr-titulo);
-  margin: 0 0 4px 0;
-}
-
-.mapa-subtitle {
-  font-size: 0.9em;
-  color: #6b7280;
-  margin: 0;
-}
-
-/* Layout principal */
+/* ── Layout principal ─────────────────────────────────── */
 .mapa-content {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 280px 1fr;
   gap: 24px;
-  padding: 24px;
-  min-height: calc(100vh - 140px);
+  align-items: flex-start;
 }
 
-/* Sidebar Filtros */
+/* ── Sidebar filtros ──────────────────────────────────── */
 .filtros-sidebar {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: var(--cr-background);
   border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-soft);
   height: fit-content;
   position: sticky;
   top: 24px;
@@ -49,144 +40,151 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 2px solid var(--cr-border);
+  border-bottom: 1px solid var(--cr-border);
 }
 
 .filtros-header svg {
-  color: #5f5cf6;
+  color: var(--cr-primary);
+  flex-shrink: 0;
 }
 
 .filtros-header h3 {
-  font-size: 1.1em;
-  font-weight: 700;
-  color: var(--cr-titulo);
   margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cr-text-muted);
 }
 
-/* Secciones de filtro */
+/* ── Secciones de filtro ──────────────────────────────── */
 .filtro-section {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+}
+
+.filtro-section:last-of-type {
+  margin-bottom: 0;
 }
 
 .filtro-label {
   display: block;
-  font-size: 0.85em;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #6b7280;
-  margin-bottom: 12px;
+  letter-spacing: 0.06em;
+  color: var(--cr-text-muted);
+  margin-bottom: 10px;
 }
 
 .filtro-options {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .filtro-option {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: #f9fafb;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  font-size: 0.95em;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--cr-search);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--cr-text);
   cursor: pointer;
   text-align: left;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
 }
 
 .filtro-option:hover {
-  background: #f3f4f6;
-  border-color: #e5e7eb;
-  transform: translateX(2px);
+  background: var(--cr-hover-surface);
+  border-color: var(--cr-border);
 }
 
 .filtro-option.active {
-  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-  border-color: #5f5cf6;
-  color: #5f5cf6;
-  font-weight: 700;
+  background: var(--cr-primary-soft);
+  border-color: var(--cr-primary);
+  color: var(--cr-primary);
 }
 
 .cat-dot {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-/* Contador */
+/* ── Contador ─────────────────────────────────────────── */
 .filtro-counter {
-  margin-top: 20px;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-  border-radius: 10px;
-  font-size: 0.9em;
+  margin-top: 16px;
+  padding: 10px 14px;
+  background: var(--cr-search);
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 600;
-  color: #374151;
+  color: var(--cr-text);
   text-align: center;
-  border: 1px solid #e5e7eb;
 }
 
-/* Mapa Principal */
+/* ── Panel principal ──────────────────────────────────── */
 .mapa-principal {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+/* ── Card del mapa ────────────────────────────────────── */
 .mapa-card {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: var(--cr-background);
   border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
 }
 
 .mapa-card-header {
-  padding: 24px;
+  padding: 20px 24px 16px;
   border-bottom: 1px solid var(--cr-border);
 }
 
 .mapa-card-header h3 {
-  font-size: 1.2em;
+  margin: 0 0 4px;
+  font-size: 14px;
   font-weight: 700;
-  color: var(--cr-titulo);
-  margin: 0 0 6px 0;
+  color: var(--cr-text);
 }
 
 .mapa-card-header p {
-  font-size: 0.95em;
-  color: #6b7280;
   margin: 0;
+  font-size: 13px;
+  color: var(--cr-text-muted);
 }
 
-/* Canvas del Mapa */
+/* ── Canvas del mapa ──────────────────────────────────── */
 .mapa-canvas {
   position: relative;
   width: 100%;
-  height: 500px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  overflow: hidden;
+  background: var(--cr-search);
+  display: flex;
+  align-items: stretch;
 }
 
-/* Marcador placeholder decorativo */
-.map-marker-placeholder {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0.15;
-  pointer-events: none;
+.leaflet-map {
+  width: 100%;
+  height: 620px;
+  border-radius: 0 0 12px 12px;
 }
 
-/* Pines de quejas */
+/* ── Pines de quejas ──────────────────────────────────── */
 .queja-pin {
   position: absolute;
   transform: translate(-50%, -100%);
@@ -197,50 +195,53 @@
 .pin-marker {
   width: 36px;
   height: 36px;
-  background: #ffffff;
-  border: 3px solid #ef4444;
+  background: var(--cr-background);
+  border: 3px solid var(--cr-danger, #ef4444);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-medium);
+  transition: transform 180ms ease, box-shadow 180ms ease;
   animation: pinPulse 2s infinite;
 }
 
 .queja-pin:hover .pin-marker {
   transform: scale(1.15);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-modal);
 }
 
 @keyframes pinPulse {
   0%, 100% {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-medium);
   }
   50% {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 8px rgba(239, 68, 68, 0.1);
+    box-shadow:
+      var(--shadow-medium),
+      0 0 0 8px color-mix(in srgb, #ef4444 12%, transparent);
   }
 }
 
-/* Tooltip Card */
+/* ── Tooltip ──────────────────────────────────────────── */
 .queja-tooltip {
   position: absolute;
   bottom: 45px;
   left: 50%;
   transform: translateX(-50%);
-  background: #ffffff;
+  background: var(--cr-background);
+  border: 1px solid var(--cr-border);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-modal);
   padding: 16px;
   min-width: 280px;
   z-index: 100;
-  animation: tooltipFadeIn 0.2s ease;
+  animation: tooltipFadeIn 180ms ease;
 }
 
 @keyframes tooltipFadeIn {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(10px);
+    transform: translateX(-50%) translateY(8px);
   }
   to {
     opacity: 1;
@@ -258,7 +259,7 @@
   height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-top: 8px solid #ffffff;
+  border-top: 8px solid var(--cr-background);
 }
 
 .tooltip-header {
@@ -271,58 +272,59 @@
 .tooltip-icon {
   width: 36px;
   height: 36px;
-  background: #5f5cf6;
+  background: var(--cr-primary-soft);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: var(--cr-primary);
 }
 
 .tooltip-content h4 {
-  font-size: 0.95em;
+  margin: 0 0 4px;
+  font-size: 14px;
   font-weight: 700;
-  color: #111827;
-  margin: 0 0 4px 0;
+  color: var(--cr-text);
   line-height: 1.3;
 }
 
 .tooltip-ubicacion {
-  font-size: 0.85em;
-  color: #6b7280;
   margin: 0;
+  font-size: 12px;
+  color: var(--cr-text-muted);
 }
 
 .tooltip-badge {
   display: inline-block;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.8em;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 12px;
   font-weight: 700;
-  color: #ffffff;
+  color: #fff;
   text-transform: capitalize;
 }
 
-/* Info Footer */
+/* ── Info footer ──────────────────────────────────────── */
 .mapa-info {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 20px 24px;
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border-top: 1px solid #93c5fd;
+  padding: 16px 20px;
+  background: color-mix(in srgb, var(--cr-primary) 8%, var(--cr-background));
+  border-top: 1px solid color-mix(in srgb, var(--cr-primary) 20%, var(--cr-border));
 }
 
 .mapa-info svg {
-  color: #2563eb;
+  color: var(--cr-primary);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .mapa-info p {
-  font-size: 0.9em;
-  color: #1e40af;
   margin: 0;
+  font-size: 13px;
+  color: var(--cr-text);
   line-height: 1.5;
 }
 
@@ -330,43 +332,37 @@
   font-weight: 700;
 }
 
-/* Vista alternativa */
-.vista-mapa-info {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
-  text-align: center;
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 1280px) {
+  .mapa-container {
+    padding: 0 24px 48px;
+  }
 }
 
-.vista-mapa-info h4 {
-  font-size: 1.1em;
-  font-weight: 700;
-  color: #111827;
-  margin: 0 0 8px 0;
-}
-
-.vista-mapa-info p {
-  font-size: 0.95em;
-  color: #6b7280;
-  margin: 0;
-}
-
-/* Responsive */
 @media (max-width: 1024px) {
+  .mapa-container {
+    padding: 0 20px 40px;
+  }
   .mapa-content {
     grid-template-columns: 1fr;
   }
-
   .filtros-sidebar {
     position: static;
   }
-
-  .mapa-canvas {
-    height: 400px;
+  .leaflet-map {
+    height: 420px;
   }
 }
+
+@media (max-width: 860px) {
+  .mapa-container {
+    padding: 0 16px 32px;
+  }
+  .leaflet-map {
+    height: 340px;
+  }
+}
+
 
 .mapa-container { padding: 18px; font-family: Inter, Roboto, Arial, sans-serif; color: var(--cr-text); background: var(--cr-background-content); min-height: 100vh; }
 .mapa-content { display: flex; gap: 18px; align-items: flex-start; }

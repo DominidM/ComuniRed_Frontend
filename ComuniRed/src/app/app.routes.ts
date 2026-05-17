@@ -71,6 +71,7 @@ export const routes: Routes = [
     path: 'admin',
     component: AdminComponent,
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     data: { roles: ['68ca68c40bc4d9ca3267b667'] },
     children: [
       { path: 'dashboard', component: DashboardComponent },
@@ -78,6 +79,7 @@ export const routes: Routes = [
 
       { path: 'queja', component: ListadoQuejaComponent },
       { path: 'queja/:id', component: DetalleQuejaComponent },
+
       { path: 'asignacion', component: CrudAsignacionComponent },
       { path: 'comentarios', component: CrudComentarioComponent },
       { path: 'evidencias', component: CrudEvidenciaComponent },
