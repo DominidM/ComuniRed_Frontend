@@ -48,15 +48,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
       label: 'Mensajes',
       icon: 'chat_bubble',
       route: '/public/messages',
-      badgeType: 'count',
-      badgeCount: 0,
+  
     },
     { label: 'Tendencias', icon: 'trending_up', route: '/public/trending' },
     {
       label: 'Reels',
       icon: 'video_library',
       route: '/public/reels',
-      badgeType: 'new',
     },
   ];
 

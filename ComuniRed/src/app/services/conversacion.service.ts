@@ -271,6 +271,26 @@ export class ConversacionService {
     );
   }
 
+  suscribirseANuevosMensajes(usuarioId: string): Observable<Mensaje> {
+    return this.apollo
+      .subscribe<{ nuevoMensajeRecibido: Mensaje }>({
+        query: gql`
+          subscription NuevoMensajeRecibido($usuarioId: ID!) {
+            nuevoMensajeRecibido(usuario_id: $usuarioId) {
+              id
+              conversacionId
+              emisorId
+              contenido
+              fechaEnvio
+              leido
+            }
+          }
+        `,
+        variables: { usuarioId },
+      })
+      .pipe(map((r) => r.data!.nuevoMensajeRecibido));
+  }
+
   seSiguenMutuamente(usuarioId1: string, usuarioId2: string): Observable<boolean> {
     const query = gql`
       query SeSiguenMutuamente($usuarioId1: ID!, $usuarioId2: ID!) {

@@ -27,7 +27,7 @@
 
         <input
           type="text"
-          placeholder="Buscar reportes o personas..."
+          placeholder="Buscar personas..."
           [value]="query"
           (input)="onQueryChange($event)"
           (keyup.escape)="closeSearch()"
@@ -44,28 +44,21 @@
       >
         <div
           class="search-item"
-          *ngFor="let result of searchResults; trackBy: trackByResult"
-          (click)="selectResult(result)"
+          *ngFor="let user of searchResults; trackBy: trackByResult"
+          (click)="selectResult(user)"
         >
           <div class="search-item-icon">
             <img
-              *ngIf="result.type === 'persona' && result.foto_perfil"
-              [src]="result.foto_perfil"
+              [src]="obtenerFoto(user.foto_perfil)"
               class="search-avatar"
               alt="avatar"
             />
-            <mat-icon *ngIf="result.type === 'reporte'">report_problem</mat-icon>
-            <mat-icon *ngIf="result.type === 'persona' && !result.foto_perfil">person</mat-icon>
           </div>
 
           <div class="search-item-info">
-            <span class="search-item-title">{{ getResultTitle(result) }}</span>
-            <span class="search-item-sub">{{ getResultSubtitle(result) }}</span>
+            <span class="search-item-title">{{ getResultName(user) }}</span>
+            <span class="search-item-sub" *ngIf="user.distrito">{{ user.distrito }}</span>
           </div>
-
-          <span class="search-item-date" *ngIf="result.fecha">
-            {{ formatDate(result.fecha) }}
-          </span>
         </div>
       </div>
 
@@ -134,3 +127,41 @@
   *ngIf="showSearchResults && !modalActive"
   (click)="closeSearch()"
 ></div>
+
+<div class="modal-overlay" *ngIf="showUserModal && selectedUser" (click)="closeUserModal()">
+  <div class="user-modal" (click)="$event.stopPropagation()">
+    <button class="modal-close-btn" (click)="closeUserModal()" type="button">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <div class="modal-avatar-wrapper">
+      <img
+        [src]="obtenerFoto(selectedUser.foto_perfil)"
+        class="modal-avatar"
+        alt="avatar"
+      />
+    </div>
+
+    <h2 class="modal-name">{{ selectedUser.nombre }} {{ selectedUser.apellido }}</h2>
+
+    <div class="modal-details">
+      <div class="modal-detail" *ngIf="selectedUser.email">
+        <mat-icon>email</mat-icon>
+        <span>{{ selectedUser.email }}</span>
+      </div>
+      <div class="modal-detail" *ngIf="selectedUser.distrito">
+        <mat-icon>location_on</mat-icon>
+        <span>{{ selectedUser.distrito }}</span>
+      </div>
+      <div class="modal-detail" *ngIf="calcularEdad(selectedUser.fecha_nacimiento) as edad">
+        <mat-icon>calendar_today</mat-icon>
+        <span>{{ edad }} años</span>
+      </div>
+    </div>
+
+    <button class="modal-profile-btn" (click)="goToProfile()" type="button">
+      <mat-icon>person</mat-icon>
+      Ver perfil completo
+    </button>
+  </div>
+</div>

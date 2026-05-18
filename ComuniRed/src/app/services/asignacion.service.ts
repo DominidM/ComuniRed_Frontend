@@ -140,10 +140,10 @@ export class AsignacionService {
         variables: { soporteId },
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(map((r: any) => r), 
-        map(result => {
-          console.log('📥 Asignaciones del soporte:', result.data.asignacionesPorSoporte);
-          return result.data.asignacionesPorSoporte;
+      .valueChanges.pipe(
+        map((result: any) => {
+          if (!result.data?.asignacionesPorSoporte) return [];
+          return result.data.asignacionesPorSoporte as Asignacion[];
         })
       );
   }
@@ -154,10 +154,10 @@ export class AsignacionService {
         query: GET_ASIGNACIONES_ACTIVAS,
         fetchPolicy: 'network-only'
       })
-      .valueChanges.pipe(map((r: any) => r), 
-        map(result => {
-          console.log('📥 Asignaciones activas:', result.data.asignacionesActivas);
-          return result.data.asignacionesActivas;
+      .valueChanges.pipe(
+        map((result: any) => {
+          if (!result.data?.asignacionesActivas) return [];
+          return result.data.asignacionesActivas as Asignacion[];
         })
       );
   }

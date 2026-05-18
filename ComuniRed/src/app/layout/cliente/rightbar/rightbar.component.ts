@@ -5,9 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import {
   ConversacionService,
   Conversacion,
+  Mensaje,
 } from '../../../services/conversacion.service';
 import { UsuarioService } from '../../../services/usuario.service';
-import { forkJoin, of } from 'rxjs';
+import { Subscription, forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 export interface ChatPreview {
@@ -58,6 +59,7 @@ export class RightbarComponent implements OnInit, OnDestroy {
 
   private onKey = this.handleKeyDown.bind(this);
   private currentUserId = '';
+  private mensajeSub?: Subscription;
 
   // Colores para avatares sin foto
   private readonly COLORS = [
@@ -82,11 +84,40 @@ export class RightbarComponent implements OnInit, OnDestroy {
     if (u) {
       this.currentUserId = u.id || u._id;
       this.loadConversaciones();
+      this.iniciarSuscripcionMensajes();
     }
   }
 
   ngOnDestroy(): void {
     document.removeEventListener('keydown', this.onKey, true);
+    this.mensajeSub?.unsubscribe();
+  }
+
+  private iniciarSuscripcionMensajes(): void {
+    this.mensajeSub = this.conversacionService
+      .suscribirseANuevosMensajes(this.currentUserId)
+      .subscribe({
+        next: (mensaje) => {
+          if (!mensaje) return;
+          const idx = this.mensajes.findIndex(
+            (c) => c.conversacionId === mensaje.conversacionId,
+          );
+          if (idx >= 0) {
+            const chat = this.mensajes[idx];
+            this.mensajes[idx] = {
+              ...chat,
+              preview: mensaje.contenido,
+              time: this.formatTime(mensaje.fechaEnvio),
+              unread: true,
+              unreadCount: (chat.unreadCount ?? 0) + 1,
+            };
+            this.mensajes = [...this.mensajes];
+          } else {
+            this.loadConversaciones();
+          }
+        },
+        error: () => {},
+      });
   }
 
   private loadConversaciones(): void {

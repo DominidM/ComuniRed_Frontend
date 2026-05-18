@@ -11,20 +11,11 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { QuejaService } from '../../../services/queja.service';
-import { UsuarioService } from '../../../services/usuario.service';
+import { Subscription } from 'rxjs';
+import { UsuarioService, Usuario } from '../../../services/usuario.service';
+import { SeguimientoService } from '../../../services/seguimiento.service';
 import { ThemeService } from '../../../services/theme.service';
-
-interface SearchResult {
-  type: 'reporte' | 'persona';
-  id: string;
-  titulo?: string;
-  nombre?: string;
-  apellido?: string;
-  foto_perfil?: string;
-  categoria?: string;
-  fecha?: string;
-}
+import { NotificacionService } from '../../../services/notificacion.service';
 
 @Component({
   selector: 'app-navbar',
@@ -44,11 +35,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   @Input() modalActive = false;
 
   query = '';
-  notificationCount = 5;
+  notificationCount = 0;
+  private notifSub?: Subscription;
   logoUrl =
     'https://res.cloudinary.com/dp1vgjhsq/image/upload/v1778266727/WhatsApp_Image_2026-05-08_at_12.35.24_PM-removebg-preview_sga0m0.png';
   showSearchResults = false;
-  searchResults: SearchResult[] = [];
+  searchResults: Usuario[] = [];
   searching = false;
   currentUserId?: string;
 
@@ -58,10 +50,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
   avatarUrl = '';
   initials = 'CR';
 
+  showUserModal = false;
+  selectedUser: Usuario | null = null;
+
   constructor(
     private router: Router,
-    private quejaService: QuejaService,
     private usuarioService: UsuarioService,
+    private seguimientoService: SeguimientoService,
+    private notificacionService: NotificacionService,
     public themeService: ThemeService
   ) {}
 
@@ -72,11 +68,34 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.avatarUrl = this.usuarioService.obtenerFotoMiniatura(user.foto_perfil, 44);
       this.initials =
         `${user.nombre?.[0] ?? ''}${user.apellido?.[0] ?? ''}`.toUpperCase() || 'CR';
+      this.cargarContadorNotificaciones();
+      this.suscribirseANotificaciones();
     }
   }
 
   ngOnDestroy(): void {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
+    this.notifSub?.unsubscribe();
+  }
+
+  private cargarContadorNotificaciones(): void {
+    if (!this.currentUserId) return;
+    this.notificacionService.contarNoLeidas(this.currentUserId).subscribe({
+      next: (count) => (this.notificationCount = count ?? 0),
+      error: () => {},
+    });
+  }
+
+  private suscribirseANotificaciones(): void {
+    if (!this.currentUserId) return;
+    this.notifSub = this.notificacionService
+      .suscribirseANotificaciones(this.currentUserId)
+      .subscribe({
+        next: (notif) => {
+          if (notif) this.notificationCount++;
+        },
+        error: () => {},
+      });
   }
 
   canInteract(): boolean {
@@ -111,55 +130,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   performSearch(term: string): void {
-    if (!this.canInteract() || !term || !this.currentUserId) return;
+    if (!this.canInteract() || !term) return;
 
     this.searching = true;
     this.showSearchResults = true;
 
-    this.quejaService.obtenerQuejas(this.currentUserId).subscribe({
-      next: (quejas) => {
-        const termLower = term.toLowerCase();
-
-        const reportesResults: SearchResult[] = quejas
-          .filter(
-            (q) =>
-              q.titulo.toLowerCase().includes(termLower) ||
-              q.descripcion.toLowerCase().includes(termLower) ||
-              q.categoria?.nombre.toLowerCase().includes(termLower)
-          )
-          .slice(0, 5)
-          .map((q) => ({
-            type: 'reporte' as const,
-            id: q.id,
-            titulo: q.titulo,
-            categoria: q.categoria?.nombre,
-            fecha: q.fecha_creacion,
-          }));
-
-        const usuariosMap = new Map<string, SearchResult>();
-        quejas.forEach((q) => {
-          if (q.usuario) {
-            const nombreCompleto =
-              `${q.usuario.nombre} ${q.usuario.apellido}`.toLowerCase();
-            if (
-              nombreCompleto.includes(termLower) &&
-              !usuariosMap.has(q.usuario.id)
-            ) {
-              usuariosMap.set(q.usuario.id, {
-                type: 'persona' as const,
-                id: q.usuario.id,
-                nombre: q.usuario.nombre,
-                apellido: q.usuario.apellido,
-                foto_perfil: q.usuario.foto_perfil,
-              });
-            }
-          }
-        });
-
-        this.searchResults = [
-          ...reportesResults,
-          ...Array.from(usuariosMap.values()).slice(0, 5),
-        ];
+    this.seguimientoService.buscarUsuarios(term, 0, 10).subscribe({
+      next: (pageData) => {
+        this.searchResults = pageData.content || [];
         this.searching = false;
       },
       error: () => {
@@ -169,21 +147,36 @@ export class NavbarComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectResult(result: SearchResult): void {
+  selectResult(user: Usuario): void {
     if (!this.canInteract()) return;
 
     this.showSearchResults = false;
     this.query = '';
+    this.selectedUser = user;
+    this.showUserModal = true;
+  }
 
-    if (result.type === 'reporte') {
-      this.router.navigate(['/public/feed'], {
-        queryParams: { reporte: result.id },
-      });
-    } else {
-      result.id === this.currentUserId
-        ? this.router.navigate(['/public/profile'])
-        : this.router.navigate(['/public/user-profile', result.id]);
-    }
+  closeUserModal(): void {
+    this.showUserModal = false;
+    this.selectedUser = null;
+  }
+
+  goToProfile(): void {
+    if (!this.selectedUser) return;
+    const id = this.selectedUser.id;
+    this.closeUserModal();
+    id === this.currentUserId
+      ? this.router.navigate(['/public/profile'])
+      : this.router.navigate(['/public/user-profile', id]);
+  }
+
+  calcularEdad(fecha?: string): number | null {
+    if (!fecha) return null;
+    return this.usuarioService.calcularEdad(fecha);
+  }
+
+  obtenerFoto(foto?: string): string {
+    return this.usuarioService.obtenerFotoMiniatura(foto, 120);
   }
 
   closeSearch(): void {
@@ -191,26 +184,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.showSearchResults = false;
   }
 
-  getResultTitle(result: SearchResult): string {
-    return result.type === 'reporte'
-      ? result.titulo || 'Reporte sin título'
-      : `${result.nombre || ''} ${result.apellido || ''}`.trim() || 'Usuario';
-  }
-
-  getResultSubtitle(result: SearchResult): string {
-    return result.type === 'reporte'
-      ? result.categoria || 'Sin categoría'
-      : 'Usuario de ComuniRed';
-  }
-
-  formatDate(dateString: string): string {
-    const diffInHours = Math.floor(
-      (Date.now() - new Date(dateString).getTime()) / 3600000
-    );
-    if (diffInHours < 1) return 'hace unos minutos';
-    if (diffInHours < 24) return `hace ${diffInHours}h`;
-    if (diffInHours < 48) return 'hace 1 día';
-    return `hace ${Math.floor(diffInHours / 24)} días`;
+  getResultName(user: Usuario): string {
+    return `${user.nombre || ''} ${user.apellido || ''}`.trim() || 'Usuario';
   }
 
   openNotifications(): void {
@@ -234,8 +209,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.router.navigate(['/public/home']);
   }
 
-  trackByResult(index: number, result: SearchResult): string {
-    return result.id;
+  trackByResult(index: number, user: Usuario): string {
+    return user.id;
   }
 
   goProfile(): void {

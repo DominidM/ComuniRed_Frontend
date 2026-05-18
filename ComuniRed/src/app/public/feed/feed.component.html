@@ -19,17 +19,6 @@
         ¿Qué problema de infraestructura quieres reportar?
       </button>
     </div>
-    <div class="create-sep"></div>
-    <div class="create-actions">
-      <button class="create-action" (click)="showCreateModal = true">
-        <i class="bi bi-image create-icon"></i>
-        <span>Foto/Video</span>
-      </button>
-      <button class="create-action" (click)="showCreateModal = true">
-        <i class="bi bi-geo-alt-fill create-icon"></i>
-        <span>Ubicación</span>
-      </button>
-    </div>
   </div>
 
   <!-- Modal crear reporte -->
@@ -37,7 +26,7 @@
     *ngIf="showCreateModal"
     [user]="user"
     [categorias]="categorias"
-    (created)="onReportCreated()"
+    (created)="onReportCreated($event)"
     (cancelled)="showCreateModal = false">
   </app-create-report>
 
