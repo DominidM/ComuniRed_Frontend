@@ -1,0 +1,119 @@
+<div class="reel-form-page">
+  <app-workspace-header
+    [title]="isEditing ? 'Editar Reel' : 'Nuevo Reel'"
+    [subtitle]="
+      isEditing
+        ? 'Actualiza la información del reel seleccionado.'
+        : 'Completa la información para registrar un nuevo reel.'
+    "
+    [breadcrumbs]="[
+      { label: 'Admin', route: '/admin/dashboard' },
+      { label: 'Reels', route: '/admin/reels' },
+      { label: isEditing ? 'Editar' : 'Nuevo' },
+    ]"
+    [secondaryActionLabel]="'Volver'"
+    [secondaryActionIcon]="'←'"
+    [actionLabel]="isEditing ? 'Actualizar' : 'Guardar'"
+    [actionIcon]="isEditing ? '✎' : '+'"
+    [loading]="loading || submitting"
+    (secondaryActionClick)="cancelar()"
+    (actionClick)="guardar()"
+  >
+  </app-workspace-header>
+
+  <div class="reel-form-card">
+    <div *ngIf="loading" class="state-box">
+      Cargando información del reel...
+    </div>
+
+    <form *ngIf="!loading" class="reel-form" (ngSubmit)="guardar()">
+      <div class="form-group">
+        <label for="title">Título</label>
+        <input
+          id="title"
+          name="title"
+          type="text"
+          [(ngModel)]="formTitle"
+          placeholder="Título del reel"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Descripción</label>
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="formDescription"
+          rows="5"
+          placeholder="Descripción del reel"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="author">Autor</label>
+          <input
+            id="author"
+            name="author"
+            type="text"
+            [(ngModel)]="formAuthor"
+            placeholder="Nombre del autor"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="avatarUrl">URL del avatar</label>
+          <input
+            id="avatarUrl"
+            name="avatarUrl"
+            type="text"
+            [(ngModel)]="formAvatarUrl"
+            placeholder="https://..."
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="video">
+          Video
+          {{
+            isEditing
+              ? "(opcional: si no subes uno, se mantiene el actual)"
+              : ""
+          }}
+        </label>
+
+        <input
+          id="video"
+          name="video"
+          type="file"
+          accept="video/*"
+          (change)="onFileSelected($event)"
+        />
+
+        <small *ngIf="selectedFileName" class="selected-file">
+          Archivo seleccionado: {{ selectedFileName }}
+        </small>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-secondary" type="button" (click)="cancelar()">
+          Cancelar
+        </button>
+
+        <button class="btn-primary" type="submit" [disabled]="submitting">
+          {{
+            submitting
+              ? "Guardando..."
+              : isEditing
+                ? "Actualizar"
+                : "Crear reel"
+          }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -74,7 +74,7 @@ export class AdminSidebarComponent {
         },
         {
           label: 'Reels',
-          route: '/admin/reel',
+          route: '/admin/reels',
           icon: 'reel',
         },
         {

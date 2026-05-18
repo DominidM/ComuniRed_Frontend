@@ -1,0 +1,109 @@
+<div class="crud-reel-root">
+  <app-workspace-header
+    [title]="'Gestión de Reels'"
+    [subtitle]="'Administra los reels registrados en la plataforma.'"
+    [breadcrumbs]="[
+      { label: 'Admin', route: '/admin/dashboard' },
+      { label: 'Reels', route: '/admin/reels' }
+    ]"
+    [count]="filteredReels.length"
+    [countLabel]="'reels'"
+    [actionLabel]="'Nuevo Reel'"
+    [actionIcon]="'+'"
+    [loading]="loading"
+    (actionClick)="crearNuevo()"
+  >
+  </app-workspace-header>
+
+  <div class="crud-reel-card">
+    <div class="crud-reel-controls-row">
+      <div class="crud-reel-search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          (keyup.enter)="buscarReel()"
+          placeholder="Buscar por título, autor o descripción..."
+        />
+
+        <button
+          class="crud-reel-search-btn"
+          type="button"
+          (click)="buscarReel()"
+          aria-label="Buscar reel"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+
+        <button
+          class="crud-reel-clear-btn"
+          type="button"
+          (click)="limpiarBusqueda()"
+          *ngIf="searchText"
+        >
+          Limpiar
+        </button>
+      </div>
+
+      <div class="crud-reel-count">
+        <span>Total: {{ filteredReels.length }} reels</span>
+      </div>
+    </div>
+
+    <app-loading-overlay [loading]="loading" text="Cargando reels...">
+      <div *ngIf="filteredReels.length > 0; else noReels" class="table-wrapper">
+        <table class="crud-reel-table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Descripción</th>
+              <th>Likes</th>
+              <th>Comentarios</th>
+              <th>Compartidos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let reel of filteredReels; trackBy: trackByReelId">
+              <td>
+                <div class="reel-title">{{ reel.title }}</div>
+              </td>
+              <td>
+                <div class="reel-author">{{ reel.author }}</div>
+              </td>
+              <td>
+                <div class="reel-desc">{{ reel.description }}</div>
+              </td>
+              <td>
+                <span class="reel-stat">{{ reel.likes }}</span>
+              </td>
+              <td>
+                <span class="reel-stat">{{ reel.comments }}</span>
+              </td>
+              <td>
+                <span class="reel-stat">{{ reel.shares }}</span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-view" type="button" (click)="verDetalle(reel)">Ver</button>
+                  <button class="btn-edit" type="button" (click)="editar(reel)">Editar</button>
+                  <button class="btn-delete" type="button" (click)="eliminar(reel)">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #noReels>
+        <div class="crud-reel-empty">
+          <p>No hay reels registrados</p>
+        </div>
+      </ng-template>
+    </app-loading-overlay>
+  </div>
+</div>

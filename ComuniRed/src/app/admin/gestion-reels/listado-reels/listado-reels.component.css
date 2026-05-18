@@ -1,0 +1,239 @@
+:host {
+  display: block;
+}
+
+.crud-reel-root {
+  padding: 0 0 24px;
+}
+
+.crud-reel-card {
+  background: var(--cr-background);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: var(--shadow-strong);
+  border: 1px solid var(--cr-border);
+}
+
+.crud-reel-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.crud-reel-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 280px;
+}
+
+.crud-reel-search-box input {
+  flex: 1;
+  border: 1px solid var(--cr-border);
+  background: var(--cr-search);
+  color: var(--cr-text);
+  border-radius: 12px;
+  padding: 12px 14px;
+  outline: none;
+  font-size: 14px;
+}
+
+.crud-reel-search-box input:focus {
+  border-color: var(--cr-primary);
+  background: var(--cr-background);
+  box-shadow: var(--shadow-ring-primary);
+}
+
+.crud-reel-search-btn,
+.crud-reel-clear-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.crud-reel-search-btn {
+  background: var(--cr-text);
+  color: var(--cr-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crud-reel-search-btn:hover {
+  background: var(--cr-neutral-strong-hover);
+  color: var(--cr-white);
+}
+
+.crud-reel-clear-btn {
+  background: var(--cr-surface);
+  color: var(--cr-text);
+  border: 1px solid var(--cr-border);
+}
+
+.crud-reel-clear-btn:hover {
+  background: var(--cr-hover-surface);
+}
+
+.crud-reel-count {
+  color: var(--cr-text-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--cr-border);
+  border-radius: 16px;
+}
+
+.crud-reel-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+  background: var(--cr-background);
+}
+
+.crud-reel-table thead th {
+  text-align: left;
+  font-size: 13px;
+  color: var(--cr-text-muted);
+  font-weight: 700;
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--cr-border);
+  background: var(--cr-surface);
+  white-space: nowrap;
+}
+
+.crud-reel-table tbody td {
+  padding: 16px 12px;
+  border-bottom: 1px solid var(--cr-border-soft);
+  vertical-align: top;
+  color: var(--cr-text);
+}
+
+.crud-reel-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.crud-reel-table tbody tr:hover {
+  background: color-mix(in srgb, var(--cr-primary) 3%, var(--cr-background));
+}
+
+.reel-title {
+  font-weight: 700;
+  color: var(--cr-text);
+}
+
+.reel-author {
+  font-weight: 600;
+  color: var(--cr-text);
+}
+
+.reel-desc {
+  color: var(--cr-text-muted);
+  max-width: 320px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.reel-stat {
+  display: inline-flex;
+  min-width: 42px;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--cr-primary-soft);
+  color: var(--cr-primary);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-view,
+.btn-edit,
+.btn-delete {
+  border: none;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-view {
+  background: color-mix(in srgb, #0ea5e9 14%, var(--cr-background));
+  color: #0369a1;
+  border: 1px solid color-mix(in srgb, #0ea5e9 24%, transparent);
+}
+
+.btn-edit {
+  background: color-mix(in srgb, #84cc16 16%, var(--cr-background));
+  color: #3f6212;
+  border: 1px solid color-mix(in srgb, #84cc16 26%, transparent);
+}
+
+.btn-delete {
+  background: var(--cr-danger-soft);
+  color: var(--cr-danger);
+  border: 1px solid var(--cr-danger-soft-2);
+}
+
+.btn-view:hover,
+.btn-edit:hover,
+.btn-delete:hover {
+  transform: translateY(-1px);
+}
+
+.crud-reel-empty {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--cr-text-muted);
+  background: var(--cr-surface);
+  border-radius: 16px;
+  border: 1px dashed var(--cr-border);
+}
+
+@media (max-width: 768px) {
+  .crud-reel-root {
+    padding: 0 0 16px;
+  }
+
+  .crud-reel-card {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .crud-reel-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .crud-reel-search-box {
+    min-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .crud-reel-search-btn,
+  .crud-reel-clear-btn {
+    flex: 1;
+  }
+
+  .crud-reel-count {
+    text-align: right;
+  }
+}
