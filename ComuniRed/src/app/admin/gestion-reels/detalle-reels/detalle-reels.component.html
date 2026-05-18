@@ -1,0 +1,81 @@
+<div class="reel-detail-page">
+  <app-workspace-header
+    [title]="'Detalle del Reel'"
+    [subtitle]="'Visualiza la información completa del reel seleccionado.'"
+    [breadcrumbs]="[
+      { label: 'Admin', route: '/admin/dashboard' },
+      { label: 'Reels', route: '/admin/reels' },
+      { label: reel?.title || 'Detalle' }
+    ]"
+    [actionLabel]="reel ? 'Editar Reel' : ''"
+    [actionIcon]="'✎'"
+    [secondaryActionLabel]="'Volver'"
+    [secondaryActionIcon]="'←'"
+    [loading]="loading"
+    (actionClick)="editar()"
+    (secondaryActionClick)="volver()"
+  >
+  </app-workspace-header>
+
+  <div class="reel-detail-card">
+    <div *ngIf="loading" class="state-box">
+      Cargando detalle del reel...
+    </div>
+
+    <div *ngIf="!loading && reel" class="reel-detail-content">
+      <div class="reel-video-preview">
+        <video controls preload="metadata">
+          <source [src]="reel.videoUrl" type="video/mp4" />
+          Tu navegador no soporta la reproducción de video.
+        </video>
+      </div>
+
+      <div class="reel-info-grid">
+        <div class="info-card">
+          <span class="info-label">Título</span>
+          <h3>{{ reel.title }}</h3>
+        </div>
+
+        <div class="info-card">
+          <span class="info-label">Autor</span>
+          <div class="author-box">
+            <img
+              *ngIf="reel.avatarUrl"
+              [src]="reel.avatarUrl"
+              alt="Avatar del autor"
+              class="reel-avatar"
+            />
+            <span>{{ reel.author }}</span>
+          </div>
+        </div>
+
+        <div class="info-card full-width">
+          <span class="info-label">Descripción</span>
+          <p>{{ reel.description }}</p>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-value">{{ reel.likes }}</span>
+          <span class="stat-label">Likes</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-value">{{ reel.comentariosCount }}</span>
+          <span class="stat-label">Comentarios</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-value">{{ reel.shares }}</span>
+          <span class="stat-label">Compartidos</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-value">{{ reel.vistas }}</span>
+          <span class="stat-label">Vistas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

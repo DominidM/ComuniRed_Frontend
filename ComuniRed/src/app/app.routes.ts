@@ -48,7 +48,6 @@ import { ConfiguracionComponent } from './admin/configuracion/configuracion.comp
 
 import { MapaGeneralComponent } from './admin/mapa-general/mapa-general.component';
 import { CrudEvidenciaComponent } from './admin/crud-evidencia/crud-evidencia.component';
-import { CrudReelComponent } from './admin/crud-reel/crud-reel.component';
 
 import { AuthGuard } from './guards/auth.guard';
 import { publicRedirectGuard } from './guards/public-redirect.guard';
@@ -61,6 +60,9 @@ import { SoporteClasificacionComponent } from './soporte/soporte-clasificacion/s
 import { SoporteValidacionComponent } from './soporte/soporte-validacion/soporte-validacion.component';
 import { SoporteSeguimientoComponent } from './soporte/soporte-seguimiento/soporte-seguimiento.component';
 import { SoporteComentarioComponent as SoporteComentariosComponent } from './soporte/soporte-comentarios/soporte-comentarios.component';
+import { DetalleReelsComponent } from './admin/gestion-reels/detalle-reels/detalle-reels.component';
+import { FormularioReelsComponent } from './admin/gestion-reels/formulario-reels/formulario-reels.component';
+import { ListadoReelsComponent } from './admin/gestion-reels/listado-reels/listado-reels.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -103,7 +105,11 @@ export const routes: Routes = [
 
       { path: 'auditoria', component: AuditoriaComponent },
       { path: 'configuracion', component: ConfiguracionComponent },
-      { path: 'reel', component: CrudReelComponent },
+
+      { path: 'reels', component: ListadoReelsComponent },
+      { path: 'reels/nuevo', component: FormularioReelsComponent },
+      { path: 'reels/editar/:id', component: FormularioReelsComponent },
+      { path: 'reels/detalle/:id', component: DetalleReelsComponent },
 
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
