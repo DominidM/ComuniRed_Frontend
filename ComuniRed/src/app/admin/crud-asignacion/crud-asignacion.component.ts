@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { AsignacionService, Asignacion } from '../../services/asignacion.service';
 import { QuejaService } from '../../services/queja.service';
 import { UsuarioService } from '../../services/usuario.service';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 
 interface QuejaParaAsignar {
   id: string;
@@ -28,17 +29,25 @@ interface UsuarioSoporte {
 @Component({
   selector: 'app-crud-asignacion',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, LoadingOverlayComponent],
   templateUrl: './crud-asignacion.component.html',
   styleUrls: ['./crud-asignacion.component.css']
 })
 export class CrudAsignacionComponent implements OnInit {
   asignaciones: Asignacion[] = [];
   asignacionesFiltradas: Asignacion[] = [];
+  asignacionesPaginadas: Asignacion[] = [];
   quejasDisponibles: QuejaParaAsignar[] = [];
   usuariosSoporte: UsuarioSoporte[] = [];
   
   loading = false;
+  asignandoAutomatico = false;
+
+  pageSize: number = 5;
+  pageSizes: number[] = [5, 10, 20, 50];
+  totalAsignaciones: number = 0;
+  currentPage: number = 1;
+  totalPages: number = 1;
   showModal = false;
   showQuejasModal = false;
   showReasignarModal = false;
@@ -85,8 +94,7 @@ export class CrudAsignacionComponent implements OnInit {
         this.verificarQuejasAsignadas();
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Error cargando asignaciones:', err);
+      error: () => {
         this.loading = false;
       }
     });
@@ -98,7 +106,6 @@ export class CrudAsignacionComponent implements OnInit {
 
     this.quejaService.obtenerQuejasAprobadas((currentUser as any).id).subscribe({
       next: (quejas: any[]) => {
-
         this.quejasDisponibles = quejas
           .filter(q => q.votes?.total >= 5)
           .map(q => ({
@@ -109,9 +116,7 @@ export class CrudAsignacionComponent implements OnInit {
         
         this.verificarQuejasAsignadas();
       },
-      error: (err) => {
-        console.error('Error cargando quejas:', err);
-      }
+      error: () => {}
     });
   }
 
@@ -125,7 +130,6 @@ export class CrudAsignacionComponent implements OnInit {
       queja.estaAsignada = asignacionesDeQueja.length > 0;
       queja.asignaciones = asignacionesDeQueja;
     });
-
   }
 
   obtenerTextoAsignacion(queja: QuejaParaAsignar): string {
@@ -154,9 +158,7 @@ export class CrudAsignacionComponent implements OnInit {
       next: (usuarios: any[]) => {
         this.usuariosSoporte = usuarios;
       },
-      error: (err) => {
-        console.error('Error cargando soportes:', err);
-      }
+      error: () => {}
     });
   }
 
@@ -170,12 +172,42 @@ export class CrudAsignacionComponent implements OnInit {
     if (this.filtroTexto.trim()) {
       const busqueda = this.filtroTexto.toLowerCase();
       resultado = resultado.filter(a => 
-        a.queja_id.toLowerCase().includes(busqueda) ||
-        a.observacion?.toLowerCase().includes(busqueda)
+        a.observacion?.toLowerCase().includes(busqueda) ||
+        this.obtenerNombreSoporte(a.soporte_id).toLowerCase().includes(busqueda)
       );
     }
 
     this.asignacionesFiltradas = resultado;
+    this.totalAsignaciones = resultado.length;
+    this.totalPages = Math.ceil(resultado.length / this.pageSize) || 1;
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+    this.actualizarPagina();
+  }
+
+  actualizarPagina(): void {
+    const start = (this.currentPage - 1) * this.pageSize;
+    this.asignacionesPaginadas = this.asignacionesFiltradas.slice(start, start + this.pageSize);
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina < 1 || pagina > this.totalPages) return;
+    this.currentPage = pagina;
+    this.actualizarPagina();
+  }
+
+  onPageSizeChange(event: any): void {
+    const newSize = +event.target.value;
+    if (!isNaN(newSize) && newSize > 0) {
+      this.pageSize = newSize;
+      this.currentPage = 1;
+      this.aplicarFiltros();
+    }
+  }
+
+  trackByAsignacionId(index: number, asig: Asignacion): string {
+    return asig.id || index.toString();
   }
 
   abrirModalNuevaAsignacion(): void {
@@ -221,23 +253,17 @@ export class CrudAsignacionComponent implements OnInit {
       this.nuevaAsignacion.observacion
     ).subscribe({
       next: (nuevaAsignacion) => {
-        
         this.asignaciones.push(nuevaAsignacion);
         this.aplicarFiltros();
         this.verificarQuejasAsignadas();
-        
-        alert('✅ Queja asignada correctamente');
+        alert('Queja asignada correctamente');
         this.cerrarModal();
-        
-        // ✅ Recargar datos para sincronizar con el servidor
         setTimeout(() => {
           this.cargarDatos();
         }, 500);
-        
         this.loading = false;
       },
-      error: (err) => {
-        console.error('❌ Error asignando queja:', err);
+      error: () => {
         alert('Error al asignar la queja');
         this.loading = false;
       }
@@ -245,7 +271,7 @@ export class CrudAsignacionComponent implements OnInit {
   }
 
   cambiarEstado(asignacion: Asignacion, nuevoEstado: string): void {
-    if (!confirm(`¿Cambiar el estado a ${this.getEstadoTexto(nuevoEstado)}?`)) {
+    if (!confirm(`Cambiar el estado a ${this.getEstadoTexto(nuevoEstado)}?`)) {
       return;
     }
 
@@ -263,11 +289,10 @@ export class CrudAsignacionComponent implements OnInit {
       (currentUser as any).id
     ).subscribe({
       next: () => {
-        alert('✅ Estado actualizado correctamente');
+        alert('Estado actualizado correctamente');
         this.cargarDatos();
       },
-      error: (err) => {
-        console.error('❌ Error cambiando estado:', err);
+      error: () => {
         alert('Error al cambiar el estado');
         this.loading = false;
       }
@@ -281,7 +306,7 @@ export class CrudAsignacionComponent implements OnInit {
     }
 
     if (!this.asignacionParaReasignar) {
-      alert('No hay asignación seleccionada');
+      alert('No hay asignacion seleccionada');
       return;
     }
 
@@ -293,7 +318,7 @@ export class CrudAsignacionComponent implements OnInit {
 
     this.loading = true;
 
-    const motivo = this.datosReasignacion.motivo || 'Reasignación administrativa';
+    const motivo = this.datosReasignacion.motivo || 'Reasignacion administrativa';
 
     this.asignacionService.reasignarQueja(
       this.asignacionParaReasignar.id,
@@ -302,15 +327,75 @@ export class CrudAsignacionComponent implements OnInit {
       motivo
     ).subscribe({
       next: () => {
-        alert('✅ Queja reasignada correctamente');
+        alert('Queja reasignada correctamente');
         this.cerrarModalReasignar();
         this.cargarDatos();
       },
-      error: (err) => {
-        console.error('❌ Error reasignando queja:', err);
+      error: () => {
         alert('Error al reasignar la queja');
         this.loading = false;
       }
+    });
+  }
+
+  asignarAutomaticamente(): void {
+    const pendientes = this.quejasDisponibles.filter(q => !q.estaAsignada);
+
+    if (pendientes.length === 0) {
+      alert('No hay quejas pendientes por asignar');
+      return;
+    }
+
+    if (this.usuariosSoporte.length === 0) {
+      alert('No hay usuarios de soporte disponibles');
+      return;
+    }
+
+    if (!confirm(`Asignar automaticamente ${pendientes.length} quejas entre ${this.usuariosSoporte.length} soportes?`)) {
+      return;
+    }
+
+    const currentUser = this.usuarioService.getUser();
+    if (!currentUser) {
+      alert('No hay usuario autenticado');
+      return;
+    }
+
+    this.asignandoAutomatico = true;
+    this.loading = true;
+    let completadas = 0;
+    let fallos = 0;
+    const total = pendientes.length;
+
+    pendientes.forEach((queja, i) => {
+      const soporte = this.usuariosSoporte[i % this.usuariosSoporte.length];
+
+      this.asignacionService.asignarQueja(
+        queja.id,
+        soporte.id,
+        (currentUser as any).id,
+        'Asignacion automatica'
+      ).subscribe({
+        next: () => {
+          completadas++;
+          if (completadas + fallos === total) {
+            this.asignandoAutomatico = false;
+            this.cargarDatos();
+            const msg = fallos > 0
+              ? `Asignacion automatica completada: ${completadas} exitosas, ${fallos} fallos`
+              : `${completadas} quejas asignadas correctamente`;
+            alert(msg);
+          }
+        },
+        error: () => {
+          fallos++;
+          if (completadas + fallos === total) {
+            this.asignandoAutomatico = false;
+            this.cargarDatos();
+            alert(`Asignacion automatica completada: ${completadas} exitosas, ${fallos} fallos`);
+          }
+        }
+      });
     });
   }
 
@@ -351,5 +436,9 @@ export class CrudAsignacionComponent implements OnInit {
 
   onFiltroChange(): void {
     this.aplicarFiltros();
+  }
+
+  get totalPendientesAuto(): number {
+    return this.quejasDisponibles.filter(q => !q.estaAsignada).length;
   }
 }

@@ -19,29 +19,22 @@
 
   <!-- ── STATS ── -->
   <div class="stats-row">
-    <div class="stat-card" [class.active]="vistaActual === 'pendientes'" (click)="setVista('pendientes')">
-      <div class="stat-icon s-yellow">⏳</div>
-      <div class="stat-info">
-        <span class="stat-num">{{ counts.pendientes }}</span>
-        <span class="stat-lbl">Sin asignar</span>
-      </div>
-    </div>
     <div class="stat-card" [class.active]="vistaActual === 'mis'" (click)="setVista('mis')">
-      <div class="stat-icon s-blue">📋</div>
+      <div class="stat-icon s-blue"><i class="bi bi-list-task"></i></div>
       <div class="stat-info">
         <span class="stat-num">{{ counts.mis }}</span>
         <span class="stat-lbl">Mis reportes</span>
       </div>
     </div>
     <div class="stat-card" [class.active]="vistaActual === 'todos'" (click)="setVista('todos')">
-      <div class="stat-icon s-gray">📊</div>
+      <div class="stat-icon s-gray"><i class="bi bi-bar-chart"></i></div>
       <div class="stat-info">
         <span class="stat-num">{{ counts.todos }}</span>
         <span class="stat-lbl">Total</span>
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon s-green">✅</div>
+      <div class="stat-icon s-green"><i class="bi bi-check-circle"></i></div>
       <div class="stat-info">
         <span class="stat-num">{{ counts.resueltos }}</span>
         <span class="stat-lbl">Resueltos</span>
@@ -51,16 +44,12 @@
 
   <!-- ── TABS ── -->
   <div class="tabs-bar">
-    <button class="tab-btn" [class.activo]="vistaActual === 'pendientes'" (click)="setVista('pendientes')">
-      <span>⏳</span> Sin asignar
-      <span class="tab-badge" *ngIf="counts.pendientes > 0">{{ counts.pendientes }}</span>
-    </button>
     <button class="tab-btn" [class.activo]="vistaActual === 'mis'" (click)="setVista('mis')">
-      <span>👤</span> Mis reportes
+      <i class="bi bi-person"></i> Mis reportes
       <span class="tab-badge mis" *ngIf="counts.mis > 0">{{ counts.mis }}</span>
     </button>
     <button class="tab-btn" [class.activo]="vistaActual === 'todos'" (click)="setVista('todos')">
-      <span>📊</span> Todos
+      <i class="bi bi-bar-chart"></i> Todos
     </button>
   </div>
 
@@ -73,12 +62,12 @@
     </div>
     <select [(ngModel)]="filtro.estado" (change)="aplicarFiltros()" class="sel-filtro" *ngIf="vistaActual === 'todos'">
       <option value="">Todos los estados</option>
-      <option value="PENDIENTE">⏳ Pendiente</option>
-      <option value="ASIGNADA">👤 Asignada</option>
-      <option value="OBSERVADO">👁 Observado</option>
-      <option value="EN_PROCESO">⚙️ En Proceso</option>
-      <option value="RESUELTO">✅ Resuelto</option>
-      <option value="CANCELADO">❌ Cancelado</option>
+      <option value="PENDIENTE">Pendiente</option>
+      <option value="ASIGNADA">Asignada</option>
+      <option value="OBSERVADO">Observado</option>
+      <option value="EN_PROCESO">En Proceso</option>
+      <option value="RESUELTO">Resuelto</option>
+      <option value="CANCELADO">Cancelado</option>
     </select>
     <select [(ngModel)]="filtro.categoria" (change)="aplicarFiltros()" class="sel-filtro">
       <option value="">Todas las categorías</option>
@@ -86,27 +75,22 @@
     </select>
     <select [(ngModel)]="filtro.riesgo" (change)="aplicarFiltros()" class="sel-filtro">
       <option value="">Cualquier riesgo</option>
-      <option value="CRITICO">🔴 Crítico</option>
-      <option value="ALTO">🟠 Alto</option>
-      <option value="MEDIO">🟡 Medio</option>
-      <option value="BAJO">🟢 Bajo</option>
+      <option value="CRITICO">Crítico</option>
+      <option value="ALTO">Alto</option>
+      <option value="MEDIO">Medio</option>
+      <option value="BAJO">Bajo</option>
     </select>
-    <button class="btn-refresh" (click)="cargarQuejas()" title="Actualizar">
+    <button class="btn-refresh" (click)="refrescarTodo()" title="Actualizar">
       <i class="bi bi-arrow-clockwise"></i>
     </button>
   </div>
 
-  <!-- ── LOADING ── -->
-  <div class="loading-state" *ngIf="cargando">
-    <div class="spinner-soporte"></div>
-    <span>Cargando reportes...</span>
-  </div>
+  <app-loading-overlay [loading]="cargando" text="Cargando reportes...">
 
   <!-- ── EMPTY ── -->
   <div class="empty-state" *ngIf="!cargando && quejasFiltradas.length === 0">
-    <div class="empty-icon">📭</div>
+    <div class="empty-icon"><i class="bi bi-inbox"></i></div>
     <h3>No hay reportes aquí</h3>
-    <p *ngIf="vistaActual === 'pendientes'">No hay reportes pendientes sin asignar</p>
     <p *ngIf="vistaActual === 'mis'">No tienes reportes asignados actualmente</p>
     <p *ngIf="vistaActual === 'todos'">No se encontraron reportes con esos filtros</p>
   </div>
@@ -136,8 +120,11 @@
             <span class="badge-estado" [class]="'est-' + getEstadoClave(queja)">
               {{ queja.estado?.nombre || 'Sin estado' }}
             </span>
+            <span class="badge-assigned" *ngIf="misAsignaciones.some(a => a.queja_id === queja.id)">
+              Asignado a ti
+            </span>
             <span class="badge-riesgo" *ngIf="queja.nivel_riesgo" [class]="'risk-' + queja.nivel_riesgo?.toLowerCase()">
-              {{ getRiesgoIcon(queja.nivel_riesgo) }} {{ queja.nivel_riesgo }}
+              {{ queja.nivel_riesgo }}
             </span>
           </div>
         </div>
@@ -164,18 +151,7 @@
 
         <!-- Acciones rápidas -->
         <div class="card-acciones" (click)="$event.stopPropagation()">
-          <!-- Si está PENDIENTE sin asignar -->
-          <button 
-            *ngIf="getEstadoClave(queja) === 'pendiente'" 
-            class="btn-accion tomar"
-            (click)="tomarReporte(queja)"
-            [disabled]="procesando[queja.id]"
-          >
-            <i class="bi bi-hand-index-thumb"></i> Tomar reporte
-          </button>
-
-          <!-- Si está ASIGNADA o EN_PROCESO -->
-          <ng-container *ngIf="['asignada','en_proceso','observado'].includes(getEstadoClave(queja)) && esDeEsteAgente(queja)">
+          <ng-container *ngIf="esDeEsteAgente(queja)">
             <button class="btn-accion proceso" (click)="cambiarEstado(queja, 'EN_PROCESO')" 
                     *ngIf="getEstadoClave(queja) !== 'en_proceso'"
                     [disabled]="procesando[queja.id]">
@@ -194,7 +170,6 @@
               <i class="bi bi-x-circle"></i> Cancelar
             </button>
           </ng-container>
-
           <button class="btn-accion historial" (click)="abrirHistorial(queja)">
             <i class="bi bi-clock-history"></i> Historial
           </button>
@@ -207,6 +182,8 @@
       </div>
     </div>
   </div>
+
+  </app-loading-overlay>
 
 </div>
 
@@ -229,7 +206,7 @@
         </span>
         <span class="badge-riesgo lg" *ngIf="quejaSeleccionada?.nivel_riesgo"
               [class]="'risk-' + quejaSeleccionada?.nivel_riesgo?.toLowerCase()">
-          {{ getRiesgoIcon(quejaSeleccionada?.nivel_riesgo) }} {{ quejaSeleccionada?.nivel_riesgo }}
+          {{ quejaSeleccionada?.nivel_riesgo }}
         </span>
       </div>
     </div>
@@ -269,7 +246,7 @@
                     [class]="'risk-btn-' + r.clave.toLowerCase()"
                     [class.seleccionado]="quejaSeleccionada?.nivel_riesgo === r.clave"
                     (click)="clasificarRiesgo(quejaSeleccionada!, r.clave)">
-              {{ r.icon }} {{ r.label }}
+              {{ r.label }}
             </button>
           </div>
         </div>
@@ -329,9 +306,7 @@
             <p>Sin eventos registrados</p>
           </div>
           <div *ngFor="let ev of historialEventos; let last = last" class="tl-item">
-            <div class="tl-marker" [class]="'tl-' + getTipoColor(ev.tipo_evento)">
-              {{ getTipoIcono(ev.tipo_evento) }}
-            </div>
+            <div class="tl-marker" [class]="'tl-' + getTipoColor(ev.tipo_evento)"></div>
             <div class="tl-content" [class.tl-last]="last">
               <span class="tl-titulo">{{ getTipoTexto(ev.tipo_evento) }}</span>
               <span class="tl-fecha">{{ formatFechaCorta(ev.fecha_evento) }}</span>

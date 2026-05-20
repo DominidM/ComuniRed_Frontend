@@ -2,8 +2,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 import { QuejaService, Queja, HistorialEvento } from '../../services/queja.service';
 import { UsuarioService } from '../../services/usuario.service';
+import { AsignacionService, Asignacion } from '../../services/asignacion.service';
 
 interface Filtro {
   busqueda: string;
@@ -12,12 +14,12 @@ interface Filtro {
   riesgo: string;
 }
 
-type Vista = 'pendientes' | 'mis' | 'todos';
+type Vista = 'mis' | 'todos';
 
 @Component({
   selector: 'app-soporte-seguimiento',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
   templateUrl: './soporte-seguimiento.component.html',
   styleUrls: ['./soporte-seguimiento.component.css'],
 })
@@ -34,8 +36,11 @@ export class SoporteSeguimientoComponent implements OnInit, OnDestroy {
   quejasFiltradas: Queja[] = [];
   quejaSeleccionada: Queja | null = null;
 
+  // Asignaciones del agente
+  misAsignaciones: Asignacion[] = [];
+
   // Vistas
-  vistaActual: Vista = 'pendientes';
+  vistaActual: Vista = 'mis';
 
   // Filtros
   filtro: Filtro = { busqueda: '', estado: '', categoria: '', riesgo: '' };
@@ -61,18 +66,19 @@ export class SoporteSeguimientoComponent implements OnInit, OnDestroy {
 
   // Niveles de riesgo
   niveles = [
-    { clave: 'BAJO',    label: 'Bajo',    icon: '🟢' },
-    { clave: 'MEDIO',   label: 'Medio',   icon: '🟡' },
-    { clave: 'ALTO',    label: 'Alto',    icon: '🟠' },
-    { clave: 'CRITICO', label: 'Crítico', icon: '🔴' },
+    { clave: 'BAJO',    label: 'Bajo' },
+    { clave: 'MEDIO',   label: 'Medio' },
+    { clave: 'ALTO',    label: 'Alto' },
+    { clave: 'CRITICO', label: 'Crítico' },
   ];
 
   // Contadores para stats
-  counts = { pendientes: 0, mis: 0, todos: 0, resueltos: 0 };
+  counts = { mis: 0, todos: 0, resueltos: 0 };
 
   constructor(
     private quejaService: QuejaService,
     private usuarioService: UsuarioService,
+    private asignacionService: AsignacionService,
   ) {}
 
   ngOnInit(): void {
@@ -81,7 +87,14 @@ export class SoporteSeguimientoComponent implements OnInit, OnDestroy {
       this.agente = u;
       this.agenteId = u.id || u._id || '';
     }
+    this.iniciarCarga();
+  }
+
+  private iniciarCarga(): void {
+    this.quejasCargadas = false;
+    this.asignacionesCargadas = false;
     this.cargarQuejas();
+    this.cargarAsignaciones();
   }
 
   ngOnDestroy(): void {
@@ -90,27 +103,64 @@ export class SoporteSeguimientoComponent implements OnInit, OnDestroy {
   }
 
   // ── CARGA ────────────────────────────────────────────────
+  refrescarTodo(): void {
+    this.iniciarCarga();
+  }
+
   cargarQuejas(): void {
     this.cargando = true;
     this.quejaService.obtenerQuejas(this.agenteId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (quejas) => {
-          // Soporte ve todos excepto los en VOTACION (esos son del feed público)
           this.todasLasQuejas = quejas.filter(q => {
             const clave = q.estado?.clave?.toLowerCase();
             return clave !== 'votacion' && clave !== 'nulo';
           });
           this.extraerCategorias();
-          this.calcularContadores();
-          this.aplicarFiltros();
-          this.cargando = false;
+          this.quejasCargadas = true;
+          this.verificarCargaCompleta();
         },
         error: () => {
           this.mostrarToast('Error al cargar reportes', 'error');
-          this.cargando = false;
+          this.quejasCargadas = true;
+          this.verificarCargaCompleta();
         },
       });
+  }
+
+  cargarAsignaciones(): void {
+    if (!this.agenteId) {
+      this.asignacionesCargadas = true;
+      this.verificarCargaCompleta();
+      return;
+    }
+    this.asignacionService.obtenerAsignacionesPorSoporte(this.agenteId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (asignaciones) => {
+          this.misAsignaciones = asignaciones.filter(a =>
+            a.estado !== 'COMPLETADA' && a.estado !== 'CANCELADA'
+          );
+          this.asignacionesCargadas = true;
+          this.verificarCargaCompleta();
+        },
+        error: () => {
+          this.asignacionesCargadas = true;
+          this.verificarCargaCompleta();
+        }
+      });
+  }
+
+  private quejasCargadas = false;
+  private asignacionesCargadas = false;
+
+  private verificarCargaCompleta(): void {
+    if (this.quejasCargadas && this.asignacionesCargadas) {
+      this.calcularContadores();
+      this.aplicarFiltros();
+      this.cargando = false;
+    }
   }
 
   private extraerCategorias(): void {
@@ -123,13 +173,7 @@ export class SoporteSeguimientoComponent implements OnInit, OnDestroy {
 
   private calcularContadores(): void {
     this.counts.todos = this.todasLasQuejas.length;
-    this.counts.pendientes = this.todasLasQuejas.filter(q =>
-      q.estado?.clave?.toLowerCase() === 'pendiente'
-    ).length;
-    this.counts.mis = this.todasLasQuejas.filter(q =>
-      this.esDeEsteAgente(q) &&
-      ['asignada', 'en_proceso', 'observado'].includes(q.estado?.clave?.toLowerCase() || '')
-    ).length;
+    this.counts.mis = this.misAsignaciones.length;
     this.counts.resueltos = this.todasLasQuejas.filter(q =>
       q.estado?.clave?.toLowerCase() === 'resuelto'
     ).length;
@@ -146,16 +190,10 @@ export class SoporteSeguimientoComponent implements OnInit, OnDestroy {
     let lista = [...this.todasLasQuejas];
 
     // Filtro por vista
-    switch (this.vistaActual) {
-      case 'pendientes':
-        lista = lista.filter(q => q.estado?.clave?.toLowerCase() === 'pendiente');
-        break;
-      case 'mis':
-        lista = lista.filter(q =>
-          this.esDeEsteAgente(q) &&
-          ['asignada', 'en_proceso', 'observado'].includes(q.estado?.clave?.toLowerCase() || '')
-        );
-        break;
+    if (this.vistaActual === 'mis') {
+      lista = lista.filter(q =>
+        this.misAsignaciones.some(a => a.queja_id === q.id)
+      );
     }
 
     // Filtro por estado (solo en "todos")
@@ -202,47 +240,36 @@ export class SoporteSeguimientoComponent implements OnInit, OnDestroy {
 
   // ── ACCIONES ─────────────────────────────────────────────
 
-  tomarReporte(queja: Queja): void {
+  cambiarEstado(queja: Queja, nuevoEstado: string, _observacion?: string): void {
     if (this.procesando[queja.id]) return;
     this.procesando[queja.id] = true;
 
-    this.quejaService.cambiarEstadoQueja(queja.id, this.agenteId, 'ASIGNADA', 
-      `Reporte tomado por el agente`)
+    const asignacion = this.obtenerAsignacionDeQueja(queja.id);
+    if (!asignacion) {
+      this.procesando[queja.id] = false;
+      this.mostrarToast('No se encontró la asignación para este reporte', 'error');
+      return;
+    }
+
+    const estadoAsignacion = this.mapearEstadoAsignacion(nuevoEstado);
+
+    this.asignacionService.cambiarEstadoAsignacion(asignacion.id, estadoAsignacion, this.agenteId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (actualizada) => {
-          this.actualizarQuejaLocal(actualizada);
-          this.calcularContadores();
-          this.aplicarFiltros();
-          this.procesando[queja.id] = false;
-          this.mostrarToast('Reporte asignado a ti ✅', 'ok');
-          // Si el modal está abierto, actualizar
-          if (this.quejaSeleccionada?.id === queja.id) {
-            this.quejaSeleccionada = actualizada;
+        next: () => {
+          if (estadoAsignacion === 'COMPLETADA' || estadoAsignacion === 'CANCELADA') {
+            this.misAsignaciones = this.misAsignaciones.filter(a => a.id !== asignacion.id);
+          } else {
+            const idx = this.misAsignaciones.findIndex(a => a.id === asignacion.id);
+            if (idx !== -1) {
+              this.misAsignaciones[idx] = { ...this.misAsignaciones[idx], estado: estadoAsignacion };
+            }
           }
-        },
-        error: () => {
-          this.procesando[queja.id] = false;
-          this.mostrarToast('Error al tomar el reporte', 'error');
-        },
-      });
-  }
-
-  cambiarEstado(queja: Queja, nuevoEstado: string, observacion?: string): void {
-    if (this.procesando[queja.id]) return;
-    this.procesando[queja.id] = true;
-
-    this.quejaService.cambiarEstadoQueja(queja.id, this.agenteId, nuevoEstado, observacion)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (actualizada) => {
-          this.actualizarQuejaLocal(actualizada);
           this.calcularContadores();
           this.aplicarFiltros();
           this.procesando[queja.id] = false;
           this.mostrarToast(`Estado cambiado a ${nuevoEstado}`, 'ok');
           if (this.quejaSeleccionada?.id === queja.id) {
-            this.quejaSeleccionada = actualizada;
             this.cargarHistorial(queja.id);
           }
         },
@@ -332,34 +359,27 @@ export class SoporteSeguimientoComponent implements OnInit, OnDestroy {
   }
 
   // ── HELPERS ──────────────────────────────────────────────
+  private mapearEstadoAsignacion(estadoQueja: string): string {
+    const mapa: { [k: string]: string } = {
+      'EN_PROCESO': 'EN_PROCESO',
+      'OBSERVADO': 'EN_PROCESO',
+      'RESUELTO': 'COMPLETADA',
+      'CANCELADO': 'CANCELADA',
+    };
+    return mapa[estadoQueja] || estadoQueja;
+  }
+
+  private obtenerAsignacionDeQueja(quejaId: string): Asignacion | undefined {
+    return this.misAsignaciones.find(a => a.queja_id === quejaId);
+  }
+
   esDeEsteAgente(queja: Queja | null): boolean {
     if (!queja) return false;
-    // Por ahora cualquier soporte puede gestionar los asignados
-    // Cuando agregues asignado_a_id: return (queja as any).asignado_a_id === this.agenteId
-    const clave = queja.estado?.clave?.toLowerCase() || '';
-    return ['asignada', 'en_proceso', 'observado'].includes(clave);
+    return this.misAsignaciones.some(a => a.queja_id === queja.id);
   }
 
   getEstadoClave(queja: Queja | null): string {
     return queja?.estado?.clave?.toLowerCase() || '';
-  }
-
-  getRiesgoIcon(nivel?: string): string {
-    switch (nivel?.toUpperCase()) {
-      case 'BAJO':    return '🟢';
-      case 'MEDIO':   return '🟡';
-      case 'ALTO':    return '🟠';
-      case 'CRITICO': return '🔴';
-      default:        return '⚪';
-    }
-  }
-
-  getTipoIcono(tipo: string): string {
-    const map: { [k: string]: string } = {
-      creada: '📝', estado_cambiado: '🔄', clasificada: '🏷️',
-      comentario: '💬', asignada: '👤', observacion: '👁️',
-    };
-    return map[tipo] || '📌';
   }
 
   getTipoTexto(tipo: string): string {

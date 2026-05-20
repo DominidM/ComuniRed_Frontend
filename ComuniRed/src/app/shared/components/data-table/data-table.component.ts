@@ -34,7 +34,7 @@ export class DataTableCellDirective {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [CommonModule, DataTableCellDirective],
+  imports: [CommonModule],
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.css'],
 })

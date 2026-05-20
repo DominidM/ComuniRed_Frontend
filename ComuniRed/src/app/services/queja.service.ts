@@ -643,6 +643,26 @@ const VOTAR_QUEJA = gql`
     }
   }
 `;
+const OBTENER_QUEJA_SOPORTE = gql`
+  query ObtenerQuejaSoporte($id: ID!, $usuarioActualId: ID!) {
+    obtenerQuejaPorId(id: $id, usuarioActualId: $usuarioActualId) {
+      id
+      titulo
+      descripcion
+      ubicacion
+      imagen_url
+      fecha_creacion
+      nivel_riesgo
+      fecha_clasificacion
+      usuario { id nombre apellido foto_perfil }
+      categoria { id nombre }
+      estado { id clave nombre }
+      commentsCount
+      votes { yes total }
+    }
+  }
+`;
+
 const OBTENER_QUEJAS_ADMIN_PAGINADAS = gql`
   query ObtenerQuejasAdminPaginadas(
     $usuarioActualId: ID!
@@ -724,6 +744,18 @@ export class QuejaService {
           if (!result.data || !result.data.obtenerQuejas) return [];
           return result.data.obtenerQuejas as Queja[];
         }),
+      );
+  }
+
+  obtenerQuejaPorIdSoporte(id: string, usuarioActualId: string): Observable<Queja | null> {
+    return this.apollo
+      .query<{ obtenerQuejaPorId: Queja | null }>({
+        query: OBTENER_QUEJA_SOPORTE,
+        variables: { id, usuarioActualId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(
+        map((result) => result.data?.obtenerQuejaPorId ?? null),
       );
   }
 
