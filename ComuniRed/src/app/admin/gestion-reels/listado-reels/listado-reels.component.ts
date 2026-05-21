@@ -5,6 +5,11 @@ import { Router } from '@angular/router';
 import { LoadingOverlayComponent } from '../../../shared/components/loading/loading.component';
 import { WorkspaceHeaderComponent } from '../../../shared/components/workspace-header/workspace-header.component';
 import { ReelService, ReelResponse } from '../../../services/reel.service';
+import {
+  DataTableComponent,
+  DataTableColumn,
+  DataTableCellDirective,
+} from '../../../shared/components/data-table/data-table.component';
 
 interface Reel {
   id: string;
@@ -25,7 +30,9 @@ interface Reel {
     CommonModule,
     FormsModule,
     LoadingOverlayComponent,
-    WorkspaceHeaderComponent
+    WorkspaceHeaderComponent,
+    DataTableComponent,
+    DataTableCellDirective,
   ],
   templateUrl: './listado-reels.component.html',
   styleUrls: ['./listado-reels.component.css'],
@@ -35,6 +42,27 @@ export class ListadoReelsComponent implements OnInit {
   filteredReels: Reel[] = [];
   loading = false;
   searchText = '';
+
+  columns: DataTableColumn[] = [
+    { key: 'title', label: 'Título' },
+    { key: 'author', label: 'Autor' },
+    { key: 'description', label: 'Descripción' },
+    { key: 'likes', label: 'Likes' },
+    { key: 'comments', label: 'Comentarios' },
+    { key: 'shares', label: 'Compartidos' },
+    { key: 'acciones', label: 'Acciones' },
+  ];
+
+  page = 0;
+  totalPages = 1;
+
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
+  goToPage(p: number): void {
+    this.page = p;
+  }
 
   constructor(
     private reelService: ReelService,

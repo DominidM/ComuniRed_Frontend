@@ -24,7 +24,7 @@
       </div>
       <div class="crud-rol-show-select">
         <label for="pageSize">por página</label>
-        <select id="pageSize" (change)="onPageSizeChange($event)" [value]="size">
+        <select id="pageSize" (change)="onPageSizeChange($event.target.value)" [value]="size">
           <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
         </select>
         <span>Total: {{ totalElements }}</span>
@@ -32,70 +32,26 @@
     </div>
 
     <app-loading-overlay [loading]="loading" text="Cargando roles...">
-      <div *ngIf="roles && roles.length > 0; else noRoles">
-        <table class="crud-rol-table">
-          <thead>
-            <tr>
-              <th style="display: none;">ID</th>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let rol of roles; trackBy: trackByRolId">
-              <td style="display: none;">{{ rol.id }}</td>
-              <td>
-                <div class="role-name">{{ rol.nombre }}</div>
-              </td>
-              <td>
-                <div class="role-description">{{ rol.descripcion }}</div>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn-edit" (click)="openEditModal(rol)" title="Editar rol">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                    </svg>
-                    Editar
-                  </button>
-                  <button class="btn-delete" (click)="deleteRol(rol)" title="Eliminar rol">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="3,6 5,6 21,6"></polyline>
-                      <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
-                    </svg>
-                    Eliminar
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <ng-template #noRoles>
-        <div class="crud-rol-empty">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #000000;">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <p>No hay roles registrados</p>
-          <button class="btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">
-            Crear primer rol
-          </button>
-        </div>
-      </ng-template>
-
-      <div class="crud-rol-pagination-row" *ngIf="totalElements > 0">
-        <div class="crud-rol-pagination">
-          <button class="crud-rol-pagination-btn" (click)="prevPage()" [disabled]="page === 0"><b>&lt; Anterior</b></button>
-          <span class="crud-rol-pagination-info"><b>Página {{ page + 1 }} de {{ totalPages }}</b></span>
-          <button class="crud-rol-pagination-btn" (click)="nextPage()" [disabled]="page >= totalPages - 1"><b>Siguiente &gt;</b></button>
-        </div>
-        <div class="crud-rol-pagination-count">
-          <span>Mostrando {{ roles.length }} de {{ totalElements }} datos.</span>
-        </div>
-      </div>
+      <app-data-table
+        [columns]="columns"
+        [rows]="roles"
+        [page]="page"
+        [pages]="pages"
+        [totalPages]="totalPages"
+        [totalElements]="totalElements"
+        [loading]="loading"
+        [rowTrackBy]="trackByRolId"
+        emptyMessage="No hay roles registrados."
+        minWidth="800px"
+        (pageChange)="goToPage($event)"
+      >
+        <ng-template dataTableCell="acciones" let-row>
+          <div class="action-buttons">
+            <button class="btn-edit" (click)="openEditModal(row)" title="Editar rol">Editar</button>
+            <button class="btn-delete" (click)="deleteRol(row)" title="Eliminar rol">Eliminar</button>
+          </div>
+        </ng-template>
+      </app-data-table>
     </app-loading-overlay>
 
     <div class="crud-rol-modal" #modal *ngIf="showModal" (click)="closeModal()">

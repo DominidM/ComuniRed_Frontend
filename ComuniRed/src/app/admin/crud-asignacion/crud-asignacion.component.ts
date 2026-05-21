@@ -6,6 +6,11 @@ import { AsignacionService, Asignacion } from '../../services/asignacion.service
 import { QuejaService } from '../../services/queja.service';
 import { UsuarioService } from '../../services/usuario.service';
 import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
+import {
+  DataTableComponent,
+  DataTableColumn,
+  DataTableCellDirective,
+} from '../../shared/components/data-table/data-table.component';
 
 interface QuejaParaAsignar {
   id: string;
@@ -29,7 +34,7 @@ interface UsuarioSoporte {
 @Component({
   selector: 'app-crud-asignacion',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, LoadingOverlayComponent],
+  imports: [CommonModule, FormsModule, RouterModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective],
   templateUrl: './crud-asignacion.component.html',
   styleUrls: ['./crud-asignacion.component.css']
 })
@@ -43,10 +48,18 @@ export class CrudAsignacionComponent implements OnInit {
   loading = false;
   asignandoAutomatico = false;
 
+  columns: DataTableColumn[] = [
+    { key: 'soporte', label: 'Soporte Asignado' },
+    { key: 'estado', label: 'Estado' },
+    { key: 'fecha_asignacion', label: 'Fecha Asignacion' },
+    { key: 'observacion', label: 'Observacion' },
+    { key: 'acciones', label: 'Acciones' },
+  ];
+
   pageSize: number = 5;
   pageSizes: number[] = [5, 10, 20, 50];
   totalAsignaciones: number = 0;
-  currentPage: number = 1;
+  page: number = 0;
   totalPages: number = 1;
   showModal = false;
   showQuejasModal = false;
@@ -180,28 +193,32 @@ export class CrudAsignacionComponent implements OnInit {
     this.asignacionesFiltradas = resultado;
     this.totalAsignaciones = resultado.length;
     this.totalPages = Math.ceil(resultado.length / this.pageSize) || 1;
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = this.totalPages;
+    if (this.page >= this.totalPages) {
+      this.page = Math.max(0, this.totalPages - 1);
     }
     this.actualizarPagina();
   }
 
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
   actualizarPagina(): void {
-    const start = (this.currentPage - 1) * this.pageSize;
+    const start = this.page * this.pageSize;
     this.asignacionesPaginadas = this.asignacionesFiltradas.slice(start, start + this.pageSize);
   }
 
-  cambiarPagina(pagina: number): void {
-    if (pagina < 1 || pagina > this.totalPages) return;
-    this.currentPage = pagina;
+  goToPage(pagina: number): void {
+    if (pagina < 0 || pagina >= this.totalPages || pagina === this.page) return;
+    this.page = pagina;
     this.actualizarPagina();
   }
 
-  onPageSizeChange(event: any): void {
-    const newSize = +event.target.value;
+  onPageSizeChange(size: any): void {
+    const newSize = +size;
     if (!isNaN(newSize) && newSize > 0) {
       this.pageSize = newSize;
-      this.currentPage = 1;
+      this.page = 0;
       this.aplicarFiltros();
     }
   }

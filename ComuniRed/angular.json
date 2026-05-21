@@ -29,7 +29,8 @@
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles.css"
+              "src/styles.css",
+              "src/app/shared/components/button/buttons.css"
             ],
             "scripts": []
           },

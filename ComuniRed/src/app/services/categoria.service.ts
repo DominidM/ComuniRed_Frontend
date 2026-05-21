@@ -26,7 +26,7 @@ export class CategoriaService {
 
   obtenerCategorias(page: number, size: number): Observable<CategoriaPage> {
     return this.apollo
-      .watchQuery<{ obtenerCategorias: CategoriaPage }>({
+      .query<{ obtenerCategorias: CategoriaPage }>({
         query: gql`
           query ($page: Int!, $size: Int!) {
             obtenerCategorias(page: $page, size: $size) {
@@ -45,7 +45,7 @@ export class CategoriaService {
         `,
         variables: { page, size },
       })
-      .valueChanges.pipe(
+      .pipe(
         map((result) => {
           if (!result.data || !result.data.obtenerCategorias) {
             return {
@@ -62,7 +62,7 @@ export class CategoriaService {
   }
 
   buscarCategoriaPorNombre(nombre: string): Observable<Categoria | null> {
-    return this.apollo.watchQuery<{ buscarCategoriaPorNombre: Categoria }>({
+    return this.apollo.query<{ buscarCategoriaPorNombre: Categoria }>({
       query: gql`
         query ($nombre: String!) {
           buscarCategoriaPorNombre(nombre: $nombre) {
@@ -74,7 +74,7 @@ export class CategoriaService {
         }
       `,
       variables: { nombre }
-    }).valueChanges.pipe(
+    }).pipe(
       map(result => (result.data?.buscarCategoriaPorNombre ?? null) as Categoria | null)
     );
   }

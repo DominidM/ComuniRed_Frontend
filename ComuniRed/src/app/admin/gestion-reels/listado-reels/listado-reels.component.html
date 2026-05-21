@@ -53,57 +53,28 @@
     </div>
 
     <app-loading-overlay [loading]="loading" text="Cargando reels...">
-      <div *ngIf="filteredReels.length > 0; else noReels" class="table-wrapper">
-        <table class="crud-reel-table">
-          <thead>
-            <tr>
-              <th>Título</th>
-              <th>Autor</th>
-              <th>Descripción</th>
-              <th>Likes</th>
-              <th>Comentarios</th>
-              <th>Compartidos</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr *ngFor="let reel of filteredReels; trackBy: trackByReelId">
-              <td>
-                <div class="reel-title">{{ reel.title }}</div>
-              </td>
-              <td>
-                <div class="reel-author">{{ reel.author }}</div>
-              </td>
-              <td>
-                <div class="reel-desc">{{ reel.description }}</div>
-              </td>
-              <td>
-                <span class="reel-stat">{{ reel.likes }}</span>
-              </td>
-              <td>
-                <span class="reel-stat">{{ reel.comments }}</span>
-              </td>
-              <td>
-                <span class="reel-stat">{{ reel.shares }}</span>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn-view" type="button" (click)="verDetalle(reel)">Ver</button>
-                  <button class="btn-edit" type="button" (click)="editar(reel)">Editar</button>
-                  <button class="btn-delete" type="button" (click)="eliminar(reel)">Eliminar</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <ng-template #noReels>
-        <div class="crud-reel-empty">
-          <p>No hay reels registrados</p>
-        </div>
-      </ng-template>
+      <app-data-table
+        [columns]="columns"
+        [rows]="filteredReels"
+        [page]="page"
+        [pages]="pages"
+        [totalPages]="totalPages"
+        [totalElements]="filteredReels.length"
+        [loading]="loading"
+        [rowTrackBy]="trackByReelId"
+        emptyMessage="No hay reels registrados."
+        minWidth="1100px"
+        (pageChange)="goToPage($event)"
+        [showPagination]="false"
+      >
+        <ng-template dataTableCell="acciones" let-row>
+          <div class="action-buttons">
+            <button class="btn-view" type="button" (click)="verDetalle(row)">Ver</button>
+            <button class="btn-edit" type="button" (click)="editar(row)">Editar</button>
+            <button class="btn-delete" type="button" (click)="eliminar(row)">Eliminar</button>
+          </div>
+        </ng-template>
+      </app-data-table>
     </app-loading-overlay>
   </div>
 </div>

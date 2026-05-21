@@ -4,19 +4,24 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { EstadosQuejaService, EstadoQueja, EstadoQuejaPage } from '../../services/estado-queja.service';
 import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
+import {
+  DataTableComponent,
+  DataTableColumn,
+  DataTableCellDirective,
+} from '../../shared/components/data-table/data-table.component';
 
 @Component({
   selector: 'app-crud-estado-queja',
   templateUrl: './crud-estado-queja.component.html',
   styleUrls: ['./crud-estado-queja.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent]
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective]
 })
 export class CrudEstadoQuejaComponent implements OnInit {
 
   estados: EstadoQueja[] = [];
   totalEstados: number = 0;
-  currentPage: number = 1;
+  page: number = 0;
   totalPages: number = 1;
   pageSize: number = 5;
   pageSizes: number[] = [5, 10, 20, 50, 100];
@@ -29,6 +34,14 @@ export class CrudEstadoQuejaComponent implements OnInit {
   modoEdicion = false;
   estadoActual: EstadoQueja = { id: '', clave: '', nombre: '', descripcion: '', orden: 1 };
 
+  columns: DataTableColumn[] = [
+    { key: 'clave', label: 'Clave' },
+    { key: 'nombre', label: 'Nombre' },
+    { key: 'descripcion', label: 'Descripción' },
+    { key: 'orden', label: 'Orden' },
+    { key: 'acciones', label: 'Acciones' },
+  ];
+
   constructor(
     private estadosService: EstadosQuejaService,
     private cdr: ChangeDetectorRef
@@ -38,21 +51,25 @@ export class CrudEstadoQuejaComponent implements OnInit {
     this.obtenerEstados();
   }
 
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
   trackByEstadoId(index: number, estado: EstadoQueja): string {
     return estado.id || index.toString();
   }
 
   obtenerEstados() {
     this.loading = true;
-    this.estadosService.obtenerEstadosQueja(this.currentPage - 1, this.pageSize)
+    this.estadosService.obtenerEstadosQueja(this.page, this.pageSize)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (data: EstadoQuejaPage) => {
           this.estados = data.content;
           this.totalEstados = data.totalElements;
           this.totalPages = data.totalPages;
-          if (this.currentPage > this.totalPages && this.totalPages > 0) {
-            this.currentPage = this.totalPages;
+          if (this.page >= this.totalPages && this.totalPages > 0) {
+            this.page = this.totalPages - 1;
             this.obtenerEstados();
           }
           this.cdr.detectChanges();
@@ -64,19 +81,18 @@ export class CrudEstadoQuejaComponent implements OnInit {
       });
   }
 
-  onPageSizeChange(event: any): void {
-    const newSize = +event.target.value;
-    if (!isNaN(newSize) && newSize > 0) {
-      this.pageSize = newSize;
-      this.currentPage = 1;
-      this.obtenerEstados();
-    }
+  goToPage(p: number): void {
+    if (p < 0 || p >= this.totalPages || p === this.page) return;
+    this.page = p;
+    this.obtenerEstados();
   }
 
-  cambiarPagina(pagina: number): void {
-    if (pagina < 1 || pagina > this.totalPages) return;
-    this.currentPage = pagina;
-    this.obtenerEstados();
+  onPageSizeChange(newSize: number): void {
+    if (newSize > 0) {
+      this.pageSize = newSize;
+      this.page = 0;
+      this.obtenerEstados();
+    }
   }
 
   abrirModal() {
@@ -118,7 +134,7 @@ export class CrudEstadoQuejaComponent implements OnInit {
         this.estadoActual.nombre,
         this.estadoActual.descripcion ?? '',
         this.estadoActual.orden,
-        this.currentPage - 1,
+        this.page,
         this.pageSize
       )
       .pipe(finalize(() => (this.saving = false)))
@@ -138,7 +154,7 @@ export class CrudEstadoQuejaComponent implements OnInit {
         this.estadoActual.nombre,
         this.estadoActual.descripcion ?? '',
         this.estadoActual.orden,
-        this.currentPage - 1,
+        this.page,
         this.pageSize
       )
       .pipe(finalize(() => (this.saving = false)))
@@ -157,17 +173,18 @@ export class CrudEstadoQuejaComponent implements OnInit {
 
   eliminarEstado(id: string) {
     if (!confirm('¿Deseas eliminar este estado de queja?')) return;
-    let paginaGuardada = this.currentPage;
-    if (this.estados.length === 1 && this.currentPage > 1) {
-      paginaGuardada = this.currentPage - 1;
+    let paginaGuardada = this.page;
+    if (this.estados.length === 1 && this.page > 0) {
+      paginaGuardada = this.page - 1;
     }
+
     this.deleting = true;
-    this.estadosService.eliminarEstadoQueja(id, paginaGuardada - 1, this.pageSize)
+    this.estadosService.eliminarEstadoQueja(id, paginaGuardada, this.pageSize)
       .pipe(finalize(() => (this.deleting = false)))
       .subscribe({
         next: (ok) => {
           if (ok) {
-            this.currentPage = paginaGuardada;
+            this.page = paginaGuardada;
             this.obtenerEstados();
           }
         },

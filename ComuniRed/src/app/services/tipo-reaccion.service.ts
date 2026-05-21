@@ -27,7 +27,7 @@ export class TipoReaccionService {
     size: number,
   ): Observable<TiposReaccionPage> {
     return this.apollo
-      .watchQuery<{ obtenerTipo_reaccion: TiposReaccionPage }>({
+      .query<{ obtenerTipo_reaccion: TiposReaccionPage }>({
         query: gql`
           query ($page: Int!, $size: Int!) {
             obtenerTipo_reaccion(page: $page, size: $size) {
@@ -46,17 +46,16 @@ export class TipoReaccionService {
           }
         `,
         variables: { page, size },
-        fetchPolicy: 'network-only', // 👈 Agrega esta línea
+        fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(
-        map((r: any) => r),
+      .pipe(
         map((result: any) => result.data?.obtenerTipo_reaccion ?? []),
       );
   }
 
   buscarPorLabel(label: string): Observable<TipoReaccion | null> {
     return this.apollo
-      .watchQuery<{ buscarTipoReaccionPorLabel: TipoReaccion | null }>({
+      .query<{ buscarTipoReaccionPorLabel: TipoReaccion | null }>({
         query: gql`
           query ($label: String!) {
             buscarTipoReaccionPorLabel(label: $label) {
@@ -71,8 +70,7 @@ export class TipoReaccionService {
         variables: { label },
         fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(
-        map((r: any) => r),
+      .pipe(
         map((result) => result.data.buscarTipoReaccionPorLabel),
       );
   }

@@ -103,21 +103,7 @@
         <mat-icon>{{ themeService.isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
       </button>
 
-      <button
-        class="nav-avatar"
-        (click)="goProfile()"
-        matTooltip="Mi perfil"
-        [disabled]="modalActive"
-        type="button"
-      >
-        <img
-          *ngIf="avatarUrl"
-          [src]="avatarUrl"
-          class="nav-avatar-img"
-          alt="avatar"
-        />
-        <span *ngIf="!avatarUrl" class="nav-avatar-fallback">{{ initials }}</span>
-      </button>
+
     </div>
   </div>
 </nav>

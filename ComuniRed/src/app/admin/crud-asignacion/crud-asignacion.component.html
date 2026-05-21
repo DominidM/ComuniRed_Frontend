@@ -53,84 +53,68 @@
     <div class="controls-row" *ngIf="asignacionesFiltradas.length > 0">
       <div class="show-select">
         <label for="pageSize">Por pagina:</label>
-        <select id="pageSize" (change)="onPageSizeChange($event)" [value]="pageSize">
+        <select id="pageSize" (change)="onPageSizeChange($event.target.value)" [value]="pageSize">
           <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
         </select>
         <span class="total-count">Total: {{ totalAsignaciones }}</span>
       </div>
     </div>
 
-    <div *ngIf="asignacionesPaginadas.length > 0" class="asignaciones-table-wrapper">
-      <table class="asignaciones-table">
-        <thead>
-          <tr>
-            <th>Soporte Asignado</th>
-            <th>Estado</th>
-            <th>Fecha Asignacion</th>
-            <th>Observacion</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let asignacion of asignacionesPaginadas; trackBy: trackByAsignacionId">
-            <td>
-              <div class="soporte-info">
-                <div class="soporte-avatar">{{ obtenerNombreSoporte(asignacion.soporte_id).charAt(0) }}</div>
-                <span>{{ obtenerNombreSoporte(asignacion.soporte_id) }}</span>
-              </div>
-            </td>
-            <td>
-              <span class="badge" [ngClass]="getEstadoBadgeClass(asignacion.estado)">
-                {{ getEstadoTexto(asignacion.estado) }}
-              </span>
-            </td>
-            <td class="date-cell">{{ asignacion.fecha_asignacion | date:'dd/MM/yyyy HH:mm' }}</td>
-            <td class="obs-cell">{{ asignacion.observacion || '-' }}</td>
-            <td class="actions-cell">
-              <button class="btn btn-sm btn-info" (click)="verDetalleQueja(asignacion.queja_id)" title="Ver queja">
-                Ver
-              </button>
-              <div class="dropdown">
-                <button class="btn btn-sm btn-secondary-dd">
-                  Estado
-                </button>
-                <div class="dropdown-content">
-                  <a (click)="cambiarEstado(asignacion, 'EN_PROCESO')">En Proceso</a>
-                  <a (click)="cambiarEstado(asignacion, 'COMPLETADA')">Completada</a>
-                  <a (click)="cambiarEstado(asignacion, 'CANCELADA')">Cancelada</a>
-                </div>
-              </div>
-              <button class="btn btn-sm btn-warning" (click)="abrirModalReasignar(asignacion)" title="Reasignar">
-                Reasignar
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <app-data-table
+      [columns]="columns"
+      [rows]="asignacionesPaginadas"
+      [page]="page"
+      [pages]="pages"
+      [totalPages]="totalPages"
+      [totalElements]="totalAsignaciones"
+      [loading]="loading"
+      [rowTrackBy]="trackByAsignacionId"
+      emptyMessage="No hay asignaciones. Crea una nueva asignacion o usa 'Asignar Automaticamente'."
+      minWidth="1000px"
+      (pageChange)="goToPage($event)"
+    >
+      <ng-template dataTableCell="soporte" let-row>
+        <div class="soporte-info">
+          <div class="soporte-avatar">{{ obtenerNombreSoporte(row.soporte_id).charAt(0) }}</div>
+          <span>{{ obtenerNombreSoporte(row.soporte_id) }}</span>
+        </div>
+      </ng-template>
 
-      <div class="pagination-row" *ngIf="totalPages > 1">
-        <div class="pagination">
-          <button class="pag-btn" (click)="cambiarPagina(currentPage - 1)" [disabled]="currentPage === 1">
-            Anterior
+      <ng-template dataTableCell="estado" let-row>
+        <span class="badge" [ngClass]="getEstadoBadgeClass(row.estado)">
+          {{ getEstadoTexto(row.estado) }}
+        </span>
+      </ng-template>
+
+      <ng-template dataTableCell="fecha_asignacion" let-row>
+        {{ row.fecha_asignacion | date:'dd/MM/yyyy HH:mm' }}
+      </ng-template>
+
+      <ng-template dataTableCell="observacion" let-row>
+        {{ row.observacion || '-' }}
+      </ng-template>
+
+      <ng-template dataTableCell="acciones" let-row>
+        <div class="actions-cell">
+          <button class="btn btn-sm btn-info" (click)="verDetalleQueja(row.queja_id)" title="Ver queja">
+            Ver
           </button>
-          <span class="pag-info">
-            Pagina {{ currentPage }} de {{ totalPages }}
-          </span>
-          <button class="pag-btn" (click)="cambiarPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
-            Siguiente
+          <div class="dropdown">
+            <button class="btn btn-sm btn-secondary-dd">
+              Estado
+            </button>
+            <div class="dropdown-content">
+              <a (click)="cambiarEstado(row, 'EN_PROCESO')">En Proceso</a>
+              <a (click)="cambiarEstado(row, 'COMPLETADA')">Completada</a>
+              <a (click)="cambiarEstado(row, 'CANCELADA')">Cancelada</a>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-warning" (click)="abrirModalReasignar(row)" title="Reasignar">
+            Reasignar
           </button>
         </div>
-        <div class="pag-count">
-          Mostrando {{ asignacionesPaginadas.length }} de {{ totalAsignaciones }}
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="asignacionesFiltradas.length === 0" class="empty-state">
-      <div class="empty-icon">0</div>
-      <h3>No hay asignaciones</h3>
-      <p>Crea una nueva asignacion o usa "Asignar Automaticamente"</p>
-    </div>
+      </ng-template>
+    </app-data-table>
   </app-loading-overlay>
 
   <!-- Modal Nueva Asignacion -->

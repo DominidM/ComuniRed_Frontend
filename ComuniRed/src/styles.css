@@ -544,7 +544,7 @@ app-change {
 }
 
 @media (max-width: 768px) {
-  :root {
+:root {
     --cr-navbar-height: 56px;
     --cr-sidebar-width: 60px;
   }

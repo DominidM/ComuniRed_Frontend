@@ -1,0 +1,430 @@
+/* ═══════════════════════════════════════════════
+   SHARED BUTTON STYLES — Legacy class names
+   Import this file for unified button styles
+   across all admin components.
+   ═══════════════════════════════════════════════ */
+
+/* ── Base ── */
+.action-buttons,
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-outline,
+.btn-edit,
+.btn-delete,
+.btn-cancel,
+.btn-confirm,
+.btn-info,
+.btn-warning,
+.btn-detail,
+.btn-view,
+.btn-auto,
+.btn-refrescar,
+.btn-secondary-dd,
+.btn-sm,
+.btn-cancelar,
+.btn-guardar,
+.btn-eliminar-modal,
+.btn-accion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.2;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 120ms ease,
+    box-shadow 180ms ease;
+}
+
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-outline,
+.btn-edit,
+.btn-delete,
+.btn-cancel,
+.btn-confirm,
+.btn-info,
+.btn-warning,
+.btn-detail,
+.btn-view,
+.btn-auto,
+.btn-refrescar,
+.btn-secondary-dd,
+.btn-sm,
+.btn-cancelar,
+.btn-guardar,
+.btn-eliminar-modal,
+.btn-accion {
+  padding: 10px 20px;
+  font-size: 0.875rem;
+}
+
+.btn:active,
+.btn-primary:active,
+.btn-secondary:active,
+.btn-outline:active,
+.btn-edit:active,
+.btn-delete:active,
+.btn-cancel:active,
+.btn-confirm:active,
+.btn-info:active,
+.btn-warning:active,
+.btn-detail:active,
+.btn-view:active,
+.btn-auto:active,
+.btn-refrescar:active,
+.btn-secondary-dd:active,
+.btn-cancelar:active,
+.btn-guardar:active,
+.btn-eliminar-modal:active,
+.btn-accion:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled,
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-outline:disabled,
+.btn-edit:disabled,
+.btn-delete:disabled,
+.btn-cancel:disabled,
+.btn-confirm:disabled,
+.btn-info:disabled,
+.btn-warning:disabled,
+.btn-detail:disabled,
+.btn-view:disabled,
+.btn-auto:disabled,
+.btn-refrescar:disabled,
+.btn-secondary-dd:disabled,
+.btn-cancelar:disabled,
+.btn-guardar:disabled,
+.btn-eliminar-modal:disabled,
+.btn-accion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Sizes ── */
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  gap: 4px;
+}
+
+/* ── Primary ── */
+
+.btn-primary {
+  background: var(--cr-success, #059669);
+  border-color: var(--cr-success, #059669);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--cr-success-hover, #047857);
+  border-color: var(--cr-success-hover, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
+}
+
+/* ── Header button override (for top-right Nuevo buttons) ── */
+.crud-rol-header .btn-primary,
+.crud-estado-queja-header .btn-primary,
+.crud-tipo-reaccion-header .btn-primary,
+.crud-usuario-header .btn-primary,
+.crud-rol-header .btn-primary,
+.crud-asignacion-header .btn-primary {
+  background: var(--cr-background, #ffffff);
+  border-color: var(--cr-border, #e5e7eb);
+  color: var(--cr-text, #111827);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.crud-rol-header .btn-primary:hover:not(:disabled),
+.crud-estado-queja-header .btn-primary:hover:not(:disabled),
+.crud-tipo-reaccion-header .btn-primary:hover:not(:disabled),
+.crud-usuario-header .btn-primary:hover:not(:disabled),
+.crud-rol-header .btn-primary:hover:not(:disabled),
+.crud-asignacion-header .btn-primary:hover:not(:disabled) {
+  background: var(--cr-hover-surface, #f7f8fa);
+  border-color: var(--cr-success, #059669);
+  color: var(--cr-success, #059669);
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Secondary ── */
+
+.btn-secondary {
+  background: var(--cr-background, #ffffff);
+  border-color: var(--cr-border, #e5e7eb);
+  color: var(--cr-text, #111827);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--cr-hover-surface, #f7f8fa);
+  border-color: var(--cr-primary, #ba3c3c);
+  color: var(--cr-primary, #ba3c3c);
+  transform: translateY(-1px);
+}
+
+/* ── Outline ── */
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--cr-border, #e5e7eb);
+  color: var(--cr-text, #111827);
+}
+
+.btn-outline:hover:not(:disabled) {
+  border-color: var(--cr-primary, #ba3c3c);
+  color: var(--cr-primary, #ba3c3c);
+  background: color-mix(in srgb, var(--cr-primary, #ba3c3c) 6%, transparent);
+}
+
+/* ── Edit ── */
+
+.btn-edit {
+  background: transparent;
+  border-color: var(--cr-primary, #2563eb);
+  color: var(--cr-primary, #2563eb);
+}
+
+.btn-edit:hover:not(:disabled) {
+  background: var(--cr-primary, #2563eb);
+  border-color: var(--cr-primary, #2563eb);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* ── Delete ── */
+
+.btn-delete {
+  background: transparent;
+  border-color: var(--cr-danger, #dc2626);
+  color: var(--cr-danger, #dc2626);
+}
+
+.btn-delete:hover:not(:disabled) {
+  background: var(--cr-danger, #dc2626);
+  border-color: var(--cr-danger, #dc2626);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+/* ── Cancel ── */
+
+.btn-cancel {
+  background: transparent;
+  border-color: var(--cr-border, #e5e7eb);
+  color: var(--cr-text-muted, #6b7280);
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: var(--cr-hover-surface, #f7f8fa);
+  border-color: var(--cr-border-strong, #d1d5db);
+  color: var(--cr-text, #111827);
+}
+
+/* ── Confirm ── */
+
+.btn-confirm {
+  background: var(--cr-primary, #ba3c3c);
+  border-color: var(--cr-primary, #ba3c3c);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(186, 60, 60, 0.25);
+}
+
+.btn-confirm:hover:not(:disabled) {
+  background: var(--cr-primary-hover, #a93434);
+  border-color: var(--cr-primary-hover, #a93434);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(186, 60, 60, 0.35);
+}
+
+/* ── Info / View ── */
+
+.btn-info,
+.btn-view {
+  background: color-mix(in srgb, #0ea5e9 14%, var(--cr-background, #ffffff));
+  color: #0369a1;
+  border-color: color-mix(in srgb, #0ea5e9 24%, transparent);
+}
+
+.btn-info:hover:not(:disabled),
+.btn-view:hover:not(:disabled) {
+  background: color-mix(in srgb, #0ea5e9 24%, var(--cr-background, #ffffff));
+  transform: translateY(-1px);
+}
+
+/* ── Warning ── */
+
+.btn-warning {
+  background: color-mix(in srgb, #f59e0b 16%, var(--cr-background, #ffffff));
+  color: #92400e;
+  border-color: color-mix(in srgb, #f59e0b 26%, transparent);
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: color-mix(in srgb, #f59e0b 28%, var(--cr-background, #ffffff));
+  transform: translateY(-1px);
+}
+
+/* ── Detail ── */
+
+.btn-detail {
+  background: var(--cr-primary-soft, #ba3c3c14);
+  color: var(--cr-primary, #ba3c3c);
+  border-color: color-mix(in srgb, var(--cr-primary, #ba3c3c) 24%, var(--cr-border, #e5e7eb));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-detail:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--cr-primary, #ba3c3c) 12%, var(--cr-background, #ffffff));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Refrescar / Auto / Secondary-dd ── */
+
+.btn-refrescar,
+.btn-auto,
+.btn-secondary-dd {
+  background: var(--cr-background, #ffffff);
+  border-color: var(--cr-border, #e5e7eb);
+  color: var(--cr-text, #111827);
+}
+
+.btn-refrescar:hover:not(:disabled),
+.btn-auto:hover:not(:disabled),
+.btn-secondary-dd:hover:not(:disabled) {
+  background: var(--cr-hover-surface, #f7f8fa);
+  border-color: var(--cr-primary, #ba3c3c);
+  color: var(--cr-primary, #ba3c3c);
+  transform: translateY(-1px);
+}
+
+/* ── Auto specific ── */
+.btn-auto {
+  background: var(--cr-primary, #2563eb);
+  border-color: var(--cr-primary, #2563eb);
+  color: #ffffff;
+}
+
+.btn-auto:hover:not(:disabled) {
+  background: var(--cr-primary-hover, #1d4ed8);
+  border-color: var(--cr-primary-hover, #1d4ed8);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* ── Cancelar / Guardar / Eliminar-modal (crud-comentario/evidencia) ── */
+
+.btn-cancelar {
+  background: var(--cr-background, #ffffff);
+  border-color: var(--cr-border, #e5e7eb);
+  color: var(--cr-text, #111827);
+}
+
+.btn-cancelar:hover:not(:disabled) {
+  background: var(--cr-hover-surface, #f7f8fa);
+}
+
+.btn-guardar {
+  background: var(--cr-success, #059669);
+  border-color: var(--cr-success, #059669);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+}
+
+.btn-guardar:hover:not(:disabled) {
+  background: var(--cr-success-hover, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
+}
+
+.btn-eliminar-modal {
+  background: var(--cr-danger, #dc2626);
+  border-color: var(--cr-danger, #dc2626);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+}
+
+.btn-eliminar-modal:hover:not(:disabled) {
+  background: var(--cr-danger-hover, #b91c1c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+}
+
+/* ── Acción ── */
+
+.btn-accion {
+  background: var(--cr-background-content, #ffffff);
+  border-color: var(--cr-border, #e5e7eb);
+  color: var(--cr-text, #111827);
+}
+
+.btn-accion:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--cr-primary, #ba3c3c) 10%, var(--cr-background, #ffffff));
+  border-color: var(--cr-primary, #ba3c3c);
+  color: var(--cr-primary, #ba3c3c);
+}
+
+/* ── Action buttons container ── */
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline,
+  .btn-edit,
+  .btn-delete,
+  .btn-cancel,
+  .btn-confirm,
+  .btn-info,
+  .btn-warning,
+  .btn-detail,
+  .btn-view,
+  .btn-auto,
+  .btn-refrescar,
+  .btn-secondary-dd,
+  .btn-sm,
+  .btn-cancelar,
+  .btn-guardar,
+  .btn-eliminar-modal,
+  .btn-accion {
+    width: 100%;
+    justify-content: center;
+  }
+}

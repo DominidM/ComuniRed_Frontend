@@ -307,14 +307,13 @@ export class UsuarioService {
 
   obtenerUsuarios(page: number, size: number): Observable<UsuarioPage> {
     return this.apollo
-      .watchQuery<{ obtenerUsuarios: UsuarioPage }>({
+      .query<{ obtenerUsuarios: UsuarioPage }>({
         query: OBTENER_USUARIOS,
         variables: { page, size },
         fetchPolicy: 'network-only',
         errorPolicy: 'all',
       })
-      .valueChanges.pipe(
-        map((r: any) => r),
+      .pipe(
         map(
           (result) =>
             result.data?.obtenerUsuarios ||
@@ -331,12 +330,11 @@ export class UsuarioService {
 
   obtenerTodosLosUsuarios(): Observable<Usuario[]> {
     return this.apollo
-      .watchQuery<{ obtenerTodosLosUsuarios: Usuario[] }>({
+      .query<{ obtenerTodosLosUsuarios: Usuario[] }>({
         query: OBTENER_TODOS_LOS_USUARIOS,
         fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(
-        map((r: any) => r),
+      .pipe(
         map((result) => result.data?.obtenerTodosLosUsuarios || []),
       );
   }

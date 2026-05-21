@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable, map } from 'rxjs';
+import { Observable, map, filter } from 'rxjs';
 
 export interface Queja {
   id: string;
@@ -211,11 +211,6 @@ const OBTENER_QUEJAS = gql`
         clave
         nombre
       }
-      evidence {
-        id
-        url
-        tipo
-      }
       votes {
         yes
         no
@@ -231,17 +226,6 @@ const OBTENER_QUEJAS = gql`
           helpful
           dislike
           report
-        }
-      }
-      comments {
-        id
-        texto
-        fecha_creacion
-        author {
-          id
-          nombre
-          apellido
-          foto_perfil
         }
       }
       commentsCount
@@ -738,8 +722,10 @@ export class QuejaService {
         query: OBTENER_QUEJAS,
         variables: { usuarioActualId },
         fetchPolicy: 'network-only',
+        errorPolicy: 'all',
       })
       .valueChanges.pipe(
+        filter(result => !result.loading),
         map((result) => {
           if (!result.data || !result.data.obtenerQuejas) return [];
           return result.data.obtenerQuejas as Queja[];
