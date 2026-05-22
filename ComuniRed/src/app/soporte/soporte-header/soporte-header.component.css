@@ -1,54 +1,22 @@
-:root {
-  --bg: #ffffff;
-  --bg-alt: #ffffff;
-  --border: #e2e8f0;
-  --muted: #64748b;
-  --text: #000000;
-  --text-muted: #666666;
-  --hover-bg: #f1f5f9;
-  --shadow-color: rgba(0, 0, 0, 0.08);
-}
-
-[data-theme='dark'] {
-  --bg: #000000;
-  --bg-alt: #1a202c;
-  --border: #333333;
-  --muted: #9ca3af;
-  --text: #ffffff;
-  --text-muted: #d1d5db;
-  --hover-bg: #2d3748;
-  --shadow-color: rgba(255, 255, 255, 0.1);
-}
 
 * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-body {
-  background-color: var(--bg);
-  color: var(--text);
-  margin: 0;
-  padding: 0;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
+  background: var(--cr-background);
   padding: 0.8rem 1.2rem;
-  box-shadow: 0 2px 4px var(--shadow-color);
-  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  border-bottom: 1px solid var(--cr-border);
   gap: 1rem;
   font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   position: sticky;
   top: 0;
   z-index: 1000;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-[data-theme='dark'] .header {
-  background: var(--bg-alt);
 }
 
 .logo-section {
@@ -61,12 +29,12 @@ body {
   width: 46px;
   height: 46px;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
+  background: var(--cr-background);
 }
 
 .logo img {
@@ -79,13 +47,13 @@ body {
   font-size: 1.25rem;
   margin: 0;
   font-weight: 700;
-  color: var(--text);
+  color: var(--cr-text);
   letter-spacing: -0.02em;
 }
 
 .app-info .subtitle {
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--cr-text-muted);
   font-weight: 400;
   margin: 0;
 }
@@ -119,7 +87,7 @@ body {
 }
 
 .action-btn:hover {
-  background: var(--hover-bg);
+  background: var(--cr-hover-surface);
   transform: scale(1.05);
 }
 
@@ -128,14 +96,14 @@ body {
 }
 
 .action-btn:focus-visible {
-  outline: 2px solid var(--muted);
+  outline: 2px solid var(--cr-primary);
   outline-offset: 2px;
 }
 
 .action-btn svg {
   display: block;
   flex-shrink: 0;
-  color: var(--text);
+  color: var(--cr-text);
 }
 
 .notification-badge {
@@ -145,21 +113,48 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e02424;
-  color: #ffffff;
+  background: var(--cr-brand-red);
+  color: var(--cr-white);
   min-width: 20px;
   height: 20px;
   font-size: 11px;
   font-weight: 600;
   border-radius: 999px;
   padding: 0 5px;
-  box-shadow: 0 2px 4px rgba(224, 36, 36, 0.4);
-  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--cr-brand-red) 35%, transparent);
+  border: 2px solid var(--cr-background);
   transition: border-color 0.3s ease;
 }
 
-[data-theme='dark'] .notification-badge {
-  border-color: var(--bg-alt);
+.theme-toggle-btn {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid var(--cr-border);
+  background: var(--cr-background);
+  color: var(--cr-text);
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--cr-hover-surface);
+  border-color: var(--cr-primary);
+  color: var(--cr-primary);
+  transform: translateY(-1px);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-ring-primary);
 }
 
 @media (max-width: 720px) {

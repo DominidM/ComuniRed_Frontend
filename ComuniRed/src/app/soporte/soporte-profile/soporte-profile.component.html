@@ -8,10 +8,7 @@
       <h2>Editar Perfil</h2>
     </div>
 
-    <div *ngIf="cargando" class="loading">
-      <div class="spinner"></div>
-      <p>Cargando perfil...</p>
-    </div>
+    <app-loading-overlay [loading]="cargando" text="Cargando perfil..."></app-loading-overlay>
 
     <div *ngIf="error && !cargando" class="error-message">
       <p>{{ error }}</p>
@@ -22,28 +19,28 @@
 
       <div class="avatar-section">
         <div class="avatar-container">
-          <img 
-            [src]="avatarPreview || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" 
-            alt="Avatar" 
+          <img
+            [src]="avatarPreview || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'"
+            alt="Avatar"
             class="avatar"
           />
           <div class="avatar-overlay">
             <label for="file-input" class="avatar-label">
               📷
             </label>
-            <input 
-              id="file-input" 
-              type="file" 
-              accept="image/*" 
+            <input
+              id="file-input"
+              type="file"
+              accept="image/*"
               (change)="cambiarAvatar($event)"
               style="display: none;"
             />
           </div>
         </div>
         <p class="avatar-info">Tamaño máximo: 5MB</p>
-        <button 
-          *ngIf="avatarPreview" 
-          class="btn-quitar-foto" 
+        <button
+          *ngIf="avatarPreview"
+          class="btn-quitar-foto"
           (click)="quitarFoto()"
           type="button"
         >
@@ -130,7 +127,7 @@
             type="text"
             [value]="calcularEdad(usuario.fecha_nacimiento) + ' años'"
             readonly
-            style="background-color: #f3f4f6; cursor: not-allowed;"
+            class="readonly-input"
           />
           <small>Calculada desde la fecha de nacimiento</small>
         </div>
@@ -189,7 +186,7 @@
             type="text"
             [value]="usuario.fecha_registro | date:'dd/MM/yyyy HH:mm'"
             readonly
-            style="background-color: #f3f4f6; cursor: not-allowed;"
+            class="readonly-input"
           />
           <small>Este campo no se puede modificar</small>
         </div>
@@ -204,8 +201,8 @@
             </div>
           </div>
 
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn-toggle-password"
             (click)="toggleCambiarPassword()"
           >
@@ -302,7 +299,7 @@
           >
             Cancelar
           </button>
-          
+
           <button
             type="button"
             class="btn-guardar"
