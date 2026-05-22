@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-header',
@@ -13,17 +14,15 @@ export class SoporteHeaderComponent implements OnInit {
   isDarkMode = false;
   notificationCount = 3;
 
+  constructor(private themeService: ThemeService) {}
+
   ngOnInit(): void {
-    const savedTheme = localStorage.getItem('theme');
-    this.isDarkMode = savedTheme === 'dark';
-    document.body.setAttribute('data-theme', savedTheme || 'light');
+    this.isDarkMode = this.themeService.isDarkTheme();
   }
 
   toggleTheme(): void {
-    this.isDarkMode = !this.isDarkMode;
-    const theme = this.isDarkMode ? 'dark' : 'light';
-    document.body.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    this.themeService.toggleTheme();
+    this.isDarkMode = this.themeService.isDarkTheme();
   }
 
   openNotifications(): void {

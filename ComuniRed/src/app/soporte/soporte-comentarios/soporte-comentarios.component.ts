@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 import { ComentarioService } from '../../services/comentario.service';
 import { UsuarioService } from '../../services/usuario.service';
 
@@ -28,7 +29,7 @@ interface ComentarioConContexto {
 @Component({
   selector: 'app-soporte-comentario',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, LoadingOverlayComponent],
   templateUrl: './soporte-comentarios.component.html',
   styleUrls: ['./soporte-comentarios.component.css']
 })
@@ -181,7 +182,7 @@ export class SoporteComentarioComponent implements OnInit {
 
   rechazarComentario(comentario: ComentarioConContexto): void {
     const razon = prompt('Razón del rechazo (opcional):');
-    
+
     if (razon === null) {
       return;
     }
@@ -195,8 +196,8 @@ export class SoporteComentarioComponent implements OnInit {
     this.loading = true;
 
     this.comentarioService.rechazarComentario(
-      comentario.id, 
-      (soporteUser as any).id, 
+      comentario.id,
+      (soporteUser as any).id,
       razon || 'Contenido inapropiado'
     ).subscribe({
       next: () => {
