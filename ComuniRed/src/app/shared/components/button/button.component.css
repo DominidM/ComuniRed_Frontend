@@ -1,0 +1,255 @@
+/* ═══════════════════════════════════════════════
+   BUTTON COMPONENT — Variants
+   ═══════════════════════════════════════════════ */
+
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 120ms ease,
+    box-shadow 180ms ease;
+  font-family: inherit;
+  line-height: 1.2;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-btn:active {
+  transform: scale(0.97);
+}
+
+.app-btn--disabled,
+.app-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Sizes */
+.app-btn--sm {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  gap: 4px;
+}
+
+.app-btn--md {
+  padding: 10px 20px;
+  font-size: 0.875rem;
+}
+
+.app-btn--lg {
+  padding: 12px 24px;
+  font-size: 1rem;
+}
+
+/* Primary */
+.app-btn--primary {
+  background: var(--cr-success, #059669);
+  border-color: var(--cr-success, #059669);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+}
+
+.app-btn--primary:hover:not(:disabled):not(.app-btn--disabled) {
+  background: var(--cr-success-hover, #047857);
+  border-color: var(--cr-success-hover, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
+}
+
+/* Secondary */
+.app-btn--secondary {
+  background: var(--cr-background, #ffffff);
+  border-color: var(--cr-border, #e5e7eb);
+  color: var(--cr-text, #111827);
+}
+
+.app-btn--secondary:hover:not(:disabled):not(.app-btn--disabled) {
+  background: var(--cr-hover-surface, #f7f8fa);
+  border-color: var(--cr-primary, #ba3c3c);
+  color: var(--cr-primary, #ba3c3c);
+  transform: translateY(-1px);
+}
+
+/* Edit */
+.app-btn--edit {
+  background: transparent;
+  border-color: var(--cr-primary, #2563eb);
+  color: var(--cr-primary, #2563eb);
+}
+
+.app-btn--edit:hover:not(:disabled):not(.app-btn--disabled) {
+  background: var(--cr-primary, #2563eb);
+  border-color: var(--cr-primary, #2563eb);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Delete */
+.app-btn--delete {
+  background: transparent;
+  border-color: var(--cr-danger, #dc2626);
+  color: var(--cr-danger, #dc2626);
+}
+
+.app-btn--delete:hover:not(:disabled):not(.app-btn--disabled) {
+  background: var(--cr-danger, #dc2626);
+  border-color: var(--cr-danger, #dc2626);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+/* Cancel */
+.app-btn--cancel {
+  background: transparent;
+  border-color: var(--cr-border, #e5e7eb);
+  color: var(--cr-text-muted, #6b7280);
+}
+
+.app-btn--cancel:hover:not(:disabled):not(.app-btn--disabled) {
+  background: var(--cr-hover-surface, #f7f8fa);
+  border-color: var(--cr-border-strong, #d1d5db);
+  color: var(--cr-text, #111827);
+}
+
+/* Confirm */
+.app-btn--confirm {
+  background: var(--cr-primary, #ba3c3c);
+  border-color: var(--cr-primary, #ba3c3c);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(186, 60, 60, 0.25);
+}
+
+.app-btn--confirm:hover:not(:disabled):not(.app-btn--disabled) {
+  background: var(--cr-primary-hover, #a93434);
+  border-color: var(--cr-primary-hover, #a93434);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(186, 60, 60, 0.35);
+}
+
+/* Outline */
+.app-btn--outline {
+  background: transparent;
+  border-color: var(--cr-border, #e5e7eb);
+  color: var(--cr-text, #111827);
+}
+
+.app-btn--outline:hover:not(:disabled):not(.app-btn--disabled) {
+  border-color: var(--cr-primary, #ba3c3c);
+  color: var(--cr-primary, #ba3c3c);
+  background: color-mix(in srgb, var(--cr-primary, #ba3c3c) 6%, transparent);
+}
+
+/* Info / View */
+.app-btn--info,
+.app-btn--view {
+  background: color-mix(in srgb, #0ea5e9 14%, var(--cr-background, #ffffff));
+  color: #0369a1;
+  border-color: color-mix(in srgb, #0ea5e9 24%, transparent);
+}
+
+.app-btn--info:hover:not(:disabled):not(.app-btn--disabled),
+.app-btn--view:hover:not(:disabled):not(.app-btn--disabled) {
+  background: color-mix(in srgb, #0ea5e9 24%, var(--cr-background, #ffffff));
+  transform: translateY(-1px);
+}
+
+/* Warning */
+.app-btn--warning {
+  background: color-mix(in srgb, #f59e0b 16%, var(--cr-background, #ffffff));
+  color: #92400e;
+  border-color: color-mix(in srgb, #f59e0b 26%, transparent);
+}
+
+.app-btn--warning:hover:not(:disabled):not(.app-btn--disabled) {
+  background: color-mix(in srgb, #f59e0b 28%, var(--cr-background, #ffffff));
+  transform: translateY(-1px);
+}
+
+/* Detail */
+.app-btn--detail {
+  background: var(--cr-primary-soft, #ba3c3c14);
+  color: var(--cr-primary, #ba3c3c);
+  border-color: color-mix(in srgb, var(--cr-primary, #ba3c3c) 24%, var(--cr-border, #e5e7eb));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.app-btn--detail:hover:not(:disabled):not(.app-btn--disabled) {
+  background: color-mix(in srgb, var(--cr-primary, #ba3c3c) 12%, var(--cr-background, #ffffff));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon / Close */
+.app-btn--icon,
+.app-btn--close {
+  padding: 4px;
+  min-width: 32px;
+  min-height: 32px;
+  background: transparent;
+  border-color: transparent;
+  color: var(--cr-text-muted, #6b7280);
+  font-size: 1.25rem;
+  border-radius: 6px;
+}
+
+.app-btn--icon:hover:not(:disabled):not(.app-btn--disabled),
+.app-btn--close:hover:not(:disabled):not(.app-btn--disabled) {
+  background: var(--cr-hover-surface, #f7f8fa);
+  color: var(--cr-text, #111827);
+}
+
+/* Spinner */
+.app-btn__spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: app-btn-spin 0.6s linear infinite;
+}
+
+.app-btn--sm .app-btn__spinner {
+  width: 12px;
+  height: 12px;
+  border-width: 1.5px;
+}
+
+@keyframes app-btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Action buttons container */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .app-btn,
+  .action-buttons .app-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

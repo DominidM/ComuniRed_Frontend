@@ -126,36 +126,6 @@
   font-weight: 600;
 }
 
-.btn-descargar {
-  width: 100%;
-  padding: 14px 24px;
-  background: linear-gradient(135deg, #5f5cf6 0%, #8b96fa 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1em;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(95, 92, 246, 0.3);
-  margin-bottom: 16px;
-}
-
-.btn-descargar:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(95, 92, 246, 0.4);
-  background: linear-gradient(135deg, #4f4cf5 0%, #7c7ef8 100%);
-}
-
-.btn-descargar:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.btn-descargar:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .report-info {
   padding: 16px;
   background: #f9fafb;
@@ -188,8 +158,4 @@
     grid-template-columns: 1fr;
   }
 
-  .btn-descargar {
-    padding: 12px 20px;
-    font-size: 0.95em;
-  }
 }

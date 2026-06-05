@@ -1,7 +1,7 @@
 <div class="soporte-comentarios-root">
   <div class="header">
     <h2>🗨️ Moderación de Comentarios</h2>
-    
+
     <div class="stats">
       <div class="stat-card">
         <div class="stat-number">{{ totalComentarios }}</div>
@@ -13,9 +13,9 @@
   <div class="filtros-container">
     <div class="filtro-group">
       <label>🔍 Buscar:</label>
-      <input 
-        type="text" 
-        [(ngModel)]="filtroTexto" 
+      <input
+        type="text"
+        [(ngModel)]="filtroTexto"
         (ngModelChange)="onFiltroChange()"
         placeholder="Buscar en comentarios, autor o publicación..."
         class="input-buscar">
@@ -44,25 +44,22 @@
     </button>
   </div>
 
-  <div *ngIf="loading" class="loading-container">
-    <div class="spinner"></div>
-    <p>Cargando comentarios...</p>
-  </div>
+  <app-loading-overlay [loading]="loading" text="Cargando comentarios..."></app-loading-overlay>
 
   <div *ngIf="!loading && comentariosFiltrados.length > 0" class="comentarios-list">
-    <div 
-      *ngFor="let comentario of comentariosFiltrados" 
+    <div
+      *ngFor="let comentario of comentariosFiltrados"
       class="comentario-card"
       [ngClass]="{
         'card-rechazado': comentario.estado === 'rechazado',
         'card-aprobado': comentario.estado === 'aprobado',
         'card-pendiente': comentario.estado === 'pendiente'
       }">
-      
+
       <div class="comentario-header">
         <div class="autor-info">
-          <img 
-            [src]="comentario.autor.foto_perfil || 'assets/img/default-avatar.png'" 
+          <img
+            [src]="comentario.autor.foto_perfil || 'assets/img/default-avatar.png'"
             alt="Avatar"
             class="avatar"
             (error)="$event.target.src='assets/img/default-avatar.png'">
@@ -75,7 +72,7 @@
         </div>
 
         <div class="badges">
-          <span 
+          <span
             class="badge"
             [ngClass]="getEstadoClass(comentario.estado)">
             {{ comentario.estado || 'Sin revisar' }}
@@ -93,8 +90,8 @@
         <div class="contexto-label">📋 Publicación:</div>
         <div class="contexto-content">
           <div class="queja-imagen-wrapper" *ngIf="comentario.queja.imagen_url">
-            <img 
-              [src]="comentario.queja.imagen_url" 
+            <img
+              [src]="comentario.queja.imagen_url"
               alt="Imagen de la publicación"
               class="queja-imagen"
               (click)="abrirImagenGrande(comentario.queja.imagen_url)"
@@ -103,7 +100,7 @@
               <span>🔍 Ver imagen</span>
             </div>
           </div>
-          
+
           <div class="queja-info">
             <strong>{{ comentario.queja.titulo }}</strong>
             <p>{{ comentario.queja.descripcion.substring(0, 100) }}...</p>
@@ -115,21 +112,21 @@
         <button class="btn btn-ver" (click)="verDetalle(comentario)">
           👁️ Ver detalle
         </button>
-        
-        <button 
-          *ngIf="comentario.estado !== 'aprobado'" 
-          class="btn btn-aprobar" 
+
+        <button
+          *ngIf="comentario.estado !== 'aprobado'"
+          class="btn btn-aprobar"
           (click)="aprobarComentario(comentario)">
           ✅ Aprobar
         </button>
-        
-        <button 
-          *ngIf="comentario.estado !== 'rechazado'" 
-          class="btn btn-rechazar" 
+
+        <button
+          *ngIf="comentario.estado !== 'rechazado'"
+          class="btn btn-rechazar"
           (click)="rechazarComentario(comentario)">
           ⚠️ Rechazar
         </button>
-        
+
         <button class="btn btn-eliminar" (click)="eliminarComentario(comentario)">
           🗑️ Eliminar
         </button>
@@ -159,8 +156,8 @@
         <div class="detalle-section">
           <h4>👤 Autor</h4>
           <div class="autor-detalle">
-            <img 
-              [src]="comentarioSeleccionado.autor.foto_perfil || 'assets/img/default-avatar.png'" 
+            <img
+              [src]="comentarioSeleccionado.autor.foto_perfil || 'assets/img/default-avatar.png'"
               alt="Avatar"
               class="avatar-grande"
               (error)="$event.target.src='assets/img/default-avatar.png'">
@@ -195,14 +192,14 @@
         <div class="detalle-section">
           <h4>📋 Publicación Asociada</h4>
           <div class="publicacion-info">
-            <img 
-              *ngIf="comentarioSeleccionado.queja.imagen_url" 
-              [src]="comentarioSeleccionado.queja.imagen_url" 
+            <img
+              *ngIf="comentarioSeleccionado.queja.imagen_url"
+              [src]="comentarioSeleccionado.queja.imagen_url"
               alt="Imagen de la publicación"
               class="queja-imagen-modal"
               (click)="abrirImagenGrande(comentarioSeleccionado.queja.imagen_url)"
               (error)="$event.target.style.display='none'">
-            
+
             <strong>{{ comentarioSeleccionado.queja.titulo }}</strong>
             <p>{{ comentarioSeleccionado.queja.descripcion }}</p>
             <a [routerLink]="['/public/feed/queja', comentarioSeleccionado.queja.id]" class="link-publicacion">
@@ -214,20 +211,20 @@
 
       <div class="modal-footer">
         <button class="btn btn-secondary" (click)="cerrarModal()">Cerrar</button>
-        <button 
+        <button
           *ngIf="comentarioSeleccionado && comentarioSeleccionado.estado !== 'aprobado'"
-          class="btn btn-aprobar" 
+          class="btn btn-aprobar"
           (click)="aprobarComentario(comentarioSeleccionado); cerrarModal()">
           ✅ Aprobar
         </button>
-        <button 
+        <button
           *ngIf="comentarioSeleccionado && comentarioSeleccionado.estado !== 'rechazado'"
-          class="btn btn-rechazar" 
+          class="btn btn-rechazar"
           (click)="rechazarComentario(comentarioSeleccionado); cerrarModal()">
           ⚠️ Rechazar
         </button>
-        <button 
-          class="btn btn-eliminar" 
+        <button
+          class="btn btn-eliminar"
           (click)="eliminarComentario(comentarioSeleccionado!); cerrarModal()">
           🗑️ Eliminar
         </button>

@@ -72,30 +72,7 @@
     color: var(--cr-titulo);
 }
 
-/* Botón "Nueva Asignación/Categoría" */
-.btn-primary {
-    background: var(--cr-background);
-    border: 1.5px solid var(--cr-border);
-    color: var(--cr-titulo);
-    border-radius: var(--border-radius);
-    padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.2s;
-}
 
-.btn-primary:hover {
-    /* Efecto sutil para el botón claro */
-    background: var(--gray-50);
-}
-.dark-mode .btn-primary:hover {
-    background: var(--cr-search);
-}
 
 /* Controles (Buscador/Select de Paginación) */
 .crud-rol-controls-row {
@@ -180,46 +157,7 @@
     background: color-mix(in srgb, var(--primary-color) 10%, var(--cr-background-content)) !important;
 }
 
-/* --- 3. BOTONES DE ACCIÓN (Editar / Eliminar) --- */
-.action-buttons {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
 
-.btn-edit,
-.btn-delete {
-    border: 1px solid;
-    border-radius: 4px; /* Ligeramente menos redondeado que el border-radius global */
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
-    cursor: pointer;
-    font-weight: 500;
-    text-transform: none;
-    background: transparent;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.2s;
-}
-
-/* Botón EDITAR (Borde Azul Claro) */
-.btn-edit {
-    border-color: var(--btn-edit-border);
-    color: var(--btn-edit-text);
-}
-.btn-edit:hover {
-    /* Sombra azul suave al pasar el ratón */
-    background: rgba(74, 144, 226, 0.1); 
-}
-
-/* Botón ELIMINAR (Borde Gris/Blanco) */
-.btn-delete {
-    border-color: var(--btn-delete-border);
-    color: var(--btn-delete-text);
-}
-.btn-delete:hover {
-    /* Sombra oscura/sutil al pasar el ratón */
-    background: rgba(107, 114, 128, 0.1);
-}
 
 /* --- 4. BADGE DE ESTADO ('Sí' en Categorías) --- */
 .status-badge {
@@ -259,23 +197,6 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
-}
-
-.crud-rol-pagination-btn {
-    background: transparent;
-    border: none;
-    color: var(--cr-titulo);
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    padding: 0.5rem 1rem;
-}
-.crud-rol-pagination-btn:hover:not(:disabled) {
-    color: var(--primary-color);
-}
-.crud-rol-pagination-btn:disabled {
-    color: var(--gray-400);
-    cursor: not-allowed;
 }
 
 .crud-rol-pagination-info,

@@ -400,57 +400,6 @@
   text-transform: uppercase;
 }
 
-/* ── Botones ──────────────────────────────────────────── */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 20px;
-  background: var(--cr-primary);
-  color: #fff;
-  border: 1px solid var(--cr-primary);
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background 180ms ease,
-    border-color 180ms ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--cr-primary-hover);
-  border-color: var(--cr-primary-hover);
-}
-
-.btn-primary:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.btn-cancel {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 20px;
-  background: transparent;
-  color: var(--cr-text-muted);
-  border: 1px solid var(--cr-border);
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background 180ms ease,
-    color 180ms ease;
-}
-
-.btn-cancel:hover {
-  background: var(--cr-hover-surface);
-  color: var(--cr-text);
-}
-
 /* ── Evidencias ───────────────────────────────────────── */
 .evidence-grid {
   display: grid;

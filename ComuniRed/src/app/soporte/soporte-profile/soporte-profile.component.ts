@@ -4,32 +4,33 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
   templateUrl: './soporte-profile.component.html',
   styleUrls: ['./soporte-profile.component.css'],
 })
 export class SoporteProfileComponent implements OnInit, OnDestroy {
   usuario: Usuario | null = null;
   original: Usuario | null = null;
-  
+
   cargando = true;
   guardando = false;
   error: string | null = null;
-  
+
   avatarPreview: string | null = null;
-  
+
   hoy: string = new Date().toISOString().substring(0, 10);
-  
+
   mostrarCambiarPassword = false;
   passwordActual = '';
   passwordNueva = '';
   passwordConfirmar = '';
   cambiandoPassword = false;
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -40,7 +41,7 @@ export class SoporteProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     let id = this.route.snapshot.paramMap.get('id');
-    
+
     if (!id) {
       const usuarioActual = this.usuarioService.getUser();
       if (usuarioActual && usuarioActual.id) {
@@ -73,11 +74,11 @@ export class SoporteProfileComponent implements OnInit, OnDestroy {
           if (usuario) {
             this.usuario = { ...usuario };
             this.original = { ...usuario };
-            
+
             if (usuario.foto_perfil) {
               this.avatarPreview = usuario.foto_perfil;
             }
-            
+
             console.log('Usuario cargado:', usuario);
           } else {
             this.error = 'Usuario no encontrado';
@@ -102,7 +103,7 @@ export class SoporteProfileComponent implements OnInit, OnDestroy {
 
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-      
+
       if (file.size > 5 * 1024 * 1024) {
         alert('La imagen es muy grande. Máximo 5MB.');
         return;
@@ -117,7 +118,7 @@ export class SoporteProfileComponent implements OnInit, OnDestroy {
       reader.onload = () => {
         const base64 = reader.result as string;
         this.avatarPreview = base64;
-        
+
         if (this.usuario) {
           this.usuario.foto_perfil = base64;
         }
@@ -163,16 +164,16 @@ export class SoporteProfileComponent implements OnInit, OnDestroy {
           console.log('Usuario actualizado:', usuarioActualizado);
           this.usuario = { ...usuarioActualizado };
           this.original = { ...usuarioActualizado };
-          
+
           if (usuarioActualizado.foto_perfil) {
             this.avatarPreview = usuarioActualizado.foto_perfil;
           } else {
             this.avatarPreview = null;
           }
-          
+
           this.guardando = false;
           alert('Perfil actualizado con éxito');
-          
+
           const currentUser = this.usuarioService.getUser();
           if (currentUser && currentUser.id === usuarioActualizado.id) {
             this.usuarioService.saveUser(usuarioActualizado);
@@ -224,7 +225,7 @@ export class SoporteProfileComponent implements OnInit, OnDestroy {
       const confirmar = confirm('¿Estás seguro de cancelar? Se perderán los cambios no guardados.');
       if (!confirmar) return;
     }
-    
+
     if (this.original) {
       this.usuario = { ...this.original };
       this.avatarPreview = this.original.foto_perfil || null;
@@ -236,7 +237,7 @@ export class SoporteProfileComponent implements OnInit, OnDestroy {
       const confirmar = confirm('¿Estás seguro de salir? Se perderán los cambios no guardados.');
       if (!confirmar) return;
     }
-    
+
     window.history.back();
   }
 

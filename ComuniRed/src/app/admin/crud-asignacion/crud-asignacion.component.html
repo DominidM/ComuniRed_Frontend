@@ -1,145 +1,144 @@
 <div class="crud-asignacion-root">
-  <div class="crud-asignacion-header">
-    <h2>📋 Gestión de Asignaciones</h2>
-    <div class="header-actions">
-      <button class="btn-secondary" (click)="abrirModalQuejas()">
-        📊 Ver Quejas Disponibles (+5 votos)
+  <app-loading-overlay [loading]="loading" text="Cargando asignaciones...">
+    <div class="crud-asignacion-header">
+      <h2>Gestion de Asignaciones</h2>
+      <div class="header-actions">
+        <button class="btn btn-outline btn-icon" (click)="abrirModalQuejas()" title="Ver quejas disponibles">
+          <span class="btn-icon-symbol">Q</span>
+          Quejas Disponibles ({{ quejasDisponibles.length }})
+        </button>
+        <button class="btn btn-auto" (click)="asignarAutomaticamente()" [disabled]="asignandoAutomatico || totalPendientesAuto === 0" title="Asignar automaticamente quejas sin asignar">
+          <span class="btn-icon-symbol">AA</span>
+          {{ asignandoAutomatico ? 'Asignando...' : 'Asignar Automaticamente' }}
+          <span *ngIf="totalPendientesAuto > 0" class="badge-counter">{{ totalPendientesAuto }}</span>
+        </button>
+        <button class="btn btn-primary" (click)="abrirModalNuevaAsignacion()">
+          <span class="btn-icon-symbol">+</span>
+          Nueva Asignacion
+        </button>
+      </div>
+    </div>
+
+    <div class="filtros-container">
+      <div class="filtro-group">
+        <label>Buscar:</label>
+        <input 
+          type="text" 
+          [(ngModel)]="filtroTexto" 
+          (ngModelChange)="onFiltroChange()"
+          placeholder="Buscar por soporte u observacion..."
+          class="input-buscar">
+      </div>
+
+      <div class="filtro-group">
+        <label>Estado:</label>
+        <select [(ngModel)]="filtroEstado" (ngModelChange)="onFiltroChange()" class="select-filtro">
+          <option value="todos">Todos</option>
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="EN_PROCESO">En Proceso</option>
+          <option value="COMPLETADA">Completada</option>
+          <option value="CANCELADA">Cancelada</option>
+        </select>
+      </div>
+
+      <div class="filtro-group filtro-count">
+        <span class="result-count">{{ asignacionesFiltradas.length }} resultado{{ asignacionesFiltradas.length !== 1 ? 's' : '' }}</span>
+      </div>
+
+      <button class="btn btn-refrescar" (click)="cargarDatos()">
+        Refrescar
       </button>
-      <button class="btn-primary" (click)="abrirModalNuevaAsignacion()">
-        ➕ Nueva Asignación
-      </button>
-    </div>
-  </div>
-
-  <div class="filtros-container">
-    <div class="filtro-group">
-      <label>🔍 Buscar:</label>
-      <input 
-        type="text" 
-        [(ngModel)]="filtroTexto" 
-        (ngModelChange)="onFiltroChange()"
-        placeholder="Buscar por ID o observación..."
-        class="input-buscar">
     </div>
 
-    <div class="filtro-group">
-      <label>📊 Estado:</label>
-      <select [(ngModel)]="filtroEstado" (ngModelChange)="onFiltroChange()" class="select-filtro">
-        <option value="todos">Todos</option>
-        <option value="PENDIENTE">Pendiente</option>
-        <option value="EN_PROCESO">En Proceso</option>
-        <option value="COMPLETADA">Completada</option>
-        <option value="CANCELADA">Cancelada</option>
-      </select>
+    <div class="controls-row" *ngIf="asignacionesFiltradas.length > 0">
+      <div class="show-select">
+        <label for="pageSize">Por pagina:</label>
+        <select id="pageSize" (change)="onPageSizeChange($event.target.value)" [value]="pageSize">
+          <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+        </select>
+        <span class="total-count">Total: {{ totalAsignaciones }}</span>
+      </div>
     </div>
 
-    <button class="btn-refrescar" (click)="cargarDatos()">
-      🔄 Refrescar
-    </button>
-  </div>
-
-  <div *ngIf="loading" class="loading-container">
-    <div class="spinner"></div>
-    <p>Cargando...</p>
-  </div>
-
-  <div *ngIf="!loading && asignacionesFiltradas.length > 0" class="asignaciones-grid">
-    <div *ngFor="let asignacion of asignacionesFiltradas" class="asignacion-card">
-      <div class="card-header">
-        <div class="card-id">
-          <span class="label">ID:</span>
-          <span class="value">{{ asignacion.id.substring(0, 8) }}...</span>
+    <app-data-table
+      [columns]="columns"
+      [rows]="asignacionesPaginadas"
+      [page]="page"
+      [pages]="pages"
+      [totalPages]="totalPages"
+      [totalElements]="totalAsignaciones"
+      [loading]="loading"
+      [rowTrackBy]="trackByAsignacionId"
+      emptyMessage="No hay asignaciones. Crea una nueva asignacion o usa 'Asignar Automaticamente'."
+      minWidth="1000px"
+      (pageChange)="goToPage($event)"
+    >
+      <ng-template dataTableCell="soporte" let-row>
+        <div class="soporte-info">
+          <div class="soporte-avatar">{{ obtenerNombreSoporte(row.soporte_id).charAt(0) }}</div>
+          <span>{{ obtenerNombreSoporte(row.soporte_id) }}</span>
         </div>
-        <span class="badge" [ngClass]="getEstadoBadgeClass(asignacion.estado)">
-          {{ getEstadoTexto(asignacion.estado) }}
+      </ng-template>
+
+      <ng-template dataTableCell="estado" let-row>
+        <span class="badge" [ngClass]="getEstadoBadgeClass(row.estado)">
+          {{ getEstadoTexto(row.estado) }}
         </span>
-      </div>
+      </ng-template>
 
-      <div class="card-body">
-        <div class="info-row">
-          <span class="icon">📝</span>
-          <div>
-            <div class="label">Queja ID:</div>
-            <div class="value">{{ asignacion.queja_id.substring(0, 8) }}...</div>
-          </div>
-        </div>
+      <ng-template dataTableCell="fecha_asignacion" let-row>
+        {{ row.fecha_asignacion | date:'dd/MM/yyyy HH:mm' }}
+      </ng-template>
 
-        <div class="info-row">
-          <span class="icon">👤</span>
-          <div>
-            <div class="label">Asignado a:</div>
-            <div class="value">{{ obtenerNombreSoporte(asignacion.soporte_id) }}</div>
-          </div>
-        </div>
+      <ng-template dataTableCell="observacion" let-row>
+        {{ row.observacion || '-' }}
+      </ng-template>
 
-        <div class="info-row">
-          <span class="icon">📅</span>
-          <div>
-            <div class="label">Asignado:</div>
-            <div class="value">{{ asignacion.fecha_asignacion | date:'short' }}</div>
-          </div>
-        </div>
-
-        <div class="info-row" *ngIf="asignacion.observacion">
-          <span class="icon">📌</span>
-          <div>
-            <div class="label">Observación:</div>
-            <div class="value">{{ asignacion.observacion }}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card-actions">
-        <button class="btn btn-info" (click)="verDetalleQueja(asignacion.queja_id)">
-          👁️ Ver Queja
-        </button>
-
-        <div class="dropdown">
-          <button class="btn btn-secondary">
-            🔧 Cambiar Estado
+      <ng-template dataTableCell="acciones" let-row>
+        <div class="actions-cell">
+          <button class="btn btn-sm btn-info" (click)="verDetalleQueja(row.queja_id)" title="Ver queja">
+            Ver
           </button>
-          <div class="dropdown-content">
-            <a (click)="cambiarEstado(asignacion, 'EN_PROCESO')">En Proceso</a>
-            <a (click)="cambiarEstado(asignacion, 'COMPLETADA')">Completada</a>
-            <a (click)="cambiarEstado(asignacion, 'CANCELADA')">Cancelada</a>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-secondary-dd">
+              Estado
+            </button>
+            <div class="dropdown-content">
+              <a (click)="cambiarEstado(row, 'EN_PROCESO')">En Proceso</a>
+              <a (click)="cambiarEstado(row, 'COMPLETADA')">Completada</a>
+              <a (click)="cambiarEstado(row, 'CANCELADA')">Cancelada</a>
+            </div>
           </div>
+          <button class="btn btn-sm btn-warning" (click)="abrirModalReasignar(row)" title="Reasignar">
+            Reasignar
+          </button>
         </div>
+      </ng-template>
+    </app-data-table>
+  </app-loading-overlay>
 
-        <button class="btn btn-warning" (click)="abrirModalReasignar(asignacion)">
-          🔄 Reasignar
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div *ngIf="!loading && asignacionesFiltradas.length === 0" class="empty-state">
-    <div class="empty-icon">📋</div>
-    <h3>No hay asignaciones</h3>
-    <p>Crea una nueva asignación para comenzar</p>
-  </div>
-
-  <!-- Modal Nueva Asignación -->
+  <!-- Modal Nueva Asignacion -->
   <div *ngIf="showModal" class="modal-overlay" (click)="cerrarModal()">
     <div class="modal-container" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>➕ Nueva Asignación</h3>
-        <button class="btn-close" (click)="cerrarModal()">×</button>
+        <h3>Nueva Asignacion</h3>
+        <button class="btn-close" (click)="cerrarModal()">&times;</button>
       </div>
 
       <div class="modal-body">
         <div class="form-group">
-          <label>📝 Queja:</label>
+          <label>Queja:</label>
           <select [(ngModel)]="nuevaAsignacion.quejaId" class="form-control">
             <option value="">Seleccionar queja</option>
             <option *ngFor="let queja of quejasDisponibles" [value]="queja.id">
               {{ queja.titulo }} ({{ queja.votes.total }} votos)
-              <span *ngIf="queja.estaAsignada"> - ✓ Asignada</span>
+              <span *ngIf="queja.estaAsignada"> - Asignada</span>
             </option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>👤 Usuario de Soporte:</label>
+          <label>Usuario de Soporte:</label>
           <select [(ngModel)]="nuevaAsignacion.soporteId" class="form-control">
             <option value="">Seleccionar soporte</option>
             <option *ngFor="let soporte of usuariosSoporte" [value]="soporte.id">
@@ -149,12 +148,12 @@
         </div>
 
         <div class="form-group">
-          <label>📌 Observación (opcional):</label>
+          <label>Observacion (opcional):</label>
           <textarea 
             [(ngModel)]="nuevaAsignacion.observacion" 
             class="form-control"
             rows="3"
-            placeholder="Escribe una observación...">
+            placeholder="Escribe una observacion...">
           </textarea>
         </div>
       </div>
@@ -168,23 +167,19 @@
     </div>
   </div>
 
-  <!-- Modal de Reasignación -->
+  <!-- Modal Reasignacion -->
   <div *ngIf="showReasignarModal" class="modal-overlay" (click)="cerrarModalReasignar()">
     <div class="modal-container" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>🔄 Reasignar Queja</h3>
-        <button class="btn-close" (click)="cerrarModalReasignar()">×</button>
+        <h3>Reasignar Queja</h3>
+        <button class="btn-close" (click)="cerrarModalReasignar()">&times;</button>
       </div>
 
       <div class="modal-body">
         <div class="info-asignacion-actual" *ngIf="asignacionParaReasignar">
-          <h4>📋 Asignación Actual</h4>
+          <h4>Asignacion Actual</h4>
           <div class="info-item">
-            <span class="label">ID:</span>
-            <span class="value">{{ asignacionParaReasignar.id.substring(0, 8) }}...</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Soporte Actual:</span>
+            <span class="label">Soporte:</span>
             <span class="value">{{ obtenerNombreSoporte(asignacionParaReasignar.soporte_id) }}</span>
           </div>
           <div class="info-item">
@@ -196,7 +191,7 @@
         </div>
 
         <div class="form-group">
-          <label>👤 Nuevo Usuario de Soporte:</label>
+          <label>Nuevo Usuario de Soporte:</label>
           <select [(ngModel)]="datosReasignacion.nuevoSoporteId" class="form-control">
             <option value="">Seleccionar nuevo soporte</option>
             <option 
@@ -210,12 +205,12 @@
         </div>
 
         <div class="form-group">
-          <label>📝 Motivo de reasignación:</label>
+          <label>Motivo de reasignacion:</label>
           <textarea 
             [(ngModel)]="datosReasignacion.motivo" 
             class="form-control"
             rows="3"
-            placeholder="Escribe el motivo de la reasignación...">
+            placeholder="Escribe el motivo de la reasignacion...">
           </textarea>
         </div>
       </div>
@@ -223,7 +218,7 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" (click)="cerrarModalReasignar()">Cancelar</button>
         <button class="btn btn-primary" (click)="confirmarReasignacion()" [disabled]="loading">
-          {{ loading ? 'Reasignando...' : 'Confirmar Reasignación' }}
+          {{ loading ? 'Reasignando...' : 'Confirmar Reasignacion' }}
         </button>
       </div>
     </div>
@@ -233,13 +228,13 @@
   <div *ngIf="showQuejasModal" class="modal-overlay" (click)="cerrarModalQuejas()">
     <div class="modal-container modal-large" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>📊 Quejas Disponibles para Asignar (+5 votos)</h3>
-        <button class="btn-close" (click)="cerrarModalQuejas()">×</button>
+        <h3>Quejas Disponibles para Asignar (+5 votos)</h3>
+        <button class="btn-close" (click)="cerrarModalQuejas()">&times;</button>
       </div>
 
       <div class="modal-body">
         <div *ngIf="quejasDisponibles.length === 0" class="empty-state-modal">
-          <p>No hay quejas con más de 5 votos disponibles</p>
+          <p>No hay quejas con mas de 5 votos disponibles</p>
         </div>
 
         <div *ngIf="quejasDisponibles.length > 0" class="quejas-list">
@@ -249,7 +244,7 @@
               <div class="queja-title-section">
                 <h4>{{ queja.titulo }}</h4>
                 <span *ngIf="queja.estaAsignada" class="badge-asignada">
-                  ✓ {{ obtenerTextoAsignacion(queja) }}
+                  {{ obtenerTextoAsignacion(queja) }}
                 </span>
               </div>
               <span class="votes-badge">{{ queja.votes.total }} votos</span>
@@ -258,9 +253,9 @@
             <p>{{ queja.descripcion.substring(0, 150) }}...</p>
             
             <div class="queja-meta">
-              <span>👤 {{ queja.usuario.nombre }} {{ queja.usuario.apellido }}</span>
-              <span>📂 {{ queja.categoria.nombre }}</span>
-              <span>📅 {{ queja.fecha_creacion | date:'short' }}</span>
+              <span>{{ queja.usuario.nombre }} {{ queja.usuario.apellido }}</span>
+              <span>{{ queja.categoria.nombre }}</span>
+              <span>{{ queja.fecha_creacion | date:'short' }}</span>
             </div>
 
             <div *ngIf="queja.asignaciones && queja.asignaciones.length > 0" class="asignaciones-actuales">
@@ -276,7 +271,7 @@
             <button 
               class="btn btn-primary btn-sm" 
               (click)="nuevaAsignacion.quejaId = queja.id; abrirModalNuevaAsignacion()">
-              {{ queja.estaAsignada ? '➕ Asignar Nuevamente' : 'Asignar Esta Queja' }}
+              {{ queja.estaAsignada ? 'Asignar Nuevamente' : 'Asignar Esta Queja' }}
             </button>
           </div>
         </div>

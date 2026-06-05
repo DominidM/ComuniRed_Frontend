@@ -158,47 +158,6 @@
   font-size: 13px;
 }
 
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.btn-view,
-.btn-edit,
-.btn-delete {
-  border: none;
-  border-radius: 10px;
-  padding: 9px 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.btn-view {
-  background: color-mix(in srgb, #0ea5e9 14%, var(--cr-background));
-  color: #0369a1;
-  border: 1px solid color-mix(in srgb, #0ea5e9 24%, transparent);
-}
-
-.btn-edit {
-  background: color-mix(in srgb, #84cc16 16%, var(--cr-background));
-  color: #3f6212;
-  border: 1px solid color-mix(in srgb, #84cc16 26%, transparent);
-}
-
-.btn-delete {
-  background: var(--cr-danger-soft);
-  color: var(--cr-danger);
-  border: 1px solid var(--cr-danger-soft-2);
-}
-
-.btn-view:hover,
-.btn-edit:hover,
-.btn-delete:hover {
-  transform: translateY(-1px);
-}
-
 .crud-reel-empty {
   padding: 48px 20px;
   text-align: center;

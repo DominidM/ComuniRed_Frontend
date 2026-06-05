@@ -12,79 +12,27 @@
       </button>
     </div>
 
-    <div class="crud-estado-queja-controls-row">
-      <div class="crud-estado-queja-show-select">
-        <label for="pageSize">por página</label>
-        <select id="pageSize" (change)="onPageSizeChange($event)" [value]="pageSize">
-          <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
-        </select>
-        <span>Total: {{ totalEstados }}</span>
-      </div>
-    </div>
-
     <app-loading-overlay [loading]="loading" text="Cargando estados...">
-      <div *ngIf="estados && estados.length > 0; else noEstados">
-        <table class="crud-estado-queja-table">
-          <thead>
-            <tr>
-              <th style="display: none;">ID</th>
-              <th>Clave</th>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Orden</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let estado of estados; trackBy: trackByEstadoId">
-              <td style="display: none;">{{ estado.id }}</td>
-              <td><div class="estado-clave">{{ estado.clave }}</div></td>
-              <td><div class="estado-nombre">{{ estado.nombre }}</div></td>
-              <td><div class="estado-descripcion">{{ estado.descripcion }}</div></td>
-              <td><span class="orden-badge">{{ estado.orden }}</span></td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn-edit" (click)="editarEstado(estado)" title="Editar estado">Editar</button>
-                  <button class="btn-delete" (click)="eliminarEstado(estado.id)" title="Eliminar estado">Eliminar</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <ng-template #noEstados>
-        <div class="crud-estado-queja-empty">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10 9 9 9 8 9"></polyline>
-          </svg>
-          <p>No hay estados de queja registrados</p>
-          <button class="btn-primary" (click)="abrirModal()" style="margin-top: 1rem;">
-            Crear primer estado
-          </button>
-        </div>
-      </ng-template>
-
-      <div class="crud-estado-queja-pagination-row" *ngIf="totalEstados > 0">
-        <div class="crud-estado-queja-pagination">
-          <button class="crud-estado-queja-pagination-btn" (click)="cambiarPagina(currentPage - 1)" [disabled]="currentPage === 1">
-            &lt; Anterior
-          </button>
-          <span class="crud-estado-queja-pagination-info">
-            Página {{ currentPage }} de {{ totalPages }}
-          </span>
-          <button class="crud-estado-queja-pagination-btn" (click)="cambiarPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
-            Siguiente &gt;
-          </button>
-        </div>
-        <div class="crud-estado-queja-pagination-count">
-          <span>Mostrando {{ estados.length }} de {{ totalEstados }} datos.</span>
-        </div>
-      </div>
+      <app-data-table
+        [columns]="columns"
+        [rows]="estados"
+        [page]="page"
+        [pages]="pages"
+        [totalPages]="totalPages"
+        [totalElements]="totalEstados"
+        [loading]="loading"
+        [rowTrackBy]="trackByEstadoId"
+        emptyMessage="No hay estados de queja registrados."
+        minWidth="1000px"
+        (pageChange)="goToPage($event)"
+      >
+        <ng-template dataTableCell="acciones" let-row>
+          <div class="action-buttons">
+            <button class="btn-edit" (click)="editarEstado(row)" title="Editar estado">Editar</button>
+            <button class="btn-delete" (click)="eliminarEstado(row.id)" title="Eliminar estado">Eliminar</button>
+          </div>
+        </ng-template>
+      </app-data-table>
     </app-loading-overlay>
 
     <div class="crud-estado-queja-modal" *ngIf="modalVisible" (click)="cerrarModal()">

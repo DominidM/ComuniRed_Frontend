@@ -5,11 +5,16 @@ import { finalize } from 'rxjs/operators';
 import { UsuarioService, Usuario, UsuarioPage, UsuarioInput } from '../../services/usuario.service';
 import { RolService, Rol } from '../../services/rol.service';
 import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
+import {
+  DataTableComponent,
+  DataTableColumn,
+  DataTableCellDirective,
+} from '../../shared/components/data-table/data-table.component';
 
 @Component({
   selector: 'app-crud-usuario',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective],
   templateUrl: './crud-usuario.component.html',
   styleUrls: ['./crud-usuario.component.css'],
 })
@@ -37,6 +42,18 @@ export class CrudUsuarioComponent implements OnInit {
 
   hoy: string = new Date().toISOString().substring(0, 10);
 
+  columns: DataTableColumn[] = [
+    { key: 'nombre', label: 'Nombre' },
+    { key: 'apellido', label: 'Apellido' },
+    { key: 'rol_id', label: 'Rol' },
+    { key: 'dni', label: 'DNI' },
+    { key: 'edad', label: 'Edad' },
+    { key: 'distrito', label: 'Distrito' },
+    { key: 'fecha_nacimiento', label: 'Fecha Nac.' },
+    { key: 'fecha_registro', label: 'Fecha Reg.' },
+    { key: 'acciones', label: 'Acciones' },
+  ];
+
   // UI states
   loading = false;
   saving = false;
@@ -57,6 +74,16 @@ export class CrudUsuarioComponent implements OnInit {
 
   trackByUsuarioId(index: number, usuario: Usuario): any {
     return usuario.id;
+  }
+
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
+  goToPage(p: number): void {
+    if (p < 0 || p >= this.totalPages || p === this.page) return;
+    this.page = p;
+    this.loadUsuarios();
   }
 
   loadUsuarios() {
@@ -90,8 +117,8 @@ export class CrudUsuarioComponent implements OnInit {
       });
   }
 
-  onPageSizeChange(event: any) {
-    const newSize = +event.target.value;
+  onPageSizeChange(size: any) {
+    const newSize = +size;
     if (!isNaN(newSize) && newSize > 0) {
       this.size = newSize;
       this.page = 0;

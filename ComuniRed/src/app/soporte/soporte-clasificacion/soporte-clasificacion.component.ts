@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
 import { QuejaService, Queja } from '../../services/queja.service';
 import { AsignacionService, Asignacion } from '../../services/asignacion.service';
 import { UsuarioService } from '../../services/usuario.service';
@@ -11,7 +13,6 @@ interface NivelRiesgo {
   nombre: string;
   descripcion: string;
   color: string;
-  icono: string;
   total: number;
   prioridad: number;
 }
@@ -19,7 +20,7 @@ interface NivelRiesgo {
 @Component({
   selector: 'app-clasificacion',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
   templateUrl: './soporte-clasificacion.component.html',
   styleUrls: ['./soporte-clasificacion.component.css']
 })
@@ -27,21 +28,20 @@ export class SoporteClasificacionComponent implements OnInit {
   asignaciones: Asignacion[] = [];
   quejas: Queja[] = [];
   quejasFiltradas: Queja[] = [];
-  
+
   mostrarModal: boolean = false;
   mostrarModalImagen: boolean = false;
   imagenSeleccionada: string = '';
   quejaSeleccionada: Queja | null = null;
   nivelSeleccionadoModal: string = '';
   nivelSeleccionadoObj: NivelRiesgo | null = null;
-  
+
   nivelesRiesgo: NivelRiesgo[] = [
     {
       id: 'CRITICO',
       nombre: 'Crítico',
       descripcion: 'Requiere atención inmediata - Riesgo alto para la comunidad',
       color: '#dc2626',
-      icono: '🔴',
       total: 0,
       prioridad: 1
     },
@@ -50,7 +50,6 @@ export class SoporteClasificacionComponent implements OnInit {
       nombre: 'Alto',
       descripcion: 'Problema grave que debe resolverse pronto',
       color: '#ea580c',
-      icono: '🟠',
       total: 0,
       prioridad: 2
     },
@@ -59,7 +58,6 @@ export class SoporteClasificacionComponent implements OnInit {
       nombre: 'Medio',
       descripcion: 'Problema moderado que requiere seguimiento',
       color: '#f59e0b',
-      icono: '🟡',
       total: 0,
       prioridad: 3
     },
@@ -68,7 +66,6 @@ export class SoporteClasificacionComponent implements OnInit {
       nombre: 'Bajo',
       descripcion: 'Problema menor sin urgencia inmediata',
       color: '#22c55e',
-      icono: '🟢',
       total: 0,
       prioridad: 4
     },
@@ -77,7 +74,6 @@ export class SoporteClasificacionComponent implements OnInit {
       nombre: 'Informativo',
       descripcion: 'Solo información, no requiere acción urgente',
       color: '#3b82f6',
-      icono: 'ℹ️',
       total: 0,
       prioridad: 5
     },
@@ -86,7 +82,6 @@ export class SoporteClasificacionComponent implements OnInit {
       nombre: 'Sin Clasificar',
       descripcion: 'Reportes pendientes de clasificación',
       color: '#6b7280',
-      icono: '❓',
       total: 0,
       prioridad: 6
     }
@@ -95,6 +90,8 @@ export class SoporteClasificacionComponent implements OnInit {
   nivelSeleccionado: string = '';
   busqueda: string = '';
   loading: boolean = false;
+
+  toast = { visible: false, mensaje: '', tipo: 'ok' as 'ok' | 'error' };
 
   constructor(
     private quejaService: QuejaService,
@@ -110,9 +107,9 @@ export class SoporteClasificacionComponent implements OnInit {
   cargarQuejasAsignadas(): void {
     this.loading = true;
     const currentUser = this.usuarioService.getUser();
-    
+
     if (!currentUser) {
-      console.error('❌ No hay usuario autenticado');
+      console.error('No hay usuario autenticado');
       this.loading = false;
       return;
     }
@@ -122,7 +119,7 @@ export class SoporteClasificacionComponent implements OnInit {
     this.asignacionService.obtenerAsignacionesPorSoporte(soporteId).subscribe({
       next: (asignaciones) => {
         this.asignaciones = asignaciones;
-        
+
         if (asignaciones.length === 0) {
           this.quejas = [];
           this.quejasFiltradas = [];
@@ -133,23 +130,22 @@ export class SoporteClasificacionComponent implements OnInit {
 
         const quejaIds = [...new Set(asignaciones.map(a => a.queja_id))];
 
-        this.quejaService.obtenerQuejasAprobadas(soporteId).subscribe({
-          next: (quejasAprobadas) => {
-            this.quejas = quejasAprobadas.filter(q => quejaIds.includes(q.id));
-            this.quejasFiltradas = [...this.quejas];
-            this.calcularTotales();
-            this.loading = false;
-          },
-          error: (err) => {
-            console.error('❌ Error cargando quejas aprobadas:', err);
-            alert('Error al cargar las quejas aprobadas');
-            this.loading = false;
-          }
-        });
+        forkJoin(quejaIds.map(id => this.quejaService.obtenerQuejaPorIdSoporte(id, soporteId)))
+          .subscribe({
+            next: (quejas) => {
+              this.quejas = quejas.filter((q): q is Queja => q !== null);
+              this.quejasFiltradas = [...this.quejas];
+              this.calcularTotales();
+              this.loading = false;
+            },
+            error: () => {
+              this.mostrarToast('Error al cargar las quejas', 'error');
+              this.loading = false;
+            }
+          });
       },
-      error: (err) => {
-        console.error('❌ Error cargando asignaciones:', err);
-        alert('Error al cargar las asignaciones');
+      error: () => {
+        this.mostrarToast('Error al cargar las asignaciones', 'error');
         this.loading = false;
       }
     });
@@ -178,9 +174,7 @@ export class SoporteClasificacionComponent implements OnInit {
   }
 
   abrirModalClasificacion(queja: Queja, nivelId: string): void {
-    if (!nivelId || nivelId === '') {
-      return;
-    }
+    if (!nivelId || nivelId === '') return;
 
     this.quejaSeleccionada = queja;
     this.nivelSeleccionadoModal = nivelId;
@@ -196,15 +190,13 @@ export class SoporteClasificacionComponent implements OnInit {
   }
 
   confirmarClasificacion(): void {
-    if (!this.quejaSeleccionada || !this.nivelSeleccionadoModal) {
-      return;
-    }
+    if (!this.quejaSeleccionada || !this.nivelSeleccionadoModal) return;
 
     this.loading = true;
     const currentUser = this.usuarioService.getUser();
-    
+
     if (!currentUser) {
-      alert('❌ No hay usuario autenticado');
+      this.mostrarToast('No hay usuario autenticado', 'error');
       this.loading = false;
       return;
     }
@@ -222,17 +214,16 @@ export class SoporteClasificacionComponent implements OnInit {
         if (index !== -1) {
           this.quejas[index] = { ...this.quejas[index], ...quejaActualizada };
         }
-        
+
         this.calcularTotales();
         this.aplicarBusqueda();
         this.loading = false;
         this.cerrarModal();
-        
-        alert(`✅ Queja clasificada como ${nivel?.nombre}`);
+
+        this.mostrarToast(`Queja clasificada como ${nivel?.nombre}`, 'ok');
       },
-      error: (err) => {
-        console.error('❌ Error clasificando queja:', err);
-        alert('❌ Error al clasificar la queja. Intenta nuevamente.');
+      error: () => {
+        this.mostrarToast('Error al clasificar la queja. Intenta nuevamente.', 'error');
         this.loading = false;
       }
     });
@@ -254,7 +245,7 @@ export class SoporteClasificacionComponent implements OnInit {
       this.quejasFiltradas = [...this.quejas];
     } else {
       this.nivelSeleccionado = nivelId;
-      
+
       if (nivelId === 'SIN_CLASIFICAR') {
         this.quejasFiltradas = this.quejas.filter(q => !q.nivel_riesgo || q.nivel_riesgo === '');
       } else {
@@ -265,7 +256,7 @@ export class SoporteClasificacionComponent implements OnInit {
   }
 
   aplicarBusqueda(): void {
-    let filtradas = this.nivelSeleccionado 
+    let filtradas = this.nivelSeleccionado
       ? this.quejas.filter(q => {
           if (this.nivelSeleccionado === 'SIN_CLASIFICAR') {
             return !q.nivel_riesgo || q.nivel_riesgo === '';
@@ -302,12 +293,6 @@ export class SoporteClasificacionComponent implements OnInit {
     return nivel ? nivel.color : '#6b7280';
   }
 
-  getNivelIcono(nivelRiesgo?: string): string {
-    if (!nivelRiesgo || nivelRiesgo === '') return '❓';
-    const nivel = this.nivelesRiesgo.find(n => n.id === nivelRiesgo.toUpperCase());
-    return nivel ? nivel.icono : '❓';
-  }
-
   get totalQuejas(): number {
     return this.quejas.length;
   }
@@ -327,5 +312,10 @@ export class SoporteClasificacionComponent implements OnInit {
 
   recargarQuejas(): void {
     this.cargarQuejasAsignadas();
+  }
+
+  mostrarToast(mensaje: string, tipo: 'ok' | 'error' = 'ok'): void {
+    this.toast = { visible: true, mensaje, tipo };
+    setTimeout(() => { this.toast.visible = false; }, 3000);
   }
 }

@@ -4,18 +4,23 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { TipoReaccionService, TipoReaccion, TiposReaccionPage } from '../../services/tipo-reaccion.service';
 import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
+import {
+  DataTableComponent,
+  DataTableColumn,
+  DataTableCellDirective,
+} from '../../shared/components/data-table/data-table.component';
 
 @Component({
   selector: 'app-crud-tipo-reaccion',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective],
   templateUrl: './crud-tipo-reaccion.component.html',
   styleUrls: ['./crud-tipo-reaccion.component.css']
 })
 export class CrudTipoReaccionComponent implements OnInit {
   tipos: TipoReaccion[] = [];
   totalTipos: number = 0;
-  currentPage: number = 1;
+  page: number = 0;
   totalPages: number = 1;
   pageSize: number = 5;
   pageSizes: number[] = [5, 10, 20, 50, 100];
@@ -28,6 +33,14 @@ export class CrudTipoReaccionComponent implements OnInit {
   editingTipo: TipoReaccion | null = null;
   tipoData: Partial<TipoReaccion> = {};
 
+  columns: DataTableColumn[] = [
+    { key: 'key', label: 'Clave (Key)' },
+    { key: 'label', label: 'Nombre (Label)' },
+    { key: 'activo', label: 'Estado' },
+    { key: 'orden', label: 'Orden' },
+    { key: 'acciones', label: 'Acciones' },
+  ];
+
   constructor(
     private tipoReaccionService: TipoReaccionService,
     private cdr: ChangeDetectorRef
@@ -37,21 +50,25 @@ export class CrudTipoReaccionComponent implements OnInit {
     this.loadTipos();
   }
 
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
   trackByTipoId(index: number, tipo: TipoReaccion): string {
     return tipo.id || index.toString();
   }
 
   loadTipos() {
     this.loading = true;
-    this.tipoReaccionService.obtenerTipoReaccionPage(this.currentPage - 1, this.pageSize)
+    this.tipoReaccionService.obtenerTipoReaccionPage(this.page, this.pageSize)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (data: TiposReaccionPage) => {
           this.tipos = data.content;
           this.totalTipos = data.totalElements;
           this.totalPages = data.totalPages;
-          if (this.currentPage > this.totalPages && this.totalPages > 0) {
-            this.currentPage = this.totalPages;
+          if (this.page >= this.totalPages && this.totalPages > 0) {
+            this.page = this.totalPages - 1;
             this.loadTipos();
           }
           this.cdr.detectChanges();
@@ -63,19 +80,18 @@ export class CrudTipoReaccionComponent implements OnInit {
       });
   }
 
-  onPageSizeChange(event: any): void {
-    const newSize = +event.target.value;
-    if (!isNaN(newSize) && newSize > 0) {
-      this.pageSize = newSize;
-      this.currentPage = 1;
-      this.loadTipos();
-    }
+  goToPage(p: number): void {
+    if (p < 0 || p >= this.totalPages || p === this.page) return;
+    this.page = p;
+    this.loadTipos();
   }
 
-  cambiarPagina(pagina: number): void {
-    if (pagina < 1 || pagina > this.totalPages) return;
-    this.currentPage = pagina;
-    this.loadTipos();
+  onPageSizeChange(newSize: number): void {
+    if (newSize > 0) {
+      this.pageSize = newSize;
+      this.page = 0;
+      this.loadTipos();
+    }
   }
 
   openAddModal() {
@@ -108,7 +124,7 @@ export class CrudTipoReaccionComponent implements OnInit {
       this.tipoReaccionService.actualizarTipoReaccion(
         this.editingTipo.id,
         this.tipoData,
-        this.currentPage - 1,
+        this.page,
         this.pageSize
       )
       .pipe(finalize(() => (this.saving = false)))
@@ -125,7 +141,7 @@ export class CrudTipoReaccionComponent implements OnInit {
     } else {
       this.tipoReaccionService.crearTipoReaccion(
         this.tipoData,
-        this.currentPage - 1,
+        this.page,
         this.pageSize
       )
       .pipe(finalize(() => (this.saving = false)))
@@ -151,18 +167,18 @@ export class CrudTipoReaccionComponent implements OnInit {
       return;
     }
 
-    let paginaGuardada = this.currentPage;
-    if (this.tipos.length === 1 && this.currentPage > 1) {
-      paginaGuardada = this.currentPage - 1;
+    let paginaGuardada = this.page;
+    if (this.tipos.length === 1 && this.page > 0) {
+      paginaGuardada = this.page - 1;
     }
 
     this.deleting = true;
-    this.tipoReaccionService.eliminarTipoReaccion(id, paginaGuardada - 1, this.pageSize)
+    this.tipoReaccionService.eliminarTipoReaccion(id, paginaGuardada, this.pageSize)
       .pipe(finalize(() => (this.deleting = false)))
       .subscribe({
         next: (ok) => {
           if (ok) {
-            this.currentPage = paginaGuardada;
+            this.page = paginaGuardada;
             this.loadTipos();
           }
         },

@@ -4,11 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { CategoriaService, Categoria, CategoriaPage } from '../../services/categoria.service';
 import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
+import {
+  DataTableComponent,
+  DataTableColumn,
+  DataTableCellDirective,
+} from '../../shared/components/data-table/data-table.component';
 
 @Component({
   selector: 'app-crud-categoria',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective],
   templateUrl: './crud-categoria.component.html',
   styleUrls: ['./crud-categoria.component.css']
 })
@@ -28,12 +33,19 @@ export class CrudCategoriaComponent implements OnInit {
   pageSize: number = 5;
   pageSizes: number[] = [5, 10, 20, 50, 100];
   totalCategorias: number = 0;
-  currentPage: number = 1;  // GraphQL backend: index 0
+  page: number = 0;
   totalPages: number = 1;
 
   loading = false;
   saving = false;
   deleting = false;
+
+  columns: DataTableColumn[] = [
+    { key: 'nombre', label: 'Nombre' },
+    { key: 'descripcion', label: 'Descripción' },
+    { key: 'activo', label: 'Activo' },
+    { key: 'acciones', label: 'Acciones' },
+  ];
 
   constructor(
     private categoriaService: CategoriaService,
@@ -44,18 +56,21 @@ export class CrudCategoriaComponent implements OnInit {
     this.obtenerCategorias();
   }
 
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
   obtenerCategorias(): void {
     this.loading = true;
-    this.categoriaService.obtenerCategorias(this.currentPage - 1, this.pageSize)
+    this.categoriaService.obtenerCategorias(this.page, this.pageSize)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (data: CategoriaPage) => {
           this.categorias = data.content;
           this.totalCategorias = data.totalElements;
           this.totalPages = data.totalPages;
-          // Si eliminaste el único registro de la última página, retrocede de página
-          if (this.currentPage > this.totalPages && this.totalPages > 0) {
-            this.currentPage = this.totalPages;
+          if (this.page >= this.totalPages && this.totalPages > 0) {
+            this.page = this.totalPages - 1;
             this.obtenerCategorias();
           }
           this.cdr.detectChanges();
@@ -67,19 +82,18 @@ export class CrudCategoriaComponent implements OnInit {
       });
   }
 
-  onPageSizeChange(event: any): void {
-    const newSize = +event.target.value;
-    if (!isNaN(newSize) && newSize > 0) {
-      this.pageSize = newSize;
-      this.currentPage = 1;
-      this.obtenerCategorias();
-    }
+  goToPage(p: number): void {
+    if (p < 0 || p >= this.totalPages || p === this.page) return;
+    this.page = p;
+    this.obtenerCategorias();
   }
 
-  cambiarPagina(pagina: number): void {
-    if (pagina < 1 || pagina > this.totalPages) return;
-    this.currentPage = pagina;
-    this.obtenerCategorias();
+  onPageSizeChange(newSize: number): void {
+    if (newSize > 0) {
+      this.pageSize = newSize;
+      this.page = 0;
+      this.obtenerCategorias();
+    }
   }
 
   openAddModal(): void {
@@ -123,7 +137,7 @@ export class CrudCategoriaComponent implements OnInit {
         this.nombre,
         this.descripcion,
         this.activo,
-        this.currentPage - 1,
+        this.page,
         this.pageSize
       )
       .pipe(finalize(() => (this.saving = false)))
@@ -142,7 +156,7 @@ export class CrudCategoriaComponent implements OnInit {
         this.nombre,
         this.descripcion,
         this.activo,
-        this.currentPage - 1,
+        this.page,
         this.pageSize
       )
       .pipe(finalize(() => (this.saving = false)))
@@ -162,18 +176,18 @@ export class CrudCategoriaComponent implements OnInit {
   eliminarCategoria(id: string): void {
     if (!confirm('¿Deseas eliminar esta categoría?')) return;
 
-    let paginaGuardada = this.currentPage;
-    if (this.categorias.length === 1 && this.currentPage > 1) {
-      paginaGuardada = this.currentPage - 1;
+    let paginaGuardada = this.page;
+    if (this.categorias.length === 1 && this.page > 0) {
+      paginaGuardada = this.page - 1;
     }
 
     this.deleting = true;
-    this.categoriaService.eliminarCategoria(id, paginaGuardada - 1, this.pageSize)
+    this.categoriaService.eliminarCategoria(id, paginaGuardada, this.pageSize)
       .pipe(finalize(() => (this.deleting = false)))
       .subscribe({
         next: (ok) => {
           if (ok) {
-            this.currentPage = paginaGuardada;
+            this.page = paginaGuardada;
             this.obtenerCategorias();
           }
         },

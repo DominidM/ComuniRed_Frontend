@@ -11,84 +11,33 @@
       </button>
     </div>
 
-    <div class="crud-rol-controls-row">
-      <div class="crud-rol-show-select">
-        <label for="pageSize">por página</label>
-        <select id="pageSize" (change)="onPageSizeChange($event)" [value]="pageSize">
-          <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
-        </select>
-        <span>Total: {{ totalCategorias }}</span>
-      </div>
-    </div>
-
     <app-loading-overlay [loading]="loading" text="Cargando categorías...">
-      <div *ngIf="categorias && categorias.length > 0; else noCategorias">
-        <table class="crud-rol-table">
-          <thead>
-            <tr>
-              <th style="display: none;">ID</th>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Activo</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let cat of categorias; trackBy: trackByCategoriaId">
-              <td style="display: none;">{{ cat.id }}</td>
-              <td>
-                <div class="role-name">{{ cat.nombre }}</div>
-              </td>
-              <td>
-                <div class="role-description">{{ cat.descripcion }}</div>
-              </td>
-              <td>
-                <span class="status-badge" [class.status-active]="cat.activo" [class.status-inactive]="!cat.activo">
-                  {{ cat.activo ? 'Sí' : 'No' }}
-                </span>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn-edit" (click)="editarCategoria(cat)" title="Editar categoría">Editar</button>
-                  <button class="btn-delete" (click)="eliminarCategoria(cat.id)" title="Eliminar categoría">Eliminar</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <ng-template #noCategorias>
-        <div class="crud-rol-empty">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #000000;">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-          <p>No hay categorías registradas</p>
-          <button class="btn-primary" (click)="openAddModal()" style="margin-top: 1rem;">
-            Crear primera categoría
-          </button>
-        </div>
-      </ng-template>
-
-      <div class="crud-rol-pagination-row" *ngIf="categorias.length > 0">
-        <div class="crud-rol-pagination">
-          <button class="crud-rol-pagination-btn" (click)="cambiarPagina(currentPage - 1)" [disabled]="currentPage === 1">
-            &lt; Anterior
-          </button>
-          <span class="crud-rol-pagination-info">
-            Página {{ currentPage }} de {{ totalPages }}
+      <app-data-table
+        [columns]="columns"
+        [rows]="categorias"
+        [page]="page"
+        [pages]="pages"
+        [totalPages]="totalPages"
+        [totalElements]="totalCategorias"
+        [loading]="loading"
+        [rowTrackBy]="trackByCategoriaId"
+        emptyMessage="No hay categorías registradas."
+        minWidth="900px"
+        (pageChange)="goToPage($event)"
+      >
+        <ng-template dataTableCell="activo" let-row>
+          <span class="status-badge" [class.status-active]="row.activo" [class.status-inactive]="!row.activo">
+            {{ row.activo ? 'Sí' : 'No' }}
           </span>
-          <button class="crud-rol-pagination-btn" (click)="cambiarPagina(currentPage + 1)" [disabled]="currentPage === totalPages">
-            Siguiente &gt;
-          </button>
-        </div>
-        <div class="crud-rol-pagination-count">
-          <span>Mostrando {{ categorias.length }} de {{ totalCategorias }} datos.</span>
-        </div>
-      </div>
+        </ng-template>
+
+        <ng-template dataTableCell="acciones" let-row>
+          <div class="action-buttons">
+            <button class="btn-edit" (click)="editarCategoria(row)" title="Editar categoría">Editar</button>
+            <button class="btn-delete" (click)="eliminarCategoria(row.id)" title="Eliminar categoría">Eliminar</button>
+          </div>
+        </ng-template>
+      </app-data-table>
     </app-loading-overlay>
 
     <div class="crud-rol-modal" *ngIf="showModal" (click)="closeModal()">

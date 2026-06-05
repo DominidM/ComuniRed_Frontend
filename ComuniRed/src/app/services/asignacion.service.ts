@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 import { Queja } from './queja.service';
 
 export interface Asignacion {
@@ -155,6 +155,7 @@ export class AsignacionService {
         fetchPolicy: 'network-only'
       })
       .valueChanges.pipe(
+        filter((result: any) => !result.loading),
         map((result: any) => {
           if (!result.data?.asignacionesActivas) return [];
           return result.data.asignacionesActivas as Asignacion[];

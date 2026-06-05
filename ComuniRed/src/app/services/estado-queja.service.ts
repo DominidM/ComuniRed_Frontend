@@ -51,7 +51,7 @@ export class EstadosQuejaService {
 
   obtenerEstadosQueja(page: number, size: number): Observable<EstadoQuejaPage> {
     return this.apollo
-      .watchQuery<{ obtenerEstados_queja: EstadoQuejaPage }>({
+      .query<{ obtenerEstados_queja: EstadoQuejaPage }>({
         query: gql`
           query ($page: Int!, $size: Int!) {
             obtenerEstados_queja(page: $page, size: $size) {
@@ -71,7 +71,7 @@ export class EstadosQuejaService {
         `,
         variables: { page, size },
       })
-      .valueChanges.pipe(
+      .pipe(
         map((result: any) => result.data?.obtenerEstados_queja ?? []),
       );
   }
@@ -245,7 +245,7 @@ export class EstadosQuejaService {
 
   buscarEstadoPorNombre(nombre: string): Observable<EstadoQueja | null> {
     return this.apollo
-      .watchQuery<{ buscarEstadoPorNombre: EstadoQueja }>({
+      .query<{ buscarEstadoPorNombre: EstadoQueja }>({
         query: gql`
           query ($nombre: String!) {
             buscarEstadoPorNombre(nombre: $nombre) {
@@ -259,7 +259,7 @@ export class EstadosQuejaService {
         `,
         variables: { nombre },
       })
-      .valueChanges.pipe(
+      .pipe(
         map((result: any) => result.data?.buscarEstadoPorNombre ?? null),
       );
   }

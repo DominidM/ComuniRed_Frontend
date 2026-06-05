@@ -251,28 +251,7 @@
 
 .btn-refresh:hover { background: var(--border); }
 
-/* ── LOADING / EMPTY ── */
-.loading-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 60px;
-  color: var(--text3);
-  font-size: 14px;
-}
-
-.spinner-soporte {
-  width: 28px;
-  height: 28px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
+/* ── EMPTY ── */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -484,6 +463,18 @@
 }
 
 .badge-estado.lg { padding: 5px 12px; font-size: 13px; }
+
+.badge-assigned {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: #dbeafe;
+  color: #1e40af;
+}
 
 .est-pendiente  { background: #fef3c7; color: #92400e; }
 .est-asignada   { background: #cffafe; color: #164e63; }

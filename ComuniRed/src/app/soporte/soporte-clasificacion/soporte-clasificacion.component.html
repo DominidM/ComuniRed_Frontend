@@ -1,21 +1,22 @@
 <div class="clasificacion-container">
   <div class="header-section">
     <div class="header-content">
-      <div class="header-icon">🎯</div>
+      <div class="header-icon"><i class="bi bi-bullseye"></i></div>
       <div>
         <h2>Clasificación de Reportes por Nivel de Riesgo</h2>
         <p class="descripcion">Clasifica los reportes asignados según su nivel de urgencia y riesgo para la comunidad</p>
       </div>
     </div>
     <button class="btn-recargar" (click)="recargarQuejas()" [disabled]="loading">
-      <span *ngIf="!loading">🔄 Recargar</span>
-      <span *ngIf="loading">⏳ Cargando...</span>
+      <i class="bi bi-arrow-clockwise"></i>
+      <span *ngIf="!loading"> Recargar</span>
+      <span *ngIf="loading"> Cargando...</span>
     </button>
   </div>
 
   <div class="stats-resumen">
     <div class="stat-item">
-      <div class="stat-icon">📊</div>
+      <div class="stat-icon"><i class="bi bi-bar-chart"></i></div>
       <div class="stat-content">
         <span class="stat-value">{{ totalQuejas }}</span>
         <span class="stat-label">Total de Reportes</span>
@@ -23,7 +24,7 @@
     </div>
 
     <div class="stat-item">
-      <div class="stat-icon success">✅</div>
+      <div class="stat-icon success"><i class="bi bi-check-circle"></i></div>
       <div class="stat-content">
         <span class="stat-value">{{ totalQuejas - quejasSinClasificar }}</span>
         <span class="stat-label">Clasificados</span>
@@ -31,7 +32,7 @@
     </div>
 
     <div class="stat-item">
-      <div class="stat-icon warning">⚠️</div>
+      <div class="stat-icon warning"><i class="bi bi-exclamation-triangle"></i></div>
       <div class="stat-content">
         <span class="stat-value">{{ quejasSinClasificar }}</span>
         <span class="stat-label">Sin Clasificar</span>
@@ -39,7 +40,7 @@
     </div>
 
     <div class="stat-item alert" *ngIf="quejasCriticas > 0">
-      <div class="stat-icon danger">🔴</div>
+      <div class="stat-icon danger"><i class="bi bi-exclamation-circle"></i></div>
       <div class="stat-content">
         <span class="stat-value">{{ quejasCriticas }}</span>
         <span class="stat-label">Críticos</span>
@@ -47,7 +48,7 @@
     </div>
 
     <div class="stat-item">
-      <div class="stat-icon primary">📈</div>
+      <div class="stat-icon primary"><i class="bi bi-graph-up-arrow"></i></div>
       <div class="stat-content">
         <span class="stat-value">{{ porcentajeClasificado }}%</span>
         <span class="stat-label">Progreso</span>
@@ -68,7 +69,7 @@
   </div>
 
   <div class="section-title">
-    <h3>🏷️ Filtrar por Nivel de Riesgo</h3>
+    <h3><i class="bi bi-tags"></i> Filtrar por Nivel de Riesgo</h3>
     <p>Selecciona un nivel para filtrar los reportes</p>
   </div>
 
@@ -82,7 +83,6 @@
       (click)="seleccionarNivel(nivel.id)"
     >
       <div class="nivel-header" [style.background]="nivel.color">
-        <span class="nivel-icono">{{ nivel.icono }}</span>
         <span class="nivel-badge">{{ nivel.total }}</span>
       </div>
       <div class="nivel-body">
@@ -96,16 +96,14 @@
     <div class="quejas-header">
       <div class="header-info">
         <h3>
-          <span *ngIf="!nivelSeleccionado">📋 Todos los Reportes</span>
-          <span *ngIf="nivelSeleccionado">
-            {{ getNivelIcono(nivelSeleccionado) }} {{ getNombreNivelSeleccionado() }}
-          </span>
+          <span *ngIf="!nivelSeleccionado"><i class="bi bi-list-ul"></i> Todos los Reportes</span>
+          <span *ngIf="nivelSeleccionado">{{ getNombreNivelSeleccionado() }}</span>
         </h3>
         <span class="contador">{{ quejasFiltradas.length }} {{ quejasFiltradas.length === 1 ? 'reporte' : 'reportes' }}</span>
       </div>
-      
+
       <div class="busqueda-container">
-        <span class="search-icon">🔍</span>
+        <i class="bi bi-search search-icon"></i>
         <input 
           type="text" 
           placeholder="Buscar por título, descripción o ubicación..." 
@@ -118,15 +116,12 @@
           class="clear-search" 
           (click)="busqueda = ''; aplicarBusqueda()"
         >
-          ✕
+          <i class="bi bi-x"></i>
         </button>
       </div>
     </div>
 
-    <div *ngIf="loading" class="loading-state">
-      <div class="spinner"></div>
-      <p>Cargando reportes asignados...</p>
-    </div>
+    <app-loading-overlay [loading]="loading" text="Cargando reportes asignados...">
 
     <div class="quejas-lista" *ngIf="!loading && quejasFiltradas.length > 0">
       <div *ngFor="let queja of quejasFiltradas; let i = index" class="queja-item">
@@ -137,28 +132,28 @@
         <div class="queja-imagen" *ngIf="queja.imagen_url">
           <img [src]="queja.imagen_url" [alt]="queja.titulo" (click)="verImagenCompleta(queja.imagen_url)">
           <div class="imagen-overlay">
-            <span>🔍 Ver imagen</span>
+            <i class="bi bi-search"></i> Ver imagen
           </div>
         </div>
 
         <div class="queja-imagen sin-imagen" *ngIf="!queja.imagen_url">
           <div class="placeholder-imagen">
-            <span>📷</span>
+            <i class="bi bi-image"></i>
             <p>Sin imagen</p>
           </div>
         </div>
-        
+
         <div class="queja-info">
           <div class="queja-encabezado">
             <div class="titulo-section">
               <h4>{{ queja.titulo }}</h4>
               <div class="badges-row">
                 <span class="votos-badge">
-                  <span class="badge-icon">👍</span>
+                  <i class="bi bi-hand-thumbs-up"></i>
                   {{ queja.votes.total }}
                 </span>
                 <span class="categoria-badge">
-                  <span class="badge-icon">📂</span>
+                  <i class="bi bi-folder"></i>
                   {{ queja.categoria.nombre }}
                 </span>
               </div>
@@ -167,30 +162,30 @@
               class="nivel-tag"
               [style.background]="getNivelColor(queja.nivel_riesgo)"
             >
-              {{ getNivelIcono(queja.nivel_riesgo) }} {{ getNivelNombre(queja.nivel_riesgo) }}
+              {{ getNivelNombre(queja.nivel_riesgo) }}
             </span>
           </div>
-          
+
           <p class="queja-descripcion">{{ queja.descripcion }}</p>
-          
+
           <div class="queja-meta">
             <span class="meta-item">
-              <span class="meta-icon">📍</span>
+              <i class="bi bi-geo-alt-fill meta-icon"></i>
               <span>{{ queja.ubicacion || 'Sin ubicación' }}</span>
             </span>
             <span class="meta-item">
-              <span class="meta-icon">📅</span>
+              <i class="bi bi-calendar3 meta-icon"></i>
               <span>{{ queja.fecha_creacion | date:'dd/MM/yyyy, h:mm a' }}</span>
             </span>
             <span class="meta-item">
-              <span class="meta-icon">👤</span>
+              <i class="bi bi-person meta-icon"></i>
               <span>{{ queja.usuario.nombre }} {{ queja.usuario.apellido }}</span>
             </span>
           </div>
 
           <div class="queja-footer">
             <button class="btn-ver-detalle" (click)="verDetalleQueja(queja.id)">
-              👁️ Ver detalles completos
+              <i class="bi bi-eye"></i> Ver detalles completos
             </button>
 
             <div class="queja-estado" *ngIf="queja.estado">
@@ -201,12 +196,12 @@
 
             <div class="queja-clasificacion-info" *ngIf="queja.fecha_clasificacion">
               <span class="clasificado-badge">
-                ✅ Clasificado el {{ queja.fecha_clasificacion | date:'dd/MM/yyyy' }}
+                <i class="bi bi-check-circle-fill"></i> Clasificado el {{ queja.fecha_clasificacion | date:'dd/MM/yyyy' }}
               </span>
             </div>
           </div>
         </div>
-        
+
         <div class="queja-acciones">
           <label class="select-label">Clasificar como:</label>
           <select 
@@ -216,44 +211,43 @@
             [disabled]="loading"
           >
             <option value="">-- Seleccionar nivel --</option>
-            <option value="CRITICO">🔴 Crítico</option>
-            <option value="ALTO">🟠 Alto</option>
-            <option value="MEDIO">🟡 Medio</option>
-            <option value="BAJO">🟢 Bajo</option>
-            <option value="INFORMATIVO">ℹ️ Informativo</option>
+            <option value="CRITICO">Crítico</option>
+            <option value="ALTO">Alto</option>
+            <option value="MEDIO">Medio</option>
+            <option value="BAJO">Bajo</option>
+            <option value="INFORMATIVO">Informativo</option>
           </select>
         </div>
       </div>
     </div>
 
     <div *ngIf="!loading && quejasFiltradas.length === 0 && totalQuejas > 0" class="sin-resultados">
-      <div class="sin-resultados-icono">🔍</div>
+      <div class="sin-resultados-icono"><i class="bi bi-search"></i></div>
       <h3>No se encontraron reportes</h3>
       <p>Intenta con otra búsqueda o selecciona un nivel diferente</p>
       <button class="btn-limpiar" (click)="busqueda = ''; nivelSeleccionado = ''; aplicarBusqueda()">
-        🔄 Limpiar filtros
+        <i class="bi bi-arrow-clockwise"></i> Limpiar filtros
       </button>
     </div>
 
     <div *ngIf="!loading && totalQuejas === 0" class="sin-resultados">
-      <div class="sin-resultados-icono">📭</div>
+      <div class="sin-resultados-icono"><i class="bi bi-inbox"></i></div>
       <h3>No tienes reportes asignados</h3>
       <p>Espera a que un administrador te asigne reportes para clasificar</p>
       <button class="btn-recargar-inline" (click)="recargarQuejas()">
-        🔄 Verificar nuevos reportes
+        <i class="bi bi-arrow-clockwise"></i> Verificar nuevos reportes
       </button>
     </div>
+
+    </app-loading-overlay>
   </div>
 </div>
 
 <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
   <div class="modal-container" (click)="$event.stopPropagation()">
     <div class="modal-header" [style.background]="nivelSeleccionadoObj?.color">
-      <h3>
-        <span class="modal-icon">{{ nivelSeleccionadoObj?.icono }}</span>
-        Confirmar Clasificación
-      </h3>
-      <button class="btn-close" (click)="cerrarModal()">✕</button>
+      <h3>Confirmar Clasificación</h3>
+      <button class="btn-close" (click)="cerrarModal()"><i class="bi bi-x-lg"></i></button>
     </div>
 
     <div class="modal-body">
@@ -270,7 +264,7 @@
       <div class="nivel-info">
         <div class="nivel-card-modal" [style.border-color]="nivelSeleccionadoObj?.color">
           <div class="nivel-icon-big" [style.background]="nivelSeleccionadoObj?.color">
-            {{ nivelSeleccionadoObj?.icono }}
+            <i class="bi bi-flag-fill"></i>
           </div>
           <h3>{{ nivelSeleccionadoObj?.nombre }}</h3>
           <p>{{ nivelSeleccionadoObj?.descripcion }}</p>
@@ -278,20 +272,22 @@
       </div>
 
       <div class="alerta-clasificacion">
-        <strong>⚠️ Importante:</strong> Esta clasificación determinará la prioridad de atención del reporte.
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <strong> Importante:</strong> Esta clasificación determinará la prioridad de atención del reporte.
       </div>
     </div>
 
     <div class="modal-footer">
       <button class="btn-ver-completo" (click)="verDetalleQuejaDesdeModal()">
-        👁️ Ver detalles completos
+        <i class="bi bi-eye"></i> Ver detalles completos
       </button>
       <button class="btn-cancelar" (click)="cerrarModal()" [disabled]="loading">
         Cancelar
       </button>
       <button class="btn-confirmar" (click)="confirmarClasificacion()" [disabled]="loading">
-        <span *ngIf="!loading">✅ Confirmar Clasificación</span>
-        <span *ngIf="loading">⏳ Clasificando...</span>
+        <i class="bi bi-check-circle"></i>
+        <span *ngIf="!loading"> Confirmar Clasificación</span>
+        <span *ngIf="loading"> Clasificando...</span>
       </button>
     </div>
   </div>
@@ -299,7 +295,11 @@
 
 <div class="modal-overlay modal-imagen" *ngIf="mostrarModalImagen" (click)="cerrarModalImagen()">
   <div class="modal-imagen-container" (click)="$event.stopPropagation()">
-    <button class="btn-close-imagen" (click)="cerrarModalImagen()">✕</button>
+    <button class="btn-close-imagen" (click)="cerrarModalImagen()"><i class="bi bi-x-lg"></i></button>
     <img [src]="imagenSeleccionada" alt="Imagen completa">
   </div>
+</div>
+
+<div class="toast-clasificacion" *ngIf="toast.visible" [class]="'toast-' + toast.tipo">
+  {{ toast.mensaje }}
 </div>

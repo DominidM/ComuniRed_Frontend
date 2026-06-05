@@ -4,11 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { RolService, Rol, RolPage } from '../../services/rol.service';
 import { LoadingOverlayComponent } from '../../shared/components/loading/loading.component';
+import {
+  DataTableComponent,
+  DataTableColumn,
+  DataTableCellDirective,
+} from '../../shared/components/data-table/data-table.component';
 
 @Component({
   selector: 'app-crud-rol',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective],
   templateUrl: './crud-rol.component.html',
   styleUrls: ['./crud-rol.component.css'],
 })
@@ -27,14 +32,24 @@ export class CrudRolComponent implements AfterViewChecked {
   searchText: string = '';
   loading = false;
 
+  columns: DataTableColumn[] = [
+    { key: 'nombre', label: 'Nombre' },
+    { key: 'descripcion', label: 'Descripción' },
+    { key: 'acciones', label: 'Acciones' },
+  ];
+
   constructor(private renderer: Renderer2, private rolService: RolService) {}
 
   ngOnInit() {
     this.loadRoles();
   }
 
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
   trackByRolId(index: number, rol: Rol): any {
-    return rol.id || index; // Fallback al index si no hay ID
+    return rol.id || index;
   }
 
   loadRoles() {
@@ -43,10 +58,6 @@ export class CrudRolComponent implements AfterViewChecked {
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
       next: (data) => {
-        
-        data.content.forEach((rol, index) => {
-        });
-        
         this.roles = data.content;
         this.totalElements = data.totalElements;
         this.totalPages = data.totalPages;
@@ -57,24 +68,16 @@ export class CrudRolComponent implements AfterViewChecked {
     });
 }
 
-  onPageSizeChange(event: any) {
-    this.size = +event.target.value;
-    this.page = 0;
+  goToPage(p: number): void {
+    if (p < 0 || p >= this.totalPages || p === this.page) return;
+    this.page = p;
     this.loadRoles();
   }
 
-  nextPage() {
-    if (this.page < this.totalPages - 1) {
-      this.page++;
-      this.loadRoles();
-    }
-  }
-
-  prevPage() {
-    if (this.page > 0) {
-      this.page--;
-      this.loadRoles();
-    }
+  onPageSizeChange(size: any) {
+    this.size = +size;
+    this.page = 0;
+    this.loadRoles();
   }
 
   openAddModal() {

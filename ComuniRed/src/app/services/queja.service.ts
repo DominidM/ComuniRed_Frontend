@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable, map } from 'rxjs';
+import { Observable, map, filter } from 'rxjs';
 
 export interface Queja {
   id: string;
@@ -211,11 +211,6 @@ const OBTENER_QUEJAS = gql`
         clave
         nombre
       }
-      evidence {
-        id
-        url
-        tipo
-      }
       votes {
         yes
         no
@@ -231,17 +226,6 @@ const OBTENER_QUEJAS = gql`
           helpful
           dislike
           report
-        }
-      }
-      comments {
-        id
-        texto
-        fecha_creacion
-        author {
-          id
-          nombre
-          apellido
-          foto_perfil
         }
       }
       commentsCount
@@ -643,6 +627,26 @@ const VOTAR_QUEJA = gql`
     }
   }
 `;
+const OBTENER_QUEJA_SOPORTE = gql`
+  query ObtenerQuejaSoporte($id: ID!, $usuarioActualId: ID!) {
+    obtenerQuejaPorId(id: $id, usuarioActualId: $usuarioActualId) {
+      id
+      titulo
+      descripcion
+      ubicacion
+      imagen_url
+      fecha_creacion
+      nivel_riesgo
+      fecha_clasificacion
+      usuario { id nombre apellido foto_perfil }
+      categoria { id nombre }
+      estado { id clave nombre }
+      commentsCount
+      votes { yes total }
+    }
+  }
+`;
+
 const OBTENER_QUEJAS_ADMIN_PAGINADAS = gql`
   query ObtenerQuejasAdminPaginadas(
     $usuarioActualId: ID!
@@ -718,12 +722,26 @@ export class QuejaService {
         query: OBTENER_QUEJAS,
         variables: { usuarioActualId },
         fetchPolicy: 'network-only',
+        errorPolicy: 'all',
       })
       .valueChanges.pipe(
+        filter(result => !result.loading),
         map((result) => {
           if (!result.data || !result.data.obtenerQuejas) return [];
           return result.data.obtenerQuejas as Queja[];
         }),
+      );
+  }
+
+  obtenerQuejaPorIdSoporte(id: string, usuarioActualId: string): Observable<Queja | null> {
+    return this.apollo
+      .query<{ obtenerQuejaPorId: Queja | null }>({
+        query: OBTENER_QUEJA_SOPORTE,
+        variables: { id, usuarioActualId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(
+        map((result) => result.data?.obtenerQuejaPorId ?? null),
       );
   }
 

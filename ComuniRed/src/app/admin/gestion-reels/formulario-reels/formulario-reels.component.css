@@ -102,40 +102,6 @@
   width: 100%;
 }
 
-.btn-primary,
-.btn-secondary {
-  border: none;
-  border-radius: 12px;
-  padding: 12px 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.btn-primary {
-  background: var(--cr-brand-red);
-  color: var(--cr-white);
-}
-
-.btn-primary:hover {
-  background: var(--cr-brand-red-hover);
-}
-
-.btn-primary:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.btn-secondary {
-  background: var(--cr-surface);
-  color: var(--cr-text);
-  border: 1px solid var(--cr-border);
-}
-
-.btn-secondary:hover {
-  background: var(--cr-hover-surface);
-}
-
 @media (max-width: 768px) {
   .reel-form-page {
     padding: 0 0 16px;
@@ -154,8 +120,4 @@
     flex-direction: column-reverse;
   }
 
-  .btn-primary,
-  .btn-secondary {
-    width: 100%;
-  }
 }

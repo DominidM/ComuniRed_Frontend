@@ -6,16 +6,22 @@ export class ThemeService {
 
   constructor() {
     const saved = localStorage.getItem('cr-theme');
-    if (saved === 'dark') {
-      this.darkTheme = true;
-      document.body.classList.add('dark-theme');
-    }
+    const theme = saved === 'dark' ? 'dark' : 'light';
+    this.darkTheme = theme === 'dark';
+    document.body.classList.toggle('dark-theme', this.darkTheme);
+    document.body.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('dark-theme', this.darkTheme);
+    document.documentElement.setAttribute('data-theme', theme);
   }
 
   toggleTheme(): void {
     this.darkTheme = !this.darkTheme;
+    const theme = this.darkTheme ? 'dark' : 'light';
     document.body.classList.toggle('dark-theme', this.darkTheme);
-    localStorage.setItem('cr-theme', this.darkTheme ? 'dark' : 'light');
+    document.body.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('dark-theme', this.darkTheme);
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('cr-theme', theme);
   }
 
   isDarkTheme(): boolean {
