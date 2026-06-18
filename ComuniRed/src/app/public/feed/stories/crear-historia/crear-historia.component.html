@@ -1,0 +1,146 @@
+<div class="ch-overlay" (click)="cerrar()">
+  <div class="ch-panel" (click)="$event.stopPropagation()" (drop)="onDrop($event)" (dragover)="onDragOver($event)">
+
+    <!-- ─── PREVIEW 9:16 ─── -->
+    <div class="ch-preview" [style.background]="previewUrl ? '#000' : colorFondo">
+
+      <!-- Progress bars -->
+      <div class="ch-progress">
+        <div class="ch-progress-seg">
+          <div class="ch-progress-fill"
+               [style.width.%]="progresoPreview">
+          </div>
+        </div>
+      </div>
+
+      <!-- Header overlay: user left | controls right -->
+      <div class="ch-header-overlay">
+        <div class="ch-user">
+          <img [src]="user?.avatarUrl" class="ch-avatar" />
+          <div class="ch-user-info">
+            <span class="ch-name">{{ user?.name || 'Usuario' }}</span>
+            <span class="ch-time">ahora</span>
+          </div>
+        </div>
+        <div class="ch-controls">
+          <!-- Volume -->
+          <div class="ch-volume">
+            <button class="ch-vol-btn" (click)="toggleMute()" [title]="muted ? 'Activar sonido' : 'Silenciar'">
+              <i [class]="muted ? 'bi bi-volume-mute-fill' : 'bi bi-volume-up-fill'"></i>
+            </button>
+            <input type="range" min="0" max="1" step="0.05"
+                   [(ngModel)]="volumen" (input)="onVolumeChange()"
+                   class="ch-vol-slider" />
+          </div>
+          <!-- Play / Pause -->
+          <button class="ch-action-btn" (click)="togglePlayPause()" [title]="pausado ? 'Reproducir' : 'Pausar'">
+            <i [class]="pausado ? 'bi bi-play-fill' : 'bi bi-pause-fill'"></i>
+          </button>
+          <!-- Add music -->
+          <button class="ch-action-btn" (click)="toggleBusquedaMusica(); $event.stopPropagation()" title="Añadir música">
+            <i class="bi bi-music-note-beamed"></i>
+          </button>
+          <!-- Close -->
+          <button class="ch-action-btn" (click)="cerrar()" title="Cerrar">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Media / Text content -->
+      <img *ngIf="previewUrl && !esVideo" [src]="previewUrl" class="ch-preview-media" />
+      <video *ngIf="previewUrl && esVideo" [src]="previewUrl" class="ch-preview-media" muted autoplay loop playsinline></video>
+      <div *ngIf="texto && !previewUrl" class="ch-preview-texto">{{ texto }}</div>
+
+      <!-- Music widget (Instagram-style, bottom) -->
+      <div *ngIf="pistaSeleccionada" class="ch-music-widget" (click)="toggleMusicaPreview(); $event.stopPropagation()">
+        <div class="ch-music-cover-wrap">
+          <img [src]="pistaSeleccionada.coverUrl" class="ch-music-cover" [class.ch-music-spinning]="musicaSonando" />
+          <div class="ch-music-play-overlay" *ngIf="!musicaSonando">
+            <i class="bi bi-play-fill"></i>
+          </div>
+        </div>
+        <div class="ch-music-info">
+          <span class="ch-music-title">{{ pistaSeleccionada.title }}</span>
+          <span class="ch-music-artist">{{ pistaSeleccionada.artist }}</span>
+        </div>
+        <div class="ch-music-status">
+          <i [class]="musicaSonando ? 'bi bi-music-note-beamed' : 'bi bi-play-circle'"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── INPUT TEXTO ─── -->
+    <div class="ch-input-section" *ngIf="!previewUrl">
+      <textarea [(ngModel)]="texto" class="ch-textarea" placeholder="Escribe algo..." rows="1" maxlength="150"></textarea>
+      <span class="ch-contador">{{ texto.length }}/150</span>
+    </div>
+
+    <!-- ─── PROGRESO DE SUBIDA ─── -->
+    <div *ngIf="publicando" class="ch-progreso-section">
+      <div class="ch-progreso-barra"><div class="ch-progreso-lleno" [style.width.%]="progresoSubida"></div></div>
+      <div class="ch-progreso-info">
+        <span>Publicando... {{ progresoSubida | number:'1.0-0' }}%</span>
+        <button class="ch-cancelar-btn" (click)="cancelarSubida()">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- ─── ERROR ─── -->
+    <div *ngIf="errorSubida" class="ch-error">{{ errorSubida }}</div>
+
+    <!-- ─── TOOLS (fondo oscuro sólido) ─── -->
+    <div class="ch-tools">
+      <div class="ch-tool-row">
+        <input type="file" #inputArchivo accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" (change)="onArchivoSeleccionado($event)" class="ch-hidden-input" />
+        <button class="ch-tool-btn" (click)="inputArchivo.click()" title="Imagen o video">
+          <i class="bi bi-image"></i>
+        </button>
+        <span class="ch-drag-hint" *ngIf="!previewUrl">
+          <i class="bi bi-arrow-up-circle"></i> Arrastra un archivo
+        </span>
+        <button *ngIf="pistaSeleccionada" class="ch-tool-btn ch-tool-btn-danger" (click)="eliminarPista(); $event.stopPropagation()" title="Quitar música">
+          <i class="bi bi-music-note-beamed"></i>
+        </button>
+      </div>
+
+      <div class="ch-color-row" *ngIf="!previewUrl">
+        <button *ngFor="let bg of opcionesColor" class="ch-color-swatch" [style.background]="bg" [class.seleccionado]="colorFondo === bg" (click)="colorFondo = bg; iniciarPreview()" type="button"></button>
+      </div>
+
+      <div class="ch-action-row">
+        <div class="ch-duracion-group">
+          <button *ngFor="let d of opcionesDuracion" class="ch-dur-btn" [class.seleccionado]="duracion === d.value" (click)="duracion = d.value; iniciarPreview()" type="button">{{ d.label }}</button>
+        </div>
+        <button class="ch-publicar-btn" (click)="publicar()" [disabled]="!esValido || publicando">
+          <span *ngIf="!publicando">Publicar</span>
+          <div class="ch-spinner" *ngIf="publicando"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── MUSIC SEARCH OVERLAY ─── -->
+    <div *ngIf="mostrarBusquedaMusica" class="ch-musica-overlay">
+      <div class="ch-musica-header">
+        <span>Buscar música</span>
+        <button class="ch-btn-icon" (click)="toggleBusquedaMusica()"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="ch-musica-input-wrap">
+        <i class="bi bi-search"></i>
+        <input type="text" [(ngModel)]="consultaMusica" (input)="onInputMusica()" placeholder="Buscar canciones..." class="ch-musica-input" autofocus />
+      </div>
+      <div *ngIf="buscandoMusica" class="ch-musica-loading"><div class="ch-spinner"></div> Buscando...</div>
+      <div *ngIf="!buscandoMusica && resultadosMusica.length === 0 && consultaMusica.length >= 2" class="ch-musica-vacio">Sin resultados</div>
+      <div *ngIf="resultadosMusica.length > 0" class="ch-musica-resultados">
+        <button *ngFor="let track of resultadosMusica" class="ch-musica-item" (click)="seleccionarPista(track)" type="button">
+          <img [src]="track.coverUrl" class="ch-musica-item-portada" />
+          <div class="ch-musica-item-info">
+            <span class="ch-musica-item-titulo">{{ track.title }}</span>
+            <span class="ch-musica-item-artista">{{ track.artist }}</span>
+          </div>
+          <i class="bi bi-play-circle-fill ch-musica-item-play"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

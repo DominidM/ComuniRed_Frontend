@@ -1,0 +1,138 @@
+<ng-container *ngIf="pageMode; else modalMode">
+  <div class="vh-viewer" [class.vh-viewer-page]="true"
+       (click)="$event.stopPropagation()"
+       (touchstart)="onHoldStart()" (touchend)="onHoldEnd()">
+    <ng-container *ngTemplateOutlet="viewerContent"></ng-container>
+  </div>
+</ng-container>
+
+<ng-template #modalMode>
+  <div class="vh-overlay" (click)="cerrar()">
+    <div class="vh-viewer" (click)="$event.stopPropagation()"
+         (touchstart)="onHoldStart()" (touchend)="onHoldEnd()">
+      <ng-container *ngTemplateOutlet="viewerContent"></ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #viewerContent>
+  <!-- ─── PROGRESS BARS ─── -->
+  <div class="vh-progress">
+    <div *ngFor="let s of group?.stories; trackBy: trackPorId; let i = index" class="vh-progress-seg">
+      <div class="vh-progress-fill"
+           [class.activo]="i === indiceActual"
+           [class.completado]="i < indiceActual"
+           [style.width.%]="i === indiceActual ? progreso : i < indiceActual ? 100 : 0">
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── HEADER ─── -->
+  <div class="vh-header">
+    <!-- Left: avatar + name + time -->
+    <div class="vh-user">
+      <img [src]="group?.userAvatar" class="vh-avatar" />
+      <div class="vh-user-info">
+        <span class="vh-name">{{ group?.userName }}</span>
+        <span class="vh-time">{{ formatTime(historiaActual?.timeAgo || '') }}</span>
+      </div>
+    </div>
+
+    <!-- Right: volume + actions (space-between separates from user) -->
+    <div class="vh-controls">
+      <div class="vh-volume">
+        <button class="vh-vol-btn" (click)="toggleMute()" [title]="muted ? 'Activar sonido' : 'Silenciar'">
+          <i [class]="muted || volumen === 0 ? 'bi bi-volume-mute-fill' : volumen < 0.5 ? 'bi bi-volume-down-fill' : 'bi bi-volume-up-fill'"></i>
+        </button>
+        <input type="range" min="0" max="1" step="0.05"
+               [(ngModel)]="volumen" (input)="onVolumeChange()"
+               class="vh-vol-slider" />
+      </div>
+      <div class="vh-actions">
+        <button class="vh-action-btn" (click)="togglePlayPause()" [title]="isPlaying ? 'Pausar' : 'Reproducir'">
+          <i [class]="isPlaying ? 'bi bi-pause-fill' : 'bi bi-play-fill'"></i>
+        </button>
+        <button *ngIf="esPropia" class="vh-action-btn vh-delete-btn" (click)="confirmarEliminar()" title="Eliminar">
+          <i class="bi bi-trash3-fill"></i>
+        </button>
+        <button class="vh-action-btn" (click)="cerrar()" title="Cerrar">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CONTENT ─── -->
+  <div class="vh-content" (click)="onTap($event)">
+
+    <!-- Image -->
+    <img *ngIf="esImagen" [src]="historiaActual?.imageUrl" class="vh-media" />
+
+    <!-- Video -->
+    <video #videoPlayer *ngIf="esVideo" [src]="historiaActual?.videoUrl"
+           class="vh-media" muted playsinline
+           (ended)="onVideoTerminado()" (loadedmetadata)="onVideoCargado()">
+    </video>
+
+    <!-- Text-only story -->
+    <div *ngIf="historiaActual?.text && !historiaActual?.imageUrl && !historiaActual?.videoUrl"
+         class="vh-texto" [style.background]="historiaActual?.bgColor || '#1a1a2e'">
+      {{ historiaActual?.text }}
+    </div>
+
+    <!-- ─── MUSIC WIDGET (Instagram-style) ─── -->
+    <div *ngIf="historiaActual?.songTitle" class="music-card-widget" (click)="toggleMusica(); $event.stopPropagation()">
+      <div class="music-card-cover-wrap">
+        <img [src]="historiaActual?.songCoverUrl" class="music-card-cover" [class.music-card-spinning]="musicaSonando" />
+        <div class="music-card-play-overlay" *ngIf="!musicaSonando">
+          <i class="bi bi-play-fill"></i>
+        </div>
+      </div>
+      <div class="music-card-info">
+        <span class="music-card-title">{{ historiaActual?.songTitle || 'Sin título' }}</span>
+        <span class="music-card-artist">{{ historiaActual?.songArtist || 'Artista desconocido' }}</span>
+      </div>
+      <div class="music-card-status">
+        <i [class]="musicaSonando ? 'bi bi-music-note-beamed' : 'bi bi-play-circle'"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TAP ZONES ─── -->
+  <div class="vh-tap-zone vh-tap-prev" (click)="anterior($event)"></div>
+  <div class="vh-tap-zone vh-tap-next" (click)="siguiente($event)"></div>
+
+  <!-- ─── FOOTER ─── -->
+  <div class="vh-footer">
+    <div class="vh-footer-row">
+      <!-- Left: reply input with dynamic placeholder -->
+      <div class="vh-reply-wrap">
+        <input type="text" [(ngModel)]="textoRespuesta"
+               [placeholder]="placeholderRespuesta"
+               class="vh-reply-input"
+               (keyup.enter)="enviarRespuesta()" />
+      </div>
+
+      <!-- Right: heart + share outline -->
+      <div class="vh-footer-actions">
+        <button class="vh-footer-btn" (click)="toggleLike()" [title]="leGusta ? 'Quitar like' : 'Dar like'">
+          <i [class]="leGusta ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+        </button>
+        <button class="vh-footer-btn" (click)="compartir()" title="Compartir">
+          <i class="bi bi-send"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── DELETE CONFIRM ─── -->
+  <div *ngIf="mostrarConfirmacionEliminar" class="vh-confirm-overlay" (click)="cancelarEliminar()">
+    <div class="vh-confirm" (click)="$event.stopPropagation()">
+      <p>¿Eliminar esta historia?</p>
+      <div class="vh-confirm-actions">
+        <button class="vh-confirm-cancel" (click)="cancelarEliminar()">Cancelar</button>
+        <button class="vh-confirm-delete" (click)="eliminarHistoriaActual()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</ng-template>

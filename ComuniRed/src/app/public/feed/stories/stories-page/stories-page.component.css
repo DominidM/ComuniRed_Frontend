@@ -1,0 +1,280 @@
+/*
+ * ─── STORIES PAGE ─────────────────────────────
+ * Full-viewport dedicated page with carousel
+ * depth effect à la Instagram Web.
+ * Ruta: /stories/:username (top-level, no layout)
+ * ────────────────────────────────────────────── */
+
+/* ─── Variables ─── */
+:root {
+  --sp-bg: #111111;
+  --sp-card-bg: #c43927;
+  --sp-accent: #0095f6;
+}
+
+/* ─── Full viewport shell ─── */
+.sp-layout {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: var(--sp-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: sp-fadeIn 0.15s ease;
+}
+@keyframes sp-fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── Close button ─── */
+.sp-close-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1300;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  backdrop-filter: blur(4px);
+}
+.sp-close-btn:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ─── Loading / Error ─── */
+.sp-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sp-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: sp-spin 0.7s linear infinite;
+}
+@keyframes sp-spin {
+  to { transform: rotate(360deg); }
+}
+.sp-error {
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+}
+.sp-back-btn {
+  margin-top: 12px;
+  padding: 8px 24px;
+  border-radius: 20px;
+  background: var(--sp-accent);
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sp-back-btn:hover {
+  background: #1877f2;
+}
+
+/* ════════════════════════════════════════════
+   CAROUSEL
+   ════════════════════════════════════════════ */
+.sp-carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+/* ─── Active story card ─── */
+.sp-story-card {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.6);
+  background: var(--sp-card-bg);
+
+  /* Desktop: height-constrained with 9:16 ratio */
+  height: min(85vh, 800px);
+  aspect-ratio: 9 / 16;
+  max-width: min(100vw, 500px);
+  z-index: 2;
+}
+
+/* ─── Carousel side cards (prev / next depth) ─── */
+.sp-carousel-card {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #1a1a1a;
+  user-select: none;
+
+  /* Same 9:16 ratio but smaller */
+  height: min(70vh, 680px);
+  aspect-ratio: 9 / 16;
+  max-width: 120px;
+
+  /* Depth visual */
+  opacity: 0.35;
+  z-index: 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sp-carousel-card:hover {
+  opacity: 0.6;
+}
+
+.sp-carousel-prev {
+  transform: translateX(-16px) scale(0.85);
+}
+.sp-carousel-prev:hover {
+  transform: translateX(-12px) scale(0.88);
+}
+
+.sp-carousel-next {
+  transform: translateX(16px) scale(0.85);
+}
+.sp-carousel-next:hover {
+  transform: translateX(12px) scale(0.88);
+}
+
+.sp-carousel-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  text-align: center;
+  width: 100%;
+}
+
+.sp-carousel-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.3);
+  display: block;
+}
+
+.sp-carousel-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Mobile nav (prev/next user) ─── */
+.sp-mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1300;
+  padding: 8px 16px max(16px, env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+}
+.sp-mobile-nav-btn {
+  pointer-events: auto;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s;
+  backdrop-filter: blur(4px);
+}
+.sp-mobile-nav-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════ */
+
+/* Tablet: hide carousel side cards */
+@media (max-width: 900px) {
+  .sp-carousel-card { display: none; }
+  .sp-carousel { gap: 0; }
+  .sp-story-card { height: 85vh; }
+}
+
+/* Mobile: full screen */
+@media (max-width: 600px) {
+  .sp-layout { align-items: stretch; }
+
+  .sp-carousel {
+    padding: 0;
+    height: 100vh;
+    align-items: stretch;
+  }
+
+  .sp-story-card {
+    width: 100vw;
+    height: 100vh;
+    aspect-ratio: unset;
+    max-width: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .sp-close-btn {
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .sp-mobile-nav {
+    display: flex;
+  }
+}
+
+/* Desktop wide */
+@media (min-width: 1200px) {
+  .sp-carousel { gap: 16px; }
+  .sp-carousel-card {
+    max-width: 160px;
+  }
+}
