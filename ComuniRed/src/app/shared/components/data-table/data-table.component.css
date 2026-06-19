@@ -5,9 +5,13 @@
 /* ── Toolbar ── */
 .dt-toolbar {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
   margin-bottom: 12px;
 }
+
+
 
 .dt-view-toggle {
   display: flex;
@@ -182,10 +186,45 @@
 .dt-pagination {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 0 8px;
+}
+
+.dt-page-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--cr-text-muted);
+}
+
+.dt-page-size label {
+  white-space: nowrap;
+}
+
+.dt-page-size select {
+  padding: 5px 8px;
+  border: 1px solid var(--cr-border);
+  border-radius: 7px;
+  background: var(--cr-surface);
+  color: var(--cr-text);
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.dt-page-size select:focus {
+  border-color: var(--cr-primary);
+}
+
+.dt-pagination-nav {
+  display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 20px 0 8px;
 }
 
 .dt-pagination button {

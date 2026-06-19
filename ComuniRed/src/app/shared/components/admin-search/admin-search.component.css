@@ -8,6 +8,7 @@
   border: 1px solid var(--cr-border);
   border-radius: 12px;
   flex-wrap: wrap;
+  margin-bottom: 16px;
 }
 
 .as-left {
@@ -65,12 +66,12 @@
 
 .as-btn-search {
   background: var(--cr-text);
-  color: #fff;
+  color: var(--cr-background);
   border-color: var(--cr-text);
 }
 
 .as-btn-search:hover {
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
 .as-filters {
@@ -94,12 +95,6 @@
 
 .as-select:focus {
   border-color: var(--cr-primary);
-}
-
-.as-select-sm {
-  min-width: auto;
-  padding: 6px 8px;
-  font-size: 11px;
 }
 
 .as-right {

@@ -14,6 +14,11 @@
   border: 1px solid var(--cr-border);
 }
 
+.crud-reel-card app-admin-search {
+  display: block;
+  margin-bottom: 20px;
+}
+
 .table-wrapper {
   overflow-x: auto;
   border: 1px solid var(--cr-border);

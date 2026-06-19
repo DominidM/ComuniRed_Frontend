@@ -15,10 +15,6 @@
     placeholder="Buscar quejas..."
     [total]="totalElements"
     totalLabel="quejas"
-    [showPageSize]="true"
-    [(pageSize)]="pageSize"
-    [pageSizes]="pageSizes"
-    (pageSizeChange)="onPageSizeChange($event)"
     (search)="loadQuejas()"
     (clear)="loadQuejas()"
   ></app-admin-search>

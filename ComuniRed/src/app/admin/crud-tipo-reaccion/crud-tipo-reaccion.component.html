@@ -6,10 +6,6 @@
       placeholder="Buscar tipos de reacción..."
       [total]="totalTipos"
       totalLabel="tipos"
-      [showPageSize]="true"
-      [(pageSize)]="pageSize"
-      [pageSizes]="pageSizes"
-      (pageSizeChange)="onPageSizeChange($event)"
       (search)="buscarTipos()"
       (clear)="limpiarBusqueda()"
     ></app-admin-search>

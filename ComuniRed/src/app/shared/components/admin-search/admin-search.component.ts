@@ -22,16 +22,12 @@ export class AdminSearchComponent implements OnDestroy {
   @Input() filterValues: { [key: string]: string } = {};
   @Input() total: number | null = null;
   @Input() totalLabel = 'resultados';
-  @Input() showPageSize = false;
-  @Input() pageSize = 10;
-  @Input() pageSizes: number[] = [5, 10, 20, 50];
   @Input() loading = false;
 
   @Output() searchTextChange = new EventEmitter<string>();
   @Output() search = new EventEmitter<void>();
   @Output() clear = new EventEmitter<void>();
   @Output() filterChange = new EventEmitter<{ key: string; value: string }>();
-  @Output() pageSizeChange = new EventEmitter<number>();
 
   private debounceTimer?: any;
 
@@ -66,10 +62,6 @@ export class AdminSearchComponent implements OnDestroy {
   onFilterChange(key: string, value: string): void {
     this.filterValues[key] = value;
     this.filterChange.emit({ key, value });
-  }
-
-  onPageSizeChange(value: string): void {
-    this.pageSizeChange.emit(Number(value));
   }
 
   private clearDebounce(): void {

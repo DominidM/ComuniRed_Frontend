@@ -6,10 +6,6 @@
       placeholder="Buscar categorías..."
       [total]="totalCategorias"
       totalLabel="categorías"
-      [showPageSize]="true"
-      [(pageSize)]="pageSize"
-      [pageSizes]="pageSizes"
-      (pageSizeChange)="onPageSizeChange($event)"
       (search)="buscarCategorias()"
       (clear)="limpiarBusqueda()"
     ></app-admin-search>

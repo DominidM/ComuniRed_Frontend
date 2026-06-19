@@ -6,12 +6,8 @@
       placeholder="Buscar por nombre, apellido, DNI..."
       [total]="totalElements"
       totalLabel="usuarios"
-      [showPageSize]="true"
-      [(pageSize)]="size"
-      [pageSizes]="pageSizes"
       (search)="buscarUsuario()"
       (clear)="limpiarBusqueda()"
-      (pageSizeChange)="onPageSizeChange($event)"
     ></app-admin-search>
 
     <app-loading-overlay [loading]="loading" text="Cargando usuarios...">

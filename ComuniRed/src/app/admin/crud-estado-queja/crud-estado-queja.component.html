@@ -6,10 +6,6 @@
       placeholder="Buscar estados..."
       [total]="totalEstados"
       totalLabel="estados"
-      [showPageSize]="true"
-      [(pageSize)]="pageSize"
-      [pageSizes]="pageSizes"
-      (pageSizeChange)="onPageSizeChange($event)"
       (search)="buscarEstados()"
       (clear)="limpiarBusqueda()"
     ></app-admin-search>

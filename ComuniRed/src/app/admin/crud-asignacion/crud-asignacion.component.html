@@ -22,13 +22,9 @@
       [filterValues]="{ estado: filtroEstado }"
       [total]="asignacionesFiltradas.length"
       totalLabel="resultados"
-      [showPageSize]="true"
-      [(pageSize)]="pageSize"
-      [pageSizes]="pageSizes"
       (search)="cargarDatos()"
       (clear)="onFiltroChange()"
       (filterChange)="onFiltroChange()"
-      (pageSizeChange)="onPageSizeChange($event)"
     ></app-admin-search>
 
     <app-data-table
