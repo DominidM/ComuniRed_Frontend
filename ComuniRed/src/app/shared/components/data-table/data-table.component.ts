@@ -52,8 +52,11 @@ export class DataTableComponent implements AfterContentInit {
   @Input() showPagination = true;
   @Input() rowTrackBy?: (index: number, row: any) => any;
   @Input() viewMode: DataTableViewMode = 'table';
+  @Input() pageSize = 10;
+  @Input() pageSizes: number[] = [5, 10, 20, 50];
 
   @Output() pageChange = new EventEmitter<number>();
+  @Output() pageSizeChange = new EventEmitter<number>();
 
   @ContentChildren(DataTableCellDirective, { descendants: true })
   cellTemplates!: QueryList<DataTableCellDirective>;
@@ -79,6 +82,10 @@ export class DataTableComponent implements AfterContentInit {
 
   setViewMode(mode: DataTableViewMode): void {
     this.viewMode = mode;
+  }
+
+  onPageSizeChange(event: any): void {
+    this.pageSizeChange.emit(Number(event.target.value));
   }
 
   hasTemplate(key: string): boolean {

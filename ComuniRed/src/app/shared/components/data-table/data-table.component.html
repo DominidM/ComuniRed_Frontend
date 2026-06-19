@@ -1,6 +1,6 @@
 <div class="dt-wrapper">
 
-  <!-- Toolbar con toggle de vista -->
+  <!-- Toolbar con toggle de vista + page size -->
   <div class="dt-toolbar">
     <div class="dt-view-toggle">
       <button
@@ -32,6 +32,7 @@
         Tarjetas
       </button>
     </div>
+
   </div>
 
   <!-- ===== MODO TABLA ===== -->
@@ -122,22 +123,31 @@
 
   <!-- Paginación (compartida) -->
   <div class="dt-pagination" *ngIf="showPagination && totalPages > 1">
-    <button type="button" (click)="goToPage(page - 1)" [disabled]="page === 0">‹</button>
+    <div class="dt-page-size">
+      <label>por pág.</label>
+      <select (change)="onPageSizeChange($event)">
+        <option *ngFor="let s of pageSizes" [value]="s" [selected]="s === pageSize">{{ s }}</option>
+      </select>
+    </div>
 
-    <button
-      type="button"
-      *ngFor="let p of pages"
-      (click)="goToPage(p)"
-      [class.active]="p === page"
-    >
-      {{ p + 1 }}
-    </button>
+    <div class="dt-pagination-nav">
+      <button type="button" (click)="goToPage(page - 1)" [disabled]="page === 0">‹</button>
 
-    <button type="button" (click)="goToPage(page + 1)" [disabled]="page === totalPages - 1">›</button>
+      <button
+        type="button"
+        *ngFor="let p of pages"
+        (click)="goToPage(p)"
+        [class.active]="p === page"
+      >
+        {{ p + 1 }}
+      </button>
 
-    <span class="dt-page-info">
-      {{ totalElements }} registros · Página {{ page + 1 }} de {{ totalPages }}
-    </span>
+      <button type="button" (click)="goToPage(page + 1)" [disabled]="page === totalPages - 1">›</button>
+
+      <span class="dt-page-info">
+        {{ totalElements }} registros · Página {{ page + 1 }} de {{ totalPages }}
+      </span>
+    </div>
   </div>
 </div>
 

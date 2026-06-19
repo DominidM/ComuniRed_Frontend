@@ -8,9 +8,12 @@
   <div class="admin-main">
     <app-admin-navbar
       [userDisplay]="userDisplay"
+      [avatarUrl]="userAvatar"
       [isDarkMode]="isDarkMode"
+      [notificationCount]="notificationCount"
       (toggleThemeClick)="toggleTheme()"
-      (logoutClick)="logout()">
+      (logoutClick)="logout()"
+      (notificationsClick)="goToNotifications()">
     </app-admin-navbar>
 
     <main class="admin-content">

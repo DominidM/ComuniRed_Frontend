@@ -10,11 +10,12 @@ import {
   DataTableCellDirective,
 } from '../../shared/components/data-table/data-table.component';
 import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
+import { AdminSearchComponent } from '../../shared/components/admin-search/admin-search.component';
 
 @Component({
   selector: 'app-crud-categoria',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent, AdminSearchComponent],
   templateUrl: './crud-categoria.component.html',
   styleUrls: ['./crud-categoria.component.css']
 })
@@ -27,15 +28,29 @@ export class CrudCategoriaComponent implements OnInit {
   descripcion: string = '';
   activo: boolean = true;
   nombreBuscado: string = '';
+  searchText: string = '';
 
   showModal: boolean = false;
   editingCategoria: boolean = false;
 
   pageSize: number = 5;
   pageSizes: number[] = [5, 10, 20, 50, 100];
-  totalCategorias: number = 0;
+  private _totalCategorias: number = 0;
   page: number = 0;
   totalPages: number = 1;
+
+  get categoriasFiltradas(): Categoria[] {
+    if (!this.searchText || this.searchText.trim() === '') return this.categorias;
+    const s = this.searchText.toLowerCase().trim();
+    return this.categorias.filter(c =>
+      c.nombre.toLowerCase().includes(s) ||
+      c.descripcion.toLowerCase().includes(s)
+    );
+  }
+
+  get totalCategorias(): number {
+    return this.categoriasFiltradas.length;
+  }
 
   loading = false;
   saving = false;
@@ -68,7 +83,7 @@ export class CrudCategoriaComponent implements OnInit {
       .subscribe({
         next: (data: CategoriaPage) => {
           this.categorias = data.content;
-          this.totalCategorias = data.totalElements;
+          this._totalCategorias = data.totalElements;
           this.totalPages = data.totalPages;
           if (this.page >= this.totalPages && this.totalPages > 0) {
             this.page = this.totalPages - 1;
@@ -81,6 +96,14 @@ export class CrudCategoriaComponent implements OnInit {
           alert('Error al cargar las categorías');
         }
       });
+  }
+
+  buscarCategorias(): void {
+    // client-side filter handled by the search component
+  }
+
+  limpiarBusqueda(): void {
+    this.searchText = '';
   }
 
   goToPage(p: number): void {

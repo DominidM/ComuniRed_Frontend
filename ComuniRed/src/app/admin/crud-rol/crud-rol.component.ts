@@ -10,11 +10,12 @@ import {
   DataTableCellDirective,
 } from '../../shared/components/data-table/data-table.component';
 import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
+import { AdminSearchComponent } from '../../shared/components/admin-search/admin-search.component';
 
 @Component({
   selector: 'app-crud-rol',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent, AdminSearchComponent],
   templateUrl: './crud-rol.component.html',
   styleUrls: ['./crud-rol.component.css'],
 })
@@ -155,6 +156,11 @@ export class CrudRolComponent implements AfterViewChecked {
              (r.descripcion?.toLowerCase().includes(lowerSearch))
       );
     }
+  }
+
+  limpiarBusqueda() {
+    this.searchText = '';
+    this.roles = [...this.allRoles];
   }
 
   ngAfterViewChecked(): void {

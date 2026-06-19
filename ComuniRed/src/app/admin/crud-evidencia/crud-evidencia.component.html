@@ -1,27 +1,15 @@
 <div class="admin-page">
   <app-workspace-header title="Gestión de Evidencias" subtitle="Administra las imágenes y pruebas" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Evidencias' }]" actionLabel="Nueva Evidencia" (actionClick)="abrirFormulario()"></app-workspace-header>
 
-  <!-- Filtros y Búsqueda -->
-  <div class="evidencias-filtros">
-    <input
-      type="text"
-      class="evidencias-busqueda"
-      placeholder="Buscar por usuario o título..."
-      [(ngModel)]="busqueda"
-    />
-
-    <div class="filtros-grupo">
-      <select class="filtro-select" [(ngModel)]="filtroEstado">
-        <option>Todos</option>
-        <option *ngFor="let estado of estados">{{ estado }}</option>
-      </select>
-
-      <select class="filtro-select" [(ngModel)]="filtroCategoria">
-        <option>Todos</option>
-        <option *ngFor="let categoria of categorias">{{ categoria }}</option>
-      </select>
-    </div>
-  </div>
+  <app-admin-search
+    [(searchText)]="busqueda"
+    placeholder="Buscar por usuario o título..."
+    [filters]="[{ key: 'estado', label: 'Estado', options: getEstadoOptions() }, { key: 'categoria', label: 'Categoría', options: getCategoriaOptions() }]"
+    [filterValues]="filterValues"
+    (filterChange)="onFilterChange($event)"
+    (search)="buscarEvidencias()"
+    (clear)="limpiarBusqueda()"
+  ></app-admin-search>
 
   <!-- Galería de Evidencias -->
   <div class="evidencias-galeria">

@@ -12,6 +12,8 @@ import { Router, RouterModule } from '@angular/router';
 
 import { UsuarioService } from '../services/usuario.service';
 import { ThemeService } from '../services/theme.service';
+import { NotificacionService } from '../services/notificacion.service';
+import { Subscription } from 'rxjs';
 
 import { AdminNavbarComponent } from '../layout/admin/admin-navbar/admin-navbar.component';
 import { AdminSidebarComponent } from '../layout/admin/admin-sidebar/admin-sidebar.component';
@@ -45,6 +47,8 @@ export class AdminComponent implements OnInit, AfterViewChecked, OnDestroy {
   private shouldScrollToBottom = false;
 
   isDarkMode = false;
+  notificationCount = 0;
+  private notifSub?: Subscription;
 
   private readonly botResponses = [
     'Gracias por tu mensaje. ¿En qué más puedo ayudarte?',
@@ -61,12 +65,14 @@ export class AdminComponent implements OnInit, AfterViewChecked, OnDestroy {
   constructor(
     private router: Router,
     private usuarioService: UsuarioService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private notificacionService: NotificacionService,
   ) {}
 
   ngOnInit(): void {
     window.addEventListener('storage', this.windowStorageListener);
     this.isDarkMode = this.themeService.isDarkTheme();
+    this.cargarNotificaciones();
   }
 
   ngAfterViewChecked(): void {
@@ -78,6 +84,7 @@ export class AdminComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   ngOnDestroy(): void {
     window.removeEventListener('storage', this.windowStorageListener);
+    this.notifSub?.unsubscribe();
   }
 
   toggleTheme(): void {
@@ -88,12 +95,32 @@ export class AdminComponent implements OnInit, AfterViewChecked, OnDestroy {
   get userDisplay(): string {
     const u = this.usuarioService.getUser();
     if (!u) return 'Invitado';
-
     const nombre = (u as any).nombre ?? '';
     const apellido = (u as any).apellido ?? '';
     const email = (u as any).email ?? '';
-
     return (nombre || apellido) ? `${nombre} ${apellido}`.trim() : email;
+  }
+
+  get userAvatar(): string {
+    const u = this.usuarioService.getUser() as any;
+    return u?.foto_perfil ? this.usuarioService.obtenerFotoMiniatura(u.foto_perfil, 44) : '';
+  }
+
+  private cargarNotificaciones(): void {
+    const u = this.usuarioService.getUser() as any;
+    const id = u?.id || u?._id;
+    if (!id) return;
+    this.notificacionService.contarNoLeidas(id).subscribe({
+      next: (count) => { this.notificationCount = count ?? 0; },
+    });
+    this.notifSub = this.notificacionService.suscribirseANotificaciones(id).subscribe({
+      next: (notif) => { if (notif) this.notificationCount++; },
+    });
+  }
+
+  goToNotifications(): void {
+    this.router.navigate(['/admin/notifications']);
+    this.notificationCount = 0;
   }
 
   private rolesCache(): string[] {

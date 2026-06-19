@@ -1,10 +1,19 @@
 <div class="admin-page">
   <app-workspace-header title="Gestión de Categorías" subtitle="Administra las categorías de reportes" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Categorías' }]" actionLabel="Nueva Categoría" (actionClick)="openAddModal()"></app-workspace-header>
 
+    <app-admin-search
+      [(searchText)]="searchText"
+      placeholder="Buscar categorías..."
+      [total]="totalCategorias"
+      totalLabel="categorías"
+      (search)="buscarCategorias()"
+      (clear)="limpiarBusqueda()"
+    ></app-admin-search>
+
     <app-loading-overlay [loading]="loading" text="Cargando categorías...">
       <app-data-table
         [columns]="columns"
-        [rows]="categorias"
+        [rows]="categoriasFiltradas"
         [page]="page"
         [pages]="pages"
         [totalPages]="totalPages"

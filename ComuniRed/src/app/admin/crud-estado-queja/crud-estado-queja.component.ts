@@ -10,22 +10,38 @@ import {
   DataTableCellDirective,
 } from '../../shared/components/data-table/data-table.component';
 import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
+import { AdminSearchComponent } from '../../shared/components/admin-search/admin-search.component';
 
 @Component({
   selector: 'app-crud-estado-queja',
   templateUrl: './crud-estado-queja.component.html',
   styleUrls: ['./crud-estado-queja.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent]
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent, AdminSearchComponent]
 })
 export class CrudEstadoQuejaComponent implements OnInit {
 
   estados: EstadoQueja[] = [];
-  totalEstados: number = 0;
+  private _totalEstados: number = 0;
   page: number = 0;
   totalPages: number = 1;
   pageSize: number = 5;
   pageSizes: number[] = [5, 10, 20, 50, 100];
+  searchText: string = '';
+
+  get estadosFiltrados(): EstadoQueja[] {
+    if (!this.searchText || this.searchText.trim() === '') return this.estados;
+    const s = this.searchText.toLowerCase().trim();
+    return this.estados.filter(e =>
+      e.nombre.toLowerCase().includes(s) ||
+      e.descripcion.toLowerCase().includes(s) ||
+      e.clave.toLowerCase().includes(s)
+    );
+  }
+
+  get totalEstados(): number {
+    return this.estadosFiltrados.length;
+  }
 
   loading = false;
   saving = false;
@@ -60,6 +76,11 @@ export class CrudEstadoQuejaComponent implements OnInit {
     return estado.id || index.toString();
   }
 
+  buscarEstados(): void {}
+  limpiarBusqueda(): void {
+    this.searchText = '';
+  }
+
   obtenerEstados() {
     this.loading = true;
     this.estadosService.obtenerEstadosQueja(this.page, this.pageSize)
@@ -67,7 +88,7 @@ export class CrudEstadoQuejaComponent implements OnInit {
       .subscribe({
         next: (data: EstadoQuejaPage) => {
           this.estados = data.content;
-          this.totalEstados = data.totalElements;
+          this._totalEstados = data.totalElements;
           this.totalPages = data.totalPages;
           if (this.page >= this.totalPages && this.totalPages > 0) {
             this.page = this.totalPages - 1;

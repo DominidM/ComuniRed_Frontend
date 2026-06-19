@@ -1,25 +1,14 @@
 <div class="admin-page">
   <app-workspace-header title="Gestión de Roles" subtitle="Administra los roles del sistema" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Roles' }]" actionLabel="Nuevo Rol" (actionClick)="openAddModal()"></app-workspace-header>
 
-    <!-- Controles superiores: Buscador + mostrar por página + total -->
-    <div class="crud-rol-controls-row">
-      <div class="crud-rol-search-box">
-        <input type="text" [(ngModel)]="searchText" placeholder="Buscar por nombre..." />
-        <button class="crud-rol-search-btn" (click)="buscarRol()" aria-label="Buscar rol">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-        </button>
-      </div>
-      <div class="crud-rol-show-select">
-        <label for="pageSize">por página</label>
-        <select id="pageSize" (change)="onPageSizeChange($event.target.value)" [value]="size">
-          <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
-        </select>
-        <span>Total: {{ totalElements }}</span>
-      </div>
-    </div>
+    <app-admin-search
+      [(searchText)]="searchText"
+      placeholder="Buscar por nombre..."
+      [total]="totalElements"
+      totalLabel="roles"
+      (search)="buscarRol()"
+      (clear)="limpiarBusqueda()"
+    ></app-admin-search>
 
     <app-loading-overlay [loading]="loading" text="Cargando roles...">
       <app-data-table

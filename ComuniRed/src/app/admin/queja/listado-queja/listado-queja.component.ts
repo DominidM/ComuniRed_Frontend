@@ -12,6 +12,7 @@ import {
   DataTableColumn,
   DataTableCellDirective,
 } from '../../../shared/components/data-table/data-table.component';
+import { AdminSearchComponent } from '../../../shared/components/admin-search/admin-search.component';
 
 interface Queja {
   id: string;
@@ -44,6 +45,7 @@ interface EstadoQueja {
     DataTableComponent,
     DataTableCellDirective,
     WorkspaceHeaderComponent,
+    AdminSearchComponent,
   ],
   templateUrl: './listado-queja.component.html',
   styleUrls: ['./listado-queja.component.css'],
@@ -60,10 +62,27 @@ export class ListadoQuejaComponent implements OnInit {
   nuevoEstadoNombre = '';
   observacionEstado = '';
 
+  searchText = '';
   page = 0;
   pageSize = 5;
-  totalElements = 0;
+  private _totalElements = 0;
   totalPages = 0;
+  pageSizes = [5, 10, 20, 50];
+
+  get quejasFiltradas(): Queja[] {
+    if (!this.searchText || this.searchText.trim() === '') return this.quejas;
+    const s = this.searchText.toLowerCase().trim();
+    return this.quejas.filter(q =>
+      (q.titulo && q.titulo.toLowerCase().includes(s)) ||
+      q.descripcion.toLowerCase().includes(s) ||
+      (q.usuario_nombre && q.usuario_nombre.toLowerCase().includes(s)) ||
+      (q.estado_nombre && q.estado_nombre.toLowerCase().includes(s))
+    );
+  }
+
+  get totalElements(): number {
+    return this.quejasFiltradas.length;
+  }
 
   columns: DataTableColumn[] = [
     { key: 'descripcion_custom', label: 'Descripción', width: '32%' },
@@ -89,6 +108,14 @@ export class ListadoQuejaComponent implements OnInit {
 
   get pages(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
+  onPageSizeChange(newSize: number): void {
+    if (newSize > 0) {
+      this.pageSize = newSize;
+      this.page = 0;
+      this.loadQuejas();
+    }
   }
 
   goToPage(p: number): void {
@@ -123,14 +150,14 @@ export class ListadoQuejaComponent implements OnInit {
             imagen_url: q.imagen_url || '',
           }));
 
-          this.totalElements = resp?.totalElements || 0;
+          this._totalElements = resp?.totalElements || 0;
           this.totalPages = resp?.totalPages || 0;
           this.loading = false;
         },
         error: (err) => {
           console.error('Error cargando quejas:', err);
           this.quejas = [];
-          this.totalElements = 0;
+          this._totalElements = 0;
           this.totalPages = 0;
           this.loading = false;
         },

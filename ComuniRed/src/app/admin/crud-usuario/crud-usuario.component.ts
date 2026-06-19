@@ -11,11 +11,12 @@ import {
   DataTableCellDirective,
 } from '../../shared/components/data-table/data-table.component';
 import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
+import { AdminSearchComponent } from '../../shared/components/admin-search/admin-search.component';
 
 @Component({
   selector: 'app-crud-usuario',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent, AdminSearchComponent],
   templateUrl: './crud-usuario.component.html',
   styleUrls: ['./crud-usuario.component.css'],
 })
@@ -443,5 +444,10 @@ export class CrudUsuarioComponent implements OnInit {
       (u.distrito ?? '').toLowerCase().includes(q) ||
       (u.email ?? '').toLowerCase().includes(q)
     );
+  }
+
+  limpiarBusqueda() {
+    this.searchText = '';
+    this.usuarios = [...this.allUsuarios];
   }
 }
