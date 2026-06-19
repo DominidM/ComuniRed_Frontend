@@ -1,13 +1,5 @@
-<div class="admin-content">
-  <div class="evidencias-header">
-    <div>
-      <h1 class="evidencias-titulo">Gestión de Evidencias</h1>
-      <p class="evidencias-subtitulo">Administra las imágenes y pruebas de problemas en la comunidad</p>
-    </div>
-    <button class="btn-nueva-evidencia" (click)="abrirFormulario()">
-      <span>➕</span> Nueva Evidencia
-    </button>
-  </div>
+<div class="admin-page">
+  <app-workspace-header title="Gestión de Evidencias" subtitle="Administra las imágenes y pruebas" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Evidencias' }]" actionLabel="Nueva Evidencia" (actionClick)="abrirFormulario()"></app-workspace-header>
 
   <!-- Filtros y Búsqueda -->
   <div class="evidencias-filtros">

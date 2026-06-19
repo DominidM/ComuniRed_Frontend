@@ -1,23 +1,19 @@
-<div class="crud-asignacion-root">
+<div class="admin-page">
+  <app-workspace-header title="Gestión de Asignaciones" subtitle="Administra las asignaciones de soporte" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Asignaciones' }]" actionLabel="Nueva Asignación" (actionClick)="abrirModalNuevaAsignacion()"></app-workspace-header>
+
+  <div class="extra-actions">
+    <button class="btn btn-outline btn-icon" (click)="abrirModalQuejas()" title="Ver quejas disponibles">
+      <span class="btn-icon-symbol">Q</span>
+      Quejas Disponibles ({{ quejasDisponibles.length }})
+    </button>
+    <button class="btn btn-auto" (click)="asignarAutomaticamente()" [disabled]="asignandoAutomatico || totalPendientesAuto === 0" title="Asignar automaticamente quejas sin asignar">
+      <span class="btn-icon-symbol">AA</span>
+      {{ asignandoAutomatico ? 'Asignando...' : 'Asignar Automaticamente' }}
+      <span *ngIf="totalPendientesAuto > 0" class="badge-counter">{{ totalPendientesAuto }}</span>
+    </button>
+  </div>
+
   <app-loading-overlay [loading]="loading" text="Cargando asignaciones...">
-    <div class="crud-asignacion-header">
-      <h2>Gestion de Asignaciones</h2>
-      <div class="header-actions">
-        <button class="btn btn-outline btn-icon" (click)="abrirModalQuejas()" title="Ver quejas disponibles">
-          <span class="btn-icon-symbol">Q</span>
-          Quejas Disponibles ({{ quejasDisponibles.length }})
-        </button>
-        <button class="btn btn-auto" (click)="asignarAutomaticamente()" [disabled]="asignandoAutomatico || totalPendientesAuto === 0" title="Asignar automaticamente quejas sin asignar">
-          <span class="btn-icon-symbol">AA</span>
-          {{ asignandoAutomatico ? 'Asignando...' : 'Asignar Automaticamente' }}
-          <span *ngIf="totalPendientesAuto > 0" class="badge-counter">{{ totalPendientesAuto }}</span>
-        </button>
-        <button class="btn btn-primary" (click)="abrirModalNuevaAsignacion()">
-          <span class="btn-icon-symbol">+</span>
-          Nueva Asignacion
-        </button>
-      </div>
-    </div>
 
     <div class="filtros-container">
       <div class="filtro-group">

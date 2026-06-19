@@ -45,6 +45,25 @@
 /* ── Tabla ── */
 .dt-scroll {
   overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cr-border) transparent;
+}
+
+.dt-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.dt-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dt-scroll::-webkit-scrollbar-thumb {
+  background: var(--cr-border);
+  border-radius: 3px;
+}
+
+.dt-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--cr-text-muted);
 }
 
 .dt-table {

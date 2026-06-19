@@ -1,0 +1,4 @@
+.admin-page {
+  min-height: 100vh;
+  background: var(--cr-background-content);
+}

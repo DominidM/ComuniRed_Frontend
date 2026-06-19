@@ -1,6 +1,7 @@
 import { Component, type OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
+import { WorkspaceHeaderComponent } from "../../shared/components/workspace-header/workspace-header.component"
 
 interface Evidencia {
   id: number
@@ -18,7 +19,7 @@ interface Evidencia {
 @Component({
   selector: "app-crud-evidencia",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, WorkspaceHeaderComponent],
   templateUrl: "./crud-evidencia.component.html",
   styleUrls: ["./crud-evidencia.component.css"],
 })

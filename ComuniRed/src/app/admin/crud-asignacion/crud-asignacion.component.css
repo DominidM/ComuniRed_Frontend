@@ -20,7 +20,7 @@
   box-sizing: border-box;
 }
 
-.crud-asignacion-root {
+.admin-page {
   padding: 0;
   max-width: none;
   margin: 0;
@@ -676,6 +676,14 @@ textarea.form-control {
 .pag-count {
   font-size: 0.8rem;
   color: var(--cr-text);
+}
+
+.extra-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0 2rem 1.5rem 2rem;
 }
 
 /* Responsivo */

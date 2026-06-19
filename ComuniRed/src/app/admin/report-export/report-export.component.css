@@ -1,10 +1,6 @@
-.report-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+.admin-page {
   min-height: 100vh;
-  padding: 20px;
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4ff 100%);
+  background: var(--cr-background-content);
 }
 
 .report-card {

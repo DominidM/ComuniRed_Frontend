@@ -10,11 +10,12 @@ import {
   DataTableColumn,
   DataTableCellDirective,
 } from '../../shared/components/data-table/data-table.component';
+import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
 
 @Component({
   selector: 'app-crud-usuario',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent],
   templateUrl: './crud-usuario.component.html',
   styleUrls: ['./crud-usuario.component.css'],
 })
@@ -43,13 +44,10 @@ export class CrudUsuarioComponent implements OnInit {
   hoy: string = new Date().toISOString().substring(0, 10);
 
   columns: DataTableColumn[] = [
-    { key: 'nombre', label: 'Nombre' },
-    { key: 'apellido', label: 'Apellido' },
+    { key: 'nombre_completo', label: 'Nombre' },
     { key: 'rol_id', label: 'Rol' },
     { key: 'dni', label: 'DNI' },
-    { key: 'edad', label: 'Edad' },
     { key: 'distrito', label: 'Distrito' },
-    { key: 'fecha_nacimiento', label: 'Fecha Nac.' },
     { key: 'fecha_registro', label: 'Fecha Reg.' },
     { key: 'acciones', label: 'Acciones' },
   ];

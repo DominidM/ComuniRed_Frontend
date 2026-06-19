@@ -1,8 +1,9 @@
 /* Contenedor principal */
-.admin-content {
-  padding: 32px;
+.admin-page {
+  padding: 0;
   flex: 1;
   background: var(--cr-background-content);
+  min-height: 100vh;
 }
 
 /* Header */

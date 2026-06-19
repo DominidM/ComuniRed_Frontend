@@ -1,8 +1,5 @@
-<div class="crud-reaccion-root">
-  <div class="crud-reaccion-header">
-    <h2>Gestión de Reacciones</h2>
-    <button class="btn-primary" (click)="openAddModal()">Nueva Reacción</button>
-  </div>
+<div class="admin-page">
+  <app-workspace-header title="Gestión de Reacciones" subtitle="Administra las reacciones de los usuarios" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Reacciones' }]" actionLabel="Nueva Reacción" (actionClick)="openAddModal()"></app-workspace-header>
 
   <div *ngIf="reacciones && reacciones.length > 0; else noReacciones">
     <table class="crud-reaccion-table">
