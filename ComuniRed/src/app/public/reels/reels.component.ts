@@ -47,6 +47,7 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   comentarios: ReelComentario[] = [];
   loadingComments = false;
   sendingComment = false;
+  private comentariosCache = new Map<string, ReelComentario[]>();
 
   videoProgress = 0;
   isDarkMode = true;
@@ -95,7 +96,11 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
           liked: r.liked,
           saved: r.saved,
         }));
-        setTimeout(() => { this.loadVideo(); this.cargarComentarios(); }, 50);
+        setTimeout(() => {
+          this.loadVideo();
+          this.cargarComentarios();
+          if (this.reels.length > 1) this.precargarComentarios(this.reels[1].id);
+        }, 50);
       },
       error: () => {
         this.isLoading = false;
@@ -196,10 +201,22 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     this.loadVideo();
   }
 
+  private recargarComentarios() {
+    this.cargarComentarios();
+    const nextIdx = this.currentIndex + 1;
+    if (nextIdx < this.reels.length) {
+      this.precargarComentarios(this.reels[nextIdx].id);
+    }
+    if (this.currentIndex > 0) {
+      this.precargarComentarios(this.reels[this.currentIndex - 1].id);
+    }
+  }
+
   nextReel() {
     if (this.currentIndex < this.reels.length - 1) {
       this.currentIndex++;
       this.resetVideo();
+      this.recargarComentarios();
       this.reelService.incrementarVista(this.reels[this.currentIndex].id).subscribe();
     }
   }
@@ -208,6 +225,7 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     if (this.currentIndex > 0) {
       this.currentIndex--;
       this.resetVideo();
+      this.recargarComentarios();
     }
   }
 
@@ -315,6 +333,13 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   cargarComentarios() {
     const reelId = this.reels[this.currentIndex]?.id;
     if (!reelId) return;
+
+    if (this.comentariosCache.has(reelId)) {
+      this.comentarios = this.comentariosCache.get(reelId)!;
+      return;
+    }
+
+    this.comentarios = [];
     this.loadingComments = true;
     this.reelService.obtenerComentarios(reelId).subscribe({
       next: (res) => {
@@ -322,9 +347,22 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
           ...c,
           usuarioAvatar: this.usuarioService.obtenerFotoMiniatura(c.usuarioAvatar, 36),
         }));
+        this.comentariosCache.set(reelId, this.comentarios);
         this.loadingComments = false;
       },
       error: () => { this.loadingComments = false; },
+    });
+  }
+
+  private precargarComentarios(reelId: string) {
+    if (!reelId || this.comentariosCache.has(reelId)) return;
+    this.reelService.obtenerComentarios(reelId).subscribe({
+      next: (res) => {
+        this.comentariosCache.set(reelId, res.map(c => ({
+          ...c,
+          usuarioAvatar: this.usuarioService.obtenerFotoMiniatura(c.usuarioAvatar, 36),
+        })));
+      },
     });
   }
 

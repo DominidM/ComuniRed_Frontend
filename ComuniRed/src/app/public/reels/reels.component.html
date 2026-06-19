@@ -180,7 +180,10 @@
         <span class="comments-title">{{ (currentReel?.comments || 0) > 0 ? currentReel.comments + ' comentarios' : 'Comentarios' }}</span>
       </div>
       <div class="comments-body" #commentsBody>
-        <div *ngIf="loadingComments" class="comments-loading">Cargando...</div>
+        <div *ngIf="loadingComments" class="comments-loading">
+          <div class="spinner"></div>
+          <span>Cargando comentarios...</span>
+        </div>
         <div *ngIf="!loadingComments && comentarios.length === 0" class="comments-empty">No hay comentarios. ¡Sé el primero en comentar!</div>
         <div *ngFor="let c of comentarios" class="comment-item">
           <div class="comment-avatar" (click)="irAPerfil(c.usuarioId)">

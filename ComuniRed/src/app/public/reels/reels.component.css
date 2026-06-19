@@ -344,7 +344,31 @@ video::-webkit-media-controls-panel { display: none !important; }
 .comments-empty { color: rgba(255,255,255,0.38); font-size: 13px; text-align: center; margin-top: 24px; }
 .light-mode .comments-empty { color: rgba(0,0,0,0.32); }
 
-.comments-loading { color: rgba(255,255,255,0.5); font-size: 13px; text-align: center; margin-top: 24px; }
+.comments-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  text-align: center;
+  margin-top: 24px;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255,255,255,0.12);
+  border-top-color: var(--primary-red);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.light-mode .spinner { border-color: rgba(0,0,0,0.1); border-top-color: var(--primary-red); }
 
 .comment-item { display: flex; gap: 12px; padding: 16px 0; align-items: flex-start; }
 .comment-item + .comment-item { border-top: 1px solid rgba(255,255,255,0.06); }
