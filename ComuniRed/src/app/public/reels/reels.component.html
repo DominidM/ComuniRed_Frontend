@@ -9,6 +9,7 @@
   <div class="reels-layout">
 
     <div class="reel-content-area">
+      <div class="reel-media-group">
     <!-- ══ VIDEO ══════════════════════════════════════ -->
     <div class="video-wrapper" (click)="togglePlayPause()">
 
@@ -61,36 +62,7 @@
     </div>
     <!-- /video-wrapper -->
 
-    <!-- ══ PANEL COMENTARIOS ══════════════════════════ -->
-    <div class="comments-panel" [class.open]="showComments" (click)="$event.stopPropagation()">
-      <div class="comments-header">
-        <span class="comments-title">{{ (currentReel?.comments || 0) > 0 ? currentReel.comments + ' comentarios' : 'Comentarios' }}</span>
-        <button class="comments-close" (click)="toggleComments()" type="button">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-          </svg>
-        </button>
-      </div>
-      <div class="comments-body" #commentsBody>
-        <div *ngIf="loadingComments" class="comments-loading">Cargando...</div>
-        <div *ngIf="!loadingComments && comentarios.length === 0" class="comments-empty">No hay comentarios. ¡Sé el primero en comentar!</div>
-        <div *ngFor="let c of comentarios" class="comment-item">
-          <div class="comment-content">
-            <span class="comment-author">{{ c.usuarioNombre }}</span>
-            <p class="comment-text">{{ c.texto }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="comments-input-row">
-        <input class="comments-input" [(ngModel)]="commentText" (keydown.enter)="enviarComentario()" placeholder="Añade un comentario..." type="text" />
-        <button class="comments-send" [disabled]="!commentText.trim() || sendingComment" (click)="enviarComentario()" type="button">{{ sendingComment ? 'Enviando...' : 'Enviar' }}</button>
-      </div>
-    </div>
-
-    </div>
-    <!-- /reel-content-area -->
-
-    <!-- ══ SIDEBAR DERECHO ════════════════════════════ -->
+    <!-- ══ SIDEBAR DERECHO (junto al video) ════ -->
     <div class="sidebar-right">
 
       <!-- Acciones + flechas integradas -->
@@ -195,6 +167,41 @@
 
     </div>
     <!-- /sidebar-right -->
+
+      </div>
+    <!-- /reel-media-group -->
+    </div>
+    <!-- /reel-content-area -->
+
+    <!-- ══ PANEL COMENTARIOS (lateral derecho) ════════ -->
+    <div class="comments-panel-wrap" [class.open]="showComments">
+    <div class="comments-panel" (click)="$event.stopPropagation()">
+      <div class="comments-header">
+        <span class="comments-title">{{ (currentReel?.comments || 0) > 0 ? currentReel.comments + ' comentarios' : 'Comentarios' }}</span>
+      </div>
+      <div class="comments-body" #commentsBody>
+        <div *ngIf="loadingComments" class="comments-loading">
+          <div class="spinner"></div>
+          <span>Cargando comentarios...</span>
+        </div>
+        <div *ngIf="!loadingComments && comentarios.length === 0" class="comments-empty">No hay comentarios. ¡Sé el primero en comentar!</div>
+        <div *ngFor="let c of comentarios" class="comment-item">
+          <div class="comment-avatar" (click)="irAPerfil(c.usuarioId)">
+            <img *ngIf="c.usuarioAvatar; else avatarFallback" [src]="c.usuarioAvatar" alt="">
+            <ng-template #avatarFallback><span class="comment-avatar-letter">{{ c.usuarioNombre[0] }}</span></ng-template>
+          </div>
+          <div class="comment-content">
+            <span class="comment-author" (click)="irAPerfil(c.usuarioId)">{{ c.usuarioNombre }}</span>
+            <p class="comment-text">{{ c.texto }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="comments-input-row">
+        <input class="comments-input" [(ngModel)]="commentText" (keydown.enter)="enviarComentario()" placeholder="Añade un comentario..." type="text" />
+        <button class="comments-send" [disabled]="!commentText.trim() || sendingComment" (click)="enviarComentario()" type="button">{{ sendingComment ? 'Enviando...' : 'Enviar' }}</button>
+      </div>
+    </div>
+    </div>
 
   </div>
   </ng-container>

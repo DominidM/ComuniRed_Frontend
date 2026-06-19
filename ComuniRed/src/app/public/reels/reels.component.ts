@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ReelService, ReelResponse, ReelComentario } from '../../services/reel.service';
 import { UsuarioService } from '../../services/usuario.service';
 
@@ -46,6 +47,7 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   comentarios: ReelComentario[] = [];
   loadingComments = false;
   sendingComment = false;
+  private comentariosCache = new Map<string, ReelComentario[]>();
 
   videoProgress = 0;
   isDarkMode = true;
@@ -61,6 +63,7 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   constructor(
     private reelService: ReelService,
     private usuarioService: UsuarioService,
+    private router: Router,
   ) {}
 
   ngAfterViewInit() {
@@ -76,7 +79,7 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     if (user) {
       this.usuarioId = user.id || user._id || '';
       this.usuarioNombre = (user.nombre || '') + ' ' + (user.apellido || '');
-      this.usuarioAvatar = user.foto_perfil || '';
+      this.usuarioAvatar = this.usuarioService.obtenerFotoMiniatura(user.foto_perfil, 36) || '';
     }
     this.reelService.obtenerActivos(this.usuarioId).subscribe({
       next: (res) => {
@@ -93,7 +96,11 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
           liked: r.liked,
           saved: r.saved,
         }));
-        setTimeout(() => this.loadVideo(), 50);
+        setTimeout(() => {
+          this.loadVideo();
+          this.cargarComentarios();
+          if (this.reels.length > 1) this.precargarComentarios(this.reels[1].id);
+        }, 50);
       },
       error: () => {
         this.isLoading = false;
@@ -194,10 +201,22 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     this.loadVideo();
   }
 
+  private recargarComentarios() {
+    this.cargarComentarios();
+    const nextIdx = this.currentIndex + 1;
+    if (nextIdx < this.reels.length) {
+      this.precargarComentarios(this.reels[nextIdx].id);
+    }
+    if (this.currentIndex > 0) {
+      this.precargarComentarios(this.reels[this.currentIndex - 1].id);
+    }
+  }
+
   nextReel() {
     if (this.currentIndex < this.reels.length - 1) {
       this.currentIndex++;
       this.resetVideo();
+      this.recargarComentarios();
       this.reelService.incrementarVista(this.reels[this.currentIndex].id).subscribe();
     }
   }
@@ -206,6 +225,7 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     if (this.currentIndex > 0) {
       this.currentIndex--;
       this.resetVideo();
+      this.recargarComentarios();
     }
   }
 
@@ -313,10 +333,36 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   cargarComentarios() {
     const reelId = this.reels[this.currentIndex]?.id;
     if (!reelId) return;
+
+    if (this.comentariosCache.has(reelId)) {
+      this.comentarios = this.comentariosCache.get(reelId)!;
+      return;
+    }
+
+    this.comentarios = [];
     this.loadingComments = true;
     this.reelService.obtenerComentarios(reelId).subscribe({
-      next: (res) => { this.comentarios = res; this.loadingComments = false; },
+      next: (res) => {
+        this.comentarios = res.map(c => ({
+          ...c,
+          usuarioAvatar: this.usuarioService.obtenerFotoMiniatura(c.usuarioAvatar, 36),
+        }));
+        this.comentariosCache.set(reelId, this.comentarios);
+        this.loadingComments = false;
+      },
       error: () => { this.loadingComments = false; },
+    });
+  }
+
+  private precargarComentarios(reelId: string) {
+    if (!reelId || this.comentariosCache.has(reelId)) return;
+    this.reelService.obtenerComentarios(reelId).subscribe({
+      next: (res) => {
+        this.comentariosCache.set(reelId, res.map(c => ({
+          ...c,
+          usuarioAvatar: this.usuarioService.obtenerFotoMiniatura(c.usuarioAvatar, 36),
+        })));
+      },
     });
   }
 
@@ -328,13 +374,20 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
     this.sendingComment = true;
     this.reelService.comentar(reelId, this.usuarioId, this.usuarioNombre, this.usuarioAvatar, texto).subscribe({
       next: (res) => {
-        this.comentarios.push(res);
+        this.comentarios.push({
+          ...res,
+          usuarioAvatar: this.usuarioService.obtenerFotoMiniatura(res.usuarioAvatar, 36),
+        });
         this.commentText = '';
         this.sendingComment = false;
         this.currentReel.comments = this.comentarios.length;
       },
       error: () => { this.sendingComment = false; },
     });
+  }
+
+  irAPerfil(usuarioId: string): void {
+    this.router.navigate(['/public/profile', usuarioId]);
   }
 
   formatNumber(num: number): string {
