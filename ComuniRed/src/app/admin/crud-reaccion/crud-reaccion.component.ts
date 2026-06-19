@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 // import { UsuarioService } from '../../services/usuario.service';
 // import { QuejaService } from '../../services/queja.service';
 // import { TipoReaccionService } from '../../services/tipo-reaccion.service';
+import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
 
 interface Reaccion {
   id: number;
@@ -37,7 +38,7 @@ interface TipoReaccion {
 @Component({
   selector: 'app-crud-reaccion',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, WorkspaceHeaderComponent],
   templateUrl: './crud-reaccion.component.html',
   styleUrls: ['./crud-reaccion.component.css']
 })

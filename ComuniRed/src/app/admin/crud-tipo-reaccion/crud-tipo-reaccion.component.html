@@ -1,16 +1,5 @@
-<div class="crud-tipo-reaccion-root">
-  <div class="crud-tipo-reaccion-card">
-
-    <div class="crud-tipo-reaccion-header">
-      <h2>Gestión de Tipos de Reacción</h2>
-      <button class="btn-primary" (click)="openAddModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Nuevo Tipo
-      </button>
-    </div>
+<div class="admin-page">
+  <app-workspace-header title="Gestión de Tipos de Reacción" subtitle="Administra los tipos de reacción" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Tipos de Reacción' }]" actionLabel="Nuevo Tipo" (actionClick)="openAddModal()"></app-workspace-header>
 
     <app-loading-overlay [loading]="loading" text="Cargando tipos de reacción...">
       <app-data-table
@@ -120,5 +109,4 @@
         </form>
       </div>
     </div>
-  </div>
 </div>

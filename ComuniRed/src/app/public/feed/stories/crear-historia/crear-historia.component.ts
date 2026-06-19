@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { HistoriaService } from '../../../../services/historia.service';
 import { MusicaService, MusicTrackResponse as MusicTrack } from '../../../../services/musica.service';
 import { Story } from '../../../../services/historia.service';
+import { ModalStateService } from '../../../../shared/services/modal-state.service';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime'];
@@ -71,6 +72,7 @@ export class CrearHistoriaComponent implements OnInit, OnDestroy {
   buscandoMusica = false;
   pistaSeleccionada: MusicTrack | null = null;
   musicaSonando = false;
+  mostrarTools = false;
   private audioMusica: HTMLAudioElement | null = null;
   private timeoutBusqueda: any;
   private suscripcionPublicar?: Subscription;
@@ -85,14 +87,19 @@ export class CrearHistoriaComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private historiaService: HistoriaService,
     private musicaService: MusicaService,
+    private modalState: ModalStateService,
   ) {}
 
   ngOnInit(): void {
+    this.modalState.open();
+    document.body.style.overflow = 'hidden';
     this.resetear();
     this.iniciarPreview();
   }
 
   ngOnDestroy(): void {
+    this.modalState.close();
+    document.body.style.overflow = '';
     this.limpiarPreview();
     this.limpiarMusica();
     this.suscripcionPublicar?.unsubscribe();
@@ -256,6 +263,10 @@ export class CrearHistoriaComponent implements OnInit, OnDestroy {
     if (!this.mostrarBusquedaMusica) {
       this.consultaMusica = ''; this.resultadosMusica = []; this.buscandoMusica = false;
     }
+  }
+
+  toggleTools(): void {
+    this.mostrarTools = !this.mostrarTools;
   }
 
   onInputMusica(): void {

@@ -1,13 +1,5 @@
-<div class="admin-content">
-  <div class="comentarios-header">
-    <div>
-      <h1 class="comentarios-titulo">Gestión de Comentarios</h1>
-      <p class="comentarios-subtitulo">Administra los comentarios de los usuarios sobre problemas en la comunidad</p>
-    </div>
-    <button class="btn-nuevo-comentario" (click)="abrirFormulario()">
-      <span>➕</span> Nuevo Comentario
-    </button>
-  </div>
+<div class="admin-page">
+  <app-workspace-header title="Gestión de Comentarios" subtitle="Administra los comentarios de los usuarios" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Comentarios' }]" actionLabel="Nuevo Comentario" (actionClick)="abrirFormulario()"></app-workspace-header>
 
   <!-- Filtros y Búsqueda -->
   <div class="comentarios-filtros">

@@ -1,29 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  ConversacionService,
-  Conversacion,
-  Mensaje,
-} from '../../../services/conversacion.service';
-import { UsuarioService } from '../../../services/usuario.service';
-import { Subscription, forkJoin, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-
-export interface ChatPreview {
-  id: string;
-  conversacionId: string;
-  name: string;
-  initials: string;
-  color: string;
-  avatarUrl: string | null;
-  preview: string;
-  time: string;
-  online: boolean;
-  unread: boolean;
-  unreadCount?: number;
-}
+import { UsuarioService, Usuario } from '../../../services/usuario.service';
+import { SeguimientoService, EstadoSeguimiento } from '../../../services/seguimiento.service';
 
 @Component({
   selector: 'app-rightbar',
@@ -32,258 +12,109 @@ export interface ChatPreview {
   templateUrl: './rightbar.component.html',
   styleUrls: ['./rightbar.component.css'],
 })
-export class RightbarComponent implements OnInit, OnDestroy {
-  mensajes: ChatPreview[] = [];
-  loadingMensajes = true;
+export class RightbarComponent implements OnInit {
+  sugerencias: Usuario[] = [];
+  estadosSeguimiento: Map<string, EstadoSeguimiento> = new Map();
+  cargandoSeguimiento: Set<string> = new Set();
+  loadingSugerencias = false;
 
-  trends = [
-    {
-      tag: 'VíasEnMalEstado',
-      count: 45,
-      desc: 'Múltiples reportes sobre huecos',
-    },
-    {
-      tag: 'AlumbradoPúblico',
-      count: 23,
-      desc: 'Postes dañados en varios sectores',
-    },
-    { tag: 'AguaPotable', count: 18, desc: 'Cortes reportados en la zona' },
-  ];
-
-  stats = { today: 247, solvedPercent: 89 };
-
-  accessibilityOpen = false;
-  textScale = 1;
-  isHighContrast = false;
-  isReducedMotion = false;
-
-  private onKey = this.handleKeyDown.bind(this);
   private currentUserId = '';
-  private mensajeSub?: Subscription;
-
-  // Colores para avatares sin foto
-  private readonly COLORS = [
-    'linear-gradient(135deg,#667eea,#764ba2)',
-    'linear-gradient(135deg,#f093fb,#f5576c)',
-    'linear-gradient(135deg,#4facfe,#00f2fe)',
-    'linear-gradient(135deg,#43e97b,#38f9d7)',
-    'linear-gradient(135deg,#fa709a,#fee140)',
-  ];
 
   constructor(
     private router: Router,
-    private conversacionService: ConversacionService,
     private usuarioService: UsuarioService,
+    private seguimientoService: SeguimientoService,
   ) {}
 
   ngOnInit(): void {
-    this.loadAccesibilidad();
-    document.addEventListener('keydown', this.onKey, true);
-
     const u = this.usuarioService.getUser() as any;
     if (u) {
       this.currentUserId = u.id || u._id;
-      this.loadConversaciones();
-      this.iniciarSuscripcionMensajes();
+      this.cargarSugerencias();
     }
   }
 
-  ngOnDestroy(): void {
-    document.removeEventListener('keydown', this.onKey, true);
-    this.mensajeSub?.unsubscribe();
+  private cargarSugerencias(): void {
+    if (!this.currentUserId) return;
+    this.loadingSugerencias = true;
+    this.usuarioService.obtenerUsuarios(0, 50).subscribe({
+      next: (page) => {
+        const users = (page.content || [])
+          .filter(u => u.id !== this.currentUserId)
+          .sort((a, b) => {
+            const da = a.fecha_registro ? new Date(a.fecha_registro).getTime() : 0;
+            const db = b.fecha_registro ? new Date(b.fecha_registro).getTime() : 0;
+            return db - da;
+          })
+          .slice(0, 8);
+        this.sugerencias = users;
+        this.sugerencias.forEach(u => this.cargarEstado(u));
+        this.loadingSugerencias = false;
+      },
+      error: () => { this.loadingSugerencias = false; },
+    });
   }
 
-  private iniciarSuscripcionMensajes(): void {
-    this.mensajeSub = this.conversacionService
-      .suscribirseANuevosMensajes(this.currentUserId)
-      .subscribe({
-        next: (mensaje) => {
-          if (!mensaje) return;
-          const idx = this.mensajes.findIndex(
-            (c) => c.conversacionId === mensaje.conversacionId,
-          );
-          if (idx >= 0) {
-            const chat = this.mensajes[idx];
-            this.mensajes[idx] = {
-              ...chat,
-              preview: mensaje.contenido,
-              time: this.formatTime(mensaje.fechaEnvio),
-              unread: true,
-              unreadCount: (chat.unreadCount ?? 0) + 1,
-            };
-            this.mensajes = [...this.mensajes];
-          } else {
-            this.loadConversaciones();
-          }
-        },
-        error: () => {},
-      });
+  private cargarEstado(usuario: Usuario): void {
+    if (!this.currentUserId || !usuario.id) return;
+    this.seguimientoService.obtenerEstadoSeguimiento(this.currentUserId, usuario.id).subscribe({
+      next: (estado) => {
+        this.estadosSeguimiento.set(usuario.id, estado);
+        this.estadosSeguimiento = new Map(this.estadosSeguimiento);
+      },
+    });
   }
 
-  private loadConversaciones(): void {
-    this.loadingMensajes = true;
+  getEstado(usuario: Usuario): EstadoSeguimiento | undefined {
+    return this.estadosSeguimiento.get(usuario.id);
+  }
 
-    this.conversacionService
-      .misConversaciones(this.currentUserId, 0, 10)
-      .subscribe({
-        next: (page) => {
-          if (page.content.length === 0) {
-            this.mensajes = [];
-            this.loadingMensajes = false;
-            return;
-          }
+  estaCargando(usuario: Usuario): boolean {
+    return this.cargandoSeguimiento.has(usuario.id);
+  }
 
-          // Obtener el ID del otro participante de cada conversación
-          const requests = page.content.map((conv, i) => {
-            const otroId =
-              conv.participante1Id === this.currentUserId
-                ? conv.participante2Id
-                : conv.participante1Id;
+  toggleSeguir(usuario: Usuario): void {
+    if (!this.currentUserId || !usuario.id) return;
+    const estado = this.getEstado(usuario);
+    if (!estado) return;
 
-            return this.usuarioService.obtenerUsuarioPorId(otroId).pipe(
-              catchError(() => of(null)),
-              map((usuario) => this.mapConversacion(conv, i, usuario)),
-            );
+    this.cargandoSeguimiento.add(usuario.id);
+
+    if (estado.estaSiguiendo || estado.solicitudEnviada) {
+      this.seguimientoService.dejarDeSeguir(this.currentUserId, usuario.id).subscribe({
+        next: () => {
+          this.estadosSeguimiento.set(usuario.id, {
+            estaSiguiendo: false, teSigue: false,
+            seguimientoMutuo: false, solicitudPendiente: false,
+            solicitudEnviada: false,
           });
-
-          forkJoin(requests).subscribe({
-            next: (chats) => {
-              this.mensajes = chats.filter((c) => c.unread);
-              this.loadingMensajes = false;
-            },
-            error: () => {
-              this.loadingMensajes = false;
-            },
-          });
+          this.estadosSeguimiento = new Map(this.estadosSeguimiento);
+          this.cargandoSeguimiento.delete(usuario.id);
         },
-        error: () => {
-          this.loadingMensajes = false;
-        },
+        error: () => this.cargandoSeguimiento.delete(usuario.id),
       });
+    } else {
+      this.seguimientoService.enviarSolicitud(this.currentUserId, usuario.id).subscribe({
+        next: () => {
+          this.estadosSeguimiento.set(usuario.id, {
+            ...estado, estaSiguiendo: true, solicitudEnviada: false,
+          });
+          this.estadosSeguimiento = new Map(this.estadosSeguimiento);
+          this.cargandoSeguimiento.delete(usuario.id);
+        },
+        error: () => this.cargandoSeguimiento.delete(usuario.id),
+      });
+    }
   }
 
-  private mapConversacion(
-    conv: Conversacion,
-    index: number,
-    usuario: any,
-  ): ChatPreview {
-    const otroId =
-      conv.participante1Id === this.currentUserId
-        ? conv.participante2Id
-        : conv.participante1Id;
-
-    const unread = conv.ultimoMensaje
-      ? !conv.ultimoMensaje.leido &&
-        conv.ultimoMensaje.emisorId !== this.currentUserId
-      : false;
-
-    const nombre = usuario
-      ? `${usuario.nombre} ${usuario.apellido}`.trim()
-      : otroId;
-
-    const initials = usuario
-      ? `${usuario.nombre?.[0] ?? ''}${usuario.apellido?.[0] ?? ''}`.toUpperCase()
-      : '??';
-
-    const avatarUrl = usuario
-      ? this.usuarioService.obtenerFotoMiniatura(usuario.foto_perfil, 44)
-      : null;
-
-    return {
-      id: otroId,
-      conversacionId: conv.id,
-      name: nombre,
-      initials,
-      color: avatarUrl ? '' : this.COLORS[index % this.COLORS.length],
-      avatarUrl, // ← campo nuevo
-      preview: unread
-        ? conv.ultimoMensaje?.contenido || ''
-        : conv.ultimoMensaje?.contenido || 'Sin mensajes',
-      time: this.formatTime(conv.fechaUltimaActividad),
-      online: usuario?.estaEnLinea ?? false,
-      unread,
-      unreadCount: unread ? 1 : undefined,
-    };
-  }
-  private formatTime(fecha: string): string {
-    if (!fecha) return '';
-    const diff = (Date.now() - new Date(fecha).getTime()) / 1000;
-    if (diff < 60) return 'ahora';
-    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-    return `${Math.floor(diff / 86400)}d`;
+  verPerfil(usuario: Usuario): void {
+    if (!usuario.id) return;
+    usuario.id === this.currentUserId
+      ? this.router.navigate(['/public/profile'])
+      : this.router.navigate(['/public/user-profile', usuario.id]);
   }
 
-  // ── Navegación ────────────────────────────────────────────────
-  onAbrirChat(chat: ChatPreview): void {
-    this.router.navigate(['/public/messages', chat.conversacionId]);
-  }
-
-  onNuevoMensaje(): void {
-    this.router.navigate(['/public/messages/new']);
-  }
-
-  // ── Accesibilidad ─────────────────────────────────────────────
-  private loadAccesibilidad(): void {
-    const savedScale = parseFloat(localStorage.getItem('acc-textScale') || '1');
-    this.textScale = isNaN(savedScale) ? 1 : savedScale;
-    this.isHighContrast = localStorage.getItem('acc-highContrast') === '1';
-    this.isReducedMotion = localStorage.getItem('acc-reducedMotion') === '1';
-
-    document.documentElement.style.fontSize = `${Math.round(this.textScale * 100)}%`;
-    if (this.isHighContrast)
-      document.documentElement.classList.add('high-contrast');
-    if (this.isReducedMotion)
-      document.documentElement.classList.add('reduced-motion');
-  }
-
-  toggleAccessibility(): void {
-    this.accessibilityOpen = !this.accessibilityOpen;
-  }
-
-  increaseText(): void {
-    this.textScale = Math.min(1.6, +(this.textScale + 0.1).toFixed(2));
-    this.applyTextScale();
-  }
-  decreaseText(): void {
-    this.textScale = Math.max(0.8, +(this.textScale - 0.1).toFixed(2));
-    this.applyTextScale();
-  }
-  resetText(): void {
-    this.textScale = 1;
-    this.applyTextScale();
-    localStorage.removeItem('acc-textScale');
-  }
-
-  toggleHighContrast(): void {
-    this.isHighContrast = !this.isHighContrast;
-    document.documentElement.classList.toggle(
-      'high-contrast',
-      this.isHighContrast,
-    );
-    this.isHighContrast
-      ? localStorage.setItem('acc-highContrast', '1')
-      : localStorage.removeItem('acc-highContrast');
-  }
-
-  toggleReducedMotion(): void {
-    this.isReducedMotion = !this.isReducedMotion;
-    document.documentElement.classList.toggle(
-      'reduced-motion',
-      this.isReducedMotion,
-    );
-    this.isReducedMotion
-      ? localStorage.setItem('acc-reducedMotion', '1')
-      : localStorage.removeItem('acc-reducedMotion');
-  }
-
-  private applyTextScale(): void {
-    document.documentElement.style.fontSize = `${Math.round(this.textScale * 100)}%`;
-    localStorage.setItem('acc-textScale', String(this.textScale));
-  }
-
-  private handleKeyDown(e: KeyboardEvent): void {
-    if (this.accessibilityOpen && e.key === 'Escape')
-      this.accessibilityOpen = false;
+  obtenerFoto(foto?: string): string {
+    return this.usuarioService.obtenerFotoMiniatura(foto, 44);
   }
 }

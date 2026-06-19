@@ -47,7 +47,7 @@
 
 
 /* --- 1. ESTRUCTURA GENERAL Y ENCABEZADOS --- */
-.crud-rol-root {
+.admin-page {
     padding: 0;
     margin: 0;
     background: var(--cr-background-content);

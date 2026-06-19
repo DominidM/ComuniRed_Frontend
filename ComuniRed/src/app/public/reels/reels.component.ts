@@ -50,7 +50,6 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   private comentariosCache = new Map<string, ReelComentario[]>();
 
   videoProgress = 0;
-  isDarkMode = true;
   private isSeeking = false;
   private scrollThrottle = false;
 

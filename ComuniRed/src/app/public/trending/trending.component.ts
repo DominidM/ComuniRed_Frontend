@@ -104,6 +104,7 @@ export class TrendingComponent implements OnInit {
             icon: 'bi-tag',
             description: cat.descripcion || 'Sin descripción'
           }));
+        if (this.posts.length > 0) this.actualizarConteoCategorias();
       },
       error: (err) => {
         console.error('Error cargando categorías', err);
@@ -139,6 +140,7 @@ export class TrendingComponent implements OnInit {
           commentsCount: q.commentsCount || 0
         }));
         this.updateStats();
+        this.actualizarConteoCategorias();
         this.applyFilters();
         this.loading = false;
       },
@@ -169,6 +171,15 @@ export class TrendingComponent implements OnInit {
       weekAgo.setDate(weekAgo.getDate() - 7);
       this.stats.reportesEstaSemana = this.posts.filter(p => new Date(p.fecha_creacion) > weekAgo).length;
     }
+  }
+
+  actualizarConteoCategorias(): void {
+    const counts: { [key: string]: number } = {};
+    this.posts.forEach(p => {
+      const id = p.categoria?.id;
+      if (id) counts[id] = (counts[id] || 0) + 1;
+    });
+    this.categorias = this.categorias.map(c => ({ ...c, count: counts[c.id] || 0 }));
   }
 
   applyFilters(): void {

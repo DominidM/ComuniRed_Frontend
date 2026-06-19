@@ -17,7 +17,149 @@
       <div class="feed-area" [class.reels-mode]="isReelsRoute">
         <router-outlet></router-outlet>
       </div>
-      <app-rightbar *ngIf="isDesktop && !isReelsRoute && !isMessagesRoute"></app-rightbar>
+      <div class="rightbar-spacer" *ngIf="isDesktop && !isReelsRoute && !isMessagesRoute && !isSuggestionsRoute"></div>
     </div>
+    <app-rightbar *ngIf="isDesktop && !isReelsRoute && !isMessagesRoute && !isSuggestionsRoute"></app-rightbar>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<app-crear-historia
+  *ngIf="showCreateStory"
+  [user]="createStoryUser"
+  (close)="closeCreateStoryModal()"
+  (storyCreated)="onStoryCreated($event)">
+</app-crear-historia>
+
+<!-- ── FAB Mensajes ── -->
+<button class="chat-fab" (click)="toggleChatPanel()" type="button" aria-label="Mensajes">
+  <mat-icon>chat_bubble</mat-icon>
+</button>
+
+<!-- ── Chat Panel ── -->
+<div class="chat-panel-overlay" *ngIf="showChatPanel" (click)="showChatPanel = false"></div>
+<div class="chat-panel" *ngIf="showChatPanel" (click)="$event.stopPropagation()">
+  <div class="chat-panel-header">
+    <span>Mensajes</span>
+    <button class="chat-panel-close" (click)="showChatPanel = false" type="button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="chat-panel-body">
+    <div *ngIf="loadingChats" class="chat-panel-loading">
+      <mat-icon class="chat-spin">autorenew</mat-icon>
+      <span>Cargando...</span>
+    </div>
+    <div *ngIf="!loadingChats && chats.length === 0" class="chat-panel-empty">
+      Sin conversaciones
+    </div>
+    <div
+      class="chat-panel-item"
+      *ngFor="let c of chats"
+      (click)="abrirChat(c)"
+      [class.unread]="c.unread"
+    >
+      <div class="chat-item-avatar" [style.background]="c.avatarUrl ? 'transparent' : c.color">
+        <img *ngIf="c.avatarUrl" [src]="c.avatarUrl" [alt]="c.name" />
+        <span *ngIf="!c.avatarUrl">{{ c.initials }}</span>
+      </div>
+      <div class="chat-item-info">
+        <span class="chat-item-name">{{ c.name }}</span>
+        <span class="chat-item-preview" [class.bold]="c.unread">{{ c.preview || 'Sin mensajes' }}</span>
+      </div>
+      <span class="chat-item-time">{{ c.time }}</span>
+    </div>
+  </div>
+  <div class="chat-panel-footer">
+    <button class="chat-new-btn" (click)="toggleNewChat()" type="button">
+      <mat-icon>{{ showNewChat ? 'arrow_back' : 'edit' }}</mat-icon>
+      {{ showNewChat ? 'Volver' : 'Nuevo mensaje' }}
+    </button>
+  </div>
+</div>
+
+<!-- ── Nueva conversacion (overlay dentro del panel) ── -->
+<div class="new-chat-overlay" *ngIf="showChatPanel && showNewChat">
+  <div class="new-chat-header">
+    <span>Selecciona un usuario</span>
+    <span class="new-chat-hint">Solo personas que te siguen mutuamente</span>
+  </div>
+  <div class="new-chat-body">
+    <div *ngIf="loadingMutuos" class="chat-panel-loading">
+      <mat-icon class="chat-spin">autorenew</mat-icon>
+      <span>Cargando...</span>
+    </div>
+    <div *ngIf="!loadingMutuos && mutuos.length === 0" class="chat-panel-empty">
+      No hay usuarios disponibles
+    </div>
+    <div
+      class="chat-panel-item"
+      *ngFor="let u of mutuos"
+      (click)="iniciarChat(u)"
+    >
+      <div class="chat-item-avatar" [style.background]="u.avatarUrl ? 'transparent' : '#e0e0e0'">
+        <img *ngIf="u.avatarUrl" [src]="u.avatarUrl" [alt]="u.name" />
+        <span *ngIf="!u.avatarUrl" style="color:#666;">{{ u.name[0] }}</span>
+      </div>
+      <div class="chat-item-info">
+        <span class="chat-item-name">{{ u.name }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Chat Windows ── -->
+<div class="chat-windows-rack">
+  <div
+    class="chat-window"
+    *ngFor="let w of chatWindows; trackBy: trackByWindow"
+    [class.minimized]="w.minimized"
+  >
+    <div class="chat-win-header" (click)="toggleMinWindow(w)">
+      <div class="chat-win-user">
+        <div class="chat-win-avatar" [style.background]="w.avatarUrl ? 'transparent' : w.color">
+          <img *ngIf="w.avatarUrl" [src]="w.avatarUrl" [alt]="w.name" />
+          <span *ngIf="!w.avatarUrl">{{ w.initials }}</span>
+        </div>
+        <span class="chat-win-name">{{ w.name }}</span>
+      </div>
+      <div class="chat-win-actions">
+        <button class="chat-win-btn" (click)="$event.stopPropagation(); closeChatWindow(w)" type="button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-win-body" *ngIf="!w.minimized">
+      <div class="chat-win-msgs" #msgContainer>
+        <div *ngIf="w.loading" class="chat-win-loading">Cargando...</div>
+        <div
+          class="chat-win-msg"
+          *ngFor="let msg of w.messages; trackBy: trackByMsgId"
+          [class.mine]="esMiMsg(msg)"
+        >
+          <div class="chat-win-bubble">{{ msg.contenido }}</div>
+        </div>
+        <div *ngIf="!w.loading && w.messages.length === 0" class="chat-win-empty">
+          No hay mensajes
+        </div>
+        <div *ngIf="!w.loading && !w.canSend" class="chat-win-warning">
+          <mat-icon>block</mat-icon>
+          Ya no se siguen mutuamente — no puedes enviar mensajes
+        </div>
+      </div>
+      <div class="chat-win-input-row">
+        <input
+          class="chat-win-input"
+          [(ngModel)]="w.newMessage"
+          (keydown.enter)="w.canSend ? enviarMsgWindow(w) : null"
+          placeholder="Escribe..."
+          type="text"
+          [disabled]="!w.canSend"
+        />
+        <button class="chat-win-send" (click)="enviarMsgWindow(w)" [disabled]="!w.canSend || !w.newMessage.trim() || w.sending" type="button">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

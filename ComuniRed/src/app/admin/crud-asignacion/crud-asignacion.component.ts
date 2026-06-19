@@ -11,6 +11,7 @@ import {
   DataTableColumn,
   DataTableCellDirective,
 } from '../../shared/components/data-table/data-table.component';
+import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
 
 interface QuejaParaAsignar {
   id: string;
@@ -34,7 +35,7 @@ interface UsuarioSoporte {
 @Component({
   selector: 'app-crud-asignacion',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective],
+  imports: [CommonModule, FormsModule, RouterModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent],
   templateUrl: './crud-asignacion.component.html',
   styleUrls: ['./crud-asignacion.component.css']
 })

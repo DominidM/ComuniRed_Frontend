@@ -1,14 +1,21 @@
-<div class="comments-section">
-  <div *ngFor="let comment of comments" class="comment">
-    <img class="comment-avatar" [src]="getAvatarUrl(comment.author)" alt="Avatar"/>
-    <div>
-      <span class="comment-author">{{ comment.author }}</span>
-      <span class="comment-date">{{ comment.date }}</span>
-      <p class="comment-content">{{ comment.content }}</p>
+<div class="ig-comments">
+  <div *ngFor="let comment of comments" class="ig-comment">
+    <img class="ig-comment-avatar" [src]="getAvatarUrl(comment.author)" alt="" />
+    <div class="ig-comment-body">
+      <span class="ig-comment-author">{{ comment.author }}</span>
+      <span class="ig-comment-text">{{ comment.content }}</span>
+      <div class="ig-comment-meta">
+        <span class="ig-comment-time">{{ comment.date }}</span>
+        <button class="ig-comment-like" type="button">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
-  <mat-form-field style="width: 100%;">
-    <input matInput [(ngModel)]="newComment" placeholder="Escribe un comentario...">
-  </mat-form-field>
-  <button mat-stroked-button color="primary" (click)="addComment()">Comentar</button>
+  <div class="ig-comment-input">
+    <input [(ngModel)]="newComment" (keydown.enter)="addComment()" placeholder="Agrega un comentario..." type="text" />
+    <button [class.active]="newComment.trim().length > 0" [disabled]="!newComment.trim()" (click)="addComment()" type="button">Publicar</button>
+  </div>
 </div>

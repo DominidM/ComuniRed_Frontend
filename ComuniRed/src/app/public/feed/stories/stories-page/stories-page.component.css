@@ -1,23 +1,8 @@
-/*
- * ─── STORIES PAGE ─────────────────────────────
- * Full-viewport dedicated page with carousel
- * depth effect à la Instagram Web.
- * Ruta: /stories/:username (top-level, no layout)
- * ────────────────────────────────────────────── */
-
-/* ─── Variables ─── */
-:root {
-  --sp-bg: #111111;
-  --sp-card-bg: #c43927;
-  --sp-accent: #0095f6;
-}
-
-/* ─── Full viewport shell ─── */
 .sp-layout {
   position: fixed;
   inset: 0;
   z-index: 1200;
-  background: var(--sp-bg);
+  background: #1a1a1a;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,11 +13,10 @@
   to   { opacity: 1; }
 }
 
-/* ─── Close button ─── */
 .sp-close-btn {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  top: 20px;
+  right: 20px;
   z-index: 1300;
   width: 40px;
   height: 40px;
@@ -52,7 +36,6 @@
   background: rgba(255,255,255,0.15);
 }
 
-/* ─── Loading / Error ─── */
 .sp-loading {
   position: absolute;
   inset: 0;
@@ -80,7 +63,7 @@
   margin-top: 12px;
   padding: 8px 24px;
   border-radius: 20px;
-  background: var(--sp-accent);
+  background: var(--cr-primary);
   color: #fff;
   border: none;
   font-size: 13px;
@@ -89,12 +72,9 @@
   transition: background 0.15s;
 }
 .sp-back-btn:hover {
-  background: #1877f2;
+  background: var(--cr-primary-hover);
 }
 
-/* ════════════════════════════════════════════
-   CAROUSEL
-   ════════════════════════════════════════════ */
 .sp-carousel {
   display: flex;
   align-items: center;
@@ -102,27 +82,24 @@
   gap: 8px;
   width: 100%;
   height: 100%;
-  padding: 0 20px;
+  padding: 40px 20px;
   box-sizing: border-box;
 }
 
-/* ─── Active story card ─── */
 .sp-story-card {
   position: relative;
   flex-shrink: 0;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 30px rgba(0,0,0,0.6);
-  background: var(--sp-card-bg);
+  background: #c43927;
 
-  /* Desktop: height-constrained with 9:16 ratio */
-  height: min(85vh, 800px);
+  height: min(90vh, 800px);
   aspect-ratio: 9 / 16;
-  max-width: min(100vw, 500px);
+  max-width: min(100vw, 540px);
   z-index: 2;
 }
 
-/* ─── Carousel side cards (prev / next depth) ─── */
 .sp-carousel-card {
   position: relative;
   flex-shrink: 0;
@@ -132,12 +109,10 @@
   background: #1a1a1a;
   user-select: none;
 
-  /* Same 9:16 ratio but smaller */
   height: min(70vh, 680px);
   aspect-ratio: 9 / 16;
   max-width: 120px;
 
-  /* Depth visual */
   opacity: 0.35;
   z-index: 1;
   transition: opacity 0.25s ease, transform 0.25s ease;
@@ -194,7 +169,6 @@
   white-space: nowrap;
 }
 
-/* ─── Mobile nav (prev/next user) ─── */
 .sp-mobile-nav {
   display: none;
   position: fixed;
@@ -228,18 +202,12 @@
   background: rgba(255,255,255,0.2);
 }
 
-/* ════════════════════════════════════════════
-   RESPONSIVE
-   ════════════════════════════════════════════ */
-
-/* Tablet: hide carousel side cards */
 @media (max-width: 900px) {
   .sp-carousel-card { display: none; }
-  .sp-carousel { gap: 0; }
+  .sp-carousel { gap: 0; padding: 20px; }
   .sp-story-card { height: 85vh; }
 }
 
-/* Mobile: full screen */
 @media (max-width: 600px) {
   .sp-layout { align-items: stretch; }
 
@@ -259,8 +227,8 @@
   }
 
   .sp-close-btn {
-    top: 8px;
-    right: 8px;
+    top: 12px;
+    right: 12px;
     width: 36px;
     height: 36px;
     font-size: 16px;
@@ -271,9 +239,8 @@
   }
 }
 
-/* Desktop wide */
 @media (min-width: 1200px) {
-  .sp-carousel { gap: 16px; }
+  .sp-carousel { gap: 16px; padding: 60px 40px; }
   .sp-carousel-card {
     max-width: 160px;
   }

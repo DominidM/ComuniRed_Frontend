@@ -15,6 +15,7 @@
   border-bottom: 1px solid var(--cr-border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
+  position: relative;
 }
 
 .navbar-inner {
@@ -510,4 +511,102 @@
   inset: 0;
   z-index: 9999;
   cursor: default;
+}
+
+/* ── Accesibilidad ── */
+.acc-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+}
+
+.acc-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 16px;
+  background: var(--cr-background);
+  border: 1px solid var(--cr-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  width: 280px;
+  overflow: hidden;
+  animation: accFadeIn 0.15s ease;
+}
+
+@keyframes accFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.acc-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cr-text);
+  border-bottom: 1px solid var(--cr-border);
+}
+
+.acc-dropdown-header mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--cr-text-muted);
+}
+
+.acc-dropdown-body {
+  padding: 12px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.acc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.acc-label {
+  font-size: 12px;
+  color: var(--cr-text-muted);
+  flex: 1;
+}
+
+.acc-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.acc-btn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cr-text);
+  background: var(--cr-surface);
+  border: 1px solid var(--cr-border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 100ms ease;
+  white-space: nowrap;
+}
+
+.acc-btn:hover {
+  background: var(--cr-background);
+  border-color: var(--cr-text-muted);
+}
+
+.acc-btn--toggle {
+  min-width: 78px;
+  text-align: center;
+}
+
+.acc-btn.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
 }

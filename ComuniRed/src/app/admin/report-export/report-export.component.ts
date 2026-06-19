@@ -1,6 +1,7 @@
 import { Component, type OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
+import { WorkspaceHeaderComponent } from "../../shared/components/workspace-header/workspace-header.component"
 
 interface Comentario {
   id: number
@@ -26,7 +27,7 @@ interface Usuario {
 @Component({
   selector: "app-report-export",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, WorkspaceHeaderComponent],
   templateUrl: "./report-export.component.html",
   styleUrls: ["./report-export.component.css"],
 })

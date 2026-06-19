@@ -1,15 +1,5 @@
-<div class="crud-usuario-root">
-  <div class="crud-usuario-card">
-    <div class="crud-usuario-header">
-      <h2>Gestión de Usuarios</h2>
-      <button class="btn-primary" (click)="openAddModal()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Nuevo Usuario
-      </button>
-    </div>
+<div class="admin-page">
+  <app-workspace-header title="Gestión de Usuarios" subtitle="Administra los usuarios registrados" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Usuarios' }]" actionLabel="Nuevo Usuario" (actionClick)="openAddModal()"></app-workspace-header>
 
     <div class="crud-usuario-controls-row">
       <div class="crud-usuario-search-box">
@@ -41,34 +31,20 @@
         [loading]="loading"
         [rowTrackBy]="trackByUsuarioId"
         emptyMessage="No hay usuarios registrados."
-        minWidth="1400px"
+        minWidth="800px"
         (pageChange)="goToPage($event)"
       >
+        <ng-template dataTableCell="nombre_completo" let-row>
+          <span style="font-weight:600;">{{ row.nombre }} {{ row.apellido }}</span>
+        </ng-template>
+
         <ng-template dataTableCell="rol_id" let-row>
           {{ getRolNombre(row.rol_id) }}
         </ng-template>
 
-        <ng-template dataTableCell="edad" let-row>
-          <ng-container *ngIf="calcularEdad(row.fecha_nacimiento) as edad; else sinEdad">
-            <span style="color: #000;">{{ edad }} años</span>
-          </ng-container>
-          <ng-template #sinEdad>
-            <span style="color: #9ca3af;">—</span>
-          </ng-template>
-        </ng-template>
-
-        <ng-template dataTableCell="fecha_nacimiento" let-row>
-          <ng-container *ngIf="row.fecha_nacimiento; else sinFechaNac">
-            {{ row.fecha_nacimiento | date:'dd/MM/yyyy' }}
-          </ng-container>
-          <ng-template #sinFechaNac>
-            <span style="color: #9ca3af;">—</span>
-          </ng-template>
-        </ng-template>
-
         <ng-template dataTableCell="fecha_registro" let-row>
           <ng-container *ngIf="row.fecha_registro; else sinFechaReg">
-            {{ row.fecha_registro | date:'dd/MM/yyyy HH:mm' }}
+            {{ row.fecha_registro | date:'dd/MM/yyyy' }}
           </ng-container>
           <ng-template #sinFechaReg>
             <span style="color: #9ca3af;">—</span>
@@ -189,5 +165,4 @@
         </form>
       </div>
     </div>
-  </div>
 </div>

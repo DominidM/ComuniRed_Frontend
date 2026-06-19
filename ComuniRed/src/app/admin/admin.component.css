@@ -27,6 +27,13 @@
   box-sizing: border-box;
 }
 
+/* ── Clase unificada para todos los módulos admin ── */
+:host ::ng-deep .admin-page {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .chatbot-container {
   position: fixed;
   right: 28px;

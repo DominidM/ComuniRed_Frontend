@@ -1,6 +1,7 @@
 import { Component, type OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
+import { WorkspaceHeaderComponent } from "../../shared/components/workspace-header/workspace-header.component"
 
 interface Comentario {
   id: number
@@ -17,7 +18,7 @@ interface Comentario {
 @Component({
   selector: "app-crud-comentario",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, WorkspaceHeaderComponent],
   templateUrl: "./crud-comentario.component.html",
   styleUrls: ["./crud-comentario.component.css"],
 })

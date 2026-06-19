@@ -9,11 +9,12 @@ import {
   DataTableColumn,
   DataTableCellDirective,
 } from '../../shared/components/data-table/data-table.component';
+import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
 
 @Component({
   selector: 'app-crud-categoria',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent],
   templateUrl: './crud-categoria.component.html',
   styleUrls: ['./crud-categoria.component.css']
 })

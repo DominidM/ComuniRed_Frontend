@@ -77,14 +77,11 @@ export class AdminSidebarComponent {
           route: '/admin/reels',
           icon: 'reel',
         },
-        {
-          label: 'Auditoría',
-          route: '/admin/auditoria',
-          icon: 'auditoria',
-        },
       ],
     },
+
     {
+      
       title: 'Configuración',
       roles: ['admin'],
       items: [

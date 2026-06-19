@@ -43,7 +43,6 @@ import { BackupsComponent } from './admin/tools/backups/backups.component';
 import { JobMonitorComponent } from './admin/tools/job-monitor/job-monitor.component';
 import { ExportsHistoryComponent } from './admin/tools/exports-history/exports-history.component';
 
-import { AuditoriaComponent } from './admin/auditoria/auditoria.component';
 import { ConfiguracionComponent } from './admin/configuracion/configuracion.component';
 
 import { MapaGeneralComponent } from './admin/mapa-general/mapa-general.component';
@@ -107,7 +106,6 @@ export const routes: Routes = [
       { path: 'job-monitor', component: JobMonitorComponent },
       { path: 'exports-history', component: ExportsHistoryComponent },
 
-      { path: 'auditoria', component: AuditoriaComponent },
       { path: 'configuracion', component: ConfiguracionComponent },
 
       { path: 'reels', component: ListadoReelsComponent },
