@@ -94,9 +94,9 @@
   box-shadow: 0 4px 30px rgba(0,0,0,0.6);
   background: #c43927;
 
-  height: min(85vh, 800px);
+  height: min(90vh, 800px);
   aspect-ratio: 9 / 16;
-  max-width: min(100vw, 500px);
+  max-width: min(100vw, 540px);
   z-index: 2;
 }
 

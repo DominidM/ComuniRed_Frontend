@@ -17,8 +17,9 @@
       <div class="feed-area" [class.reels-mode]="isReelsRoute">
         <router-outlet></router-outlet>
       </div>
-      <app-rightbar *ngIf="isDesktop && !isReelsRoute && !isMessagesRoute && !isSuggestionsRoute"></app-rightbar>
+      <div class="rightbar-spacer" *ngIf="isDesktop && !isReelsRoute && !isMessagesRoute && !isSuggestionsRoute"></div>
     </div>
+    <app-rightbar *ngIf="isDesktop && !isReelsRoute && !isMessagesRoute && !isSuggestionsRoute"></app-rightbar>
   </mat-sidenav-content>
 </mat-sidenav-container>
 

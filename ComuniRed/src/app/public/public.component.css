@@ -79,22 +79,30 @@ mat-sidenav-content {
   overflow: hidden !important;
 }
 
-/* ── Rightbar: sticky dentro del scroll de mat-sidenav-content ── */
-app-rightbar {
+/* ── Spacer ocupa el ancho del rightbar en el flex ── */
+.rightbar-spacer {
   flex: 0 0 var(--rightbar-w);
   width: var(--rightbar-w);
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
+}
+
+/* ── Rightbar: fixed para que siempre se vea al hacer scroll ── */
+app-rightbar {
+  position: fixed;
+  top: var(--navbar-h);
+  right: 0;
+  width: var(--rightbar-w);
   height: calc(100vh - var(--navbar-h));
   overflow-y: auto;
   overflow-x: hidden;
   border-left: 1px solid var(--cr-border);
   background: var(--cr-background);
-  flex-shrink: 0;
+  z-index: 100;
 }
 
 @media (max-width: 1100px) {
   app-rightbar { display: none !important; }
+  .rightbar-spacer { display: none !important; }
 }
 
 @media (max-width: 768px) {
