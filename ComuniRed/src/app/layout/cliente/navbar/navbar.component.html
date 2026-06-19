@@ -95,6 +95,16 @@
 
       <button
         class="nav-icon-btn"
+        matTooltip="Accesibilidad"
+        (click)="toggleAcc()"
+        [disabled]="modalActive"
+        type="button"
+      >
+        <mat-icon>accessibility</mat-icon>
+      </button>
+
+      <button
+        class="nav-icon-btn"
         matTooltip="Cambiar tema"
         (click)="toggleTheme()"
         [disabled]="modalActive"
@@ -103,7 +113,36 @@
         <mat-icon>{{ themeService.isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
       </button>
 
+    </div>
 
+    <!-- ── Accesibilidad dropdown ── -->
+    <div class="acc-dropdown" *ngIf="accOpen" (click)="$event.stopPropagation()">
+      <div class="acc-dropdown-header">
+        <mat-icon>accessibility</mat-icon>
+        Accesibilidad
+      </div>
+      <div class="acc-dropdown-body">
+        <div class="acc-row">
+          <span class="acc-label">Tamaño de letra</span>
+          <div class="acc-btns">
+            <button (click)="decreaseText()" type="button" class="acc-btn" aria-label="Disminuir">A−</button>
+            <button (click)="resetText()" type="button" class="acc-btn" aria-label="Restablecer">A</button>
+            <button (click)="increaseText()" type="button" class="acc-btn" aria-label="Aumentar">A+</button>
+          </div>
+        </div>
+        <div class="acc-row">
+          <span class="acc-label">Alto contraste</span>
+          <button (click)="toggleHighContrast()" [class.active]="isHighContrast" type="button" class="acc-btn acc-btn--toggle">
+            {{ isHighContrast ? 'Desactivar' : 'Activar' }}
+          </button>
+        </div>
+        <div class="acc-row">
+          <span class="acc-label">Reducir animaciones</span>
+          <button (click)="toggleReducedMotion()" [class.active]="isReducedMotion" type="button" class="acc-btn acc-btn--toggle">
+            {{ isReducedMotion ? 'Desactivar' : 'Activar' }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
@@ -112,6 +151,12 @@
   class="search-backdrop"
   *ngIf="showSearchResults && !modalActive"
   (click)="closeSearch()"
+></div>
+
+<div
+  class="acc-backdrop"
+  *ngIf="accOpen && !modalActive"
+  (click)="accOpen = false"
 ></div>
 
 <div class="modal-overlay" *ngIf="showUserModal && selectedUser" (click)="closeUserModal()">

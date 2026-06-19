@@ -62,91 +62,62 @@
     </button>
   </section>
 
-  <!-- ── Accesibilidad (integrada, sin botón flotante) ── -->
-  <section
-    class="rb-section acc-section"
-    aria-label="Opciones de accesibilidad"
-  >
-    <button
-      class="acc-toggle"
-      (click)="toggleAccessibility()"
-      [attr.aria-expanded]="accessibilityOpen"
-      aria-controls="acc-panel"
-      type="button"
-    >
-      <span class="acc-toggle-left">
-        <mat-icon>accessibility</mat-icon>
-        Accesibilidad
-      </span>
-      <mat-icon class="acc-chevron" [class.rotated]="accessibilityOpen"
-        >expand_more</mat-icon
-      >
-    </button>
-
-    <div
-      id="acc-panel"
-      class="acc-panel"
-      [class.open]="accessibilityOpen"
-      role="region"
-      aria-label="Controles de accesibilidad"
-    >
-      <div class="acc-inner">
-        <div class="acc-row">
-          <span class="acc-label">Tamaño de letra</span>
-          <div class="acc-btns">
-            <button
-              (click)="decreaseText()"
-              aria-label="Disminuir"
-              type="button"
-              class="acc-btn"
-            >
-              A−
-            </button>
-            <button
-              (click)="resetText()"
-              aria-label="Restablecer"
-              type="button"
-              class="acc-btn"
-            >
-              A
-            </button>
-            <button
-              (click)="increaseText()"
-              aria-label="Aumentar"
-              type="button"
-              class="acc-btn"
-            >
-              A+
-            </button>
-          </div>
-        </div>
-
-        <div class="acc-row">
-          <span class="acc-label">Alto contraste</span>
-          <button
-            (click)="toggleHighContrast()"
-            [class.active]="isHighContrast"
-            [attr.aria-pressed]="isHighContrast"
-            type="button"
-            class="acc-btn acc-btn--toggle"
-          >
-            {{ isHighContrast ? "Desactivar" : "Activar" }}
-          </button>
-        </div>
-
-        <div class="acc-row">
-          <span class="acc-label">Reducir animaciones</span>
-          <button
-            (click)="toggleReducedMotion()"
-            [class.active]="isReducedMotion"
-            [attr.aria-pressed]="isReducedMotion"
-            type="button"
-            class="acc-btn acc-btn--toggle"
-          >
-            {{ isReducedMotion ? "Desactivar" : "Activar" }}
-          </button>
-        </div>
+  <!-- ── Sugerencias ── -->
+  <section class="rb-section" aria-label="Sugerencias de usuarios">
+    <div class="rb-section-header">
+      <div class="rb-title">
+        <mat-icon>group_add</mat-icon>
+        Sugerencias
       </div>
     </div>
+
+    <div *ngIf="loadingSugerencias" class="rb-loading">
+      <mat-icon class="rb-spin">autorenew</mat-icon>
+      <span>Cargando...</span>
+    </div>
+
+    <div class="sug-list" *ngIf="!loadingSugerencias">
+      <div
+        class="sug-item"
+        *ngFor="let usuario of sugerencias"
+        (click)="verPerfil(usuario)"
+      >
+        <img
+          [src]="obtenerFoto(usuario.foto_perfil)"
+          class="sug-avatar"
+          alt="avatar"
+          (error)="$event.target.src = 'assets/img/default-avatar.png'"
+        />
+        <div class="sug-info">
+          <span class="sug-name">{{ usuario.nombre }} {{ usuario.apellido }}</span>
+          <span class="sug-distrito" *ngIf="usuario.distrito">{{ usuario.distrito }}</span>
+        </div>
+        <button
+          class="sug-btn"
+          [class.siguiendo]="getEstado(usuario)?.estaSiguiendo"
+          [class.pendiente]="getEstado(usuario)?.solicitudEnviada"
+          [disabled]="estaCargando(usuario)"
+          (click)="$event.stopPropagation(); toggleSeguir(usuario)"
+          type="button"
+        >
+          <span *ngIf="estaCargando(usuario)">...</span>
+          <span *ngIf="!estaCargando(usuario)">
+            {{ getEstado(usuario)?.estaSiguiendo ? 'Siguiendo' : getEstado(usuario)?.solicitudEnviada ? 'Pendiente' : 'Seguir' }}
+          </span>
+        </button>
+      </div>
+      <div class="sug-empty" *ngIf="sugerencias.length === 0 && !loadingSugerencias">
+        No hay sugerencias
+      </div>
+    </div>
+
+    <button
+      class="rb-ver-todos"
+      [routerLink]="['/public/suggestions']"
+      type="button"
+      *ngIf="sugerencias.length > 0"
+    >
+      Ver más
+    </button>
   </section>
 </div>

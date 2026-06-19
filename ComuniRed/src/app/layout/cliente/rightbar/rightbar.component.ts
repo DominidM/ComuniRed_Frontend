@@ -7,7 +7,8 @@ import {
   Conversacion,
   Mensaje,
 } from '../../../services/conversacion.service';
-import { UsuarioService } from '../../../services/usuario.service';
+import { UsuarioService, Usuario } from '../../../services/usuario.service';
+import { SeguimientoService, EstadoSeguimiento } from '../../../services/seguimiento.service';
 import { Subscription, forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
@@ -36,28 +37,11 @@ export class RightbarComponent implements OnInit, OnDestroy {
   mensajes: ChatPreview[] = [];
   loadingMensajes = true;
 
-  trends = [
-    {
-      tag: 'VíasEnMalEstado',
-      count: 45,
-      desc: 'Múltiples reportes sobre huecos',
-    },
-    {
-      tag: 'AlumbradoPúblico',
-      count: 23,
-      desc: 'Postes dañados en varios sectores',
-    },
-    { tag: 'AguaPotable', count: 18, desc: 'Cortes reportados en la zona' },
-  ];
+  sugerencias: Usuario[] = [];
+  estadosSeguimiento: Map<string, EstadoSeguimiento> = new Map();
+  cargandoSeguimiento: Set<string> = new Set();
+  loadingSugerencias = false;
 
-  stats = { today: 247, solvedPercent: 89 };
-
-  accessibilityOpen = false;
-  textScale = 1;
-  isHighContrast = false;
-  isReducedMotion = false;
-
-  private onKey = this.handleKeyDown.bind(this);
   private currentUserId = '';
   private mensajeSub?: Subscription;
 
@@ -74,22 +58,20 @@ export class RightbarComponent implements OnInit, OnDestroy {
     private router: Router,
     private conversacionService: ConversacionService,
     private usuarioService: UsuarioService,
+    private seguimientoService: SeguimientoService,
   ) {}
 
   ngOnInit(): void {
-    this.loadAccesibilidad();
-    document.addEventListener('keydown', this.onKey, true);
-
     const u = this.usuarioService.getUser() as any;
     if (u) {
       this.currentUserId = u.id || u._id;
       this.loadConversaciones();
       this.iniciarSuscripcionMensajes();
+      this.cargarSugerencias();
     }
   }
 
   ngOnDestroy(): void {
-    document.removeEventListener('keydown', this.onKey, true);
     this.mensajeSub?.unsubscribe();
   }
 
@@ -223,67 +205,80 @@ export class RightbarComponent implements OnInit, OnDestroy {
     this.router.navigate(['/public/messages/new']);
   }
 
-  // ── Accesibilidad ─────────────────────────────────────────────
-  private loadAccesibilidad(): void {
-    const savedScale = parseFloat(localStorage.getItem('acc-textScale') || '1');
-    this.textScale = isNaN(savedScale) ? 1 : savedScale;
-    this.isHighContrast = localStorage.getItem('acc-highContrast') === '1';
-    this.isReducedMotion = localStorage.getItem('acc-reducedMotion') === '1';
-
-    document.documentElement.style.fontSize = `${Math.round(this.textScale * 100)}%`;
-    if (this.isHighContrast)
-      document.documentElement.classList.add('high-contrast');
-    if (this.isReducedMotion)
-      document.documentElement.classList.add('reduced-motion');
+  // ── Sugerencias ──────────────────────────────────────────────
+  private cargarSugerencias(): void {
+    if (!this.currentUserId) return;
+    this.loadingSugerencias = true;
+    this.seguimientoService.obtenerUsuariosSugeridos(this.currentUserId, 0, 5).subscribe({
+      next: (page) => {
+        this.sugerencias = page.content || [];
+        this.sugerencias.forEach(u => this.cargarEstado(u));
+        this.loadingSugerencias = false;
+      },
+      error: () => { this.loadingSugerencias = false; },
+    });
   }
 
-  toggleAccessibility(): void {
-    this.accessibilityOpen = !this.accessibilityOpen;
+  private cargarEstado(usuario: Usuario): void {
+    if (!this.currentUserId || !usuario.id) return;
+    this.seguimientoService.obtenerEstadoSeguimiento(this.currentUserId, usuario.id).subscribe({
+      next: (estado) => {
+        this.estadosSeguimiento.set(usuario.id, estado);
+        this.estadosSeguimiento = new Map(this.estadosSeguimiento);
+      },
+    });
   }
 
-  increaseText(): void {
-    this.textScale = Math.min(1.6, +(this.textScale + 0.1).toFixed(2));
-    this.applyTextScale();
-  }
-  decreaseText(): void {
-    this.textScale = Math.max(0.8, +(this.textScale - 0.1).toFixed(2));
-    this.applyTextScale();
-  }
-  resetText(): void {
-    this.textScale = 1;
-    this.applyTextScale();
-    localStorage.removeItem('acc-textScale');
+  getEstado(usuario: Usuario): EstadoSeguimiento | undefined {
+    return this.estadosSeguimiento.get(usuario.id);
   }
 
-  toggleHighContrast(): void {
-    this.isHighContrast = !this.isHighContrast;
-    document.documentElement.classList.toggle(
-      'high-contrast',
-      this.isHighContrast,
-    );
-    this.isHighContrast
-      ? localStorage.setItem('acc-highContrast', '1')
-      : localStorage.removeItem('acc-highContrast');
+  estaCargando(usuario: Usuario): boolean {
+    return this.cargandoSeguimiento.has(usuario.id);
   }
 
-  toggleReducedMotion(): void {
-    this.isReducedMotion = !this.isReducedMotion;
-    document.documentElement.classList.toggle(
-      'reduced-motion',
-      this.isReducedMotion,
-    );
-    this.isReducedMotion
-      ? localStorage.setItem('acc-reducedMotion', '1')
-      : localStorage.removeItem('acc-reducedMotion');
+  toggleSeguir(usuario: Usuario): void {
+    if (!this.currentUserId || !usuario.id) return;
+    const estado = this.getEstado(usuario);
+    if (!estado) return;
+
+    this.cargandoSeguimiento.add(usuario.id);
+
+    if (estado.estaSiguiendo || estado.solicitudEnviada) {
+      this.seguimientoService.dejarDeSeguir(this.currentUserId, usuario.id).subscribe({
+        next: () => {
+          this.estadosSeguimiento.set(usuario.id, {
+            estaSiguiendo: false, teSigue: false,
+            seguimientoMutuo: false, solicitudPendiente: false,
+            solicitudEnviada: false,
+          });
+          this.estadosSeguimiento = new Map(this.estadosSeguimiento);
+          this.cargandoSeguimiento.delete(usuario.id);
+        },
+        error: () => this.cargandoSeguimiento.delete(usuario.id),
+      });
+    } else {
+      this.seguimientoService.enviarSolicitud(this.currentUserId, usuario.id).subscribe({
+        next: () => {
+          this.estadosSeguimiento.set(usuario.id, {
+            ...estado, estaSiguiendo: true, solicitudEnviada: false,
+          });
+          this.estadosSeguimiento = new Map(this.estadosSeguimiento);
+          this.cargandoSeguimiento.delete(usuario.id);
+        },
+        error: () => this.cargandoSeguimiento.delete(usuario.id),
+      });
+    }
   }
 
-  private applyTextScale(): void {
-    document.documentElement.style.fontSize = `${Math.round(this.textScale * 100)}%`;
-    localStorage.setItem('acc-textScale', String(this.textScale));
+  verPerfil(usuario: Usuario): void {
+    if (!usuario.id) return;
+    usuario.id === this.currentUserId
+      ? this.router.navigate(['/public/profile'])
+      : this.router.navigate(['/public/user-profile', usuario.id]);
   }
 
-  private handleKeyDown(e: KeyboardEvent): void {
-    if (this.accessibilityOpen && e.key === 'Escape')
-      this.accessibilityOpen = false;
+  obtenerFoto(foto?: string): string {
+    return this.usuarioService.obtenerFotoMiniatura(foto, 44);
   }
 }
