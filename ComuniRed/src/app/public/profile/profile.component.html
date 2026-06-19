@@ -86,14 +86,25 @@
           </div>
         </button>
 
-        <!-- Subir propio — deshabilitado hasta conectar BD -->
-        <button class="picker-item picker-upload" disabled title="Próximamente">
+        <!-- Subir video propio -->
+        <button
+          class="picker-item picker-upload"
+          [class.uploading]="uploadingBanner"
+          [disabled]="uploadingBanner"
+          (click)="bannerFileInput.click()"
+        >
           <div class="picker-upload-inner">
-            <i class="bi bi-cloud-upload"></i>
-            <span>Subir video</span>
-            <small>Próximamente</small>
+            <i class="bi" [class.bi-cloud-upload]="!uploadingBanner" [class.bi-arrow-repeat]="uploadingBanner"></i>
+            <span>{{ uploadingBanner ? 'Subiendo...' : 'Subir video' }}</span>
           </div>
         </button>
+        <input
+          #bannerFileInput
+          type="file"
+          accept="video/*"
+          hidden
+          (change)="onBannerVideoSelected($event)"
+        />
       </div>
     </div>
 

@@ -10,6 +10,11 @@ export interface Queja {
   lat?: number;
   lng?: number;
   imagen_url?: string;
+  imagenes_url?: string[];
+  musica_url?: string;
+  musica_track?: string;
+  musica_artista?: string;
+  musica_cover?: string;
   fecha_creacion: string;
   fecha_actualizacion?: string;
   nivel_riesgo?: string;
@@ -131,6 +136,11 @@ const OBTENER_QUEJAS_PAGINADAS = gql`
         lat
         lng
         imagen_url
+        imagenes_url
+        musica_url
+        musica_track
+        musica_artista
+        musica_cover
         fecha_creacion
         nivel_riesgo
         fecha_clasificacion
@@ -171,6 +181,17 @@ const OBTENER_QUEJAS_PAGINADAS = gql`
             report
           }
         }
+        comments {
+          id
+          texto
+          fecha_creacion
+          author {
+            id
+            nombre
+            apellido
+            foto_perfil
+          }
+        }
         commentsCount
         canVote
         userVote
@@ -193,6 +214,11 @@ const OBTENER_QUEJAS = gql`
       lat
       lng
       imagen_url
+      imagenes_url
+      musica_url
+      musica_track
+      musica_artista
+      musica_cover
       fecha_creacion
       nivel_riesgo
       fecha_clasificacion
@@ -228,6 +254,17 @@ const OBTENER_QUEJAS = gql`
           report
         }
       }
+      comments {
+        id
+        texto
+        fecha_creacion
+        author {
+          id
+          nombre
+          apellido
+          foto_perfil
+        }
+      }
       commentsCount
       canVote
       userVote
@@ -245,6 +282,11 @@ const OBTENER_QUEJA_POR_ID = gql`
       lat
       lng
       imagen_url
+      imagenes_url
+      musica_url
+      musica_track
+      musica_artista
+      musica_cover
       fecha_creacion
       fecha_actualizacion
       nivel_riesgo
@@ -275,6 +317,17 @@ const OBTENER_QUEJA_POR_ID = gql`
         total
         userReaction
       }
+      comments {
+        id
+        texto
+        fecha_creacion
+        author {
+          id
+          nombre
+          apellido
+          foto_perfil
+        }
+      }
       commentsCount
       canVote
       userVote
@@ -292,6 +345,11 @@ const QUEJAS_POR_USUARIO = gql`
       lat
       lng
       imagen_url
+      imagenes_url
+      musica_url
+      musica_track
+      musica_artista
+      musica_cover
       fecha_creacion
       fecha_actualizacion
       nivel_riesgo
@@ -333,6 +391,17 @@ const QUEJAS_POR_USUARIO = gql`
           report
         }
       }
+      comments {
+        id
+        texto
+        fecha_creacion
+        author {
+          id
+          nombre
+          apellido
+          foto_perfil
+        }
+      }
       commentsCount
       canVote
       userVote
@@ -350,6 +419,11 @@ const QUEJAS_APROBADAS = gql`
       lat
       lng
       imagen_url
+      imagenes_url
+      musica_url
+      musica_track
+      musica_artista
+      musica_cover
       fecha_creacion
       nivel_riesgo
       usuario {
@@ -430,6 +504,11 @@ const CREAR_QUEJA = gql`
     $ubicacion: String
     $lat: Float
     $lng: Float
+    $imagenes_url: [String]
+    $musica_url: String
+    $musica_track: String
+    $musica_artista: String
+    $musica_cover: String
     $usuarioId: ID!
   ) {
     crearQueja(
@@ -439,6 +518,11 @@ const CREAR_QUEJA = gql`
       ubicacion: $ubicacion
       lat: $lat
       lng: $lng
+      imagenes_url: $imagenes_url
+      musica_url: $musica_url
+      musica_track: $musica_track
+      musica_artista: $musica_artista
+      musica_cover: $musica_cover
       usuarioId: $usuarioId
     ) {
       id
@@ -448,6 +532,11 @@ const CREAR_QUEJA = gql`
       lat
       lng
       imagen_url
+      imagenes_url
+      musica_url
+      musica_track
+      musica_artista
+      musica_cover
       usuario {
         id
         nombre
@@ -511,6 +600,11 @@ const ACTUALIZAR_QUEJA = gql`
       descripcion
       ubicacion
       imagen_url
+      imagenes_url
+      musica_url
+      musica_track
+      musica_artista
+      musica_cover
       usuario {
         id
         nombre
@@ -635,6 +729,11 @@ const OBTENER_QUEJA_SOPORTE = gql`
       descripcion
       ubicacion
       imagen_url
+      imagenes_url
+      musica_url
+      musica_track
+      musica_artista
+      musica_cover
       fecha_creacion
       nivel_riesgo
       fecha_clasificacion
@@ -663,6 +762,11 @@ const OBTENER_QUEJAS_ADMIN_PAGINADAS = gql`
         titulo
         descripcion
         imagen_url
+        imagenes_url
+        musica_url
+        musica_track
+        musica_artista
+        musica_cover
         fecha_creacion
         usuario {
           id
@@ -816,42 +920,40 @@ export class QuejaService {
     categoriaId: string,
     usuarioId: string,
     ubicacion?: string,
-    imagen?: File,
+    imagenes?: File[],
     lat?: number,
     lng?: number,
+    musicaUrl?: string,
+    musicaTrack?: string,
+    musicaArtista?: string,
+    musicaCover?: string,
   ): Observable<Queja> {
     const buildVars = (): any => {
       const v: any = { titulo, descripcion, categoriaId, usuarioId };
       if (ubicacion) v.ubicacion = ubicacion;
       if (lat != null) v.lat = lat;
       if (lng != null) v.lng = lng;
+      if (musicaUrl) v.musica_url = musicaUrl;
+      if (musicaTrack) v.musica_track = musicaTrack;
+      if (musicaArtista) v.musica_artista = musicaArtista;
+      if (musicaCover) v.musica_cover = musicaCover;
       return v;
     };
 
-    if (imagen) {
+    if (imagenes && imagenes.length > 0) {
       return new Observable<Queja>((observer) => {
-        this.subirImagenCloudinary(imagen)
-          .then((imagenUrl) =>
-            this.apollo
-              .mutate<{ crearQueja: Queja }>({
-                mutation: CREAR_QUEJA,
-                variables: buildVars(),
-              })
-              .toPromise()
-              .then((result) => {
-                const queja = result?.data?.crearQueja;
-                if (!queja) throw new Error('No se pudo crear la queja');
-                return this.apollo
-                  .mutate<{ actualizarQueja: Queja }>({
-                    mutation: ACTUALIZAR_QUEJA,
-                    variables: { id: queja.id, imagen_url: imagenUrl },
-                  })
-                  .toPromise();
-              })
-          )
+        Promise.all(imagenes.map(f => this.subirImagenCloudinary(f)))
+          .then((imagenesUrl) => {
+            const vars = buildVars();
+            vars.imagenes_url = imagenesUrl;
+            return this.apollo.mutate<{ crearQueja: Queja }>({
+              mutation: CREAR_QUEJA,
+              variables: vars,
+            }).toPromise();
+          })
           .then((result) => {
-            const quejaFinal = result?.data?.actualizarQueja;
-            if (!quejaFinal) throw new Error('No se pudo actualizar la imagen');
+            const quejaFinal = result?.data?.crearQueja;
+            if (!quejaFinal) throw new Error('No se pudo crear la queja');
             observer.next(quejaFinal);
             observer.complete();
           })

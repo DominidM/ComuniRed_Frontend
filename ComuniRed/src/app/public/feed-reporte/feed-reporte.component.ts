@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,7 +14,7 @@ import { UsuarioService } from '../../services/usuario.service';
   templateUrl: './feed-reporte.component.html',
   styleUrls: ['./feed-reporte.component.css']
 })
-export class FeedReporteComponent implements OnInit {
+export class FeedReporteComponent implements OnInit, OnDestroy {
   quejaId: string = '';
   queja: Queja | null = null;
   loading = false;
@@ -37,6 +37,10 @@ export class FeedReporteComponent implements OnInit {
 
   showEditModal = false;
   editingQueja: Queja | null = null;
+
+  imagenIndex = 0;
+  audioMusica: HTMLAudioElement | null = null;
+  musicaSonando = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -569,12 +573,55 @@ export class FeedReporteComponent implements OnInit {
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
   }
 
-  getImageUrl(): string {
-    return this.queja?.imagen_url || this.queja?.evidence?.[0]?.url || '';
+  getImagenes(): string[] {
+    if (this.queja?.imagenes_url && this.queja.imagenes_url.length > 0) {
+      return this.queja.imagenes_url;
+    }
+    if (this.queja?.imagen_url) return [this.queja.imagen_url];
+    if (this.queja?.evidence && this.queja.evidence.length > 0) {
+      return this.queja.evidence.map(e => e.url);
+    }
+    return [];
   }
 
   hasImage(): boolean {
-    return !!(this.queja?.imagen_url || (this.queja?.evidence && this.queja.evidence.length > 0));
+    return this.getImagenes().length > 0;
+  }
+
+  getImagenActual(): string {
+    const imgs = this.getImagenes();
+    return imgs[this.imagenIndex] || '';
+  }
+
+  siguienteImagen(): void {
+    const imgs = this.getImagenes();
+    if (this.imagenIndex < imgs.length - 1) this.imagenIndex++;
+  }
+
+  anteriorImagen(): void {
+    if (this.imagenIndex > 0) this.imagenIndex--;
+  }
+
+  tieneMusica(): boolean {
+    return !!this.queja?.musica_url;
+  }
+
+  toggleMusica(): void {
+    if (!this.queja?.musica_url) return;
+    if (this.musicaSonando) {
+      this.detenerMusica();
+    } else if (this.audioMusica) {
+      this.audioMusica.play().then(() => this.musicaSonando = true).catch(() => {});
+    } else {
+      this.audioMusica = new Audio(this.queja.musica_url);
+      this.audioMusica.addEventListener('ended', () => { this.musicaSonando = false; });
+      this.audioMusica.play().then(() => this.musicaSonando = true).catch(() => {});
+    }
+  }
+
+  detenerMusica(): void {
+    if (this.audioMusica) { this.audioMusica.pause(); this.audioMusica = null; }
+    this.musicaSonando = false;
   }
 
   getEstadoClass(estado: string): string {
@@ -595,5 +642,9 @@ export class FeedReporteComponent implements OnInit {
 
   trackByComment(index: number, comment: any): string {
     return comment.id;
+  }
+
+  ngOnDestroy(): void {
+    this.detenerMusica();
   }
 }

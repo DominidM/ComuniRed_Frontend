@@ -4,6 +4,8 @@
   <div class="profile-header">
 
     <div class="header-background">
+      <video *ngIf="usuario?.video_banner" [src]="usuario?.video_banner"
+             class="header-bg-video" autoplay muted loop playsinline></video>
       <div class="header-bg-gradient"></div>
       <div class="banner-overlay"></div>
 

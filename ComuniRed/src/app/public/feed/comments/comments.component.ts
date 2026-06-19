@@ -10,7 +10,7 @@ import { Queja, Usuario } from '../../../services/queja.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './comments.component.html',
-  styleUrls: ['./comments.component.css']
+  styleUrls: ['./comments.component.scss']
 })
 export class CommentsComponent implements OnChanges {
   @Input() post!: Queja;
@@ -44,16 +44,16 @@ export class CommentsComponent implements OnChanges {
     this.localText = '';
   }
 
-  getPreviewComments(): any[] {
-    return (this.post.comments || []).slice(0, 3);
-  }
-
-  hasMoreComments(): boolean {
-    return (this.post.comments || []).length > 3;
+  getComments(): any[] {
+    return this.post.comments || [];
   }
 
   getCommentsCount(): number {
-    return this.post.commentsCount || (this.post.comments || []).length;
+    return this.post.commentsCount || this.getComments().length;
+  }
+
+  trackById(_: number, item: any): string {
+    return item.id;
   }
 
   canEditComment(c: any): boolean {

@@ -34,8 +34,11 @@
         [group]="currentGroup"
         [currentUserId]="currentUserId"
         [pageMode]="true"
+        [hasNext]="nextGroups.length > 0"
+        [hasPrev]="prevGroups.length > 0"
         (close)="onViewerClose()"
-        (storyDeleted)="onStoryDeleted($event)">
+        (storyDeleted)="onStoryDeleted($event)"
+        (navigateToUser)="onNavigateToUser($event)">
       </app-ver-historia>
     </div>
 

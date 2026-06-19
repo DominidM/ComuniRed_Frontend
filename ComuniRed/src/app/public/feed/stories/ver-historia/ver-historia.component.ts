@@ -5,6 +5,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HistoriaService, Story } from '../../../../services/historia.service';
+import { StoryInteractionService, ViewerInfo } from '../../../../services/story-interaction.service';
 
 export interface UserStoryGroup {
   userId: string;
@@ -26,8 +27,11 @@ export class VerHistoriaComponent implements OnInit, OnDestroy {
   @Input() group: UserStoryGroup | null = null;
   @Input() currentUserId: string | null = null;
   @Input() pageMode = false;
+  @Input() hasNext = false;
+  @Input() hasPrev = false;
   @Output() close = new EventEmitter<void>();
   @Output() storyDeleted = new EventEmitter<string>();
+  @Output() navigateToUser = new EventEmitter<'prev' | 'next'>();
 
   @ViewChild('videoPlayer') videoPlayer!: ElementRef<HTMLVideoElement>;
 
@@ -47,6 +51,12 @@ export class VerHistoriaComponent implements OnInit, OnDestroy {
 
   // Heart / like
   leGusta = false;
+  totalLikes = 0;
+
+  // Viewers panel
+  panelAbierto = false;
+  viewers: ViewerInfo[] = [];
+  cargandoViewers = false;
 
   private intervaloProgreso: any;
   private timeoutHold: any;
@@ -55,6 +65,7 @@ export class VerHistoriaComponent implements OnInit, OnDestroy {
   constructor(
     private cdr: ChangeDetectorRef,
     private historiaService: HistoriaService,
+    private storyInteraction: StoryInteractionService,
   ) {}
 
   ngOnInit(): void {
@@ -100,6 +111,8 @@ export class VerHistoriaComponent implements OnInit, OnDestroy {
       this.limpiarMusica();
       this.iniciarProgreso();
       this.iniciarMusicaAuto();
+    } else if (this.hasNext) {
+      this.navigateToUser.emit('next');
     } else {
       this.cerrar();
     }
@@ -114,6 +127,8 @@ export class VerHistoriaComponent implements OnInit, OnDestroy {
       this.limpiarMusica();
       this.iniciarProgreso();
       this.iniciarMusicaAuto();
+    } else if (this.hasPrev) {
+      this.navigateToUser.emit('prev');
     }
   }
 
@@ -353,13 +368,29 @@ export class VerHistoriaComponent implements OnInit, OnDestroy {
 
   /* ─── RESPUESTA ─── */
   enviarRespuesta(): void {
-    if (!this.textoRespuesta.trim()) return;
-    this.textoRespuesta = '';
+    if (!this.textoRespuesta.trim() || !this.historiaActual || !this.currentUserId) return;
+    this.storyInteraction.enviarRespuesta(
+      this.historiaActual.id, this.currentUserId, this.textoRespuesta.trim()
+    ).subscribe({
+      next: () => {
+        this.textoRespuesta = '';
+        this.cdr.detectChanges();
+      },
+      error: () => {},
+    });
   }
 
   /* ─── LIKE / SHARE ─── */
   toggleLike(): void {
-    this.leGusta = !this.leGusta;
+    if (!this.historiaActual || !this.currentUserId) return;
+    this.storyInteraction.toggleLike(this.historiaActual.id, this.currentUserId).subscribe({
+      next: (res) => {
+        this.leGusta = res.leGusta;
+        this.totalLikes = res.totalLikes;
+        this.cdr.detectChanges();
+      },
+      error: () => {},
+    });
   }
 
   compartir(): void {
@@ -370,6 +401,33 @@ export class VerHistoriaComponent implements OnInit, OnDestroy {
         url: window.location.href,
       }).catch(() => {});
     }
+  }
+
+  /* ─── VIEWERS PANEL ─── */
+  get totalVistas(): number {
+    return this.group?.stories[this.indiceActual]?.seen
+      ? Math.max(this.viewers.length, 1) : this.viewers.length;
+  }
+
+  abrirPanelViewers(): void {
+    if (!this.historiaActual) return;
+    this.panelAbierto = true;
+    this.cargandoViewers = true;
+    this.storyInteraction.obtenerViewers(this.historiaActual.id).subscribe({
+      next: (v) => {
+        this.viewers = v;
+        this.cargandoViewers = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.cargandoViewers = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  cerrarPanelViewers(): void {
+    this.panelAbierto = false;
   }
 
   /* ─── CIERRE ─── */

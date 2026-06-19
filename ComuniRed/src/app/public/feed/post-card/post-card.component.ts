@@ -1,5 +1,5 @@
 import {
-  Component, Input, Output, EventEmitter, HostListener
+  Component, Input, Output, EventEmitter, HostListener, OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +14,7 @@ import { MapComponent } from '../../../shared/map/map.component';
   templateUrl: './post-card.component.html',
   styleUrls: ['./post-card.component.css']
 })
-export class PostCardComponent {
+export class PostCardComponent implements OnDestroy {
   @Input() post!: Queja;
   @Input() currentUser: { id?: string; name: string; avatarUrl: string } | null = null;
   @Input() editingCommentId: string | null = null;
@@ -42,6 +42,10 @@ export class PostCardComponent {
 
   showReactionMenu = false;
   hideTimeout: any = null;
+
+  imagenIndex = 0;
+  audioPlayer: HTMLAudioElement | null = null;
+  musicaSonando = false;
 
   reactions = [
     { type: 'like',    icon: 'pi pi-heart',     label: 'Me gusta' },
@@ -83,6 +87,59 @@ export class PostCardComponent {
 
   hasLocation(): boolean { return !!this.post.ubicacion; }
   hasEvidence(): boolean { return (this.post.evidence?.length ?? 0) > 0; }
+
+  getImagenes(): string[] {
+    if (this.post.imagenes_url && this.post.imagenes_url.length > 0) {
+      return this.post.imagenes_url;
+    }
+    if (this.post.imagen_url) return [this.post.imagen_url];
+    if (this.post.evidence && this.post.evidence.length > 0) {
+      return this.post.evidence.map(e => e.url);
+    }
+    return [];
+  }
+
+  getImagenActual(): string {
+    const imgs = this.getImagenes();
+    return imgs[this.imagenIndex] || '';
+  }
+
+  getTotalImagenes(): number {
+    return this.getImagenes().length;
+  }
+
+  siguienteImagen(event: Event): void {
+    event.stopPropagation();
+    if (this.imagenIndex < this.getTotalImagenes() - 1) this.imagenIndex++;
+  }
+
+  anteriorImagen(event: Event): void {
+    event.stopPropagation();
+    if (this.imagenIndex > 0) this.imagenIndex--;
+  }
+
+  tieneMusica(): boolean {
+    return !!this.post.musica_url;
+  }
+
+  toggleMusica(event: Event): void {
+    event.stopPropagation();
+    if (!this.post.musica_url) return;
+    if (this.musicaSonando) {
+      this.detenerMusica();
+    } else if (this.audioPlayer) {
+      this.audioPlayer.play().then(() => this.musicaSonando = true).catch(() => {});
+    } else {
+      this.audioPlayer = new Audio(this.post.musica_url);
+      this.audioPlayer.addEventListener('ended', () => { this.musicaSonando = false; });
+      this.audioPlayer.play().then(() => this.musicaSonando = true).catch(() => {});
+    }
+  }
+
+  detenerMusica(): void {
+    if (this.audioPlayer) { this.audioPlayer.pause(); this.audioPlayer = null; }
+    this.musicaSonando = false;
+  }
 
   getFirstEvidenceUrl(): string {
     return this.post.evidence?.[0]?.url || this.post.imagen_url || '';
@@ -172,5 +229,9 @@ export class PostCardComponent {
     if (h < 24) return `hace ${h} horas`;
     if (h < 48) return 'hace 1 día';
     return `hace ${Math.floor(h / 24)} días`;
+  }
+
+  ngOnDestroy(): void {
+    this.detenerMusica();
   }
 }

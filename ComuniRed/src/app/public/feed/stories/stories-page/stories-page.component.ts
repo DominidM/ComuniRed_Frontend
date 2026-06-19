@@ -30,8 +30,10 @@ export class StoriesPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    const username = decodeURIComponent(this.route.snapshot.paramMap.get('username') || '');
-    this.cargarHistorias(username);
+    this.route.paramMap.subscribe(params => {
+      const username = params.get('username') || '';
+      this.cargarHistorias(username);
+    });
   }
 
   ngOnDestroy(): void {}
@@ -56,6 +58,7 @@ export class StoriesPageComponent implements OnInit, OnDestroy {
     const currentId = storedUser?.id || storedUser?._id;
     this.currentUserId = currentId || null;
     this.currentUserAvatar = storedUser?.foto_perfil || 'assets/img/default-avatar.png';
+    this.error = '';
 
     if (!currentId) {
       this.error = 'Usuario no autenticado';
@@ -123,7 +126,7 @@ export class StoriesPageComponent implements OnInit, OnDestroy {
         userName: first.userName,
         userAvatar: first.userAvatar,
         stories: userStories.sort(
-          (a, b) => new Date(b.timeAgo).getTime() - new Date(a.timeAgo).getTime(),
+          (a, b) => new Date(a.timeAgo).getTime() - new Date(b.timeAgo).getTime(),
         ),
         allSeen: userStories.every((s) => s.seen),
         latestTime: userStories
@@ -149,7 +152,7 @@ export class StoriesPageComponent implements OnInit, OnDestroy {
   }
 
   goToUser(group: UserStoryGroup): void {
-    this.router.navigate(['/stories', encodeURIComponent(group.userName)]);
+    this.router.navigate(['/stories', group.userName]);
   }
 
   close(): void {
@@ -158,6 +161,13 @@ export class StoriesPageComponent implements OnInit, OnDestroy {
 
   onViewerClose(): void {
     this.close();
+  }
+
+  onNavigateToUser(dir: 'prev' | 'next'): void {
+    const groups = dir === 'next' ? this.nextGroups : this.prevGroups;
+    if (groups.length > 0) {
+      this.goToUser(groups[0]);
+    }
   }
 
   onStoryDeleted(userId: string): void {

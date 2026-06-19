@@ -98,7 +98,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
       const first = userStories[0];
       groups.push({
         userId, userName: first.userName, userAvatar: first.userAvatar,
-        stories: userStories.sort((a, b) => new Date(b.timeAgo).getTime() - new Date(a.timeAgo).getTime()),
+        stories: userStories.sort((a, b) => new Date(a.timeAgo).getTime() - new Date(b.timeAgo).getTime()),
         allSeen: userStories.every((s) => s.seen),
         latestTime: userStories.reduce((latest, s) => {
           const t = new Date(s.timeAgo).getTime();
@@ -154,7 +154,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
   }
 
   openStory(group: UserStoryGroup): void {
-    this.router.navigate(['/stories', encodeURIComponent(group.userName)]);
+    this.router.navigate(['/stories', group.userName]);
   }
 
   trackByGroupId(_index: number, group: UserStoryGroup): string {

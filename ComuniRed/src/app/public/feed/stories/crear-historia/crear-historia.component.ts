@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { HistoriaService } from '../../../../services/historia.service';
-import { MusicaService, MusicTrack } from '../../../../services/musica.service';
+import { MusicaService, MusicTrackResponse as MusicTrack } from '../../../../services/musica.service';
 import { Story } from '../../../../services/historia.service';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -48,7 +48,7 @@ export class CrearHistoriaComponent implements OnInit, OnDestroy {
   muted = false;
 
   readonly opcionesColor = [
-    'linear-gradient(135deg, #c0392b, #e74c3c)',
+    'linear-gradient(135deg, #000000, #000000)',
     'linear-gradient(135deg, #f39c12, #e67e22)',
     'linear-gradient(135deg, #2980b9, #3498db)',
     'linear-gradient(135deg, #27ae60, #2ecc71)',
@@ -74,6 +74,12 @@ export class CrearHistoriaComponent implements OnInit, OnDestroy {
   private audioMusica: HTMLAudioElement | null = null;
   private timeoutBusqueda: any;
   private suscripcionPublicar?: Subscription;
+
+  // Preview in search results
+  previewReproduciendo: MusicTrack | null = null;
+  previewProgreso = 0;
+  previewMuted = false;
+  private previewAudio: HTMLAudioElement | null = null;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -265,7 +271,59 @@ export class CrearHistoriaComponent implements OnInit, OnDestroy {
     }, 400);
   }
 
+  /* ─── PREVIEW EN BÚSQUEDA ─── */
+  togglePreview(track: MusicTrack, event: Event): void {
+    event.stopPropagation();
+    if (!track.previewUrl) return;
+
+    if (this.previewReproduciendo?.id === track.id && this.previewAudio) {
+      if (!this.previewAudio.paused) {
+        this.previewAudio.pause();
+        this.previewReproduciendo = null;
+      }
+      return;
+    }
+
+    this.detenerPreview();
+    this.previewReproduciendo = track;
+    this.previewAudio = new Audio(track.previewUrl);
+    this.previewAudio.volume = this.previewMuted ? 0 : 0.7;
+
+    this.previewAudio.addEventListener('timeupdate', () => {
+      if (this.previewAudio) {
+        this.previewProgreso = (this.previewAudio.currentTime / this.previewAudio.duration) * 100;
+      }
+    });
+
+    this.previewAudio.addEventListener('ended', () => {
+      this.previewProgreso = 0;
+      this.previewReproduciendo = null;
+      this.previewAudio = null;
+      this.cdr.detectChanges();
+    });
+
+    this.previewAudio.play().catch(() => {});
+  }
+
+  detenerPreview(): void {
+    if (this.previewAudio) {
+      this.previewAudio.pause();
+      this.previewAudio = null;
+    }
+    this.previewReproduciendo = null;
+    this.previewProgreso = 0;
+  }
+
+  toggleMutePreview(event: Event): void {
+    event.stopPropagation();
+    this.previewMuted = !this.previewMuted;
+    if (this.previewAudio) {
+      this.previewAudio.volume = this.previewMuted ? 0 : 0.7;
+    }
+  }
+
   seleccionarPista(track: MusicTrack): void {
+    this.detenerPreview();
     this.pistaSeleccionada = track;
     this.mostrarBusquedaMusica = false;
     this.consultaMusica = ''; this.resultadosMusica = [];
@@ -273,6 +331,7 @@ export class CrearHistoriaComponent implements OnInit, OnDestroy {
   }
 
   eliminarPista(): void {
+    this.detenerPreview();
     this.detenerMusica();
     this.pistaSeleccionada = null;
   }
@@ -308,6 +367,7 @@ export class CrearHistoriaComponent implements OnInit, OnDestroy {
 
   private limpiarMusica(): void {
     if (this.timeoutBusqueda) clearTimeout(this.timeoutBusqueda);
+    this.detenerPreview();
     this.detenerMusica();
   }
 

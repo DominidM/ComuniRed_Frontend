@@ -509,6 +509,92 @@
 }
 .ch-musica-item-play { font-size: 18px; color: var(--ch-primary); flex-shrink: 0; }
 
+/* Preview controls inside music item */
+.ch-musica-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.ch-music-preview-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ch-border);
+  color: var(--ch-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.ch-music-preview-btn:hover:not(:disabled) {
+  background: var(--ch-primary);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.ch-music-preview-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.ch-music-preview-btn.is-playing {
+  background: var(--ch-primary);
+  color: #fff;
+}
+
+.ch-music-preview-progress {
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.ch-music-progress-track {
+  width: 100%;
+  height: 3px;
+  background: var(--ch-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ch-music-progress-fill {
+  height: 100%;
+  background: var(--ch-primary);
+  border-radius: 4px;
+  transition: width 0.15s linear;
+}
+
+.ch-music-mute-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--ch-text-sec);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.ch-music-mute-btn:hover {
+  background: var(--ch-border);
+  color: var(--ch-text);
+}
+
+.ch-musica-item--selected {
+  background: rgba(0, 149, 246, 0.06);
+  border-radius: 8px;
+}
+
 /* ════════════════════════════════════════════
    BUTTON ICON (reusable in search overlay)
    ════════════════════════════════════════════ */

@@ -105,23 +105,90 @@
   <!-- ─── FOOTER ─── -->
   <div class="vh-footer">
     <div class="vh-footer-row">
-      <!-- Left: reply input with dynamic placeholder -->
-      <div class="vh-reply-wrap">
+      <!-- Left: eye icon + view count (solo visible al creador) -->
+      <button *ngIf="esPropia" class="vh-footer-btn vh-viewers-btn" (click)="abrirPanelViewers()" title="Ver visualizaciones">
+        <i class="bi bi-eye"></i>
+        <span class="vh-viewers-count">{{ totalVistas }}</span>
+      </button>
+
+      <!-- Center: reply input (solo visible al público externo) -->
+      <div *ngIf="!esPropia" class="vh-reply-wrap">
         <input type="text" [(ngModel)]="textoRespuesta"
                [placeholder]="placeholderRespuesta"
                class="vh-reply-input"
                (keyup.enter)="enviarRespuesta()" />
       </div>
 
-      <!-- Right: heart + share outline -->
+      <!-- Right: heart (solo público) + share -->
       <div class="vh-footer-actions">
-        <button class="vh-footer-btn" (click)="toggleLike()" [title]="leGusta ? 'Quitar like' : 'Dar like'">
+        <button *ngIf="!esPropia" class="vh-footer-btn" (click)="toggleLike()" [title]="leGusta ? 'Quitar like' : 'Dar like'">
           <i [class]="leGusta ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
         </button>
         <button class="vh-footer-btn" (click)="compartir()" title="Compartir">
           <i class="bi bi-send"></i>
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ─── VIEWERS BOTTOM-SHEET ─── -->
+  <div *ngIf="panelAbierto" class="vh-panel-overlay" (click)="cerrarPanelViewers()">
+    <div class="vh-panel" (click)="$event.stopPropagation()">
+      <div class="vh-panel-handle"></div>
+
+      <div class="vh-panel-header">
+        <div class="vh-panel-story-preview">
+          <img *ngIf="historiaActual?.imageUrl" [src]="historiaActual?.imageUrl" class="vh-panel-thumb" />
+          <video *ngIf="historiaActual?.videoUrl" [src]="historiaActual?.videoUrl" class="vh-panel-thumb" muted></video>
+          <div *ngIf="historiaActual?.text && !historiaActual?.imageUrl && !historiaActual?.videoUrl"
+               class="vh-panel-thumb vh-panel-thumb-text"
+               [style.background]="historiaActual?.bgColor || '#1a1a2e'">
+            <span>{{ historiaActual?.text }}</span>
+          </div>
+        </div>
+        <div class="vh-panel-meta">
+          <span class="vh-panel-username">{{ group?.userName }}</span>
+          <span class="vh-panel-time">{{ formatTime(historiaActual?.timeAgo || '') }}</span>
+        </div>
+      </div>
+
+      <div class="vh-panel-actions">
+        <button *ngIf="!esPropia" class="vh-panel-action-btn" (click)="toggleLike(); $event.stopPropagation()">
+          <i [class]="leGusta ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+          <span>{{ leGusta ? 'Me gusta' : 'Like' }}</span>
+        </button>
+        <button class="vh-panel-action-btn" (click)="compartir()">
+          <i class="bi bi-box-arrow-up"></i>
+          <span>Compartir</span>
+        </button>
+        <button class="vh-panel-action-btn" (click)="cerrarPanelViewers()">
+          <i class="bi bi-download"></i>
+          <span>Guardar</span>
+        </button>
+        <button *ngIf="esPropia" class="vh-panel-action-btn vh-panel-action-danger" (click)="confirmarEliminar(); cerrarPanelViewers()">
+          <i class="bi bi-trash3"></i>
+          <span>Eliminar</span>
+        </button>
+      </div>
+
+      <div class="vh-panel-divider"></div>
+
+      <div class="vh-panel-list-header">
+        <span>Visualizaciones</span>
+      </div>
+
+      <div class="vh-panel-list" *ngIf="!cargandoViewers; else loadingViewers">
+        <div *ngFor="let v of viewers" class="vh-panel-item">
+          <img [src]="v.userAvatar || 'assets/img/default-avatar.png'" class="vh-panel-item-avatar" />
+          <span class="vh-panel-item-name">{{ v.userName }}</span>
+          <i *ngIf="v.leGusta" class="bi bi-heart-fill vh-panel-item-heart"></i>
+        </div>
+        <div *ngIf="viewers.length === 0" class="vh-panel-empty">Sin visualizaciones</div>
+      </div>
+
+      <ng-template #loadingViewers>
+        <div class="vh-panel-loading">Cargando...</div>
+      </ng-template>
     </div>
   </div>
 

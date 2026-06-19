@@ -6,6 +6,15 @@ import { UsuarioService, UsuarioInput } from '../../services/usuario.service';
 import { SEXOS, DISTRITOS_LIMA } from '../../shared/data/catalogo.data';
 import { ChangeComponent, Alert } from '../../shared/components/change/change.component';
 
+export interface ReniecResult {
+  encontrado: boolean;
+  yaRegistrado: boolean;
+  nombres?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+  mensaje?: string;
+}
+
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -37,6 +46,7 @@ export class RegisterComponent {
   errors: { [key: string]: string } = {};
   isLoading = false;
   alerts: Alert[] = [];
+  consultandoDni = false;
 
   constructor(
     private usuarioService: UsuarioService,
@@ -106,8 +116,41 @@ export class RegisterComponent {
 
     if (this.usuarioData.dni.length > 0 && this.usuarioData.dni.length < 8) {
       this.errors['dni'] = 'El DNI debe tener exactamente 8 dígitos';
+      delete this.errors['dni_valido'];
+    } else if (this.usuarioData.dni.length === 8) {
+      delete this.errors['dni'];
+      this.consultarDni();
     } else {
       delete this.errors['dni'];
+      delete this.errors['dni_valido'];
+    }
+  }
+
+  private async consultarDni() {
+    const dni = this.usuarioData.dni;
+    if (!dni || dni.length !== 8) return;
+
+    this.consultandoDni = true;
+    delete this.errors['dni_valido'];
+
+    try {
+      const res = await fetch(`/api/reniec/${dni}`);
+      const data: ReniecResult = await res.json();
+
+      if (data.yaRegistrado) {
+        this.errors['dni_valido'] = 'Este DNI ya está registrado';
+      } else if (data.encontrado && data.nombres) {
+        this.usuarioData.nombre = data.nombres;
+        this.usuarioData.apellido = `${data.apellidoPaterno || ''} ${data.apellidoMaterno || ''}`.trim();
+        this.validateNombre();
+        this.validateApellido();
+      } else {
+        this.pushAlert('warning', data.mensaje || 'DNI no encontrado. Puedes escribir tus datos manualmente.');
+      }
+    } catch {
+      this.pushAlert('warning', 'Error al consultar DNI. Puedes escribir tus datos manualmente.');
+    } finally {
+      this.consultandoDni = false;
     }
   }
 
@@ -223,8 +266,9 @@ export class RegisterComponent {
   }
 
   isFormValid(): boolean {
+    const blockingErrors = Object.keys(this.errors).filter(k => k !== 'dni_valido');
     return (
-      Object.keys(this.errors).length === 0 &&
+      blockingErrors.length === 0 &&
       this.trim(this.usuarioData.nombre) !== '' &&
       this.trim(this.usuarioData.apellido) !== '' &&
       this.trim(this.usuarioData.email) !== '' &&
