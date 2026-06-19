@@ -15,20 +15,11 @@
       <div class="create-avatar">
         <img [src]="user?.avatarUrl" class="user-avatar"/>
       </div>
-      <button class="create-input" (click)="showCreateModal = true">
+      <button class="create-input" (click)="openCreateModal()">
         ¿Qué problema de infraestructura quieres reportar?
       </button>
     </div>
   </div>
-
-  <!-- Modal crear reporte -->
-  <app-create-report
-    *ngIf="showCreateModal"
-    [user]="user"
-    [categorias]="categorias"
-    (created)="onReportCreated($event)"
-    (cancelled)="showCreateModal = false">
-  </app-create-report>
 
   <!-- Posts -->
   <ng-container *ngIf="posts.length > 0 || loadingMore; else emptyState">

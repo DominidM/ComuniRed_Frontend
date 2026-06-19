@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { HistoriaService, Story } from '../../../../services/historia.service';
 import { StoryInteractionService, ViewerInfo } from '../../../../services/story-interaction.service';
 
@@ -62,10 +63,13 @@ export class VerHistoriaComponent implements OnInit, OnDestroy {
   private timeoutHold: any;
   private sosteniendo = false;
 
+  showProfileMenu = false;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private historiaService: HistoriaService,
     private storyInteraction: StoryInteractionService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -428,6 +432,18 @@ export class VerHistoriaComponent implements OnInit, OnDestroy {
 
   cerrarPanelViewers(): void {
     this.panelAbierto = false;
+  }
+
+  /* ─── PERFIL ─── */
+  toggleProfileMenu(): void {
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  verPerfil(): void {
+    this.showProfileMenu = false;
+    if (this.group?.userId) {
+      this.router.navigate(['/public/user-profile', this.group.userId]);
+    }
   }
 
   /* ─── CIERRE ─── */

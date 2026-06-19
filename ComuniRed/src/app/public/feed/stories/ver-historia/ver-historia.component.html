@@ -30,11 +30,16 @@
   <!-- ─── HEADER ─── -->
   <div class="vh-header">
     <!-- Left: avatar + name + time -->
-    <div class="vh-user">
+    <div class="vh-user" (click)="toggleProfileMenu()" style="cursor:pointer;">
       <img [src]="group?.userAvatar" class="vh-avatar" />
       <div class="vh-user-info">
         <span class="vh-name">{{ group?.userName }}</span>
         <span class="vh-time">{{ formatTime(historiaActual?.timeAgo || '') }}</span>
+      </div>
+      <div class="vh-profile-menu" *ngIf="showProfileMenu" (click)="$event.stopPropagation()">
+        <button class="vh-profile-btn" (click)="verPerfil()">
+          <i class="bi bi-person"></i> Ver perfil
+        </button>
       </div>
     </div>
 

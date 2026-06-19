@@ -20,7 +20,8 @@ import {
 } from '../../services/historial-evento.service';
 import { StoriesComponent } from './stories/stories.component';
 import { PostCardComponent } from './post-card/post-card.component';
-import { CreateReportComponent } from './create-report/create-report.component';
+
+import { ModalStateService } from '../../shared/services/modal-state.service';
 import { CommentsComponent } from './comments/comments.component';
 import { HistorialComponent } from './historial/historial.component';
 
@@ -32,7 +33,7 @@ import { HistorialComponent } from './historial/historial.component';
     FormsModule,
     StoriesComponent,
     PostCardComponent,
-    CreateReportComponent,
+
     HistorialComponent,
   ],
   templateUrl: './feed.component.html',
@@ -51,7 +52,6 @@ export class FeedComponent implements OnInit, OnDestroy {
   editingCommentText = '';
 
   // Modales
-  showCreateModal = false;
   showCommentsModal = false;
   showHistorialModal = false;
   selectedReporteForComments: Queja | null = null;
@@ -85,6 +85,7 @@ export class FeedComponent implements OnInit, OnDestroy {
     private historialService: HistorialEventoService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private modalState: ModalStateService,
   ) {}
 
   @HostListener('document:click')
@@ -101,6 +102,14 @@ export class FeedComponent implements OnInit, OnDestroy {
       ) as HTMLElement;
       this.scrollContainer?.addEventListener('scroll', this.boundOnScroll);
     }, 0);
+    this.modalState.reportCreated$.subscribe((queja: any) => {
+      if (queja) {
+        this.posts = [queja, ...this.posts];
+      } else {
+        this.loadPosts(true);
+      }
+      this.toast('¡Reporte publicado!');
+    });
   }
 
   ngOnDestroy(): void {
@@ -447,14 +456,8 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
   // ── Crear reporte ─────────────────────────────────────────────
-  onReportCreated(queja?: Queja): void {
-    this.showCreateModal = false;
-    if (queja) {
-      this.posts = [queja, ...this.posts];
-    } else {
-      this.loadPosts(true);
-    }
-    this.toast('¡Reporte publicado!');
+  openCreateModal(): void {
+    this.modalState.openCreateReport({ user: this.user, categorias: this.categorias });
   }
 
   // ── Utils ─────────────────────────────────────────────────────

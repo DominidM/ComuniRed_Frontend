@@ -30,6 +30,14 @@
   (storyCreated)="onStoryCreated($event)">
 </app-crear-historia>
 
+<app-create-report
+  *ngIf="showCreateReport && createReportData"
+  [user]="createReportData.user"
+  [categorias]="createReportData.categorias"
+  (created)="onReportCreated($event)"
+  (cancelled)="closeCreateReportModal()">
+</app-create-report>
+
 <!-- ── FAB Mensajes ── -->
 <button class="chat-fab" (click)="toggleChatPanel()" type="button" aria-label="Mensajes">
   <mat-icon>chat_bubble</mat-icon>

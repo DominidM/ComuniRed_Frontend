@@ -482,7 +482,7 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   verPerfilUsuario(): void {
     if (this.usuarioChat) {
-      this.router.navigate(['/user-profile', this.usuarioChat.id]);
+      this.router.navigate(['/public/user-profile', this.usuarioChat.id]);
     }
   }
 

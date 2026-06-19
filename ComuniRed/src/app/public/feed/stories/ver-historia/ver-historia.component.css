@@ -64,8 +64,52 @@
   align-items: center;
   gap: 8px;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
   flex-shrink: 1;
+  position: relative;
+}
+
+.vh-profile-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: rgba(30,30,30,0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 100;
+  animation: vh-menuIn 0.12s ease;
+  min-width: 140px;
+}
+
+@keyframes vh-menuIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.vh-profile-btn {
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.12s;
+  white-space: nowrap;
+}
+
+.vh-profile-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.vh-profile-btn i {
+  font-size: 15px;
 }
 .vh-avatar {
   width: 32px; height: 32px; border-radius: 50%;
