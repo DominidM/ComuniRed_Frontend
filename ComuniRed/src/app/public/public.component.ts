@@ -16,7 +16,8 @@ import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { filter, Subscription } from 'rxjs';
-import { ModalStateService } from '../shared/services/modal-state.service';
+import { ModalStateService, CreateStoryUser } from '../shared/services/modal-state.service';
+import { CrearHistoriaComponent } from './feed/stories/crear-historia/crear-historia.component';
 
 @Component({
   selector: 'app-public',
@@ -31,6 +32,7 @@ import { ModalStateService } from '../shared/services/modal-state.service';
     MatSidenavModule,
     MatButtonModule,
     MatIconModule,
+    CrearHistoriaComponent,
   ],
   templateUrl: './public.component.html',
   styleUrls: ['./public.component.css'],
@@ -43,8 +45,12 @@ export class PublicComponent implements OnInit, AfterViewInit, OnDestroy {
   isMessagesRoute = false;
   modalActive = false;
 
+  showCreateStory = false;
+  createStoryUser: CreateStoryUser | null = null;
+
   private routerSub?: Subscription;
   private modalSub?: Subscription;
+  private createStorySub?: Subscription;
 
   constructor(
     private router: Router,
@@ -75,6 +81,11 @@ export class PublicComponent implements OnInit, AfterViewInit, OnDestroy {
         document.body.classList.remove('modal-open');
       }
     });
+
+    this.createStorySub = this.modalState.createStoryUser$.subscribe((user) => {
+      this.showCreateStory = !!user;
+      this.createStoryUser = user;
+    });
   }
 
   ngAfterViewInit() {
@@ -86,6 +97,7 @@ export class PublicComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.routerSub?.unsubscribe();
     this.modalSub?.unsubscribe();
+    this.createStorySub?.unsubscribe();
     document.body.classList.remove('modal-open');
   }
 
@@ -112,5 +124,14 @@ export class PublicComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get sidenavOpened(): boolean {
     return this.isDesktop;
+  }
+
+  closeCreateStoryModal(): void {
+    this.modalState.closeCreateStory();
+  }
+
+  onStoryCreated(story: any): void {
+    this.modalState.closeCreateStory();
+    this.modalState.emitStoryCreated(story);
   }
 }

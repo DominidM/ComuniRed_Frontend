@@ -109,8 +109,11 @@ app-rightbar {
 :host.modal-active app-navbar,
 :host.modal-active mat-sidenav-container {
   pointer-events: none !important;
-  filter: brightness(0.4);
   transition: filter 0.2s ease;
+}
+
+:host.modal-active mat-sidenav-container.sidenav-container {
+  z-index: 10000 !important;
 }
 
 :host.modal-active app-change {

@@ -21,3 +21,10 @@
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<app-crear-historia
+  *ngIf="showCreateStory"
+  [user]="createStoryUser"
+  (close)="closeCreateStoryModal()"
+  (storyCreated)="onStoryCreated($event)">
+</app-crear-historia>

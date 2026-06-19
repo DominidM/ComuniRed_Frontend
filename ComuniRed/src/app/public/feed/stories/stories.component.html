@@ -41,10 +41,3 @@
   </button>
 </div>
 
-<!-- Crear Historia (moddal) -->
-<app-crear-historia
-  *ngIf="showCreateModal"
-  [user]="user"
-  (close)="closeCreateModal()"
-  (storyCreated)="onStoryCreated($event)">
-</app-crear-historia>

@@ -4,17 +4,17 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { finalize, Subscription } from 'rxjs';
 import { HistoriaService, Story } from '../../../services/historia.service';
-import { CrearHistoriaComponent } from './crear-historia/crear-historia.component';
 import { UserStoryGroup } from './ver-historia/ver-historia.component';
+import { ModalStateService } from '../../../shared/services/modal-state.service';
 
 export type { Story };
 
 @Component({
   selector: 'app-stories',
   standalone: true,
-  imports: [CommonModule, CrearHistoriaComponent],
+  imports: [CommonModule],
   templateUrl: './stories.component.html',
   styleUrls: ['./stories.component.css'],
 })
@@ -31,20 +31,25 @@ export class StoriesComponent implements OnInit, OnDestroy {
   showLeftArrow = false;
   showRightArrow = true;
 
-  // Child component visibility
-  showCreateModal = false;
+  private storyCreatedSub?: Subscription;
 
   constructor(
     private cdr: ChangeDetectorRef,
     private historiaService: HistoriaService,
     private router: Router,
+    private modalState: ModalStateService,
   ) {}
 
   ngOnInit(): void {
     this.cargarHistorias();
+    this.storyCreatedSub = this.modalState.storyCreated$.subscribe((story) => {
+      this.onStoryCreated(story);
+    });
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.storyCreatedSub?.unsubscribe();
+  }
 
   get hasMyStory(): boolean {
     return this.myActiveStories !== null;
@@ -132,11 +137,8 @@ export class StoriesComponent implements OnInit, OnDestroy {
   }
 
   openCreateStory(): void {
-    this.showCreateModal = true;
-  }
-
-  closeCreateModal(): void {
-    this.showCreateModal = false;
+    if (!this.user) return;
+    this.modalState.openCreateStory(this.user);
   }
 
   onStoryCreated(story: Story): void {

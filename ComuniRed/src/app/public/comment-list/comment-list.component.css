@@ -1,47 +1,102 @@
-.comments-section {
-  background: #f8f9fb;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 10px;
+.ig-comments {
+  padding: 4px 0;
 }
-.comment {
+
+.ig-comment {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 8px;
+  gap: 10px;
+  padding: 6px 0;
 }
-.comment-avatar {
+
+.ig-comment-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #e0e9f7;
-  margin-right: 10px;
+  flex-shrink: 0;
+  object-fit: cover;
+  background: #efefef;
 }
-.comment-author {
-  font-weight: bold;
-  margin-right: 8px;
+
+.ig-comment-body {
+  flex: 1;
+  min-width: 0;
 }
-.comment-date {
-  color: #999;
-  font-size: 0.87em;
+
+.ig-comment-author {
+  font-weight: 600;
+  font-size: 13px;
+  color: #262626;
+  margin-right: 6px;
 }
-.comment-content {
-  margin: 2px 0 0 0;
+
+.ig-comment-text {
+  font-size: 13px;
+  color: #262626;
+  line-height: 1.4;
+  word-break: break-word;
 }
-.comment-input {
-  width: 100%;
-  border-radius: 10px;
-  border: 1px solid #e0e4e8;
-  padding: 8px 10px;
-  margin-top: 6px;
-  font-size: 1em;
+
+.ig-comment-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 2px;
 }
-.comment-btn {
-  margin-top: 6px;
-  background: #1976d2;
-  color: white;
+
+.ig-comment-time {
+  font-size: 11px;
+  color: #8e8e8e;
+}
+
+.ig-comment-like {
   border: none;
-  border-radius: 18px;
-  padding: 6px 16px;
-  font-weight: bold;
+  background: none;
+  padding: 0;
   cursor: pointer;
+  color: #8e8e8e;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+.ig-comment-like:hover {
+  color: #262626;
+}
+
+.ig-comment-input {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #efefef;
+  padding: 8px 0;
+  margin-top: 4px;
+}
+
+.ig-comment-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  padding: 4px 0;
+  color: #262626;
+  background: transparent;
+}
+.ig-comment-input input::placeholder {
+  color: #8e8e8e;
+}
+
+.ig-comment-input button {
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b2dffc;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.15s;
+}
+.ig-comment-input button.active {
+  color: #0095f6;
+}
+.ig-comment-input button:disabled {
+  cursor: default;
 }
