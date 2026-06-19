@@ -1,39 +1,46 @@
 <header class="header">
   <div class="logo-section">
-    <div class="logo">
-      <img src="https://res.cloudinary.com/dxuk9bogw/image/upload/v1761270927/fcd83bdf-0f03-44bf-9f55-7cfdc8244e99.png" alt="Logo ComuniRed">
-    </div>
     <div class="app-info">
-      <h1>ComuniRed - Panel de Soporte</h1>
-      <span class="subtitle">Gestión de reportes del barrio</span>
+      <h1>ComuniRed</h1>
+      <span class="subtitle">Panel de Soporte</span>
     </div>
   </div>
 
-  <div class="perfil-header">
-    <div class="header-actions">
-      <button
-        class="theme-toggle-btn"
-        type="button"
-        (click)="toggleTheme()"
-        [attr.aria-label]="isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
-        [attr.title]="isDarkMode ? 'Modo claro' : 'Modo oscuro'">
-        <svg *ngIf="!isDarkMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <svg *ngIf="isDarkMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
+  <div class="header-center">
+    <div class="search-wrapper">
+      <i class="bi bi-search"></i>
+      <input type="text" class="header-search" placeholder="Buscar reportes, usuarios, ubicaciones..." />
+      <span class="search-hint"><i class="bi bi-calendar3"></i></span>
     </div>
+  </div>
+
+  <div class="header-right">
+    <button class="header-btn" type="button" title="Notificaciones">
+      <i class="bi bi-bell"></i>
+      <span class="notif-dot" *ngIf="notificationCount > 0"></span>
+    </button>
+    <button
+      class="header-btn theme-btn"
+      type="button"
+      (click)="toggleTheme()"
+      [attr.aria-label]="isDarkMode ? 'Modo claro' : 'Modo oscuro'"
+      [attr.title]="isDarkMode ? 'Modo claro' : 'Modo oscuro'">
+      <svg *ngIf="!isDarkMode" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg *ngIf="isDarkMode" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
   </div>
 </header>

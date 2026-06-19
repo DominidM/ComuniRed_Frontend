@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
 import { UsuarioService, Usuario } from '../../services/usuario.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './soporte-sidebar.component.html',
   styleUrls: ['./soporte-sidebar.component.css']
 })
@@ -15,29 +14,24 @@ export class SoporteSidebarComponent implements OnInit {
   usuario: Usuario | null = null;
 
   menuItems = [
-    /*{ 
-      label: 'Editar Reportes', 
-      icon: 'edit', 
-      route: '/soporte/reporte-editar' 
-    },*/
     { 
       label: 'Clasificacion',
-      icon: 'label',  
+      icon: 'bi-tags-fill',  
       route: '/soporte/clasificacion' 
     },
     { 
       label: 'Seguimiento',
-      icon: 'schedule', 
+      icon: 'bi-clock-history', 
       route: '/soporte/seguimiento' 
     },
     { 
       label: 'Comentarios', 
-      icon: 'description', 
+      icon: 'bi-chat-dots', 
       route: '/soporte/comentarios' 
     },
     { 
       label: 'Mi Perfil', 
-      icon: 'person', 
+      icon: 'bi-person-circle', 
       route: '/soporte/perfil' 
     }
   ];
@@ -61,5 +55,9 @@ export class SoporteSidebarComponent implements OnInit {
       this.usuarioService.logout();
       this.router.navigate(['/login']);
     }
+  }
+
+  onPerfilClick(): void {
+    this.router.navigate(['/soporte/perfil']);
   }
 }

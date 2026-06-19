@@ -1,22 +1,52 @@
 .soporte-container {
   display: grid;
   grid-template-rows: auto 1fr;
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
-  background: var(--cr-background-content);
-
+  background: #080c18;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
 
-/* Variables de layout (ajustables por breakpoint) */
+.soporte-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 80%, rgba(79,70,229,0.03) 0%, transparent 45%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soporte-container::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 25% 15%, rgba(99,102,241,0.03) 1px, transparent 1px),
+    radial-gradient(circle at 75% 40%, rgba(139,92,246,0.03) 1px, transparent 1px),
+    radial-gradient(circle at 40% 75%, rgba(79,70,229,0.02) 1px, transparent 1px),
+    radial-gradient(circle at 85% 65%, rgba(99,102,241,0.02) 1px, transparent 1px),
+    radial-gradient(circle at 10% 85%, rgba(139,92,246,0.02) 1px, transparent 1px),
+    radial-gradient(circle at 65% 10%, rgba(79,70,229,0.02) 1px, transparent 1px),
+    radial-gradient(circle at 45% 45%, rgba(99,102,241,0.015) 1px, transparent 1px),
+    radial-gradient(circle at 90% 25%, rgba(139,92,246,0.015) 1px, transparent 1px),
+    radial-gradient(circle at 55% 90%, rgba(79,70,229,0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Variables de layout */
 .soporte-container {
   --sidebar-width: 220px;
-  --layout-gap: 1rem;
-  --main-padding: 1rem;
+  --layout-gap: 0;
+  --main-padding: 1.5rem;
 }
 
-/* Anular reglas globales que aplican margin-left/width a .main-content y layout-content */
+/* Reset reglas globales */
 .soporte-container,
 .soporte-container .layout-content,
 .soporte-container .main-content {
@@ -26,69 +56,63 @@
   box-sizing: border-box !important;
 }
 
-/* LAYOUT PRINCIPAL - SIDEBAR A LA IZQUIERDA */
+/* LAYOUT PRINCIPAL */
 .layout-content {
-  /* Grid principal: sidebar + contenido */
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   gap: var(--layout-gap);
   align-items: start;
   justify-items: start;
   width: 100%;
-  transition: grid-template-columns 180ms ease, gap 120ms ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+  transition: grid-template-columns 180ms ease;
 }
 
-/* SIDEBAR OCUPA TODO EL LATERAL */
+/* SIDEBAR STICKY - EFECTO VIDRIO */
 app-sidebar {
-  width: var(--sidebar-width); /* Ancho controlado por variable */
-  height: 100%; /* Use 100% para respetar el layout padre, evitar 100vh */
-  background: var(--cr-background);
-  border-right: 1px solid var(--cr-border);
+  position: sticky;
+  top: 0;
+  align-self: start;
+  width: var(--sidebar-width);
   overflow: hidden;
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  border-right: 1px solid rgba(99,102,241,0.08);
 }
 
-[data-theme='dark'] app-sidebar {
-  background: #0f172a;
-  border-right-color: #1f2933;
-}
-
-/* CONTENIDO PRINCIPAL A LA DERECHA */
+/* CONTENIDO PRINCIPAL */
 .main-content {
-  overflow-y: auto;
-  overflow-x: hidden;
   padding: var(--main-padding);
-  background: var(--cr-background-content);
-  height: 100%;
+  background: transparent;
   box-sizing: border-box;
-  width: 100%; /* Ocupar todo el espacio disponible */
-  max-width: none; /* No limitar ancho */
+  width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
-[data-theme='dark'] .main-content {
-  background: #020617;
-}
-
-.main-content::-webkit-scrollbar {
+.layout-content::-webkit-scrollbar {
   width: 6px;
 }
 
-.main-content::-webkit-scrollbar-track {
+.layout-content::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.main-content::-webkit-scrollbar-thumb {
+.layout-content::-webkit-scrollbar-thumb {
   background: var(--cr-border);
   border-radius: 4px;
 }
 
-[data-theme='dark'] .main-content::-webkit-scrollbar-thumb {
+[data-theme='dark'] .layout-content::-webkit-scrollbar-thumb {
   background: #3f4752;
 }
 
-.main-content::-webkit-scrollbar-thumb:hover {
+.layout-content::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--cr-border) 55%, var(--cr-text) 45%);
 }
 
@@ -97,59 +121,24 @@ app-sidebar {
 }
 
 @media (max-width: 1200px) {
-  /* Tablet grande */
   .soporte-container { --sidebar-width: 180px; --layout-gap: 1rem; --main-padding: 1rem; }
 }
 
 @media (max-width: 992px) {
-
   .soporte-container { --sidebar-width: 120px; --layout-gap: 0.75rem; --main-padding: 0.9rem; }
 }
 
 @media (max-width: 768px) {
-
   .soporte-container { --sidebar-width: 72px; --layout-gap: 0.5rem; --main-padding: 0.75rem; }
-  .layout-content { grid-template-columns: var(--sidebar-width) minmax(0, 1fr); }
+  .layout-content { grid-template-columns: var(--sidebar-width) minmax(0, 1fr); gap: 0.5rem; }
+  app-sidebar { width: 72px; }
   app-sidebar .link-label { display: none; }
+  .main-content { padding: 0.75rem; }
 }
 
 @media (max-width: 480px) {
-
   .soporte-container { --sidebar-width: 0; --layout-gap: 0; --main-padding: 0.5rem; }
   .layout-content { grid-template-columns: 1fr; }
-  app-sidebar { position: fixed; left: 0; top: 0; height: 100%; width: 280px; transform: translateX(-110%); transition: transform 220ms ease; z-index: 1100; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
-  app-sidebar.open { transform: translateX(0); }
-}
-
-@media (max-width: 768px) {
-
-  .layout-content {
-    grid-template-columns: 72px 1fr;
-    gap: 0.5rem;
-  }
-
-  app-sidebar {
-    width: 72px;
-    height: 100%;
-    border-right: 1px solid transparent;
-  }
-
-  .main-content {
-    padding: 0.75rem;
-  }
-
-
-  app-sidebar .link-label {
-    display: none;
-  }
-}
-
-@media (max-width: 480px) {
-
-  .layout-content {
-    grid-template-columns: 1fr;
-  }
-
   app-sidebar {
     position: fixed;
     left: 0;
@@ -161,13 +150,6 @@ app-sidebar {
     z-index: 1100;
     box-shadow: 0 8px 32px rgba(0,0,0,0.12);
   }
-
-
-  app-sidebar.open {
-    transform: translateX(0);
-  }
-
-  .main-content {
-    padding: 0.5rem;
-  }
+  app-sidebar.open { transform: translateX(0); }
+  .main-content { padding: 0.5rem; }
 }

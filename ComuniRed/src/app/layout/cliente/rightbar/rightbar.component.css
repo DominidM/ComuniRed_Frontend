@@ -2,7 +2,6 @@
   display: block;
   width: 280px;
   flex-shrink: 0;
-  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
@@ -18,7 +17,6 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  border-left: 1px solid var(--cr-border);
   background: var(--cr-background);
   min-height: 100%;
 }
@@ -414,11 +412,3 @@
   }
 }
 
-.sidebar-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;   /* ← agrega esto */
-  overflow-x: hidden;
-}
