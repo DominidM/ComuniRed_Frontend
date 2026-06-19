@@ -76,95 +76,6 @@ body {
   line-height: 1.25;
 }
 
-/* Buscador y controles superiores */
-.crud-tipo-reaccion-controls-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  margin: 0 2rem 1rem 2rem;
-}
-
-.crud-tipo-reaccion-search-box {
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex: 1 1 0;
-  max-width: 400px;
-  background: var(--cr-search);
-  border: 1px solid var(--cr-border);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
-  padding: 0.3rem 0.7rem;
-  margin-right: 1.5rem;
-}
-
-.crud-tipo-reaccion-search-box input {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 1rem;
-  color: var(--gray-900);
-  width: 100%;
-  padding: 0.5rem 0.5rem 0.5rem 0;
-}
-
-.crud-tipo-reaccion-search-btn {
-  background: transparent;
-  border: none;
-  padding: 0.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.crud-tipo-reaccion-search-btn svg {
-  stroke: var(--primary-color);
-  width: 20px;
-  height: 20px;
-}
-
-.crud-tipo-reaccion-search-btn:hover {
-  background: var(--gray-100);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
-}
-
-/* Mostrar por página y total */
-.crud-tipo-reaccion-show-select {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  font-size: 1rem;
-  font-weight: 500;
-  margin-left: auto;
-}
-
-.crud-tipo-reaccion-show-select label {
-  color: var(--gray-700);
-}
-
-.crud-tipo-reaccion-show-select select {
-  padding: 0.35rem 1.2rem 0.35rem 0.5rem;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--cr-border);
-  background: var(--cr-background);
-  font-size: 1rem;
-  color: var(--gray-900);
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.crud-tipo-reaccion-show-select span {
-  color: var(--gray-700);
-  font-weight: 600;
-}
-
 /* Estilos de Tabla */
 .crud-tipo-reaccion-table {
   width: 100%;
@@ -464,25 +375,6 @@ body {
   .crud-tipo-reaccion-empty {
     margin: 0 1rem;
     padding: 2rem 1rem;
-  }
-
-  .crud-tipo-reaccion-controls-row {
-    flex-direction: column;
-    gap: 1rem;
-    margin: 0 0.5rem 1rem 0.5rem;
-    align-items: stretch;
-  }
-
-  .crud-tipo-reaccion-search-box {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
-    max-width: 100%;
-  }
-
-  .crud-tipo-reaccion-show-select {
-    margin-left: 0;
-    margin-top: 0.5rem;
-    justify-content: flex-end;
   }
 
   .crud-tipo-reaccion-pagination-row {

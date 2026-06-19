@@ -1,10 +1,23 @@
 <div class="admin-page">
   <app-workspace-header title="Gestión de Tipos de Reacción" subtitle="Administra los tipos de reacción" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Tipos de Reacción' }]" actionLabel="Nuevo Tipo" (actionClick)="openAddModal()"></app-workspace-header>
 
+    <app-admin-search
+      [(searchText)]="searchText"
+      placeholder="Buscar tipos de reacción..."
+      [total]="totalTipos"
+      totalLabel="tipos"
+      [showPageSize]="true"
+      [(pageSize)]="pageSize"
+      [pageSizes]="pageSizes"
+      (pageSizeChange)="onPageSizeChange($event)"
+      (search)="buscarTipos()"
+      (clear)="limpiarBusqueda()"
+    ></app-admin-search>
+
     <app-loading-overlay [loading]="loading" text="Cargando tipos de reacción...">
       <app-data-table
         [columns]="columns"
-        [rows]="tipos"
+        [rows]="tiposFiltrados"
         [page]="page"
         [pages]="pages"
         [totalPages]="totalPages"

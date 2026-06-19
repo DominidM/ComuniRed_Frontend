@@ -58,62 +58,6 @@
   flex-wrap: wrap;
 }
 
-/* Filtros */
-.filtros-container {
-  display: flex;
-  gap: 1rem;
-  margin: 0 2rem 1.5rem 2rem;
-  flex-wrap: wrap;
-  align-items: flex-end;
-}
-
-.filtro-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  flex: 1;
-  min-width: 180px;
-}
-
-.filtro-group.filtro-count {
-  flex: 0 0 auto;
-  min-width: auto;
-  justify-content: flex-end;
-}
-
-.filtro-group label {
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: var(--cr-text);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.result-count {
-  font-size: 0.85rem;
-  color: var(--cr-text);
-  padding-bottom: 0.6rem;
-  white-space: nowrap;
-}
-
-.input-buscar,
-.select-filtro {
-  padding: 0.6rem 1rem;
-  border: 1px solid var(--cr-border);
-  border-radius: var(--border-radius);
-  font-size: 0.9rem;
-  background: var(--cr-search);
-  color: var(--cr-text);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.input-buscar:focus,
-.select-filtro:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
 /* Botones generales */
 .btn {
   padding: 0.6rem 1.2rem;
@@ -607,48 +551,6 @@ textarea.form-control {
   font-size: 0.9rem;
 }
 
-/* Controls row (page size) */
-.controls-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 2rem 1rem 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.show-select {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: var(--cr-text);
-}
-
-.show-select label {
-  font-weight: 500;
-}
-
-.show-select select {
-  padding: 0.4rem 0.6rem;
-  border: 1px solid var(--cr-border);
-  border-radius: 6px;
-  background: var(--cr-search);
-  color: var(--cr-text);
-  font-size: 0.85rem;
-  cursor: pointer;
-  outline: none;
-}
-
-.show-select select:focus {
-  border-color: var(--primary-color);
-}
-
-.total-count {
-  font-weight: 600;
-  margin-left: 0.5rem;
-}
-
 /* Pagination */
 .pagination-row {
   display: flex;
@@ -705,15 +607,6 @@ textarea.form-control {
   .header-actions {
     width: 100%;
     flex-direction: column;
-  }
-
-  .filtros-container {
-    margin: 0 1rem 1.5rem 1rem;
-    flex-direction: column;
-  }
-
-  .filtro-group {
-    min-width: 100%;
   }
 
   .asignaciones-table th,

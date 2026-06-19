@@ -10,6 +10,7 @@ import {
   DataTableColumn,
   DataTableCellDirective,
 } from '../../../shared/components/data-table/data-table.component';
+import { AdminSearchComponent } from '../../../shared/components/admin-search/admin-search.component';
 
 interface Reel {
   id: string;
@@ -33,6 +34,7 @@ interface Reel {
     WorkspaceHeaderComponent,
     DataTableComponent,
     DataTableCellDirective,
+    AdminSearchComponent,
   ],
   templateUrl: './listado-reels.component.html',
   styleUrls: ['./listado-reels.component.css'],

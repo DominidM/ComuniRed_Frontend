@@ -15,46 +15,21 @@
 
   <app-loading-overlay [loading]="loading" text="Cargando asignaciones...">
 
-    <div class="filtros-container">
-      <div class="filtro-group">
-        <label>Buscar:</label>
-        <input 
-          type="text" 
-          [(ngModel)]="filtroTexto" 
-          (ngModelChange)="onFiltroChange()"
-          placeholder="Buscar por soporte u observacion..."
-          class="input-buscar">
-      </div>
-
-      <div class="filtro-group">
-        <label>Estado:</label>
-        <select [(ngModel)]="filtroEstado" (ngModelChange)="onFiltroChange()" class="select-filtro">
-          <option value="todos">Todos</option>
-          <option value="PENDIENTE">Pendiente</option>
-          <option value="EN_PROCESO">En Proceso</option>
-          <option value="COMPLETADA">Completada</option>
-          <option value="CANCELADA">Cancelada</option>
-        </select>
-      </div>
-
-      <div class="filtro-group filtro-count">
-        <span class="result-count">{{ asignacionesFiltradas.length }} resultado{{ asignacionesFiltradas.length !== 1 ? 's' : '' }}</span>
-      </div>
-
-      <button class="btn btn-refrescar" (click)="cargarDatos()">
-        Refrescar
-      </button>
-    </div>
-
-    <div class="controls-row" *ngIf="asignacionesFiltradas.length > 0">
-      <div class="show-select">
-        <label for="pageSize">Por pagina:</label>
-        <select id="pageSize" (change)="onPageSizeChange($event.target.value)" [value]="pageSize">
-          <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
-        </select>
-        <span class="total-count">Total: {{ totalAsignaciones }}</span>
-      </div>
-    </div>
+    <app-admin-search
+      [(searchText)]="filtroTexto"
+      placeholder="Buscar por soporte u observación..."
+      [filters]="[{ key: 'estado', label: 'Estado', options: [{ value: 'PENDIENTE', label: 'Pendiente' }, { value: 'EN_PROCESO', label: 'En Proceso' }, { value: 'COMPLETADA', label: 'Completada' }, { value: 'CANCELADA', label: 'Cancelada' }] }]"
+      [filterValues]="{ estado: filtroEstado }"
+      [total]="asignacionesFiltradas.length"
+      totalLabel="resultados"
+      [showPageSize]="true"
+      [(pageSize)]="pageSize"
+      [pageSizes]="pageSizes"
+      (search)="cargarDatos()"
+      (clear)="onFiltroChange()"
+      (filterChange)="onFiltroChange()"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-admin-search>
 
     <app-data-table
       [columns]="columns"

@@ -29,53 +29,6 @@
   margin: 8px 0 0 0;
 }
 
-/* Filtros */
-.comentarios-filtros {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.comentarios-busqueda {
-  flex: 1;
-  min-width: 250px;
-  padding: 12px 16px;
-  border: 1px solid var(--cr-border);
-  border-radius: 10px;
-  font-size: 0.95em;
-  background: var(--cr-search);
-  color: var(--cr-text);
-}
-
-.comentarios-busqueda:focus {
-  outline: none;
-  border-color: #5f5cf6;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(95, 92, 246, 0.1);
-}
-
-.filtros-grupo {
-  display: flex;
-  gap: 12px;
-}
-
-.filtro-select {
-  padding: 10px 14px;
-  border: 1px solid var(--cr-border);
-  border-radius: 8px;
-  font-size: 0.9em;
-  background: var(--cr-background);
-  color: var(--cr-text);
-  cursor: pointer;
-}
-
-.filtro-select:focus {
-  outline: none;
-  border-color: #5f5cf6;
-}
-
 /* Lista de comentarios */
 .comentarios-lista {
   display: flex;
@@ -431,20 +384,6 @@
   .comentarios-header {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .comentarios-filtros {
-    flex-direction: column;
-  }
-
-  .comentarios-busqueda,
-  .filtro-select {
-    width: 100%;
-  }
-
-  .filtros-grupo {
-    width: 100%;
-    flex-direction: column;
   }
 
   .comentario-header {

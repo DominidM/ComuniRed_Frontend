@@ -1,10 +1,23 @@
 <div class="admin-page">
   <app-workspace-header title="Gestión de Estados de Reclamo" subtitle="Administra los estados de los reclamos" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Estados' }]" actionLabel="Nuevo Estado" (actionClick)="abrirModal()"></app-workspace-header>
 
+    <app-admin-search
+      [(searchText)]="searchText"
+      placeholder="Buscar estados..."
+      [total]="totalEstados"
+      totalLabel="estados"
+      [showPageSize]="true"
+      [(pageSize)]="pageSize"
+      [pageSizes]="pageSizes"
+      (pageSizeChange)="onPageSizeChange($event)"
+      (search)="buscarEstados()"
+      (clear)="limpiarBusqueda()"
+    ></app-admin-search>
+
     <app-loading-overlay [loading]="loading" text="Cargando estados...">
       <app-data-table
         [columns]="columns"
-        [rows]="estados"
+        [rows]="estadosFiltrados"
         [page]="page"
         [pages]="pages"
         [totalPages]="totalPages"

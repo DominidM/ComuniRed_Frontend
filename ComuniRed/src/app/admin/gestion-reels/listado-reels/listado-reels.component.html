@@ -16,41 +16,14 @@
   </app-workspace-header>
 
   <div class="crud-reel-card">
-    <div class="crud-reel-controls-row">
-      <div class="crud-reel-search-box">
-        <input
-          type="text"
-          [(ngModel)]="searchText"
-          (keyup.enter)="buscarReel()"
-          placeholder="Buscar por título, autor o descripción..."
-        />
-
-        <button
-          class="crud-reel-search-btn"
-          type="button"
-          (click)="buscarReel()"
-          aria-label="Buscar reel"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-        </button>
-
-        <button
-          class="crud-reel-clear-btn"
-          type="button"
-          (click)="limpiarBusqueda()"
-          *ngIf="searchText"
-        >
-          Limpiar
-        </button>
-      </div>
-
-      <div class="crud-reel-count">
-        <span>Total: {{ filteredReels.length }} reels</span>
-      </div>
-    </div>
+    <app-admin-search
+      [(searchText)]="searchText"
+      placeholder="Buscar por título, autor o descripción..."
+      [total]="filteredReels.length"
+      totalLabel="reels"
+      (search)="buscarReel()"
+      (clear)="limpiarBusqueda()"
+    ></app-admin-search>
 
     <app-loading-overlay [loading]="loading" text="Cargando reels...">
       <app-data-table

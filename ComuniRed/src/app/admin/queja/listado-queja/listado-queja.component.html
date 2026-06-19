@@ -10,10 +10,23 @@
     countLabel="reportes"
   />
 
+  <app-admin-search
+    [(searchText)]="searchText"
+    placeholder="Buscar quejas..."
+    [total]="totalElements"
+    totalLabel="quejas"
+    [showPageSize]="true"
+    [(pageSize)]="pageSize"
+    [pageSizes]="pageSizes"
+    (pageSizeChange)="onPageSizeChange($event)"
+    (search)="loadQuejas()"
+    (clear)="loadQuejas()"
+  ></app-admin-search>
+
   <app-loading-overlay [loading]="loading" text="Cargando quejas...">
     <app-data-table
       [columns]="columns"
-      [rows]="quejas"
+      [rows]="quejasFiltradas"
       [page]="page"
       [pages]="pages"
       [totalPages]="totalPages"

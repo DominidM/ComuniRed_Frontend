@@ -1,24 +1,18 @@
 <div class="admin-page">
   <app-workspace-header title="Gestión de Usuarios" subtitle="Administra los usuarios registrados" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Usuarios' }]" actionLabel="Nuevo Usuario" (actionClick)="openAddModal()"></app-workspace-header>
 
-    <div class="crud-usuario-controls-row">
-      <div class="crud-usuario-search-box">
-        <input type="text" [(ngModel)]="searchText" placeholder="Buscar por nombre, apellido, DNI..." />
-        <button class="crud-usuario-search-btn" (click)="buscarUsuario()" aria-label="Buscar usuario">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-        </button>
-      </div>
-      <div class="crud-usuario-show-select">
-        <label for="pageSize">por página</label>
-        <select id="pageSize" (change)="onPageSizeChange($event.target.value)" [value]="size">
-          <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
-        </select>
-        <span>Total: {{ totalElements }}</span>
-      </div>
-    </div>
+    <app-admin-search
+      [(searchText)]="searchText"
+      placeholder="Buscar por nombre, apellido, DNI..."
+      [total]="totalElements"
+      totalLabel="usuarios"
+      [showPageSize]="true"
+      [(pageSize)]="size"
+      [pageSizes]="pageSizes"
+      (search)="buscarUsuario()"
+      (clear)="limpiarBusqueda()"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-admin-search>
 
     <app-loading-overlay [loading]="loading" text="Cargando usuarios...">
       <app-data-table

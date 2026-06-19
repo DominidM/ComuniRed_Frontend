@@ -74,37 +74,6 @@
 
 
 
-/* Controles (Buscador/Select de Paginación) */
-.crud-rol-controls-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-    margin: 0 2rem 1rem 2rem;
-}
-
-.crud-rol-show-select {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    font-size: 1rem;
-    font-weight: 500;
-    margin-left: auto;
-}
-
-.crud-rol-show-select label, .crud-rol-show-select span {
-    color: var(--cr-text);
-}
-
-.crud-rol-show-select select {
-    padding: 0.35rem 1.2rem 0.35rem 0.5rem;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--cr-border);
-    background: var(--cr-background-content);
-    color: var(--cr-titulo);
-}
-
-
 /* --- 2. ESTILOS DE TABLA (CLAVE DE LA REFERENCIA) --- */
 .crud-rol-table {
     width: 100%;

@@ -2,6 +2,7 @@ import { Component, type OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
 import { WorkspaceHeaderComponent } from "../../shared/components/workspace-header/workspace-header.component"
+import { AdminSearchComponent } from "../../shared/components/admin-search/admin-search.component"
 
 interface Comentario {
   id: number
@@ -18,7 +19,7 @@ interface Comentario {
 @Component({
   selector: "app-crud-comentario",
   standalone: true,
-  imports: [CommonModule, FormsModule, WorkspaceHeaderComponent],
+  imports: [CommonModule, FormsModule, WorkspaceHeaderComponent, AdminSearchComponent],
   templateUrl: "./crud-comentario.component.html",
   styleUrls: ["./crud-comentario.component.css"],
 })
@@ -151,6 +152,23 @@ export class CrudComentarioComponent implements OnInit {
         this.cerrarDetalles()
       }
     }
+  }
+
+  get filterValues(): { [key: string]: string } {
+    return { estado: this.filtroEstado, categoria: this.filtroCategoria };
+  }
+
+  getEstadoOptions() { return this.estados.map(e => ({ value: e, label: e })); }
+  getCategoriaOptions() { return this.categorias.map(c => ({ value: c, label: c })); }
+
+  onFilterChange(filter: { key: string; value: string }): void {
+    if (filter.key === 'estado') this.filtroEstado = filter.value;
+    if (filter.key === 'categoria') this.filtroCategoria = filter.value;
+  }
+
+  buscarComentarios(): void {}
+  limpiarBusqueda(): void {
+    this.busqueda = '';
   }
 
   get comentariosFiltrados(): Comentario[] {

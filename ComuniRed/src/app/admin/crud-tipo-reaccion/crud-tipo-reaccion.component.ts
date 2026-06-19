@@ -10,21 +10,36 @@ import {
   DataTableCellDirective,
 } from '../../shared/components/data-table/data-table.component';
 import { WorkspaceHeaderComponent } from '../../shared/components/workspace-header/workspace-header.component';
+import { AdminSearchComponent } from '../../shared/components/admin-search/admin-search.component';
 
 @Component({
   selector: 'app-crud-tipo-reaccion',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent],
+  imports: [CommonModule, FormsModule, LoadingOverlayComponent, DataTableComponent, DataTableCellDirective, WorkspaceHeaderComponent, AdminSearchComponent],
   templateUrl: './crud-tipo-reaccion.component.html',
   styleUrls: ['./crud-tipo-reaccion.component.css']
 })
 export class CrudTipoReaccionComponent implements OnInit {
   tipos: TipoReaccion[] = [];
-  totalTipos: number = 0;
+  private _totalTipos: number = 0;
   page: number = 0;
   totalPages: number = 1;
   pageSize: number = 5;
   pageSizes: number[] = [5, 10, 20, 50, 100];
+  searchText: string = '';
+
+  get tiposFiltrados(): TipoReaccion[] {
+    if (!this.searchText || this.searchText.trim() === '') return this.tipos;
+    const s = this.searchText.toLowerCase().trim();
+    return this.tipos.filter(t =>
+      t.key.toLowerCase().includes(s) ||
+      t.label.toLowerCase().includes(s)
+    );
+  }
+
+  get totalTipos(): number {
+    return this.tiposFiltrados.length;
+  }
 
   loading = false;
   saving = false;
@@ -59,6 +74,11 @@ export class CrudTipoReaccionComponent implements OnInit {
     return tipo.id || index.toString();
   }
 
+  buscarTipos(): void {}
+  limpiarBusqueda(): void {
+    this.searchText = '';
+  }
+
   loadTipos() {
     this.loading = true;
     this.tipoReaccionService.obtenerTipoReaccionPage(this.page, this.pageSize)
@@ -66,7 +86,7 @@ export class CrudTipoReaccionComponent implements OnInit {
       .subscribe({
         next: (data: TiposReaccionPage) => {
           this.tipos = data.content;
-          this.totalTipos = data.totalElements;
+          this._totalTipos = data.totalElements;
           this.totalPages = data.totalPages;
           if (this.page >= this.totalPages && this.totalPages > 0) {
             this.page = this.totalPages - 1;

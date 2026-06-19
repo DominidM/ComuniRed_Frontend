@@ -1,27 +1,15 @@
 <div class="admin-page">
   <app-workspace-header title="Gestión de Comentarios" subtitle="Administra los comentarios de los usuarios" [breadcrumbs]="[{ label: 'Admin', route: '/admin/dashboard' }, { label: 'Comentarios' }]" actionLabel="Nuevo Comentario" (actionClick)="abrirFormulario()"></app-workspace-header>
 
-  <!-- Filtros y Búsqueda -->
-  <div class="comentarios-filtros">
-    <input
-      type="text"
-      class="comentarios-busqueda"
-      placeholder="Buscar por usuario o título..."
-      [(ngModel)]="busqueda"
-    />
-
-    <div class="filtros-grupo">
-      <select class="filtro-select" [(ngModel)]="filtroEstado">
-        <option>Todos</option>
-        <option *ngFor="let estado of estados">{{ estado }}</option>
-      </select>
-
-      <select class="filtro-select" [(ngModel)]="filtroCategoria">
-        <option>Todos</option>
-        <option *ngFor="let categoria of categorias">{{ categoria }}</option>
-      </select>
-    </div>
-  </div>
+  <app-admin-search
+    [(searchText)]="busqueda"
+    placeholder="Buscar por usuario o título..."
+    [filters]="[{ key: 'estado', label: 'Estado', options: getEstadoOptions() }, { key: 'categoria', label: 'Categoría', options: getCategoriaOptions() }]"
+    [filterValues]="filterValues"
+    (filterChange)="onFilterChange($event)"
+    (search)="buscarComentarios()"
+    (clear)="limpiarBusqueda()"
+  ></app-admin-search>
 
   <!-- Lista de Comentarios -->
   <div class="comentarios-lista">

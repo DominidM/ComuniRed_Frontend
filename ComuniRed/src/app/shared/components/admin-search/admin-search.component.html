@@ -1,0 +1,56 @@
+<div class="as-bar">
+  <div class="as-left">
+    <div class="as-search">
+      <input
+        type="text"
+        [ngModel]="searchText"
+        (ngModelChange)="onSearchInput($event)"
+        (keyup.enter)="onSearch()"
+        [placeholder]="placeholder"
+        class="as-input"
+      />
+      <button class="as-btn as-btn-search" (click)="onSearch()" type="button" aria-label="Buscar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+      <button class="as-btn as-btn-clear" *ngIf="searchText" (click)="onClear()" type="button" aria-label="Limpiar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="as-filters" *ngIf="filters.length > 0">
+      <select
+        *ngFor="let f of filters"
+        [ngModel]="filterValues[f.key] || ''"
+        (ngModelChange)="onFilterChange(f.key, $event)"
+        class="as-select"
+      >
+        <option value="">{{ f.label }}</option>
+        <option *ngFor="let o of f.options" [value]="o.value">{{ o.label }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="as-right">
+    <span class="as-count" *ngIf="total !== null">
+      {{ total }} {{ totalLabel }}
+    </span>
+
+    <div class="as-page-size" *ngIf="showPageSize">
+      <label>por pág.</label>
+      <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)" class="as-select as-select-sm">
+        <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+
+    <div class="as-spinner" *ngIf="loading">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="as-spin">
+        <path d="M21 12a9 9 0 11-6.219-8.56"/>
+      </svg>
+    </div>
+  </div>
+</div>
