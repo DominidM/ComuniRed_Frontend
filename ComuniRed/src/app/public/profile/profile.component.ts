@@ -35,6 +35,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private readonly BANNER_KEY = 'comunired_profile_banner';
 
   @ViewChild('bannerVideoEl') bannerVideoEl!: ElementRef<HTMLVideoElement>;
+  @ViewChild('bannerFileInput') bannerFileInput!: ElementRef<HTMLInputElement>;
 
   user: {
     id: string;
@@ -42,6 +43,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     apellido: string;
     email: string;
     foto_perfil: string;
+    video_banner?: string;
     fecha_registro: string | null;
   } | null = null;
 
@@ -64,6 +66,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   editandoBanner = false;
   muteoBanner = true;
+  uploadingBanner = false;
 
   bannerOptions: BannerOption[] = [
     {
@@ -82,11 +85,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
       url: 'https://res.cloudinary.com/dp1vgjhsq/video/upload/v1776926572/YTDown.com_YouTube_Trueno-FRESH-Official-Video_Media_mcJ-jFNARyg_001_1080p_fmvvcp.mp4',
     },
     {
-      id: 'banner_comunidad',
-      nombre: 'Comunidad',
-      url: 'https://res.cloudinary.com/dp1vgjhsq/video/upload/v1776926786/YTDown.com_YouTube_Bad-Bunny-Neverita-Video-Oficial-Un-Vera_Media_ARWg160eaX4_001_480p_v4z1uc.mp4',
-    },
-    {
       id: 'banner_lima',
       nombre: 'Lima',
       url: 'https://res.cloudinary.com/dp1vgjhsq/video/upload/v1776927093/YTDown.com_YouTube_DUKI-Jhayco-RoCKSTAR-2-0-Video-Oficial_Media_cjmwG9aPGwM_001_1080p_ihlnvu.mp4',
@@ -94,7 +92,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     {
       id: 'mora',
       nombre: 'Lima',
-      url: '    https://res.cloudinary.com/dxuk9bogw/video/upload/v1778410568/YTDown_YouTube_Mora-DONDE-SE-APRENDE-A-QUERER-Video-Ofi_Media_1Pb3AiiiDIM_001_1080p_cjxi0c.mp4',
+      url: 'https://res.cloudinary.com/dxuk9bogw/video/upload/v1778410568/YTDown_YouTube_Mora-DONDE-SE-APRENDE-A-QUERER-Video-Ofi_Media_1Pb3AiiiDIM_001_1080p_cjxi0c.mp4',
     },
   ];
 
@@ -119,11 +117,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
         apellido: (u as any).apellido || '',
         email: (u as any).email || 'correo@ejemplo.com',
         foto_perfil: (u as any).foto_perfil || '',
+        video_banner: (u as any).video_banner || undefined,
         fecha_registro: (u as any).fecha_registro || null,
       };
 
       this.cargarContadores();
       this.cargarActividad();
+
+      this.usuarioService
+        .obtenerUsuarioPorId(this.user.id)
+        .subscribe((usuario) => {
+          if (usuario?.video_banner) {
+            this.user = { ...this.user!, video_banner: usuario.video_banner };
+            this.restoreBanner();
+          }
+        });
     } else {
       this.user = {
         id: '',
@@ -151,6 +159,50 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   toggleEditBanner(): void {
     this.editandoBanner = !this.editandoBanner;
+  }
+
+  async onBannerVideoSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !this.user?.id) return;
+
+    this.uploadingBanner = true;
+
+    try {
+      const url = await this.usuarioService.subirVideoBanner(
+        this.user.id,
+        file,
+      );
+
+      this.bannerSeleccionado = {
+        id: 'custom_upload',
+        nombre: 'Mi video',
+        url,
+      };
+
+      const videoEl = this.bannerVideoEl?.nativeElement;
+      if (videoEl) {
+        videoEl.pause();
+        videoEl.src = '';
+        videoEl.load();
+        setTimeout(() => {
+          videoEl.src = url;
+          videoEl.muted = this.muteoBanner;
+          videoEl.load();
+          videoEl.play().catch(() => {});
+        }, 50);
+      }
+
+      try {
+        localStorage.setItem(this.BANNER_KEY, 'custom_upload');
+      } catch {}
+    } catch (err) {
+      console.error('Error al subir video banner:', err);
+      alert('Error al subir el video. Intente con otro archivo.');
+    } finally {
+      this.uploadingBanner = false;
+      input.value = '';
+    }
   }
 
   toggleMuteoBanner(): void {
@@ -189,6 +241,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private restoreBanner(): void {
     try {
       const savedId = localStorage.getItem(this.BANNER_KEY);
+      if (savedId === 'custom_upload') {
+        if (this.user?.video_banner) {
+          this.bannerSeleccionado = {
+            id: 'custom_upload',
+            nombre: 'Mi video',
+            url: this.user.video_banner,
+          };
+          return;
+        }
+      }
       if (savedId) {
         const found = this.bannerOptions.find((b) => b.id === savedId);
         if (found) this.bannerSeleccionado = found;

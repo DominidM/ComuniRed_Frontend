@@ -74,18 +74,53 @@
     </div>
   </div>
 
-  <!-- Imagen -->
-  <div class="post-image-wrapper">
-    <ng-container *ngIf="hasEvidence() || post.imagen_url; else imgPlaceholder">
-      <img [src]="getFirstEvidenceUrl()" [alt]="post.titulo"
+  <!-- Carrusel de imágenes + Reproductor de música integrado -->
+  <div class="post-image-wrapper" *ngIf="getTotalImagenes() > 0; else imgPlaceholder">
+    <div class="carousel-container">
+      <img [src]="getImagenActual()" [alt]="post.titulo"
         class="post-image" loading="lazy"/>
-    </ng-container>
-    <ng-template #imgPlaceholder>
-      <div class="image-placeholder">
-        <i class="pi pi-image image-placeholder-icon"></i>
+
+      <!-- Flechas de navegación circulares flotantes -->
+      <button *ngIf="imagenIndex > 0" class="carousel-arrow carousel-arrow--prev"
+        (click)="anteriorImagen($event)" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <button *ngIf="imagenIndex < getTotalImagenes() - 1" class="carousel-arrow carousel-arrow--next"
+        (click)="siguienteImagen($event)" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+
+      <!-- Puntos indicadores -->
+      <div class="carousel-dots" *ngIf="getTotalImagenes() > 1">
+        <span *ngFor="let _ of getImagenes(); let i = index" class="carousel-dot"
+          [class.active]="i === imagenIndex"></span>
       </div>
-    </ng-template>
+
+      <!-- Reproductor de música integrado (píldora) -->
+      <div class="music-pill" *ngIf="tieneMusica()" (click)="toggleMusica($event)">
+        <span class="music-pill__icon">🎵</span>
+        <span class="music-pill__track">{{ post.musica_track || 'Canción' }}</span>
+        <button class="music-pill__play">
+          <svg *ngIf="!musicaSonando" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <polygon points="8,5 19,12 8,19"/>
+          </svg>
+          <svg *ngIf="musicaSonando" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16" rx="1"/>
+            <rect x="14" y="4" width="4" height="16" rx="1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
+  <ng-template #imgPlaceholder>
+    <div class="image-placeholder">
+      <i class="pi pi-image image-placeholder-icon"></i>
+    </div>
+  </ng-template>
 
   <!-- Votación -->
   <div *ngIf="isEnVotacion() && hasVotes()" class="vote-section">

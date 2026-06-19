@@ -20,6 +20,15 @@
   background: var(--cr-surface);
 }
 
+.header-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
 .header-bg-gradient {
   position: absolute;
   inset: 0;

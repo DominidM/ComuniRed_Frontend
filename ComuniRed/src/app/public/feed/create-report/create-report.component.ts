@@ -10,6 +10,9 @@ import {
   CategoriaService,
   Categoria,
 } from '../../../services/categoria.service';
+import { MusicaService, MusicTrackResponse } from '../../../services/musica.service';
+
+
 
 @Component({
   selector: 'app-create-report',
@@ -41,9 +44,18 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
     ubicacion: '',
     lat: null as number | null,
     lng: null as number | null,
-    imagenFile: null as File | null,
-    imagenPreview: null as string | null,
+    imagenFiles: [] as File[],
+    imagenPreviews: [] as string[],
+    musicaQuery: '',
+    musicaResults: [] as MusicTrackResponse[],
+    musicaBuscando: false,
+    musicaSeleccionada: null as MusicTrackResponse | null,
   };
+
+  previewAudio: HTMLAudioElement | null = null;
+  previewReproduciendo: MusicTrackResponse | null = null;
+  previewProgreso = 0;
+  previewMuted = false;
 
   isValid(): boolean {
     return !!(
@@ -55,31 +67,107 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (!input.files?.[0]) return;
-    const file = input.files[0];
-    if (file.size > 5 * 1024 * 1024) {
-      alert('La imagen no debe superar 5MB');
-      return;
+    if (!input.files?.length) return;
+    for (let i = 0; i < input.files.length; i++) {
+      const file = input.files[i];
+      if (file.size > 5 * 1024 * 1024) continue;
+      if (!file.type.startsWith('image/')) continue;
+      this.form.imagenFiles.push(file);
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.form.imagenPreviews.push(e.target.result);
+      };
+      reader.readAsDataURL(file);
     }
-    if (!file.type.startsWith('image/')) {
-      alert('Solo se permiten imágenes');
-      return;
-    }
-    this.form.imagenFile = file;
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.form.imagenPreview = e.target.result;
-    };
-    reader.readAsDataURL(file);
+    input.value = '';
   }
 
-  removeImage(event: Event): void {
+  removeImage(index: number): void {
+    this.form.imagenFiles.splice(index, 1);
+    this.form.imagenPreviews.splice(index, 1);
+  }
+
+  buscarMusica(): void {
+    const q = this.form.musicaQuery.trim();
+    if (!q) return;
+    this.form.musicaBuscando = true;
+    this.musicaService.buscar(q).subscribe({
+      next: (results) => {
+        this.form.musicaResults = results;
+        this.form.musicaBuscando = false;
+      },
+      error: () => {
+        this.form.musicaBuscando = false;
+      },
+    });
+  }
+
+  togglePreview(track: MusicTrackResponse, event: Event): void {
     event.stopPropagation();
-    this.form.imagenFile = null;
-    this.form.imagenPreview = null;
+    if (!track.previewUrl) return;
+
+      if (this.previewReproduciendo?.id === track.id && this.previewAudio) {
+      if (!this.previewAudio.paused) {
+        this.previewAudio.pause();
+        this.previewReproduciendo = null;
+      }
+      return;
+    }
+
+    this.detenerPreview();
+    this.previewReproduciendo = track;
+    this.previewAudio = new Audio(track.previewUrl);
+    this.previewAudio.volume = this.previewMuted ? 0 : 0.7;
+
+    this.previewAudio.addEventListener('timeupdate', () => {
+      if (this.previewAudio) {
+        this.previewProgreso = (this.previewAudio.currentTime / this.previewAudio.duration) * 100;
+      }
+    });
+
+    this.previewAudio.addEventListener('ended', () => {
+      this.previewProgreso = 0;
+      this.previewReproduciendo = null;
+      this.previewAudio = null;
+    });
+
+    this.previewAudio.play().catch(() => {});
   }
 
-  constructor(private quejaService: QuejaService) {}
+  detenerPreview(): void {
+    if (this.previewAudio) {
+      this.previewAudio.pause();
+      this.previewAudio = null;
+    }
+    this.previewReproduciendo = null;
+    this.previewProgreso = 0;
+  }
+
+  toggleMute(event: Event): void {
+    event.stopPropagation();
+    this.previewMuted = !this.previewMuted;
+    if (this.previewAudio) {
+      this.previewAudio.volume = this.previewMuted ? 0 : 0.7;
+    }
+  }
+
+  seleccionarMusica(track: MusicTrackResponse): void {
+    this.detenerPreview();
+    this.form.musicaSeleccionada = track;
+    this.form.musicaResults = [];
+    this.form.musicaQuery = `${track.title} - ${track.artist}`;
+  }
+
+  quitarMusica(): void {
+    this.detenerPreview();
+    this.form.musicaSeleccionada = null;
+    this.form.musicaQuery = '';
+  }
+
+  constructor(
+    private quejaService: QuejaService,
+    private musicaService: MusicaService,
+  ) {}
 
   ngOnInit(): void {}
 
@@ -102,6 +190,7 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.map) this.map.remove();
+    this.detenerPreview();
   }
 
   private setMarker(lat: number, lng: number): void {
@@ -121,6 +210,9 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.isValid() || !this.user?.id) return;
     this.loading = true;
 
+    const files = this.form.imagenFiles.length > 0 ? this.form.imagenFiles : undefined;
+    const musica = this.form.musicaSeleccionada;
+
     this.quejaService
       .crearQueja(
         this.form.titulo,
@@ -128,9 +220,13 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
         this.form.categoriaId,
         this.user.id,
         this.form.ubicacion || undefined,
-        this.form.imagenFile || undefined,
+        files,
         this.form.lat ?? undefined,
         this.form.lng ?? undefined,
+        musica?.previewUrl,
+        musica?.title,
+        musica?.artist,
+        musica?.coverUrl,
       )
       .subscribe({
         next: (queja) => {

@@ -1,0 +1,66 @@
+<div class="sp-layout">
+
+  <!-- Close button -->
+  <button class="sp-close-btn" (click)="close()" aria-label="Cerrar">
+    <i class="bi bi-x-lg"></i>
+  </button>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="sp-loading">
+    <div class="sp-spinner"></div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="sp-error">
+    <p>{{ error }}</p>
+    <button class="sp-back-btn" (click)="close()">Volver al inicio</button>
+  </div>
+
+  <!-- Main carousel -->
+  <div *ngIf="!loading && !error && currentGroup" class="sp-carousel">
+
+    <!-- Previous story card (desktop carousel depth) -->
+    <div *ngIf="prevGroups.length > 0" class="sp-carousel-card sp-carousel-prev"
+         (click)="goToUser(prevGroups[0])">
+      <div class="sp-carousel-inner">
+        <img [src]="prevGroups[0].userAvatar" alt="" class="sp-carousel-avatar" />
+        <span class="sp-carousel-label">{{ prevGroups[0].userName }}</span>
+      </div>
+    </div>
+
+    <!-- Active story card -->
+    <div class="sp-story-card">
+      <app-ver-historia
+        [group]="currentGroup"
+        [currentUserId]="currentUserId"
+        [pageMode]="true"
+        [hasNext]="nextGroups.length > 0"
+        [hasPrev]="prevGroups.length > 0"
+        (close)="onViewerClose()"
+        (storyDeleted)="onStoryDeleted($event)"
+        (navigateToUser)="onNavigateToUser($event)">
+      </app-ver-historia>
+    </div>
+
+    <!-- Next story card (desktop carousel depth) -->
+    <div *ngIf="nextGroups.length > 0" class="sp-carousel-card sp-carousel-next"
+         (click)="goToUser(nextGroups[0])">
+      <div class="sp-carousel-inner">
+        <img [src]="nextGroups[0].userAvatar" alt="" class="sp-carousel-avatar" />
+        <span class="sp-carousel-label">{{ nextGroups[0].userName }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Mobile nav (prev/next user) -->
+  <div *ngIf="!loading && !error && currentGroup" class="sp-mobile-nav">
+    <button *ngIf="prevGroups.length > 0" class="sp-mobile-nav-btn" (click)="goToUser(prevGroups[0])">
+      <i class="bi bi-chevron-left"></i> Anterior
+    </button>
+    <button *ngIf="nextGroups.length > 0" class="sp-mobile-nav-btn" (click)="goToUser(nextGroups[0])">
+      Siguiente <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+
+</div>

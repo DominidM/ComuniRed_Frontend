@@ -49,6 +49,7 @@ import { ConfiguracionComponent } from './admin/configuracion/configuracion.comp
 import { MapaGeneralComponent } from './admin/mapa-general/mapa-general.component';
 import { CrudEvidenciaComponent } from './admin/crud-evidencia/crud-evidencia.component';
 
+import { StoriesPageComponent } from './public/feed/stories/stories-page/stories-page.component';
 import { AuthGuard } from './guards/auth.guard';
 import { publicRedirectGuard } from './guards/public-redirect.guard';
 
@@ -68,6 +69,9 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'olvide-clave', component: OlvideClaveComponent },
+
+  /* ─── Stories page (outside /public to skip navbar/sidebar) ─── */
+  { path: 'stories/:username', component: StoriesPageComponent },
 
   {
     path: 'admin',

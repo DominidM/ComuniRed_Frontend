@@ -91,9 +91,33 @@
         </div>
       </div>
 
-      <!-- Imagen -->
+      <!-- Carrusel de imágenes -->
       <div class="post-image-wrapper" *ngIf="hasImage()">
-        <img [src]="getImageUrl()" [alt]="queja.titulo" class="post-image" />
+        <div class="carousel-container">
+          <img [src]="getImagenActual()" [alt]="queja.titulo" class="post-image" />
+          <button *ngIf="imagenIndex > 0" class="carousel-btn carousel-prev" (click)="anteriorImagen()">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button *ngIf="imagenIndex < getImagenes().length - 1" class="carousel-btn carousel-next" (click)="siguienteImagen()">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+          <div class="carousel-dots" *ngIf="getImagenes().length > 1">
+            <span *ngFor="let _ of getImagenes(); let i = index" class="carousel-dot"
+              [class.active]="i === imagenIndex"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reproductor de música -->
+      <div class="musica-player" *ngIf="tieneMusica()">
+        <button class="musica-play-btn" (click)="toggleMusica()">
+          <i class="bi" [ngClass]="musicaSonando ? 'bi-pause-fill' : 'bi-play-fill'"></i>
+        </button>
+        <div class="musica-info">
+          <span class="musica-track" *ngIf="queja.musica_track">{{ queja.musica_track }}</span>
+          <span class="musica-artist" *ngIf="queja.musica_artista">{{ queja.musica_artista }}</span>
+        </div>
+        <img *ngIf="queja.musica_cover" [src]="queja.musica_cover" class="musica-cover" [class.spinning]="musicaSonando"/>
       </div>
 
       <!-- Reacciones con menú estilo Facebook -->

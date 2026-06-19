@@ -251,10 +251,19 @@
 [data-theme="dark"] .menu-item { color: #e5e7eb; }
 [data-theme="dark"] .menu-item:hover { background: rgba(255,255,255,0.06); }
 
+/* ============================================================
+   CARRUSEL + REPRODUCTOR MULTIMEDIA
+   ============================================================ */
 .post-image-wrapper {
   width: 100%;
-  background: var(--cr-background-content);
   overflow: hidden;
+  position: relative;
+}
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+  line-height: 0;
 }
 
 .post-image {
@@ -264,6 +273,134 @@
   max-height: 400px;
 }
 
+/* Flechas de navegación circulares */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  margin: 0 10px;
+}
+
+.carousel-arrow:hover {
+  background: rgba(0, 0, 0, 0.75);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.carousel-arrow:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.carousel-arrow--prev { left: 0; }
+.carousel-arrow--next { right: 0; }
+
+/* Puntos indicadores */
+.carousel-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 5px 10px;
+  border-radius: 12px;
+}
+
+.carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  transition: all 0.25s ease;
+  cursor: default;
+}
+
+.carousel-dot.active {
+  background: #fff;
+  width: 18px;
+  border-radius: 4px;
+}
+
+/* Píldora de música integrada */
+.music-pill {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100% - 24px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 20px;
+  padding: 6px 10px 6px 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  user-select: none;
+}
+
+.music-pill:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.music-pill__icon {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.music-pill__track {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  line-height: 1.2;
+}
+
+.music-pill__play {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+
+.music-pill__play:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Placeholder cuando no hay imagen */
 .image-placeholder {
   width: 100%;
   height: 200px;
@@ -279,11 +416,13 @@
   color: var(--cr-text-muted);
 }
 
+/* ============================================================
+   VOTACIÓN — conecta limpio con el carrusel
+   ============================================================ */
 .vote-section {
   padding: 1rem 1.25rem;
-  background: var(--cr-background-content);
+  background: var(--cr-background);
   border-top: 1px solid var(--cr-border);
-  border-bottom: 1px solid var(--cr-border);
 }
 
 .vote-header {
@@ -303,7 +442,7 @@
   font-size: 0.8rem;
   color: var(--cr-primary);
   font-weight: 700;
-  background: var(--cr-background);
+  background: var(--cr-background-content);
   padding: 0.25rem 0.6rem;
   border-radius: 8px;
   border: 1.5px solid var(--cr-primary);
@@ -355,7 +494,7 @@
   padding: 0.6rem;
   border: 2px solid var(--cr-border);
   border-radius: 10px;
-  background: var(--cr-background);
+  background: var(--cr-background-content);
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -416,9 +555,8 @@
 
 .status-info-section {
   padding: 0.75rem 1.25rem;
-  background: var(--cr-background-content);
+  background: var(--cr-background);
   border-top: 1px solid var(--cr-border);
-  border-bottom: 1px solid var(--cr-border);
 }
 
 .status-info-item {
@@ -426,7 +564,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: var(--cr-background);
+  background: var(--cr-background-content);
   border-radius: 8px;
   border-left: 3px solid var(--cr-primary);
   font-size: 0.85rem;
@@ -628,4 +766,7 @@
   .vote-section { padding: 0.875rem; }
   .vote-buttons { gap: 0.5rem; }
   .avatar       { width: 36px; height: 36px; }
+
+  .carousel-arrow { width: 30px; height: 30px; }
+  .music-pill__track { max-width: 80px; }
 }

@@ -1,0 +1,452 @@
+// ─── Variables locales ──────────────────────────────
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-xl: 20px;
+$transition-fast: 0.15s ease;
+
+.comments-section {
+  padding: 1rem 1.5rem;
+  background: var(--cr-background);
+  border-top: 1px solid var(--cr-border);
+
+  // ── Contenedor scrolleable ────────────────────────
+  .comments-scroll {
+    max-height: 340px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+
+  // ── Lista de comentarios ──────────────────────────
+  .comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  // ── Estado vacío ───────────────────────────────────
+  .comments-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    text-align: center;
+
+    &__icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--cr-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+
+    &__text {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--cr-text);
+    }
+
+    &__sub {
+      font-size: 0.8rem;
+      color: var(--cr-text-muted);
+      margin-top: 0.2rem;
+    }
+  }
+
+  // ── Cada comentario ────────────────────────────────
+  .comment-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    position: relative;
+    animation: fadeIn 0.25s ease;
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  }
+
+  // ── Avatar ─────────────────────────────────────────
+  .comment-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+
+    &.clickable {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.08);
+      }
+    }
+  }
+
+  // ── Cuerpo (card + edit) ───────────────────────────
+  .comment-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  // ── Card del comentario (modo lectura) ─────────────
+  .comment-card {
+    background: var(--cr-background-content);
+    border-radius: $radius-md;
+    padding: 0.6rem 0.875rem;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.2rem;
+      flex-wrap: wrap;
+    }
+
+    &__author {
+      font-weight: 700;
+      font-size: 0.825rem;
+      color: var(--cr-text);
+
+      &.clickable {
+        cursor: pointer;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #667eea;
+        }
+      }
+    }
+
+    &__date {
+      font-size: 0.72rem;
+      color: var(--cr-text-muted);
+    }
+
+    &__edited {
+      font-size: 0.68rem;
+      color: var(--cr-text-muted);
+      font-style: italic;
+      opacity: 0.6;
+    }
+
+    &__text {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--cr-text-secondary);
+      line-height: 1.5;
+      word-break: break-word;
+    }
+  }
+
+  // ── Edición inline ─────────────────────────────────
+  .comment-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    &__input {
+      width: 100%;
+      padding: 0.6rem 0.875rem;
+      border: 1.5px solid var(--cr-border);
+      border-radius: $radius-sm;
+      font-size: 0.85rem;
+      outline: none;
+      background: var(--cr-background-content);
+      color: var(--cr-text);
+      transition: border-color $transition-fast;
+      box-sizing: border-box;
+
+      &:focus {
+        border-color: #667eea;
+      }
+
+      &::placeholder {
+        color: var(--cr-text-muted);
+      }
+    }
+
+    &__actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    &__btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      transition: all $transition-fast;
+
+      &--save {
+        background: #0095f6;
+        color: #fff;
+
+        &:hover {
+          background: #0080d6;
+          transform: scale(1.06);
+        }
+      }
+
+      &--cancel {
+        background: transparent;
+        color: var(--cr-text-muted);
+        border: 1px solid var(--cr-border);
+
+        &:hover {
+          background: var(--cr-hover);
+          color: var(--cr-text);
+        }
+      }
+    }
+  }
+
+  // ── Menú de 3 puntos ───────────────────────────────
+  .comment-menu {
+    position: relative;
+    flex-shrink: 0;
+    align-self: center;
+
+    &__trigger {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem 0.4rem;
+      border-radius: 6px;
+      color: var(--cr-text-muted);
+      font-size: 0.95rem;
+      transition: all $transition-fast;
+      line-height: 1;
+
+      &:hover {
+        background: var(--cr-hover);
+        color: var(--cr-text-secondary);
+      }
+    }
+
+    &__dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      background: var(--cr-card-bg, #fff);
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+      min-width: 140px;
+      z-index: 1000;
+      overflow: hidden;
+      border: 1px solid var(--cr-border);
+      animation: dropIn $transition-fast;
+
+      @keyframes dropIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+    }
+
+    &__item {
+      width: 100%;
+      padding: 0.65rem 0.875rem;
+      border: none;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.825rem;
+      color: var(--cr-text);
+      transition: background $transition-fast;
+
+      &:hover {
+        background: var(--cr-hover);
+      }
+
+      &--danger {
+        color: #e53e3e;
+
+        &:hover {
+          background: rgba(229, 62, 62, 0.08);
+        }
+      }
+    }
+  }
+
+  // ── Input nuevo comentario ─────────────────────────
+  .comment-input {
+    display: flex;
+    gap: 0.625rem;
+    align-items: center;
+    margin-top: 0.875rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--cr-border);
+
+    &__avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    &__field {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.35rem 0.35rem 1rem;
+      border: 1.5px solid var(--cr-border);
+      border-radius: $radius-xl;
+      background: var(--cr-search);
+      transition: border-color $transition-fast;
+
+      &:focus-within {
+        border-color: #667eea;
+        background: var(--cr-background);
+      }
+
+      input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 0.85rem;
+        background: transparent;
+        color: var(--cr-text);
+        font-family: inherit;
+
+        &::placeholder {
+          color: var(--cr-text-muted);
+        }
+      }
+    }
+
+    &__send {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #0095f6;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all $transition-fast;
+
+      &:hover:not(:disabled) {
+        background: #0080d6;
+        transform: scale(1.08);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // ── Dark mode ──────────────────────────────────────
+  [data-theme="dark"] & {
+    .comments-scroll {
+      scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.08);
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.18);
+        }
+      }
+    }
+
+    .comment-card {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .comment-menu__dropdown {
+      background: #2d3748;
+      border-color: #4a5568;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    .comment-menu__item {
+      color: #e2e8f0;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.07);
+      }
+    }
+
+    .comment-input__field {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: #4a5568;
+
+      &:focus-within {
+        border-color: #667eea;
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    .comment-edit__input {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: #4a5568;
+      color: #e2e8f0;
+
+      &:focus {
+        border-color: #667eea;
+      }
+    }
+  }
+
+  // ── Responsive ────────────────────────────────────
+  @media (max-width: 480px) {
+    padding: 0.875rem 1rem;
+
+    .comment-item {
+      gap: 0.625rem;
+    }
+
+    .comment-avatar,
+    .comment-input__avatar {
+      width: 30px;
+      height: 30px;
+    }
+
+    .comment-card {
+      padding: 0.5rem 0.75rem;
+    }
+
+    .comments-scroll {
+      max-height: 260px;
+    }
+  }
+}

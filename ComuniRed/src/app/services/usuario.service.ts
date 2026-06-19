@@ -7,6 +7,7 @@ import { gql } from 'apollo-angular';
 export interface Usuario {
   id: string;
   foto_perfil?: string;
+  video_banner?: string;
   nombre: string;
   apellido: string;
   dni: string;
@@ -26,6 +27,7 @@ export interface Usuario {
 
 export interface UsuarioInput {
   foto_perfil?: string;
+  video_banner?: string;
   nombre: string;
   apellido: string;
   dni?: string;
@@ -62,6 +64,7 @@ const OBTENER_USUARIOS = gql`
       content {
         id
         foto_perfil
+        video_banner
         nombre
         apellido
         dni
@@ -90,6 +93,7 @@ const OBTENER_TODOS_LOS_USUARIOS = gql`
     obtenerTodosLosUsuarios {
       id
       foto_perfil
+      video_banner
       nombre
       apellido
       dni
@@ -113,6 +117,7 @@ const OBTENER_USUARIO_POR_ID = gql`
     obtenerUsuarioPorId(id: $id) {
       id
       foto_perfil
+      video_banner
       nombre
       apellido
       dni
@@ -185,6 +190,7 @@ const CREAR_USUARIO = gql`
     crearUsuario(usuario: $usuario) {
       id
       foto_perfil
+      video_banner
       nombre
       apellido
       dni
@@ -208,6 +214,7 @@ const ACTUALIZAR_USUARIO = gql`
     actualizarUsuario(id: $id, usuario: $usuario) {
       id
       foto_perfil
+      video_banner
       nombre
       apellido
       dni
@@ -238,6 +245,18 @@ const ELIMINAR_FOTO_PERFIL = gql`
   }
 `;
 
+const GUARDAR_VIDEO_BANNER = gql`
+  mutation GuardarVideoBanner($usuarioId: ID!, $url: String!) {
+    guardarVideoBanner(usuarioId: $usuarioId, url: $url)
+  }
+`;
+
+const SUBIR_VIDEO_BANNER = gql`
+  mutation SubirVideoBanner($usuarioId: ID!, $archivo: Upload!) {
+    subirVideoBanner(usuarioId: $usuarioId, archivo: $archivo)
+  }
+`;
+
 const LOGIN = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -245,6 +264,7 @@ const LOGIN = gql`
       usuario {
         id
         foto_perfil
+        video_banner
         nombre
         apellido
         email
@@ -650,6 +670,53 @@ export class UsuarioService {
       .pipe(map((result) => result.data?.eliminarFotoPerfil ?? false));
   }
 
+  async subirVideoCloudinary(archivo: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', archivo);
+    formData.append('upload_preset', 'ml_default');
+    formData.append('folder', 'usuarios/videos');
+
+    try {
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/da4wxtjwu/video/upload',
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
+      return data.secure_url;
+    } catch (error) {
+      console.error('Error subiendo video a Cloudinary:', error);
+      throw error;
+    }
+  }
+
+  async subirVideoBanner(
+    usuarioId: string,
+    archivo: File,
+  ): Promise<string> {
+    try {
+      const url = await this.subirVideoCloudinary(archivo);
+
+      await this.apollo.mutate<{ guardarVideoBanner: string }>({
+        mutation: GUARDAR_VIDEO_BANNER,
+        variables: { usuarioId, url },
+      }).toPromise();
+
+      return url;
+    } catch (error) {
+      console.error('Error actualizando video banner:', error);
+      throw error;
+    }
+  }
+
   async subirFotoCloudinary(archivo: File): Promise<string> {
     const formData = new FormData();
     formData.append('file', archivo);
@@ -736,6 +803,63 @@ export class UsuarioService {
     }
 
     return edad;
+  }
+
+  obtenerPreferenciasNotificaciones(usuarioId: string): Observable<Usuario> {
+    return this.apollo
+      .query<{ obtenerPreferenciasNotificaciones: Usuario }>({
+        query: gql`
+          query ObtenerPreferenciasNotificaciones($usuarioId: ID!) {
+            obtenerPreferenciasNotificaciones(usuarioId: $usuarioId) {
+              notificacionesEmail
+              notificacionesPush
+              notificacionesComentarios
+              notificacionesReacciones
+              notificacionesZona
+              notificacionesEstado
+            }
+          }
+        `,
+        variables: { usuarioId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => r.data.obtenerPreferenciasNotificaciones));
+  }
+
+  actualizarPreferenciasNotificaciones(
+    usuarioId: string,
+    preferencias: {
+      email?: boolean;
+      push?: boolean;
+      comentarios?: boolean;
+      reacciones?: boolean;
+      zona?: boolean;
+      estado?: boolean;
+    }
+  ): Observable<Usuario> {
+    return this.apollo
+      .mutate<{ actualizarPreferenciasNotificaciones: Usuario }>({
+        mutation: gql`
+          mutation ActualizarPreferenciasNotificaciones(
+            $usuarioId: ID!
+            $preferencias: NotificacionPreferenciasInput!
+          ) {
+            actualizarPreferenciasNotificaciones(
+              usuarioId: $usuarioId
+              preferencias: $preferencias
+            ) {
+              notificacionesEmail
+              notificacionesPush
+              notificacionesComentarios
+              notificacionesReacciones
+              notificacionesZona
+              notificacionesEstado
+            }
+          }
+        `,
+        variables: { usuarioId, preferencias },
+      })
+      .pipe(map((r) => r.data!.actualizarPreferenciasNotificaciones));
   }
 
   formatearFechaRegistro(fechaRegistro: string): string {

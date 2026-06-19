@@ -7,14 +7,14 @@
       class="sidebar-link"
     >
       <span class="icon-wrap">
-        <mat-icon>{{ item.icon }}</mat-icon>
+        <i class="bi {{ item.icon }}"></i>
       </span>
       <span class="link-label">{{ item.label }}</span>
     </a>
   </nav>
 
   <div class="perfil-header">
-    <div class="perfil">
+    <div class="perfil" (click)="onPerfilClick()">
       <img
         [src]="getImagenUrl(usuario?.foto_perfil)"
         alt="Foto de perfil"
@@ -22,12 +22,12 @@
       />
       <div class="user-info">
         <span class="nombre">{{ usuario?.nombre }} {{ usuario?.apellido }}</span>
-        <span class="estado">En linea</span>
+        <span class="estado"><i class="bi bi-circle-fill online-dot"></i> En linea</span>
       </div>
     </div>
 
     <button class="logout-btn" (click)="onSalir()" aria-label="Cerrar sesion">
-      <mat-icon>logout</mat-icon>
+      <i class="bi bi-box-arrow-right"></i>
       <span>Cerrar Sesión</span>
     </button>
   </div>

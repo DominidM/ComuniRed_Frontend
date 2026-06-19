@@ -56,14 +56,40 @@
     </div>
   </div>
 
+  <svg width="0" height="0" style="position:absolute;">
+    <defs>
+      <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#818cf8" />
+        <stop offset="100%" stop-color="#a78bfa" />
+      </linearGradient>
+    </defs>
+  </svg>
+
   <div class="progress-container">
-    <div class="progress-header">
-      <span>Progreso de clasificación</span>
-      <span class="progress-percentage">{{ porcentajeClasificado }}%</span>
+    <div class="circular-progress">
+      <svg viewBox="0 0 72 72">
+        <circle class="bg-circle" cx="36" cy="36" r="30" />
+        <circle class="progress-circle" cx="36" cy="36" r="30"
+          [style.stroke-dasharray]="188.5"
+          [style.stroke-dashoffset]="188.5 - (188.5 * porcentajeClasificado / 100)"
+        />
+      </svg>
+      <span class="progress-text">{{ porcentajeClasificado }}%</span>
     </div>
-    <div class="barra-progreso">
-      <div class="progreso-fill" [style.width.%]="porcentajeClasificado">
-        <span class="progress-text" *ngIf="porcentajeClasificado > 10">{{ porcentajeClasificado }}%</span>
+    <div class="progress-info">
+      <div class="progress-title">Progreso de clasificación</div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" [style.width.%]="porcentajeClasificado"></div>
+      </div>
+      <div class="progress-stats">
+        <div class="progress-stat">
+          <span class="stat-num">{{ totalQuejas - quejasSinClasificar }}/{{ totalQuejas }}</span>
+          <span class="stat-lbl">Clasificados</span>
+        </div>
+        <div class="progress-stat">
+          <span class="stat-num">{{ quejasSinClasificar }}</span>
+          <span class="stat-lbl">Pendientes</span>
+        </div>
       </div>
     </div>
   </div>
@@ -74,15 +100,16 @@
   </div>
 
   <div class="niveles-grid">
-    <div 
-      *ngFor="let nivel of nivelesRiesgo" 
-      class="nivel-card"
-      [class.selected]="nivelSeleccionado === nivel.id"
-      [class.critical]="nivel.id === 'CRITICO' && nivel.total > 0"
-      [class.has-items]="nivel.total > 0"
-      (click)="seleccionarNivel(nivel.id)"
-    >
-      <div class="nivel-header" [style.background]="nivel.color">
+      <div 
+        *ngFor="let nivel of nivelesRiesgo" 
+        class="nivel-card"
+        [attr.data-level]="nivel.id"
+        [class.selected]="nivelSeleccionado === nivel.id"
+        [class.critical]="nivel.id === 'CRITICO' && nivel.total > 0"
+        [class.has-items]="nivel.total > 0"
+        (click)="seleccionarNivel(nivel.id)"
+      >
+        <div class="nivel-header">
         <span class="nivel-badge">{{ nivel.total }}</span>
       </div>
       <div class="nivel-body">
