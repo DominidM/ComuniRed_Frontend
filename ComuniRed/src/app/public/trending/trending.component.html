@@ -1,4 +1,4 @@
-<div class="trending-container" [class.light-mode]="true">
+<div class="trending-container">
   <div *ngIf="showToast" class="toast-notification">{{ toastMessage }}</div>
 
   <div *ngIf="loading" class="loading-overlay">
@@ -20,8 +20,7 @@
   <!-- STATS -->
   <div class="stats-container">
     <div class="stat-card">
-      <div class="stat-accent accent-purple"></div>
-      <i class="bi bi-fire stat-icon"></i>
+      <div class="stat-icon-wrap"><i class="bi bi-fire"></i></div>
       <div class="stat-content">
         <div class="stat-label">Más popular</div>
         <div class="stat-value">{{ stats.reportePopular }}</div>
@@ -29,8 +28,7 @@
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-accent accent-green"></div>
-      <i class="bi bi-clipboard-data stat-icon"></i>
+      <div class="stat-icon-wrap"><i class="bi bi-clipboard-data"></i></div>
       <div class="stat-content">
         <div class="stat-label">Reportes activos</div>
         <div class="stat-value">{{ stats.reportesEstaSemana }}</div>
@@ -38,8 +36,7 @@
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-accent accent-blue"></div>
-      <i class="bi bi-tags stat-icon"></i>
+      <div class="stat-icon-wrap"><i class="bi bi-tags"></i></div>
       <div class="stat-content">
         <div class="stat-label">Categoría top</div>
         <div class="stat-value">{{ stats.categoriaTop }}</div>
@@ -47,8 +44,7 @@
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-accent accent-amber"></div>
-      <i class="bi bi-graph-up stat-icon"></i>
+      <div class="stat-icon-wrap"><i class="bi bi-graph-up"></i></div>
       <div class="stat-content">
         <div class="stat-label">Total reportes</div>
         <div class="stat-value">{{ stats.totalReportes }}</div>

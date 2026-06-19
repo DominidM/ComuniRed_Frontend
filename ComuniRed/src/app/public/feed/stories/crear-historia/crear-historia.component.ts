@@ -72,6 +72,7 @@ export class CrearHistoriaComponent implements OnInit, OnDestroy {
   buscandoMusica = false;
   pistaSeleccionada: MusicTrack | null = null;
   musicaSonando = false;
+  mostrarTools = false;
   private audioMusica: HTMLAudioElement | null = null;
   private timeoutBusqueda: any;
   private suscripcionPublicar?: Subscription;
@@ -262,6 +263,10 @@ export class CrearHistoriaComponent implements OnInit, OnDestroy {
     if (!this.mostrarBusquedaMusica) {
       this.consultaMusica = ''; this.resultadosMusica = []; this.buscandoMusica = false;
     }
+  }
+
+  toggleTools(): void {
+    this.mostrarTools = !this.mostrarTools;
   }
 
   onInputMusica(): void {

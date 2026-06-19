@@ -4,7 +4,7 @@
   </button>
   <div class="ch-panel" (click)="$event.stopPropagation()" (drop)="onDrop($event)" (dragover)="onDragOver($event)">
 
-    <!-- ─── PREVIEW ─── -->
+    <!-- ─── PREVIEW (flex: 1, ocupa todo el espacio disponible) ─── -->
     <div class="ch-preview" [style.background]="previewUrl ? '#000' : colorFondo">
       <div class="ch-header-overlay">
         <div class="ch-user">
@@ -57,7 +57,7 @@
     </div>
 
     <!-- ─── TOOLS: colores | imagen | tiempo ─── -->
-    <div class="ch-tools-row">
+    <div class="ch-tools-row" *ngIf="mostrarTools">
       <div class="ch-colors-section">
         <div class="ch-color-row" *ngIf="!previewUrl">
           <button *ngFor="let bg of opcionesColor" class="ch-color-swatch" [style.background]="bg" [class.seleccionado]="colorFondo === bg" (click)="colorFondo = bg; iniciarPreview()" type="button"></button>
@@ -81,12 +81,17 @@
 
     <!-- ─── INPUT TEXTO ─── -->
     <div class="ch-input-section" *ngIf="!previewUrl">
-      <textarea [(ngModel)]="texto" class="ch-textarea" placeholder="Escribe algo..." rows="1" maxlength="150"></textarea>
-      <span class="ch-contador">{{ texto.length }}/150</span>
+      <div class="ch-input-wrap">
+        <textarea [(ngModel)]="texto" class="ch-textarea" placeholder="Escribe algo..." rows="1" maxlength="150"></textarea>
+        <span class="ch-contador">{{ texto.length }}/150</span>
+      </div>
     </div>
 
-    <!-- ─── PUBLICAR ─── -->
-    <div class="ch-action-row">
+    <!-- ─── BOTTOM: toggle + publicar ─── -->
+    <div class="ch-bottom-fixed">
+      <button class="ch-toggle-btn" (click)="toggleTools()" title="Mostrar herramientas">
+        <i [class]="mostrarTools ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
+      </button>
       <button class="ch-publicar-btn" (click)="publicar()" [disabled]="!esValido || publicando">
         <span *ngIf="!publicando">Publicar</span>
         <div class="ch-spinner" *ngIf="publicando"></div>
