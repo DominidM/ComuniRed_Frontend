@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 100001;
   animation: fadeInOverlay 0.25s ease;
 }
 
@@ -276,14 +276,15 @@
 .btn-cancel:hover { background: var(--cr-hover); }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--cr-primary) 0%, #6366f1 100%);
+  background: var(--cr-primary);
   color: white;
   border: none;
 }
 
 .btn-primary:hover:not(:disabled) {
+  background: #a32d2d;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.35);
+  box-shadow: 0 4px 12px rgba(186, 60, 60, 0.35);
 }
 
 .btn-primary:disabled {

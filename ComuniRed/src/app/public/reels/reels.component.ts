@@ -386,7 +386,7 @@ export class ReelsComponent implements AfterViewInit, OnDestroy {
   }
 
   irAPerfil(usuarioId: string): void {
-    this.router.navigate(['/public/profile', usuarioId]);
+    this.router.navigate(['/public/user-profile', usuarioId]);
   }
 
   formatNumber(num: number): string {

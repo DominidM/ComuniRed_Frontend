@@ -17,8 +17,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { filter, Subscription, forkJoin, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { ModalStateService, CreateStoryUser } from '../shared/services/modal-state.service';
+import { ModalStateService, CreateStoryUser, CreateReportData } from '../shared/services/modal-state.service';
 import { CrearHistoriaComponent } from './feed/stories/crear-historia/crear-historia.component';
+import { CreateReportComponent } from './feed/create-report/create-report.component';
 import { ConversacionService, Conversacion, Mensaje } from '../services/conversacion.service';
 import { UsuarioService } from '../services/usuario.service';
 import { SeguimientoService } from '../services/seguimiento.service';
@@ -51,7 +52,8 @@ interface ChatWindow {
     MatSidenavModule,
     MatButtonModule,
     MatIconModule,
-    CrearHistoriaComponent,
+        CrearHistoriaComponent,
+        CreateReportComponent,
   ],
   templateUrl: './public.component.html',
   styleUrls: ['./public.component.css'],
@@ -67,6 +69,8 @@ export class PublicComponent implements OnInit, AfterViewInit, OnDestroy {
 
   showCreateStory = false;
   createStoryUser: CreateStoryUser | null = null;
+  showCreateReport = false;
+  createReportData: CreateReportData | null = null;
 
   showChatPanel = false;
   showNewChat = false;
@@ -137,6 +141,11 @@ export class PublicComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showCreateStory = !!user;
       this.createStoryUser = user;
     });
+
+    this.modalState.createReport$.subscribe((data) => {
+      this.showCreateReport = !!data;
+      this.createReportData = data;
+    });
   }
 
   ngAfterViewInit() {
@@ -184,6 +193,15 @@ export class PublicComponent implements OnInit, AfterViewInit, OnDestroy {
   onStoryCreated(story: any): void {
     this.modalState.closeCreateStory();
     this.modalState.emitStoryCreated(story);
+  }
+
+  closeCreateReportModal(): void {
+    this.modalState.closeCreateReport();
+  }
+
+  onReportCreated(report: any): void {
+    this.modalState.closeCreateReport();
+    this.modalState.emitReportCreated(report);
   }
 
   toggleChatPanel(): void {
